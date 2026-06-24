@@ -1,0 +1,7 @@
+RewriteEngine On
+
+# Static files
+RewriteRule ^static/(.*)$ /home/tulasine/learning-platformfinal/staticfiles/$1 [L]
+
+# Media files
+RewriteRule ^media/(.*)$ /home/tulasine/learning-platformfinal/media/$1 [L]

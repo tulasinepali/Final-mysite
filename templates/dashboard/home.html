@@ -1,0 +1,622 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Dashboard Home - Learning Platform{% endblock %}
+{% block page_header %}Dashboard{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Home</li>
+{% endblock %}
+
+{% block content %}
+<!-- Row 1: Small Stat Boxes -->
+<div class="row">
+    <!-- Total Notes -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ total_notes }}</h3>
+                <p>Total Notes</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <a href="{% url 'dashboard:notes' %}" class="small-box-footer">Manage Notes <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- Total Blogs -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-cyan">
+            <div class="inner">
+                <h3>{{ total_blogs }}</h3>
+                <p>Total Blogs</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-blog"></i>
+            </div>
+            <a href="{% url 'dashboard:blogs' %}" class="small-box-footer">Manage Blogs <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- Total Downloads -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{ total_downloads }}</h3>
+                <p>Total Downloads</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-download"></i>
+            </div>
+            <a href="{% url 'dashboard:downloads' %}" class="small-box-footer">Manage Downloads <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- Total Quizzes -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{{ total_quizzes }}</h3>
+                <p>Total Quizzes</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <a href="{% url 'dashboard:quizzes' %}" class="small-box-footer">Manage Quizzes <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2: More Stat Boxes -->
+<div class="row">
+    <!-- Total Questions -->
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-purple"><i class="fas fa-question-circle"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total Questions</span>
+                <span class="info-box-number">{{ total_questions }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- Quiz Attempts -->
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-clipboard-check"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Quiz Attempts</span>
+                <span class="info-box-number">{{ total_quiz_attempts }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- Total Views -->
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-teal"><i class="fas fa-eye"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total Note Views</span>
+                <span class="info-box-number">{{ total_views|floatformat:0 }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- Unread Messages -->
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-danger"><i class="fas fa-envelope"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Unread Messages</span>
+                <span class="info-box-number">{{ unread_messages }}</span>
+                {% if unread_messages > 0 %}
+                <span class="badge badge-danger">{{ unread_messages }} new</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 3: Charts -->
+<div class="row">
+    <!-- Quiz Attempts Line Chart -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-line mr-1"></i> Quiz Attempts - Last 7 Days</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="quizAttemptsChart" style="min-height: 250px; height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Quiz Difficulty Doughnut -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> Quiz Difficulty</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="difficultyChart" style="min-height: 250px; height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 4: Recent Notes & Recent Blogs -->
+<div class="row">
+    <!-- Recent Notes -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header border-transparent">
+                <h3 class="card-title"><i class="fas fa-book mr-1"></i> Recent Notes</h3>
+                <div class="card-tools">
+                    <a href="{% url 'dashboard:notes' %}" class="btn btn-tool btn-sm" title="View All">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table m-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Views</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for note in recent_notes %}
+                            <tr>
+                                <td><a href="{% url 'dashboard:note_edit' note.id %}">{{ note.title|truncatechars:40 }}</a></td>
+                                <td><span class="badge badge-primary">{{ note.category.name }}</span></td>
+                                <td>{{ note.views }}</td>
+                                <td>
+                                    {% if note.is_published %}
+                                    <span class="badge badge-success">Published</span>
+                                    {% else %}
+                                    <span class="badge badge-warning">Draft</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ note.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted">No notes yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Recent Blog Posts -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header border-transparent">
+                <h3 class="card-title"><i class="fas fa-blog mr-1"></i> Recent Blog Posts</h3>
+                <div class="card-tools">
+                    <a href="{% url 'dashboard:blogs' %}" class="btn btn-tool btn-sm" title="View All">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table m-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Views</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in recent_blogs %}
+                            <tr>
+                                <td><a href="{% url 'dashboard:blog_edit' post.id %}">{{ post.title|truncatechars:40 }}</a></td>
+                                <td><span class="badge badge-info">{{ post.category.name }}</span></td>
+                                <td>{{ post.views }}</td>
+                                <td>
+                                    {% if post.is_published %}
+                                    <span class="badge badge-success">Published</span>
+                                    {% else %}
+                                    <span class="badge badge-warning">Draft</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ post.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted">No blog posts yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 5: Popular Notes, Popular Downloads, Recent Attempts -->
+<div class="row">
+    <!-- Popular Notes -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-fire mr-1"></i> Popular Notes</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% for note in popular_notes %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <span class="text-sm">{{ note.title|truncatechars:30 }}</span>
+                        <small class="d-block text-muted">{{ note.category.name }}</small>
+                    </div>
+                    <span class="text-right">
+                        <strong>{{ note.views }}</strong> views
+                    </span>
+                </div>
+                {% if note.views > 0 %}
+                <div class="progress mb-3" style="height: 6px;">
+                    {% widthratio note.views popular_notes.0.views 100 as note_pct %}
+                    <div class="progress-bar bg-primary" style="width: {% if note_pct > 100 %}100{% else %}{{ note_pct }}{% endif %}%"></div>
+                </div>
+                {% else %}
+                <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-primary" style="width: 0%"></div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p class="text-muted text-center">No notes yet</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Popular Downloads -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-download mr-1"></i> Popular Downloads</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                {% for dl in popular_downloads %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <span class="text-sm">{{ dl.title|truncatechars:30 }}</span>
+                        <small class="d-block text-muted">{{ dl.category.name }}</small>
+                    </div>
+                    <span class="text-right">
+                        <strong>{{ dl.download_count }}</strong> downloads
+                    </span>
+                </div>
+                {% if dl.download_count > 0 %}
+                <div class="progress mb-3" style="height: 6px;">
+                    {% widthratio dl.download_count popular_downloads.0.download_count 100 as dl_pct %}
+                    <div class="progress-bar bg-success" style="width: {% if dl_pct > 100 %}100{% else %}{{ dl_pct }}{% endif %}%"></div>
+                </div>
+                {% else %}
+                <div class="progress mb-3" style="height: 6px;">
+                    <div class="progress-bar bg-success" style="width: 0%"></div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p class="text-muted text-center">No downloads yet</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Recent Quiz Attempts -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-clipboard-check mr-1"></i> Recent Quiz Attempts</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm m-0">
+                        <thead>
+                            <tr>
+                                <th>Quiz</th>
+                                <th>Score</th>
+                                <th>%</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in recent_attempts %}
+                            <tr>
+                                <td>{{ attempt.quiz.title|truncatechars:25 }}</td>
+                                <td>{% if attempt.final_score > 0 %}{{ attempt.final_score|floatformat:2 }}{% else %}{{ attempt.score }}{% endif %}/{% widthratio attempt.total_questions 1 2 %}</td>
+                                <td>
+                                    {% if attempt.percentage >= 80 %}
+                                    <span class="badge badge-success">{{ attempt.percentage }}%</span>
+                                    {% elif attempt.percentage >= 50 %}
+                                    <span class="badge badge-warning">{{ attempt.percentage }}%</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">{{ attempt.percentage }}%</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ attempt.completed_at|date:"M d" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted">No attempts yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 6: Recent Messages -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-envelope mr-1"></i> Recent Messages</h3>
+                <div class="card-tools">
+                    <a href="{% url 'dashboard:messages' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table m-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;"></th>
+                                <th>From</th>
+                                <th>Subject</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for msg in recent_messages %}
+                            <tr {% if not msg.is_read %}class="table-light font-weight-bold"{% endif %}>
+                                <td>
+                                    {% if msg.is_read %}
+                                    <i class="far fa-envelope-open text-muted"></i>
+                                    {% else %}
+                                    <i class="fas fa-envelope text-danger"></i>
+                                    {% endif %}
+                                </td>
+                                <td>{{ msg.name }}</td>
+                                <td>{{ msg.subject }}</td>
+                                <td>{{ msg.message|truncatechars:60 }}</td>
+                                <td>{{ msg.created_at|date:"M d, Y g:i A" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-3">No messages yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 7: Content by Category -->
+<div class="row">
+    <!-- Notes by Category -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-folder-open mr-1"></i> Notes by Category</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm m-0">
+                        <thead>
+                            <tr><th>Category</th><th>Count</th><th>Bar</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in notes_by_category %}
+                            <tr>
+                                <td>{{ cat.name }}</td>
+                                <td>{{ cat.count }}</td>
+                                <td>
+                                    <div class="progress" style="height: 8px; min-width: 80px;">
+                                        {% if notes_by_category and notes_by_category.0.count > 0 %}
+                                        {% widthratio cat.count notes_by_category.0.count 100 as cat_pct %}
+                                        <div class="progress-bar bg-primary" style="width: {{ cat_pct }}%"></div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center text-muted">No categories</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Blog by Category -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-folder-open mr-1"></i> Blogs by Category</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm m-0">
+                        <thead>
+                            <tr><th>Category</th><th>Count</th><th>Bar</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in blog_by_category %}
+                            <tr>
+                                <td>{{ cat.name }}</td>
+                                <td>{{ cat.count }}</td>
+                                <td>
+                                    <div class="progress" style="height: 8px; min-width: 80px;">
+                                        {% if blog_by_category and blog_by_category.0.count > 0 %}
+                                        {% widthratio cat.count blog_by_category.0.count 100 as bcat_pct %}
+                                        <div class="progress-bar bg-info" style="width: {{ bcat_pct }}%"></div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center text-muted">No categories</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Quiz Attempts Line Chart
+    (function() {
+        var ctx = document.getElementById('quizAttemptsChart');
+        if (ctx) {
+            var labels = {{ quiz_chart_labels|safe }};
+            var data = {{ quiz_chart_data|safe }};
+            var avgScores = {{ quiz_avg_scores|safe }};
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Attempts',
+                            data: data,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Avg Score',
+                            data: avgScores,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            fill: false,
+                            tension: 0.4,
+                            yAxisID: 'y1',
+                            borderDash: [5, 5],
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Attempts' },
+                            ticks: { stepSize: 1 },
+                            beginAtZero: true,
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Avg Score' },
+                            beginAtZero: true,
+                            grid: { drawOnChartArea: false },
+                        }
+                    }
+                }
+            });
+        }
+    })();
+
+    // Quiz Difficulty Doughnut Chart
+    (function() {
+        var ctx = document.getElementById('difficultyChart');
+        if (ctx) {
+            var diffData = {{ quiz_difficulty|safe }};
+            var labels = [];
+            var counts = [];
+            var colors = { 'easy': '#28a745', 'medium': '#ffc107', 'hard': '#dc3545' };
+            var bgColors = [];
+
+            for (var i = 0; i < diffData.length; i++) {
+                var d = diffData[i];
+                labels.push(d.difficulty.charAt(0).toUpperCase() + d.difficulty.slice(1));
+                counts.push(d.count);
+                bgColors.push(colors[d.difficulty] || '#6c757d');
+            }
+
+            if (labels.length === 0) {
+                labels = ['No Data'];
+                counts = [1];
+                bgColors = ['#6c757d'];
+            }
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: bgColors,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

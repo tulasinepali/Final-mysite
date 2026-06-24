@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Learning Platform - Study Notes, MCQ Practice & Educational Resources" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Access free study notes, practice MCQs, download educational materials, and read informative blogs. Your one-stop educational platform for exam preparation." }}{% endblock %}
+
+{% block og_title %}{{ meta_title|default:"Learning Platform - Study Notes, MCQ Practice & Educational Resources" }}{% endblock %}
+{% block og_description %}{{ meta_description|default:"Access free study notes, practice MCQs, download educational materials, and read informative blogs." }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section d-flex align-items-center">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="hero-title mb-3">{{ site_settings.hero_title|default:"Master Your Studies with Smart Learning" }}</h1>
+                <p class="hero-subtitle mb-4">{{ site_settings.hero_subtitle|default:"Access comprehensive study notes, practice MCQs, download resources, and stay updated with our educational blog — all in one place." }}</p>
+                <form class="hero-search mb-4" action="{% url 'search:search' %}" method="get" role="search">
+                    <div class="input-group input-group-lg">
+                        <input type="search" name="q" class="form-control" placeholder="Search notes, topics, MCQs..." aria-label="Search the platform">
+                        <button class="btn btn-primary" type="submit"><i class="fas fa-search me-2"></i>Search</button>
+                    </div>
+                </form>
+                <div class="hero-quick-links d-flex flex-wrap gap-2">
+                    <a href="{% url 'notes:list' %}" class="btn btn-light btn-lg hero-quick-btn">
+                        <i class="fas fa-book text-primary me-2"></i>Notes
+                    </a>
+                    <a href="{% url 'quiz:list' %}" class="btn btn-light btn-lg hero-quick-btn">
+                        <i class="fas fa-brain text-success me-2"></i>MCQ Practice
+                    </a>
+                    <a href="{% url 'downloads:list' %}" class="btn btn-light btn-lg hero-quick-btn">
+                        <i class="fas fa-download text-warning me-2"></i>Downloads
+                    </a>
+                    <a href="{% url 'blog:list' %}" class="btn btn-light btn-lg hero-quick-btn">
+                        <i class="fas fa-blog text-info me-2"></i>Blog
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <div class="hero-illustration">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Ad Placement: Home Top -->
+{% if ads.home_after_hero %}
+<section class="py-3">
+    <div class="container">
+        <div class="ad-container text-center">
+            {{ ads.home_after_hero|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Content Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-2">Explore Our Resources</h2>
+        <p class="section-subtitle text-center text-muted mb-5">Everything you need to excel in your studies</p>
+
+        <div class="row g-4">
+            <!-- Latest Notes -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
+                            <i class="fas fa-book fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">Study Notes</h3>
+                        <p class="text-muted small mb-3">Well-organized notes covering key topics to help you understand concepts better.</p>
+                        <a href="{% url 'notes:list' %}" class="btn btn-sm btn-outline-primary">Browse Notes <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MCQ Practice -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
+                            <i class="fas fa-brain fa-2x text-success"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">MCQ Practice</h3>
+                        <p class="text-muted small mb-3">Test your knowledge with topic-wise MCQs and get instant results with explanations.</p>
+                        <a href="{% url 'quiz:list' %}" class="btn btn-sm btn-outline-success">Start Practice <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Downloads -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
+                            <i class="fas fa-download fa-2x text-warning"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">Downloads</h3>
+                        <p class="text-muted small mb-3">Download PDFs, study guides, and other resources for offline learning.</p>
+                        <a href="{% url 'downloads:list' %}" class="btn btn-sm btn-outline-warning">View Downloads <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card feature-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
+                            <i class="fas fa-blog fa-2x text-info"></i>
+                        </div>
+                        <h3 class="h5 fw-bold mb-2">Educational Blog</h3>
+                        <p class="text-muted small mb-3">Stay informed with articles on study tips, career guidance, and exam strategies.</p>
+                        <a href="{% url 'blog:list' %}" class="btn btn-sm btn-outline-info">Read Blog <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Content Grid -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Content Area -->
+            <div class="col-lg-8">
+                <!-- Latest Notes -->
+                <div class="mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h4 fw-bold mb-0"><i class="fas fa-book text-primary me-2"></i>Latest Notes</h2>
+                        <a href="{% url 'notes:list' %}" class="btn btn-sm btn-outline-primary">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    <div class="row g-3">
+                        {% for note in latest_notes|slice:":4" %}
+                        <div class="col-md-6">
+                            <div class="card card-hover h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary mb-2">{{ note.category.name }}</span>
+                                    <h3 class="h6 fw-bold mb-2">
+                                        <a href="{{ note.get_absolute_url }}" class="text-decoration-none text-dark">{{ note.title }}</a>
+                                    </h3>
+                                    <p class="text-muted small mb-2">{{ note.excerpt|truncatewords:15 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted"><i class="far fa-clock me-1"></i>{{ note.published_at|date:"M d, Y" }}</small>
+                                        <small class="text-muted"><i class="far fa-eye me-1"></i>{{ note.views }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info">Notes are coming soon. Stay tuned!</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Ad Placement: Home Content Middle -->
+                {% if ads.home_content_middle %}
+                <div class="mb-5">
+                    <div class="ad-container text-center">
+                        {{ ads.home_content_middle|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Trending Blogs -->
+                <div class="mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h4 fw-bold mb-0"><i class="fas fa-blog text-info me-2"></i>Trending Blogs</h2>
+                        <a href="{% url 'blog:list' %}" class="btn btn-sm btn-outline-info">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    <div class="row g-3">
+                        {% for post in trending_blogs|slice:":3" %}
+                        <div class="col-md-4">
+                            <div class="card card-hover h-100 border-0 shadow-sm">
+                                {% if post.featured_image %}
+                                <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy" style="height:140px;object-fit:cover;">
+                                {% else %}
+                                <div class="card-img-top bg-info bg-opacity-10 d-flex align-items-center justify-content-center" style="height:140px;">
+                                    <i class="fas fa-newspaper fa-2x text-info"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <span class="badge bg-info bg-opacity-10 text-info mb-2">{{ post.category.name }}</span>
+                                    <h3 class="h6 fw-bold mb-1">
+                                        <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark">{{ post.title }}</a>
+                                    </h3>
+                                    <small class="text-muted"><i class="far fa-clock me-1"></i>{{ post.published_at|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info">Blog posts are coming soon. Stay tuned!</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Popular Downloads -->
+                <div class="mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h4 fw-bold mb-0"><i class="fas fa-download text-warning me-2"></i>Popular Downloads</h2>
+                        <a href="{% url 'downloads:list' %}" class="btn btn-sm btn-outline-warning">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    <div class="list-group">
+                        {% for download in popular_downloads|slice:":5" %}
+                        <a href="{{ download.get_absolute_url }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                <span class="fw-medium">{{ download.title }}</span>
+                                <small class="text-muted ms-2">{{ download.file_type|upper }}</small>
+                            </div>
+                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill">
+                                <i class="fas fa-download me-1"></i>{{ download.download_count }}
+                            </span>
+                        </a>
+                        {% empty %}
+                        <div class="list-group-item text-center text-muted">Downloads are coming soon.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Ad: Sidebar Top -->
+                {% if ads.home_sidebar %}
+                <div class="mb-4">
+                    <div class="ad-container text-center">
+                        {{ ads.home_sidebar|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Recent Quizzes -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-brain text-success me-2"></i>Recent Quizzes</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for quiz in recent_quizzes|slice:":5" %}
+                        <a href="{{ quiz.get_absolute_url }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-medium small">{{ quiz.title }}</span>
+                                    <br>
+                                    <small class="text-muted">{{ quiz.question_count }} questions</small>
+                                </div>
+                                <span class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-play me-1"></i>Start
+                                </span>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="list-group-item text-center text-muted small">Quizzes are coming soon.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Categories Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-folder text-primary me-2"></i>Categories</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for cat in notes_categories %}
+                            <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="badge bg-light text-dark text-decoration-none border">{{ cat.name }}</a>
+                            {% empty %}
+                            <span class="text-muted small">Categories coming soon</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ad: Sidebar Bottom -->
+                {% if ads.home_sidebar_bottom %}
+                <div class="mb-4">
+                    <div class="ad-container text-center">
+                        {{ ads.home_sidebar_bottom|safe }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5 bg-primary text-white stats-section">
+    <div class="container">
+        <h2 class="text-center h4 fw-bold mb-5">Trusted by Students Across the Globe</h2>
+        <div class="row text-center g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <i class="fas fa-book fa-2x mb-3 opacity-75"></i>
+                    <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_notes|default:'0' }}">0</div>
+                    <div class="stat-label small opacity-75">Study Notes</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <i class="fas fa-brain fa-2x mb-3 opacity-75"></i>
+                    <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_mcqs|default:'0' }}">0</div>
+                    <div class="stat-label small opacity-75">MCQ Questions</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <i class="fas fa-download fa-2x mb-3 opacity-75"></i>
+                    <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_downloads|default:'0' }}">0</div>
+                    <div class="stat-label small opacity-75">Downloads</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <i class="fas fa-users fa-2x mb-3 opacity-75"></i>
+                    <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_users|default:'0' }}">0</div>
+                    <div class="stat-label small opacity-75">Happy Students</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About / Mission Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="about-illustration text-center">
+                    <div class="bg-primary bg-opacity-10 rounded-4 p-5 d-inline-block">
+                        <i class="fas fa-chalkboard-teacher fa-5x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-3">About {{ site_settings.site_name|default:"Learning Platform" }}</h2>
+                <p class="text-muted mb-4">{{ site_settings.about_summary|default:"We are dedicated to providing quality educational resources that help students achieve their academic goals. Our platform offers comprehensive study notes, MCQ practice sessions, downloadable resources, and insightful blog articles — all designed to make learning effective and enjoyable." }}</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                            <div>
+                                <h3 class="h6 fw-bold mb-1">Our Mission</h3>
+                                <small class="text-muted">To make quality education accessible to every student, anywhere.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-eye text-primary me-2 mt-1"></i>
+                            <div>
+                                <h3 class="h6 fw-bold mb-1">Our Vision</h3>
+                                <small class="text-muted">To become the go-to platform for exam preparation and self-learning.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'core:about' %}" class="btn btn-primary"><i class="fas fa-arrow-right me-2"></i>Learn More About Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter / CTA Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <h2 class="fw-bold mb-3">Never Miss an Update</h2>
+                <p class="text-muted mb-4">Get the latest notes, blog posts, and study resources delivered to your inbox.</p>
+                <form class="row g-2 justify-content-center" action="{% url 'core:home' %}" method="post">
+                    {% csrf_token %}
+                    <div class="col-sm-7">
+                        <input type="email" class="form-control" placeholder="Enter your email address" aria-label="Email address" required>
+                    </div>
+                    <div class="col-sm-auto">
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-paper-plane me-2"></i>Subscribe</button>
+                    </div>
+                </form>
+                <small class="text-muted mt-2 d-block">We respect your privacy. Unsubscribe at any time.</small>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animated counter for stats section
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.stat-number');
+        const speed = 80;
+
+        function animateCounters() {
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                const increment = Math.ceil(target / speed);
+                let current = 0;
+
+                const updateCount = () => {
+                    if (current < target) {
+                        current += increment;
+                        if (current > target) current = target;
+                        counter.textContent = current.toLocaleString();
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        counter.textContent = target.toLocaleString();
+                    }
+                };
+
+                updateCount();
+            });
+        }
+
+        // Use Intersection Observer to trigger animation when visible
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounters();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            observer.observe(statsSection);
+        }
+    });
+</script>
+{% endblock %}

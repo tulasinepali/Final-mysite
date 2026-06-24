@@ -1,0 +1,5 @@
+Options +FollowSymLinks
+
+PassengerEnabled on
+PassengerAppRoot /home/tulasine/learning-platformfinal
+PassengerPython /home/tulasine/virtualenv/learning-platformfinal/3.10/bin/python

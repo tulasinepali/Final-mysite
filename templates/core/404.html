@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ meta_title|default:"Page Not Found - Learning Platform" }}
+{% endblock %}
+
+{% block meta_description %}
+{{ meta_description|default:"The page you are looking for could not be found. Try searching or browse our educational resources." }}
+{% endblock %}
+
+{% block og_title %}
+{{ meta_title|default:"Page Not Found - Learning Platform" }}
+{% endblock %}
+
+{% block og_description %}
+{{ meta_description|default:"The page you are looking for could not be found." }}
+{% endblock %}
+
+{% block content %}
+<section class="py-5 min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+
+                <!-- 404 Illustration -->
+                <div class="mb-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                         style="width:160px;height:160px;">
+                        <span class="display-1 fw-bold text-primary">404</span>
+                    </div>
+                </div>
+
+                <h1 class="fw-bold mb-3">Page Not Found</h1>
+
+                <p class="text-muted mb-4">
+                    The link may be broken, or the page may have been moved or deleted.
+                    Try searching or return to the homepage.
+                </p>
+
+                <!-- Safe Search Bar (NO URL TAG to avoid crash) -->
+                <form class="mb-4" action="/search/" method="get" role="search">
+                    <div class="input-group input-group-lg">
+                        <input type="search"
+                               name="q"
+                               class="form-control"
+                               placeholder="Search for notes, topics, MCQs..."
+                               aria-label="Search the platform">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Safe Quick Links (NO reverse URL dependency) -->
+                <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+
+                    <a href="/" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+
+                    <a href="/notes/" class="btn btn-outline-success">
+                        <i class="fas fa-book me-1"></i>Notes
+                    </a>
+
+                    <a href="/quiz/" class="btn btn-outline-warning">
+                        <i class="fas fa-brain me-1"></i>MCQ Practice
+                    </a>
+
+                    <a href="/blog/" class="btn btn-outline-info">
+                        <i class="fas fa-blog me-1"></i>Blog
+                    </a>
+
+                    <a href="/downloads/" class="btn btn-outline-secondary">
+                        <i class="fas fa-download me-1"></i>Downloads
+                    </a>
+
+                </div>
+
+                <p class="text-muted small">
+                    If you believe this is an error,
+                    <a href="/contact/">contact us</a>.
+                </p>
+
+                <!-- Optional: Auto redirect -->
+                <!-- <p class="text-muted small mt-3">Redirecting to home in 10 seconds...</p> -->
+                <!-- <meta http-equiv="refresh" content="10;url=/" /> -->
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

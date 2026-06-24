@@ -1,0 +1,295 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="google-adsense-account" content="ca-pub-3956705237421931">
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KCFVW48R');</script>
+<!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}{{ meta_description }}{% endblock %}">
+    <meta name="keywords" content="education, study notes, MCQ practice, exam preparation, learning platform">
+    <meta name="author" content="{{ site_settings.owner_name|default:'Learning Platform' }}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    {% if site_settings.site_favicon %}<link rel="icon" href="{{ site_settings.site_favicon.url }}" type="image/x-icon">{% else %}<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">{% endif %}
+
+    <title>{% block title %}{{ meta_title }}{% endblock %}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}{{ meta_title }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ meta_description }}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="{{ site_settings.site_name|default:'Learning Platform' }}">
+    {% block og_image %}
+    <meta property="og:image" content="{% static 'images/og-default.png' %}">
+    {% endblock %}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ meta_title }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ meta_description }}{% endblock %}">
+    {% block twitter_image %}
+    <meta name="twitter:image" content="{% static 'images/og-default.png' %}">
+    {% endblock %}
+
+    <!-- Google Analytics -->
+    {% if site_settings.google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ site_settings.google_analytics_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ site_settings.google_analytics_id }}');
+    </script>
+    {% endif %}
+
+    <!-- Google AdSense -->
+    {% if site_settings.adsense_client_id %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id }}" crossorigin="anonymous"></script>
+    {% endif %}
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "{{ site_settings.site_name|default:'Learning Platform' }}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}",
+        "description": "{{ meta_description|default:'An educational platform for students to learn, practice MCQs, and download study materials.' }}"
+        {% if site_settings.contact_email %},"email": "{{ site_settings.contact_email }}"{% endif %}
+        {% if site_settings.address %},"address": "{{ site_settings.address }}"{% endif %}
+    }
+    </script>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KCFVW48R"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    
+    <!-- Reading Progress Bar -->
+    <div id="readingProgress" class="reading-progress-bar"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'core:home' %}">
+                <img src="{{ site_settings.site_logo.url }}" alt="Logo" class="me-2" style="height: 42px;">
+                <span class="text-primary">{{ site_settings.site_name|default:"Learning Platform" }}</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:home' %}"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'notes:list' %}"><i class="fas fa-book me-1"></i> Notes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:list' %}"><i class="fas fa-blog me-1"></i> Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'downloads:list' %}"><i class="fas fa-download me-1"></i> Downloads</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'quiz:list' %}"><i class="fas fa-brain me-1"></i> MCQ Practice</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:about' %}"><i class="fas fa-info-circle me-1"></i> About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:contact' %}"><i class="fas fa-envelope me-1"></i> Contact</a>
+                    </li>
+                </ul>
+                <form class="d-flex navbar-search" action="{% url 'search:search' %}" method="get" role="search">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search notes, blogs..." aria-label="Search">
+                    <button class="btn btn-outline-primary" type="submit" aria-label="Submit search"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Top Ad Banner -->
+    {% if ads.home_top %}
+    <div class="container mt-3">
+        <div class="ad-container text-center">
+            {{ ads.home_top|safe }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Breadcrumb -->
+    {% block breadcrumb %}{% endblock %}
+
+    <!-- Main Content -->
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light pt-5 pb-3 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h2 class="text-white h5 mb-3"><img src="{{ site_settings.site_logo.url }}" alt="Logo" class="me-2" style="height: 24px;">{{ site_settings.site_name|default:"Learning Platform" }}</h2>
+                    <p class="text-secondary">{{ site_settings.site_description|striptags|default:"An educational platform for students to learn, practice MCQs, and download study materials." }}</p>
+                    <div class="social-links mt-3">
+                        {% if site_settings.facebook_url %}
+                        <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" class="text-secondary me-3" aria-label="Facebook"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        {% endif %}
+                        {% if site_settings.twitter_url %}
+                        <a href="{{ site_settings.twitter_url }}" target="_blank" rel="noopener noreferrer" class="text-secondary me-3" aria-label="Twitter"><i class="fab fa-twitter fa-lg"></i></a>
+                        {% endif %}
+                        {% if site_settings.youtube_url %}
+                        <a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener noreferrer" class="text-secondary me-3" aria-label="YouTube"><i class="fab fa-youtube fa-lg"></i></a>
+                        {% endif %}
+                        {% if site_settings.instagram_url %}
+                        <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer" class="text-secondary me-3" aria-label="Instagram"><i class="fab fa-instagram fa-lg"></i></a>
+                        {% endif %}
+                        {% if site_settings.linkedin_url %}
+                        <a href="{{ site_settings.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="text-secondary" aria-label="LinkedIn"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h2 class="text-white h5 mb-3">Quick Links</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'core:home' %}" class="text-secondary text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'notes:list' %}" class="text-secondary text-decoration-none">Notes</a></li>
+                        <li class="mb-2"><a href="{% url 'blog:list' %}" class="text-secondary text-decoration-none">Blog</a></li>
+                        <li class="mb-2"><a href="{% url 'downloads:list' %}" class="text-secondary text-decoration-none">Downloads</a></li>
+                        <li class="mb-2"><a href="{% url 'quiz:list' %}" class="text-secondary text-decoration-none">MCQ Practice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h2 class="text-white h5 mb-3">Categories</h2>
+                    <ul class="list-unstyled">
+                        {% for cat in notes_categories|slice:":5" %}
+                        <li class="mb-2"><a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="text-secondary text-decoration-none">{{ cat.name }}</a></li>
+                        {% empty %}
+                        <li class="text-secondary">Coming soon</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h2 class="text-white h5 mb-3">Contact</h2>
+                    <ul class="list-unstyled text-secondary">
+                        {% if site_settings.contact_email %}
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i><a href="mailto:{{ site_settings.contact_email }}" class="text-secondary text-decoration-none">{{ site_settings.contact_email }}</a></li>
+                        {% endif %}
+                        {% if site_settings.contact_phone %}
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i><a href="tel:{{ site_settings.contact_phone }}" class="text-secondary text-decoration-none">{{ site_settings.contact_phone }}</a></li>
+                        {% endif %}
+                        {% if site_settings.address %}
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>{{ site_settings.address }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-secondary mb-0">&copy; {{ site_settings.site_name|default:"Learning Platform" }} {% now "Y" %}. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <span class="text-secondary me-3"><i class="fas fa-eye me-1"></i>{{ visitor_count|default:"0" }} visitors</span>
+                    <a href="{% url 'core:privacy' %}" class="text-secondary text-decoration-none me-3">Privacy Policy</a>
+                    <a href="{% url 'core:terms' %}" class="text-secondary text-decoration-none me-3">Terms &amp; Conditions</a>
+                    <a href="{% url 'core:sitemap' %}" class="text-secondary text-decoration-none me-3">Sitemap</a>
+                    <a href="{% url 'core:contact' %}" class="text-secondary text-decoration-none">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Footer Ad -->
+    {% if ads.footer %}
+    <div class="ad-container text-center py-2 bg-light">
+        {{ ads.footer|safe }}
+    </div>
+    {% endif %}
+
+    <!-- Popup Ad Modal -->
+    {% if popup_ad %}
+    <div class="modal fade" id="popupAdModal" tabindex="-1" aria-labelledby="popupAdLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content p-0 overflow-hidden" style="border:none; border-radius:12px;">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-2 z-3 bg-white rounded-circle p-2 shadow-sm" data-bs-dismiss="modal" aria-label="Close" style="font-size:0.8rem;"></button>
+                {% if popup_ad.ad_image %}
+                <a href="{{ popup_ad.link_url }}" target="_blank" rel="noopener noreferrer" class="d-block">
+                    <img src="{{ popup_ad.ad_image.url }}" alt="{{ popup_ad.name }}" class="img-fluid w-100" style="display:block;">
+                </a>
+                {% elif popup_ad.ad_code %}
+                <div class="modal-body p-4 text-center">
+                    {{ popup_ad.ad_code|safe }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back to Top -->
+    <button id="backToTop" class="btn btn-primary btn-floating position-fixed bottom-0 end-0 m-4 rounded-circle shadow" style="display:none; z-index:1050;" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+    {% if popup_ad %}
+    <script>
+    // Show popup ad after 2 seconds, only once per session
+    (function() {
+        var popupShown = sessionStorage.getItem('popupAdShown');
+        if (!popupShown) {
+            setTimeout(function() {
+                var popupEl = document.getElementById('popupAdModal');
+                if (popupEl) {
+                    var popup = new bootstrap.Modal(popupEl);
+                    popup.show();
+                    sessionStorage.setItem('popupAdShown', 'true');
+                }
+            }, 2000);
+        }
+    })();
+    </script>
+    {% endif %}
+</body>
+</html>

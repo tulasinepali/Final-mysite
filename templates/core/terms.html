@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Terms and Conditions - Learning Platform" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Read our terms and conditions to understand the rules and guidelines for using our educational platform and services." }}{% endblock %}
+
+{% block og_title %}{{ meta_title|default:"Terms and Conditions - Learning Platform" }}{% endblock %}
+{% block og_description %}{{ meta_description|default:"Read our terms and conditions to understand the rules for using our platform." }}{% endblock %}
+
+{% block breadcrumb %}
+<div class="bg-light py-3">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Terms &amp; Conditions</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="fw-bold mb-2">Terms and Conditions</h1>
+                <p class="text-muted mb-4">Last updated: {% now "F j, Y" %}</p>
+
+                <div class="content-body">
+                    <p>Welcome to {{ site_settings.site_name|default:"Learning Platform" }}. These Terms and Conditions ("Terms") govern your access to and use of our website located at {{ request.get_host }} (the "Site"), operated by {{ site_settings.site_name|default:"Learning Platform" }} ("we", "us", or "our"). By accessing or using the Site, you agree to be bound by these Terms. If you do not agree with any part of these Terms, you must not use the Site.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">1. Acceptance of Terms</h2>
+                    <p>By accessing, browsing, or using the Site, you acknowledge that you have read, understood, and agree to be bound by these Terms and our <a href="{% url 'core:privacy' %}">Privacy Policy</a>, which is incorporated herein by reference. These Terms apply to all visitors, users, and others who access or use the Site.</p>
+                    <p>We reserve the right to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion. Your continued use of the Site after any changes to the Terms constitutes acceptance of the new Terms.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">2. Use of the Website</h2>
+
+                    <h3 class="h5 fw-bold mt-4 mb-2">2.1 Permitted Use</h3>
+                    <p>You may use the Site for lawful purposes only and in accordance with these Terms. You agree to use the Site only for:</p>
+                    <ul>
+                        <li>Accessing educational content, study notes, and learning resources</li>
+                        <li>Practicing multiple-choice questions and quizzes</li>
+                        <li>Downloading available educational materials</li>
+                        <li>Reading blog posts and articles</li>
+                        <li>Communicating with us through the contact form</li>
+                    </ul>
+
+                    <h3 class="h5 fw-bold mt-4 mb-2">2.2 Prohibited Use</h3>
+                    <p>You are prohibited from:</p>
+                    <ul>
+                        <li>Using the Site in any way that violates applicable laws or regulations</li>
+                        <li>Exploiting, harming, or attempting to exploit or harm minors in any way</li>
+                        <li>Transmitting any harmful, obscene, offensive, or objectionable content</li>
+                        <li>Attempting to gain unauthorized access to any part of the Site or its systems</li>
+                        <li>Using automated tools (bots, scrapers, etc.) to access or collect data from the Site</li>
+                        <li>Interfering with or disrupting the Site's functionality or servers</li>
+                        <li>Impersonating any person or entity or misrepresenting your affiliation</li>
+                        <li>Copying, redistributing, or republishing our content without prior written permission</li>
+                        <li>Using the Site to transmit malware, viruses, or other harmful code</li>
+                        <li>Circumventing any access controls or security measures of the Site</li>
+                    </ul>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">3. Intellectual Property</h2>
+                    <p>The Site and its entire contents, features, and functionality — including but not limited to text, graphics, logos, icons, images, audio clips, video clips, data compilations, software, and the design, selection, and arrangement thereof — are owned by {{ site_settings.site_name|default:"Learning Platform" }}, its licensors, or other providers of such material, and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.</p>
+                    <p>You are granted a limited, non-exclusive, non-transferable, revocable license to access and use the Site and its content for personal, non-commercial educational purposes only. This license does not include:</p>
+                    <ul>
+                        <li>Reproducing, distributing, or publicly displaying any content from the Site</li>
+                        <li>Modifying, creating derivative works from, or reverse engineering any part of the Site</li>
+                        <li>Using any data mining, robots, or similar data gathering methods</li>
+                        <li>Downloading (other than page caching) any portion of the Site or any information contained therein</li>
+                        <li>Using the Site or its content for any commercial purpose without our express written consent</li>
+                    </ul>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">4. User Content</h2>
+                    <p>Our Site may allow you to submit, post, or display content, including comments, feedback, or other materials ("User Content"). By submitting User Content, you grant us a non-exclusive, worldwide, royalty-free, perpetual, irrevocable license to use, reproduce, modify, adapt, publish, translate, distribute, and display such User Content in connection with the operation of the Site.</p>
+                    <p>You represent and warrant that:</p>
+                    <ul>
+                        <li>You own or control all rights in and to the User Content</li>
+                        <li>All User Content is accurate and not misleading</li>
+                        <li>User Content does not violate any applicable law or regulation or the rights of any third party</li>
+                    </ul>
+                    <p>We reserve the right to remove any User Content at our sole discretion, without notice, for any reason, including if we believe it violates these Terms.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">5. Disclaimer of Warranties</h2>
+                    <p>THE SITE AND ITS CONTENT ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR COURSE OF DEALING.</p>
+                    <p>We do not warrant that:</p>
+                    <ul>
+                        <li>The Site will be uninterrupted, timely, secure, or error-free</li>
+                        <li>The results obtained from the use of the Site will be accurate or reliable</li>
+                        <li>The quality of any content, information, or other material obtained from the Site will meet your expectations</li>
+                        <li>Any errors in the Site will be corrected</li>
+                    </ul>
+                    <p>The educational content on the Site is provided for general informational and educational purposes only. It is not intended as a substitute for professional educational advice, curriculum guidance, or examination preparation. Always verify information with official sources and qualified educators.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">6. Limitation of Liability</h2>
+                    <p>TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL {{ site_settings.site_name|default:"LEARNING PLATFORM" }}, ITS DIRECTORS, EMPLOYEES, PARTNERS, AGENTS, SUPPLIERS, OR AFFILIATES BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM:</p>
+                    <ul>
+                        <li>Your access to or use of (or inability to access or use) the Site</li>
+                        <li>Any conduct or content of any third party on the Site</li>
+                        <li>Any content obtained from the Site</li>
+                        <li>Unauthorized access, use, or alteration of your transmissions or content</li>
+                    </ul>
+                    <p>This limitation of liability applies whether the alleged liability is based on contract, tort, negligence, strict liability, or any other basis, even if we have been advised of the possibility of such damage.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">7. Indemnification</h2>
+                    <p>You agree to defend, indemnify, and hold harmless {{ site_settings.site_name|default:"Learning Platform" }} and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses, including reasonable attorney's fees, arising out of or in any way connected with your access to or use of the Site or your violation of these Terms.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">8. Third-Party Links</h2>
+                    <p>The Site may contain links to third-party websites or services that are not owned or controlled by us. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites or services. You acknowledge and agree that we shall not be responsible or liable for any damage or loss caused by or in connection with the use of any such content, goods, or services available on or through any such third-party websites or services.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">9. Termination</h2>
+                    <p>We may terminate or suspend your access to the Site immediately, without prior notice or liability, for any reason, including breach of these Terms. Upon termination, your right to use the Site will immediately cease. All provisions of these Terms that by their nature should survive termination shall survive, including but not limited to ownership provisions, warranty disclaimers, and limitations of liability.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">10. Governing Law</h2>
+                    <p>These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which {{ site_settings.site_name|default:"Learning Platform" }} operates, without regard to its conflict of law provisions. Any disputes arising from or relating to these Terms or the Site shall be resolved in the competent courts of that jurisdiction.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">11. Changes to These Terms</h2>
+                    <p>We reserve the right to modify or replace these Terms at any time at our sole discretion. If a revision is material, we will try to provide at least 30 days' notice before any new terms take effect. What constitutes a material change will be determined at our sole discretion. By continuing to access or use the Site after those revisions become effective, you agree to be bound by the revised Terms.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">12. Severability</h2>
+                    <p>If any provision of these Terms is held to be unenforceable or invalid, such provision will be changed and interpreted to accomplish its objectives to the greatest extent possible under applicable law, and the remaining provisions will continue in full force and effect.</p>
+
+                    <h2 class="h4 fw-bold mt-5 mb-3">13. Contact Information</h2>
+                    <p>If you have any questions about these Terms, please contact us:</p>
+                    <ul>
+                        {% if site_settings.contact_email %}
+                        <li><strong>Email:</strong> <a href="mailto:{{ site_settings.contact_email }}">{{ site_settings.contact_email }}</a></li>
+                        {% else %}
+                        <li><strong>Email:</strong> Use the <a href="{% url 'core:contact' %}">contact form</a></li>
+                        {% endif %}
+                        {% if site_settings.contact_phone %}
+                        <li><strong>Phone:</strong> {{ site_settings.contact_phone }}</li>
+                        {% endif %}
+                        {% if site_settings.address %}
+                        <li><strong>Address:</strong> {{ site_settings.address }}</li>
+                        {% endif %}
+                        <li><strong>Contact Page:</strong> <a href="{% url 'core:contact' %}">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

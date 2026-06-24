@@ -1,0 +1,140 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Message from {{ message.name }} - Dashboard{% endblock %}
+{% block page_header %}Message Detail{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:messages' %}">Messages</a></li>
+<li class="breadcrumb-item active">Message from {{ message.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-envelope-open-text mr-1"></i>
+                    {{ message.subject|default:"No Subject" }}
+                </h3>
+                <div class="card-tools">
+                    {% if not message.is_read %}
+                    <span class="badge badge-danger mr-2"><i class="fas fa-circle mr-1"></i> Unread</span>
+                    {% else %}
+                    <span class="badge badge-success mr-2"><i class="fas fa-check-circle mr-1"></i> Read</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Sender Info -->
+                <div class="row mb-4">
+                    <div class="col-auto">
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h5 class="mb-1">{{ message.name }}</h5>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-envelope mr-1"></i>
+                            <a href="mailto:{{ message.email }}">{{ message.email }}</a>
+                        </p>
+                    </div>
+                    <div class="col-auto text-right">
+                        <small class="text-muted">
+                            <i class="fas fa-clock mr-1"></i>
+                            {{ message.created_at|date:"M d, Y" }} at {{ message.created_at|date:"h:i A" }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Subject -->
+                <div class="form-group">
+                    <label class="text-muted"><i class="fas fa-heading mr-1"></i> Subject</label>
+                    <p class="form-control-plaintext font-weight-bold pl-2">{{ message.subject|default:"(No Subject)" }}</p>
+                </div>
+
+                <hr>
+
+                <!-- Message Body -->
+                <div class="form-group">
+                    <label class="text-muted"><i class="fas fa-align-left mr-1"></i> Message</label>
+                    <div class="p-3 bg-light rounded" style="min-height: 100px; white-space: pre-wrap;">{{ message.message }}</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card-footer">
+                <div class="d-flex">
+                    <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject|default:'Your Message' }}" class="btn btn-primary mr-2">
+                        <i class="fas fa-reply mr-1"></i> Reply via Email
+                    </a>
+                    <form method="post" action="{% url 'dashboard:message_delete' message.pk %}" onsubmit="return confirm('Are you sure you want to delete this message? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash mr-1"></i> Delete
+                        </button>
+                    </form>
+                    <a href="{% url 'dashboard:messages' %}" class="btn btn-default ml-auto">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Messages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Message Details -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> Details</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <th style="width: 100px;" class="pl-3">From</th>
+                        <td>{{ message.name }}</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Email</th>
+                        <td><a href="mailto:{{ message.email }}">{{ message.email }}</a></td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Subject</th>
+                        <td>{{ message.subject|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Received</th>
+                        <td>{{ message.created_at|date:"M d, Y h:i A" }}</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Status</th>
+                        <td>
+                            {% if message.is_read %}
+                            <span class="badge badge-success">Read</span>
+                            {% else %}
+                            <span class="badge badge-danger">Unread</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick Reply -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-reply mr-1"></i> Quick Reply</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted text-sm">Click the reply button to open your email client, or compose a reply directly to <strong>{{ message.name }}</strong> at <a href="mailto:{{ message.email }}">{{ message.email }}</a>.</p>
+                <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject|default:'Your Message' }}" class="btn btn-primary btn-block">
+                    <i class="fas fa-envelope mr-1"></i> Open Email Client
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

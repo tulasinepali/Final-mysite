@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load quiz_extras %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+{% block meta_description %}Top scores for {{ quiz.title }} - see how you rank against other quiz takers.{% endblock %}
+{% block og_title %}{{ meta_title }}{% endblock %}
+{% block og_description %}Top scores for {{ quiz.title }} - see how you rank against other quiz takers.{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="bg-light py-3 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'quiz:list' %}" class="text-decoration-none">MCQ Practice</a></li>
+                <li class="breadcrumb-item"><a href="{{ quiz.get_absolute_url }}" class="text-decoration-none">{{ quiz.title|truncatewords:4 }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Leaderboard</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Leaderboard Section -->
+<section class="py-4 py-lg-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Title -->
+                <div class="text-center mb-4">
+                    <h1 class="h3 fw-bold"><i class="fas fa-trophy text-warning me-2"></i>Leaderboard</h1>
+                    <p class="text-muted mb-0">{{ quiz.title }}</p>
+                </div>
+
+                <!-- Quiz Info -->
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <span class="badge bg-success bg-opacity-10 text-success">{{ quiz.category.name }}</span>
+                    {% if quiz.difficulty == 'easy' %}
+                    <span class="badge bg-success"><i class="fas fa-seedling me-1"></i>Easy</span>
+                    {% elif quiz.difficulty == 'medium' %}
+                    <span class="badge bg-warning text-dark"><i class="fas fa-fire me-1"></i>Medium</span>
+                    {% else %}
+                    <span class="badge bg-danger"><i class="fas fa-bolt me-1"></i>Hard</span>
+                    {% endif %}
+                    <span class="badge bg-light text-dark border"><i class="fas fa-question-circle me-1"></i>{{ quiz.questions.count }} Questions</span>
+                </div>
+
+                <!-- Leaderboard Table -->
+                {% if top_attempts %}
+                <div class="card border-0 shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="text-center" style="width:80px;">Rank</th>
+                                    <th scope="col">Score</th>
+                                    <th scope="col" class="text-center">Percentage</th>
+                                    <th scope="col" class="text-end">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attempt in top_attempts %}
+                                <tr class="{% if forloop.counter <= 3 %}fw-bold{% endif %}">
+                                    <td class="text-center">
+                                        {% if forloop.counter == 1 %}
+                                        <span class="medal-gold fs-5"><i class="fas fa-medal"></i></span>
+                                        <span class="visually-hidden">1st</span>
+                                        {% elif forloop.counter == 2 %}
+                                        <span class="medal-silver fs-5"><i class="fas fa-medal"></i></span>
+                                        <span class="visually-hidden">2nd</span>
+                                        {% elif forloop.counter == 3 %}
+                                        <span class="medal-bronze fs-5"><i class="fas fa-medal"></i></span>
+                                        <span class="visually-hidden">3rd</span>
+                                        {% else %}
+                                        <span class="text-muted">{{ forloop.counter }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ attempt.final_score|floatformat:2 }}</span>
+                                        <span class="text-muted">/ {% widthratio attempt.total_questions 1 2 %}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if attempt.percentage > 80 %}
+                                        <span class="badge bg-success">{{ attempt.percentage }}%</span>
+                                        {% elif attempt.percentage >= 50 %}
+                                        <span class="badge bg-warning text-dark">{{ attempt.percentage }}%</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">{{ attempt.percentage }}%</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="text-muted small">{{ attempt.completed_at|date:"M d, Y g:i A" }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top 3 Podium -->
+                {% if top_attempts|length >= 1 %}
+                <div class="row g-3 mt-4 justify-content-center">
+                    {% if top_attempts|length >= 2 %}
+                    <div class="col-4 col-md-3 order-1 order-md-0">
+                        <div class="card border-0 shadow-sm text-center py-3 h-100">
+                            <div class="mb-2">
+                                <span class="medal-silver fs-2"><i class="fas fa-medal"></i></span>
+                            </div>
+                            <h3 class="h6 fw-bold mb-1">2nd Place</h3>
+                            <div class="display-6 fw-bold text-secondary">{{ top_attempts.1.final_score|floatformat:2 }}/{% widthratio top_attempts.1.total_questions 1 2 %}</div>
+                            <span class="badge bg-warning text-dark">{{ top_attempts.1.percentage }}%</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if top_attempts|length >= 1 %}
+                    <div class="col-4 col-md-3 order-0 order-md-0">
+                        <div class="card border-0 shadow-sm text-center py-4 h-100 border-warning">
+                            <div class="mb-2">
+                                <span class="medal-gold fs-1"><i class="fas fa-crown"></i></span>
+                            </div>
+                            <h3 class="h6 fw-bold mb-1">1st Place</h3>
+                            <div class="display-5 fw-bold text-warning">{{ top_attempts.0.final_score|floatformat:2 }}/{% widthratio top_attempts.0.total_questions 1 2 %}</div>
+                            <span class="badge bg-success">{{ top_attempts.0.percentage }}%</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if top_attempts|length >= 3 %}
+                    <div class="col-4 col-md-3 order-2">
+                        <div class="card border-0 shadow-sm text-center py-3 h-100">
+                            <div class="mb-2">
+                                <span class="medal-bronze fs-2"><i class="fas fa-medal"></i></span>
+                            </div>
+                            <h3 class="h6 fw-bold mb-1">3rd Place</h3>
+                            <div class="display-6 fw-bold" style="color:#cd7f32;">{{ top_attempts.2.final_score|floatformat:2 }}/{% widthratio top_attempts.2.total_questions 1 2 %}</div>
+                            <span class="badge bg-warning text-dark">{{ top_attempts.2.percentage }}%</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-trophy fa-4x text-muted opacity-25"></i>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">No attempts yet</h3>
+                    <p class="text-muted mb-4">Be the first to complete this quiz and top the leaderboard!</p>
+                </div>
+                {% endif %}
+
+                <!-- Back to Quiz Button -->
+                <div class="text-center mt-4">
+                    <a href="{{ quiz.get_absolute_url }}" class="btn btn-success btn-lg me-2">
+                        <i class="fas fa-play me-2"></i>Take This Quiz
+                    </a>
+                    <a href="{% url 'quiz:list' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-brain me-2"></i>All Quizzes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .medal-gold {
+        color: #FFD700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    .medal-silver {
+        color: #C0C0C0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    .medal-bronze {
+        color: #CD7F32;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    .border-warning {
+        border: 2px solid #ffc107 !important;
+    }
+</style>
+{% endblock %}

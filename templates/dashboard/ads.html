@@ -1,0 +1,138 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Ad Placements - Dashboard{% endblock %}
+{% block page_header %}Ad Placements{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Ad Placements</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-ad mr-1"></i> Ad Placements</h3>
+                <div class="card-tools">
+                    <a href="{% url 'dashboard:ad_create' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus mr-1"></i> Create Ad Placement
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if ads %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Name</th>
+                                <th style="width: 160px;">Placement</th>
+                                <th style="width: 100px;" class="text-center">Image</th>
+                                <th style="width: 80px;" class="text-center">Active</th>
+                                <th>Ad Code / Link</th>
+                                <th style="width: 200px;" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ad in ads %}
+                            <tr>
+                                <td class="text-center text-muted">{{ forloop.counter }}</td>
+                                <td class="font-weight-bold">{{ ad.name }}</td>
+                                <td>
+                                    {% if ad.placement == 'home_top' %}
+                                    <span class="badge badge-primary"><i class="fas fa-arrow-up mr-1"></i> Home Top</span>
+                                    {% elif ad.placement == 'home_sidebar' %}
+                                    <span class="badge badge-info"><i class="fas fa-columns mr-1"></i> Home Sidebar</span>
+                                    {% elif ad.placement == 'notes_top' %}
+                                    <span class="badge badge-success"><i class="fas fa-book mr-1"></i> Notes Top</span>
+                                    {% elif ad.placement == 'notes_middle' %}
+                                    <span class="badge badge-success"><i class="fas fa-book mr-1"></i> Notes Middle</span>
+                                    {% elif ad.placement == 'notes_bottom' %}
+                                    <span class="badge badge-success"><i class="fas fa-book mr-1"></i> Notes Bottom</span>
+                                    {% elif ad.placement == 'blog_top' %}
+                                    <span class="badge badge-warning"><i class="fas fa-blog mr-1"></i> Blog Top</span>
+                                    {% elif ad.placement == 'blog_middle' %}
+                                    <span class="badge badge-warning"><i class="fas fa-blog mr-1"></i> Blog Middle</span>
+                                    {% elif ad.placement == 'blog_sidebar' %}
+                                    <span class="badge badge-warning"><i class="fas fa-columns mr-1"></i> Blog Sidebar</span>
+                                    {% elif ad.placement == 'quiz_result' %}
+                                    <span class="badge badge-purple" style="background-color:#6f42c1;"><i class="fas fa-brain mr-1"></i> Quiz Result</span>
+                                    {% elif ad.placement == 'downloads_top' %}
+                                    <span class="badge badge-secondary"><i class="fas fa-download mr-1"></i> Downloads Top</span>
+                                    {% elif ad.placement == 'sidebar' %}
+                                    <span class="badge badge-info"><i class="fas fa-columns mr-1"></i> Global Sidebar</span>
+                                    {% elif ad.placement == 'footer' %}
+                                    <span class="badge badge-dark"><i class="fas fa-arrow-down mr-1"></i> Footer</span>
+                                    {% elif ad.placement == 'popup' %}
+                                    <span class="badge badge-danger"><i class="fas fa-window-restore mr-1"></i> Popup</span>
+                                    {% else %}
+                                    <span class="badge badge-dark">{{ ad.placement }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if ad.ad_image %}
+                                    <a href="{{ ad.ad_image.url }}" target="_blank" title="View full image">
+                                        <img src="{{ ad.ad_image.url }}" alt="{{ ad.name }}" style="max-width:80px; max-height:40px; border-radius:4px; object-fit:cover;">
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if ad.is_active %}
+                                    <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Active</span>
+                                    {% else %}
+                                    <span class="badge badge-secondary"><i class="fas fa-times-circle mr-1"></i> Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if ad.ad_code %}
+                                    <code class="text-sm" style="font-size: 0.75rem;">{{ ad.ad_code|truncatechars:60|striptags }}</code>
+                                    {% elif ad.link_url %}
+                                    <a href="{{ ad.link_url }}" target="_blank" class="text-info small"><i class="fas fa-link mr-1"></i>{{ ad.link_url|truncatechars:40 }}</a>
+                                    {% elif ad.ad_image %}
+                                    <span class="text-muted small"><i class="fas fa-image mr-1"></i>Image ad</span>
+                                    {% else %}
+                                    <span class="text-muted small">No content</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <!-- Toggle Active -->
+                                    <form method="post" action="{% url 'dashboard:ad_toggle' ad.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-{% if ad.is_active %}warning{% else %}success{% endif %}" title="{% if ad.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                            <i class="fas fa-{% if ad.is_active %}pause{% else %}play{% endif %}"></i>
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'dashboard:ad_edit' ad.pk %}" class="btn btn-sm btn-outline-info" title="Edit Ad">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'dashboard:ad_delete' ad.pk %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this ad placement?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Ad">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-ad fa-3x mb-3 d-block text-muted"></i>
+                    <h5>No ad placements yet</h5>
+                    <p class="text-muted">Create ad placements to manage advertisements on your site. You can use HTML ad code, upload images, or create popup ads.</p>
+                    <a href="{% url 'dashboard:ad_create' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus mr-1"></i> Create First Ad Placement
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

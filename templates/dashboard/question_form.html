@@ -1,0 +1,266 @@
+{% extends 'dashboard/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ action }} Question - {{ quiz.title }} - Dashboard{% endblock %}
+{% block page_header %}{{ action }} Question{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:quizzes' %}">Quizzes</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:quiz_questions' quiz.pk %}">{{ quiz.title }}</a></li>
+<li class="breadcrumb-item">Questions</li>
+<li class="breadcrumb-item active">{{ action }} Question</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {% if action == 'Create' %}
+                    <i class="fas fa-plus-circle mr-1"></i>
+                    {% else %}
+                    <i class="fas fa-edit mr-1"></i>
+                    {% endif %}
+                    {{ action }} Question
+                </h3>
+                <div class="card-tools">
+                    <span class="badge badge-info badge-lg">
+                        <i class="fas fa-brain mr-1"></i> Quiz: {{ quiz.title }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Question Text - Full width -->
+                    <div class="form-group {% if form.question_text.errors %}has-error{% endif %}">
+                        <label for="{{ form.question_text.id_for_label }}">Question Text <span class="text-danger">*</span></label>
+                        {{ form.question_text|add_class:'form-control'|add_error_class:'is-invalid' }}
+                        {% if form.question_text.errors %}
+                        {% for error in form.question_text.errors %}
+                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Option A + Option B -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group {% if form.option_a.errors %}has-error{% endif %}">
+                                <label for="{{ form.option_a.id_for_label }}">
+                                    <span class="badge badge-primary mr-1">A</span> Option A <span class="text-danger">*</span>
+                                </label>
+                                {{ form.option_a|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option A' }}
+                                {% if form.option_a.errors %}
+                                {% for error in form.option_a.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group {% if form.option_b.errors %}has-error{% endif %}">
+                                <label for="{{ form.option_b.id_for_label }}">
+                                    <span class="badge badge-primary mr-1">B</span> Option B <span class="text-danger">*</span>
+                                </label>
+                                {{ form.option_b|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option B' }}
+                                {% if form.option_b.errors %}
+                                {% for error in form.option_b.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option C + Option D -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group {% if form.option_c.errors %}has-error{% endif %}">
+                                <label for="{{ form.option_c.id_for_label }}">
+                                    <span class="badge badge-primary mr-1">C</span> Option C <span class="text-danger">*</span>
+                                </label>
+                                {{ form.option_c|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option C' }}
+                                {% if form.option_c.errors %}
+                                {% for error in form.option_c.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group {% if form.option_d.errors %}has-error{% endif %}">
+                                <label for="{{ form.option_d.id_for_label }}">
+                                    <span class="badge badge-primary mr-1">D</span> Option D <span class="text-danger">*</span>
+                                </label>
+                                {{ form.option_d|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option D' }}
+                                {% if form.option_d.errors %}
+                                {% for error in form.option_d.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Correct Answer + Order -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group {% if form.correct_answer.errors %}has-error{% endif %}">
+                                <label for="{{ form.correct_answer.id_for_label }}">Correct Answer <span class="text-danger">*</span></label>
+                                {{ form.correct_answer|add_class:'form-control custom-select'|add_error_class:'is-invalid' }}
+                                {% if form.correct_answer.errors %}
+                                {% for error in form.correct_answer.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group {% if form.order.errors %}has-error{% endif %}">
+                                <label for="{{ form.order.id_for_label }}">Order</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-sort-numeric-down"></i></span>
+                                    </div>
+                                    {{ form.order|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:1' }}
+                                </div>
+                                {% if form.order.errors %}
+                                {% for error in form.order.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Order in which this question appears in the quiz.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Explanation - Full width -->
+                    <div class="form-group {% if form.explanation.errors %}has-error{% endif %}">
+                        <label for="{{ form.explanation.id_for_label }}">Explanation</label>
+                        {{ form.explanation|add_class:'form-control'|add_error_class:'is-invalid' }}
+                        {% if form.explanation.errors %}
+                        {% for error in form.explanation.errors %}
+                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                        {% endfor %}
+                        {% endif %}
+                        <small class="form-text text-muted">Optional explanation shown after answering the question.</small>
+                    </div>
+
+                    <!-- Any extra fields from the form -->
+                    {% for field in form %}
+                        {% if field.name not in 'question_text,option_a,option_b,option_c,option_d,correct_answer,order,explanation' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                            {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <hr>
+                    <div class="form-group">
+                        {% if action == 'Create' %}
+                        <button type="submit" class="btn btn-success" name="_save">
+                            <i class="fas fa-plus mr-1"></i> Create Question
+                        </button>
+                        <button type="submit" class="btn btn-outline-success" name="_addanother">
+                            <i class="fas fa-plus-circle mr-1"></i> Save & Add Another
+                        </button>
+                        {% else %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> Save Changes
+                        </button>
+                        {% endif %}
+                        <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-default ml-2">
+                            <i class="fas fa-times mr-1"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-brain mr-1"></i> Quiz Info</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Title</dt>
+                    <dd class="col-sm-8">{{ quiz.title }}</dd>
+                    {% if quiz.category %}
+                    <dt class="col-sm-4">Category</dt>
+                    <dd class="col-sm-8">{{ quiz.category.name }}</dd>
+                    {% endif %}
+                    {% if quiz.difficulty %}
+                    <dt class="col-sm-4">Difficulty</dt>
+                    <dd class="col-sm-8">
+                        {% if quiz.difficulty == 'easy' %}
+                        <span class="badge badge-success">Easy</span>
+                        {% elif quiz.difficulty == 'medium' %}
+                        <span class="badge badge-warning">Medium</span>
+                        {% elif quiz.difficulty == 'hard' %}
+                        <span class="badge badge-danger">Hard</span>
+                        {% else %}
+                        <span class="badge badge-secondary">{{ quiz.difficulty }}</span>
+                        {% endif %}
+                    </dd>
+                    {% endif %}
+                    <dt class="col-sm-4">Questions</dt>
+                    <dd class="col-sm-8">{{ quiz.questions.count|default:"0" }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-lightbulb mr-1"></i> Tips</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Make all four options plausible.</li>
+                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Add an explanation to help learners.</li>
+                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Use the order field to sequence questions.</li>
+                    <li><i class="fas fa-check text-success mr-1"></i> Keep question text clear and concise.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+(function() {
+    'use strict';
+
+    // Initialize iCheck for checkboxes
+    $('input[type="checkbox"]').iCheck({
+        checkboxClass: 'icheckbox_flat-blue',
+        radioClass: 'iradio_flat-blue'
+    });
+})();
+</script>
+{% endblock %}

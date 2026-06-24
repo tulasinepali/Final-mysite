@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Sitemap - Learning Platform" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Browse our complete sitemap to find all study notes, blog posts, downloads, and MCQ quizzes available on our educational platform." }}{% endblock %}
+
+{% block og_title %}{{ meta_title|default:"Sitemap - Learning Platform" }}{% endblock %}
+{% block og_description %}{{ meta_description|default:"Browse our complete sitemap to find all educational resources available on our platform." }}{% endblock %}
+
+{% block breadcrumb %}
+<div class="bg-light py-3">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Sitemap</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="fw-bold mb-2">Sitemap</h1>
+        <p class="text-muted mb-5">Browse all pages and resources available on {{ site_settings.site_name|default:"Learning Platform" }}.</p>
+
+        <div class="row g-5">
+            <!-- Main Pages -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-home me-2"></i>Main Pages</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'core:home' %}" class="list-group-item list-group-item-action">Home</a>
+                        <a href="{% url 'core:about' %}" class="list-group-item list-group-item-action">About Us</a>
+                        <a href="{% url 'core:contact' %}" class="list-group-item list-group-item-action">Contact Us</a>
+                        <a href="{% url 'core:privacy' %}" class="list-group-item list-group-item-action">Privacy Policy</a>
+                        <a href="{% url 'core:terms' %}" class="list-group-item list-group-item-action">Terms &amp; Conditions</a>
+                        <a href="{% url 'core:sitemap' %}" class="list-group-item list-group-item-action">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-book me-2"></i>Study Notes</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'notes:list' %}" class="list-group-item list-group-item-action fw-medium">All Notes</a>
+                        {% for cat in notes_categories %}
+                        <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-folder text-muted me-2"></i>{{ cat.name }}
+                        </a>
+                        {% empty %}
+                        <span class="list-group-item text-muted">Coming soon</span>
+                        {% endfor %}
+                    </div>
+                    {% if latest_notes %}
+                    <div class="card-header bg-light border-top">
+                        <small class="fw-bold text-muted">RECENT NOTES</small>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for note in latest_notes|slice:":5" %}
+                        <a href="{{ note.get_absolute_url }}" class="list-group-item list-group-item-action small">
+                            {{ note.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Blog -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-info text-white">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-blog me-2"></i>Blog Posts</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'blog:list' %}" class="list-group-item list-group-item-action fw-medium">All Blog Posts</a>
+                        {% for cat in blog_categories %}
+                        <a href="{% url 'blog:list' %}?category={{ cat.slug }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-folder text-muted me-2"></i>{{ cat.name }}
+                        </a>
+                        {% empty %}
+                        <span class="list-group-item text-muted">Coming soon</span>
+                        {% endfor %}
+                    </div>
+                    {% if latest_blogs %}
+                    <div class="card-header bg-light border-top">
+                        <small class="fw-bold text-muted">RECENT POSTS</small>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for post in latest_blogs|slice:":5" %}
+                        <a href="{{ post.get_absolute_url }}" class="list-group-item list-group-item-action small">
+                            {{ post.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Downloads & Quizzes -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-warning text-white">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-download me-2"></i>Downloads</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'downloads:list' %}" class="list-group-item list-group-item-action fw-medium">All Downloads</a>
+                        {% for download in latest_downloads|slice:":5" %}
+                        <a href="{{ download.get_absolute_url }}" class="list-group-item list-group-item-action small">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>{{ download.title }}
+                        </a>
+                        {% empty %}
+                        <span class="list-group-item text-muted small">Coming soon</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header" style="background-color:#6f42c1;color:white;">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-brain me-2"></i>MCQ Quizzes</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'quiz:list' %}" class="list-group-item list-group-item-action fw-medium">All Quizzes</a>
+                        {% for quiz in latest_quizzes|slice:":5" %}
+                        <a href="{{ quiz.get_absolute_url }}" class="list-group-item list-group-item-action small">
+                            <i class="fas fa-brain text-purple me-2"></i>{{ quiz.title }}
+                        </a>
+                        {% empty %}
+                        <span class="list-group-item text-muted small">Coming soon</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Notes List by Category -->
+        {% if notes_by_category %}
+        <div class="mt-5">
+            <h2 class="h4 fw-bold mb-4">All Notes by Category</h2>
+            <div class="row g-4">
+                {% for category_data in notes_by_category %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h3 class="h6 fw-bold mb-0"><i class="fas fa-folder-open text-success me-2"></i>{{ category_data.category.name }}</h3>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            {% for note in category_data.notes %}
+                            <a href="{{ note.get_absolute_url }}" class="list-group-item list-group-item-action small">
+                                {{ note.title }}
+                            </a>
+                            {% empty %}
+                            <span class="list-group-item text-muted small">No notes yet</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block og_title %}{{ download.title }} - Download{% endblock %}
+{% block og_description %}{{ download.summary }}{% endblock %}
+{% block og_image %}
+{% if download.thumbnail %}
+<meta property="og:image" content="{{ download.thumbnail.url }}">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="bg-light py-3 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'downloads:list' %}" class="text-decoration-none">Downloads</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ download.title|truncatewords:5 }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Ad: Downloads Top -->
+{% if ads.downloads_top %}
+<div class="container mt-3">
+    <div class="ad-container text-center">
+        {{ ads.downloads_top|safe }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Download Detail -->
+<section class="py-4 py-lg-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <article>
+                    <!-- Download Title -->
+                    <h1 class="h3 fw-bold mb-3">{{ download.title }}</h1>
+
+                    <!-- File Meta Info -->
+                    <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                        <span class="d-flex align-items-center">
+                            <span class="file-type-icon rounded d-flex align-items-center justify-content-center me-2 {% if download.file_type == 'pdf' %}bg-danger bg-opacity-10{% elif download.file_type == 'docx' %}bg-primary bg-opacity-10{% elif download.file_type == 'ppt' %}bg-warning bg-opacity-10{% elif download.file_type == 'zip' %}bg-success bg-opacity-10{% else %}bg-secondary bg-opacity-10{% endif %}" style="width:40px;height:40px;">
+                                {% if download.file_type == 'pdf' %}
+                                <i class="fas fa-file-pdf text-danger"></i>
+                                {% elif download.file_type == 'docx' %}
+                                <i class="fas fa-file-word text-primary"></i>
+                                {% elif download.file_type == 'ppt' %}
+                                <i class="fas fa-file-powerpoint text-warning"></i>
+                                {% elif download.file_type == 'zip' %}
+                                <i class="fas fa-file-archive text-success"></i>
+                                {% else %}
+                                <i class="fas fa-file text-secondary"></i>
+                                {% endif %}
+                            </span>
+                            <span class="badge {% if download.file_type == 'pdf' %}bg-danger{% elif download.file_type == 'docx' %}bg-primary{% elif download.file_type == 'ppt' %}bg-warning text-dark{% elif download.file_type == 'zip' %}bg-success{% else %}bg-secondary{% endif %}">{{ download.get_file_type_display }}</span>
+                        </span>
+                        {% if download.file_size %}
+                        <span class="text-muted"><i class="fas fa-hdd me-1"></i>{{ download.file_size }}</span>
+                        {% endif %}
+                        <span class="badge bg-warning bg-opacity-10 text-warning">{{ download.category.name }}</span>
+                        <span class="text-muted"><i class="fas fa-download me-1"></i>{{ download.download_count }} downloads</span>
+                    </div>
+
+                    <!-- Thumbnail -->
+                    {% if download.thumbnail %}
+                    <div class="mb-4 text-center">
+                        <img src="{{ download.thumbnail.url }}" class="img-fluid rounded shadow-sm" alt="{{ download.title }}" loading="lazy" style="max-height:400px;">
+                    </div>
+                    {% endif %}
+
+                    <!-- Description -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h2 class="h5 fw-bold mb-3"><i class="fas fa-info-circle text-warning me-2"></i>Description</h2>
+                            <div class="mb-0">
+                                {{ download.description|linebreaksbr }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    {% if download.tags.all %}
+                    <div class="mb-4">
+                        <h2 class="visually-hidden">Tags</h2>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tag in download.tags.all %}
+                            <span class="badge bg-light text-dark border"><i class="fas fa-tag me-1"></i>{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Big Download Button -->
+                    <div class="mb-4">
+                        <a href="{% url 'downloads:download_file' download.slug %}" class="btn btn-warning btn-lg text-white shadow-sm w-100 py-3" id="downloadBtn">
+                            <i class="fas fa-download me-2"></i>Download Now
+                            {% if download.file_size %}<span class="opacity-75">({{ download.file_size }})</span>{% endif %}
+                        </a>
+                        <p class="text-muted text-center small mt-2 mb-0">Free download &middot; No registration required</p>
+                    </div>
+
+                    <!-- File Details Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body">
+                            <h2 class="h5 fw-bold mb-3"><i class="fas fa-list-alt text-warning me-2"></i>File Details</h2>
+                            <table class="table table-sm mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted" style="width:35%;">File Type</td>
+                                        <td class="fw-bold">{{ download.get_file_type_display }}</td>
+                                    </tr>
+                                    {% if download.file_size %}
+                                    <tr>
+                                        <td class="text-muted">File Size</td>
+                                        <td class="fw-bold">{{ download.file_size }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td class="text-muted">Category</td>
+                                        <td><a href="{% url 'downloads:list' %}?category={{ download.category.slug }}" class="text-decoration-none">{{ download.category.name }}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Downloads</td>
+                                        <td>{{ download.download_count }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Published</td>
+                                        <td>{{ download.created_at|date:"F j, Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Last Updated</td>
+                                        <td>{{ download.updated_at|date:"F j, Y" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="col-lg-4">
+                <!-- Ad: Sidebar -->
+                {% if ads.sidebar %}
+                <div class="ad-container mb-4">
+                    {{ ads.sidebar|safe }}
+                </div>
+                {% endif %}
+
+                <!-- Related Downloads -->
+                {% if related_downloads %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-warning text-white">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-file-download me-2"></i>Related Downloads</h2>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for related in related_downloads %}
+                        <a href="{{ related.get_absolute_url }}" class="text-decoration-none d-flex align-items-center px-3 py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                            <span class="rounded d-flex align-items-center justify-content-center me-3 {% if related.file_type == 'pdf' %}bg-danger bg-opacity-10{% elif related.file_type == 'docx' %}bg-primary bg-opacity-10{% elif related.file_type == 'ppt' %}bg-warning bg-opacity-10{% elif related.file_type == 'zip' %}bg-success bg-opacity-10{% else %}bg-secondary bg-opacity-10{% endif %}" style="width:40px;height:40px;min-width:40px;">
+                                {% if related.file_type == 'pdf' %}
+                                <i class="fas fa-file-pdf text-danger"></i>
+                                {% elif related.file_type == 'docx' %}
+                                <i class="fas fa-file-word text-primary"></i>
+                                {% elif related.file_type == 'ppt' %}
+                                <i class="fas fa-file-powerpoint text-warning"></i>
+                                {% elif related.file_type == 'zip' %}
+                                <i class="fas fa-file-archive text-success"></i>
+                                {% else %}
+                                <i class="fas fa-file text-secondary"></i>
+                                {% endif %}
+                            </span>
+                            <div>
+                                <span class="text-dark small fw-bold d-block">{{ related.title|truncatewords:6 }}</span>
+                                <span class="text-muted" style="font-size:0.75rem;">
+                                    <span class="badge {% if related.file_type == 'pdf' %}bg-danger{% elif related.file_type == 'docx' %}bg-primary{% elif related.file_type == 'ppt' %}bg-warning text-dark{% elif related.file_type == 'zip' %}bg-success{% else %}bg-secondary{% endif %} me-1">{{ related.get_file_type_display }}</span>
+                                    {% if related.file_size %}{{ related.file_size }}{% endif %}
+                                </span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Quick Links Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-link me-2 text-warning"></i>Quick Links</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'downloads:list' %}" class="btn btn-outline-warning btn-sm text-start">
+                                <i class="fas fa-download me-2"></i>All Downloads
+                            </a>
+                            <a href="{% url 'notes:list' %}" class="btn btn-outline-primary btn-sm text-start">
+                                <i class="fas fa-book me-2"></i>Study Notes
+                            </a>
+                            <a href="{% url 'quiz:list' %}" class="btn btn-outline-success btn-sm text-start">
+                                <i class="fas fa-brain me-2"></i>MCQ Practice
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .file-type-icon {
+        transition: transform 0.2s ease;
+    }
+    #downloadBtn {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    #downloadBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(255, 193, 7, 0.3) !important;
+    }
+</style>
+{% endblock %}

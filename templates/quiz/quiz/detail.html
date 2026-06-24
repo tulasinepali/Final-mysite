@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block og_title %}{{ quiz.title }} - MCQ Practice{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="bg-light py-3 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'quiz:list' %}" class="text-decoration-none">MCQ Practice</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ quiz.title|truncatewords:5 }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Timer Bar (if time limit set) -->
+{% if quiz.time_limit > 0 %}
+<div class="sticky-top" style="top:56px; z-index:1020;">
+    <div class="bg-dark text-white py-2">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-clock fa-lg text-warning me-2"></i>
+                <span class="fw-bold">Time Remaining:</span>
+            </div>
+            <div id="quiz-timer" class="d-flex align-items-center">
+                <span id="timer-minutes" class="display-6 fw-bold text-warning me-1">{{ quiz.time_limit }}</span>
+                <span class="fw-bold me-1">:</span>
+                <span id="timer-seconds" class="display-6 fw-bold text-warning">00</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-light text-dark me-2"><i class="fas fa-question-circle me-1"></i>{{ total_questions }} Qs</span>
+                <span id="answered-count" class="badge bg-success">0 Answered</span>
+            </div>
+        </div>
+    </div>
+    <div class="progress rounded-0" style="height:4px;">
+        <div id="timer-progress" class="progress-bar bg-warning" role="progressbar" style="width:100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quiz Taking Section -->
+<section class="py-4 py-lg-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Content - Questions -->
+            <div class="col-lg-9">
+                <!-- Quiz Title & Info -->
+                <div class="mb-4">
+                    <h1 class="h3 fw-bold mb-3">{{ quiz.title }}</h1>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <span class="badge bg-success bg-opacity-10 text-success">{{ quiz.category.name }}</span>
+                        {% if quiz.difficulty == 'easy' %}
+                        <span class="badge bg-success"><i class="fas fa-seedling me-1"></i>Easy</span>
+                        {% elif quiz.difficulty == 'medium' %}
+                        <span class="badge bg-warning text-dark"><i class="fas fa-fire me-1"></i>Medium</span>
+                        {% else %}
+                        <span class="badge bg-danger"><i class="fas fa-bolt me-1"></i>Hard</span>
+                        {% endif %}
+                        <span class="badge bg-light text-dark border"><i class="fas fa-question-circle me-1"></i>{{ total_questions }} Questions</span>
+                        {% if quiz.time_limit > 0 %}
+                        <span class="badge bg-light text-dark border"><i class="fas fa-clock me-1"></i>{{ quiz.time_limit }} Minutes</span>
+                        {% endif %}
+                        {% if quiz.negative_marking %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger"><i class="fas fa-minus-circle me-1"></i>Negative Marking: {{ quiz.negative_marking_value }} per wrong answer</span>
+                        {% endif %}
+                    </div>
+                    {% if quiz.description %}
+                    <p class="text-muted">{{ quiz.description|striptags}}</p>
+                    {% endif %}
+                    <div class="alert alert-info border-0 py-2 small">
+                        <i class="fas fa-info-circle me-2"></i>Select one answer per question. Your answers will be submitted when you click "Submit Quiz" at the bottom{% if quiz.time_limit > 0 %} or when the timer expires{% endif %}.{% if quiz.negative_marking %} <strong class="text-danger">This quiz has negative marking: {{ quiz.negative_marking_value }} marks will be deducted for each wrong answer. Unanswered questions get 0 marks (no penalty).</strong>{% endif %}
+                    </div>
+                </div>
+
+                <!-- Quiz Form -->
+                <form id="quiz-form" method="post" action="{% url 'quiz:result' quiz.slug %}">
+                    {% csrf_token %}
+
+                    {% for question in questions %}
+                    <div class="card border-0 shadow-sm mb-4 question-card" id="question-{{ question.id }}" data-question-id="{{ question.id }}">
+                        <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-success me-2 d-flex align-items-center justify-content-center" style="min-width:32px;height:32px;border-radius:50%;">{{ forloop.counter }}</span>
+                                <h2 class="h6 fw-bold mb-0">Question {{ forloop.counter }}</h2>
+                            </div>
+                            {% if quiz.negative_marking %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger"><i class="fas fa-minus-circle me-1"></i>Wrong: -{{ quiz.negative_marking_value }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <!-- Question Text -->
+                            <p class="fw-bold mb-4">{{ question.question_text }}</p>
+
+                            <!-- Options as selectable cards -->
+                            <div class="row g-3">
+                                <!-- Option A -->
+                                <div class="col-12 col-md-6">
+                                    <label class="option-card d-flex align-items-start p-3 rounded border w-100 cursor-pointer" for="q{{ question.id }}_a">
+                                        <input type="radio" name="question_{{ question.id }}" value="A" id="q{{ question.id }}_a" class="me-3 mt-1 quiz-option" data-question-id="{{ question.id }}" style="flex-shrink:0;">
+                                        <div>
+                                            <span class="badge bg-primary me-2">A</span>
+                                            <span>{{ question.option_a }}</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <!-- Option B -->
+                                <div class="col-12 col-md-6">
+                                    <label class="option-card d-flex align-items-start p-3 rounded border w-100 cursor-pointer" for="q{{ question.id }}_b">
+                                        <input type="radio" name="question_{{ question.id }}" value="B" id="q{{ question.id }}_b" class="me-3 mt-1 quiz-option" data-question-id="{{ question.id }}" style="flex-shrink:0;">
+                                        <div>
+                                            <span class="badge bg-primary me-2">B</span>
+                                            <span>{{ question.option_b }}</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <!-- Option C -->
+                                <div class="col-12 col-md-6">
+                                    <label class="option-card d-flex align-items-start p-3 rounded border w-100 cursor-pointer" for="q{{ question.id }}_c">
+                                        <input type="radio" name="question_{{ question.id }}" value="C" id="q{{ question.id }}_c" class="me-3 mt-1 quiz-option" data-question-id="{{ question.id }}" style="flex-shrink:0;">
+                                        <div>
+                                            <span class="badge bg-primary me-2">C</span>
+                                            <span>{{ question.option_c }}</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <!-- Option D -->
+                                <div class="col-12 col-md-6">
+                                    <label class="option-card d-flex align-items-start p-3 rounded border w-100 cursor-pointer" for="q{{ question.id }}_d">
+                                        <input type="radio" name="question_{{ question.id }}" value="D" id="q{{ question.id }}_d" class="me-3 mt-1 quiz-option" data-question-id="{{ question.id }}" style="flex-shrink:0;">
+                                        <div>
+                                            <span class="badge bg-primary me-2">D</span>
+                                            <span>{{ question.option_d }}</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4 mb-3">
+                        <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm" id="submit-btn">
+                            <i class="fas fa-check-circle me-2"></i>Submit Quiz
+                        </button>
+                        <p class="text-muted small mt-2">Make sure you have answered all questions before submitting.</p>
+                        {% if quiz.negative_marking %}
+                        <div class="alert alert-warning border-0 mt-3 py-2 small text-start">
+                            <i class="fas fa-exclamation-triangle me-2"></i><strong>Negative Marking Active!</strong> Each wrong answer deducts <strong>{{ quiz.negative_marking_value }} marks</strong>. If unsure, leaving a question unanswered (0 marks) is better than guessing wrong (-{{ quiz.negative_marking_value }} marks).
+                        </div>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar - Question Navigator -->
+            <aside class="col-lg-3">
+                <div class="position-sticky" style="top:120px;">
+                    <!-- Question Navigator -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h2 class="h6 fw-bold mb-0"><i class="fas fa-compass me-2"></i>Question Navigator</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2 mb-3" id="question-navigator">
+                                {% for question in questions %}
+                                <a href="#question-{{ question.id }}" class="btn btn-sm btn-outline-secondary navigator-dot d-flex align-items-center justify-content-center rounded-circle" data-question-id="{{ question.id }}" style="width:36px;height:36px;font-size:0.8rem;" title="Question {{ forloop.counter }}">
+                                    {{ forloop.counter }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                            <div class="small text-muted">
+                                <span class="d-block mb-1"><span class="inline-block rounded-circle bg-success me-1" style="width:12px;height:12px;display:inline-block;"></span> Answered</span>
+                                <span class="d-block"><span class="inline-block rounded-circle bg-secondary me-1" style="width:12px;height:12px;display:inline-block;"></span> Unanswered</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top">
+                            <div class="d-flex justify-content-between small">
+                                <span class="text-muted">Progress:</span>
+                                <span id="progress-text" class="fw-bold">0/{{ total_questions }}</span>
+                            </div>
+                            <div class="progress mt-2" style="height:6px;">
+                                <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width:0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ad Placement -->
+                    {% if ads.sidebar %}
+                    <div class="ad-container mb-4">
+                        {{ ads.sidebar|safe }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Quick Info -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-bottom">
+                            <h2 class="h6 fw-bold mb-0"><i class="fas fa-info-circle me-2 text-success"></i>Quiz Info</h2>
+                        </div>
+                        <div class="card-body small">
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                    <span class="text-muted">Questions</span>
+                                    <span class="fw-bold">{{ total_questions }}</span>
+                                </li>
+                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                    <span class="text-muted">Difficulty</span>
+                                    <span class="fw-bold text-capitalize">{{ quiz.difficulty }}</span>
+                                </li>
+                                {% if quiz.time_limit > 0 %}
+                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                    <span class="text-muted">Time Limit</span>
+                                    <span class="fw-bold">{{ quiz.time_limit }} min</span>
+                                </li>
+                                {% else %}
+                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                    <span class="text-muted">Time Limit</span>
+                                    <span class="fw-bold">None</span>
+                                </li>
+                                {% endif %}
+                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                    <span class="text-muted">Negative Marking</span>
+                                    {% if quiz.negative_marking %}
+                                    <span class="fw-bold text-danger">-{{ quiz.negative_marking_value }}/wrong</span>
+                                    {% else %}
+                                    <span class="fw-bold text-success">None</span>
+                                    {% endif %}
+                                </li>
+                                <li class="d-flex justify-content-between py-1">
+                                    <span class="text-muted">Login Required</span>
+                                    <span class="fw-bold text-success">No</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Back to List -->
+                    <a href="{% url 'quiz:list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="fas fa-arrow-left me-1"></i>All Quizzes
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .option-card {
+        transition: all 0.15s ease;
+        cursor: pointer;
+        background-color: #fff;
+    }
+    .option-card:hover {
+        border-color: #198754 !important;
+        background-color: #f8fff9;
+    }
+    .option-card.selected {
+        border-color: #198754 !important;
+        background-color: #d1e7dd;
+        box-shadow: 0 0 0 1px #198754;
+    }
+    .option-card.selected .badge {
+        background-color: #198754 !important;
+    }
+    .question-card {
+        scroll-margin-top: 140px;
+    }
+    .navigator-dot {
+        transition: all 0.15s ease;
+    }
+    .navigator-dot.answered {
+        background-color: #198754 !important;
+        color: #fff !important;
+        border-color: #198754 !important;
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // === Option Selection Highlighting ===
+    const options = document.querySelectorAll('.quiz-option');
+    const totalQuestions = {{ total_questions }};
+    const answeredQuestions = new Set();
+
+    options.forEach(function(option) {
+        option.addEventListener('change', function() {
+            const questionId = this.dataset.questionId;
+
+            // Remove selected class from all options in this question
+            const questionCard = document.getElementById('question-' + questionId);
+            if (questionCard) {
+                questionCard.querySelectorAll('.option-card').forEach(function(card) {
+                    card.classList.remove('selected');
+                });
+            }
+
+            // Add selected class to the chosen option's label
+            this.closest('.option-card').classList.add('selected');
+
+            // Track answered questions
+            answeredQuestions.add(questionId);
+            updateNavigator();
+            updateProgress();
+        });
+    });
+
+    // === Question Navigator Updating ===
+    function updateNavigator() {
+        const navDots = document.querySelectorAll('.navigator-dot');
+        navDots.forEach(function(dot) {
+            const qId = dot.dataset.questionId;
+            if (answeredQuestions.has(qId)) {
+                dot.classList.add('answered');
+            } else {
+                dot.classList.remove('answered');
+            }
+        });
+    }
+
+    // === Progress Updating ===
+    function updateProgress() {
+        const answeredCount = answeredQuestions.size;
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const answeredCountBadge = document.getElementById('answered-count');
+
+        if (progressText) {
+            progressText.textContent = answeredCount + '/' + totalQuestions;
+        }
+        if (progressBar) {
+            const pct = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
+            progressBar.style.width = pct + '%';
+            progressBar.setAttribute('aria-valuenow', pct);
+        }
+        if (answeredCountBadge) {
+            answeredCountBadge.textContent = answeredCount + ' Answered';
+        }
+    }
+
+    // === Timer Countdown ===
+    {% if quiz.time_limit > 0 %}
+    const timeLimitSeconds = {{ quiz.time_limit }} * 60;
+    let remainingSeconds = timeLimitSeconds;
+
+    const timerMinutes = document.getElementById('timer-minutes');
+    const timerSeconds = document.getElementById('timer-seconds');
+    const timerProgress = document.getElementById('timer-progress');
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(remainingSeconds / 60);
+        const secs = remainingSeconds % 60;
+        if (timerMinutes) timerMinutes.textContent = String(mins).padStart(2, '0');
+        if (timerSeconds) timerSeconds.textContent = String(secs).padStart(2, '0');
+
+        // Update progress bar
+        if (timerProgress) {
+            const pct = (remainingSeconds / timeLimitSeconds) * 100;
+            timerProgress.style.width = pct + '%';
+
+            // Change color as time runs out
+            if (pct <= 10) {
+                timerProgress.className = 'progress-bar bg-danger';
+                timerMinutes.classList.remove('text-warning');
+                timerMinutes.classList.add('text-danger');
+                timerSeconds.classList.remove('text-warning');
+                timerSeconds.classList.add('text-danger');
+            } else if (pct <= 25) {
+                timerProgress.className = 'progress-bar bg-danger';
+            } else if (pct <= 50) {
+                timerProgress.className = 'progress-bar bg-warning';
+            }
+        }
+    }
+
+    function tickTimer() {
+        if (remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            // Auto-submit when timer expires
+            document.getElementById('quiz-form').submit();
+            return;
+        }
+        remainingSeconds--;
+        updateTimerDisplay();
+    }
+
+    updateTimerDisplay();
+    const timerInterval = setInterval(tickTimer, 1000);
+    {% endif %}
+
+    // === Warn before leaving page (not on form submit) ===
+    var beforeUnloadHandler = function(e) {
+        if (answeredQuestions.size > 0) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    };
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+
+    // Remove warning when submitting so the form submits without any prompt
+    document.getElementById('quiz-form').addEventListener('submit', function() {
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
+    });
+});
+</script>
+{% endblock %}

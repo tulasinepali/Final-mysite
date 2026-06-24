@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <!-- Main Pages -->
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:home' %}</loc>
+    </url>
+
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:about' %}</loc>
+    </url>
+
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:contact' %}</loc>
+    </url>
+
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:privacy' %}</loc>
+    </url>
+
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:terms' %}</loc>
+    </url>
+
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:sitemap' %}</loc>
+    </url>
+
+    <!-- Notes -->
+    {% for note in all_notes %}
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{{ note.get_absolute_url }}</loc>
+        <lastmod>{{ note.updated_at|date:"Y-m-d" }}</lastmod>
+    </url>
+    {% endfor %}
+
+    <!-- Blog Posts -->
+    {% for post in all_blogs %}
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}</loc>
+        <lastmod>{{ post.updated_at|date:"Y-m-d" }}</lastmod>
+    </url>
+    {% endfor %}
+
+    <!-- Downloads -->
+    {% for download in all_downloads %}
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{{ download.get_absolute_url }}</loc>
+        <lastmod>{{ download.updated_at|date:"Y-m-d" }}</lastmod>
+    </url>
+    {% endfor %}
+
+    <!-- Quizzes -->
+    {% for quiz in all_quizzes %}
+    <url>
+        <loc>{{ request.scheme }}://{{ request.get_host }}{{ quiz.get_absolute_url }}</loc>
+        <lastmod>{{ quiz.updated_at|date:"Y-m-d" }}</lastmod>
+    </url>
+    {% endfor %}
+
+</urlset>

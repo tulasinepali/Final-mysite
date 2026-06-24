@@ -1,0 +1,378 @@
+{% extends 'dashboard/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Site Settings - Dashboard{% endblock %}
+{% block page_header %}Site Settings{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Site Settings</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-cog mr-1"></i> Site Settings</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Nav Tabs -->
+                    <ul class="nav nav-tabs" id="settingsTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">
+                                <i class="fas fa-info-circle mr-1"></i> General
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="owner-tab" data-toggle="tab" href="#owner" role="tab" aria-controls="owner" aria-selected="false">
+                                <i class="fas fa-user mr-1"></i> Owner Info
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="mission-tab" data-toggle="tab" href="#mission" role="tab" aria-controls="mission" aria-selected="false">
+                                <i class="fas fa-bullseye mr-1"></i> Mission & Vision
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">
+                                <i class="fas fa-envelope mr-1"></i> Contact
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="social-tab" data-toggle="tab" href="#social" role="tab" aria-controls="social" aria-selected="false">
+                                <i class="fas fa-share-alt mr-1"></i> Social Media
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="integrations-tab" data-toggle="tab" href="#integrations" role="tab" aria-controls="integrations" aria-selected="false">
+                                <i class="fas fa-plug mr-1"></i> Integrations
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content mt-4" id="settingsTabContent">
+
+                        <!-- General Tab -->
+                        <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                            <h5 class="text-muted mb-3"><i class="fas fa-info-circle mr-1"></i> General Settings</h5>
+
+                            <div class="form-group {% if form.site_name.errors %}has-error{% endif %}">
+                                <label for="{{ form.site_name.id_for_label }}">Site Name <span class="text-danger">*</span></label>
+                                {{ form.site_name|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:My Learning Platform' }}
+                                {% if form.site_name.errors %}
+                                {% for error in form.site_name.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.site_tagline.errors %}has-error{% endif %}">
+                                <label for="{{ form.site_tagline.id_for_label }}">Site Tagline</label>
+                                {{ form.site_tagline|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Learn, Grow, Succeed' }}
+                                {% if form.site_tagline.errors %}
+                                {% for error in form.site_tagline.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.site_description.errors %}has-error{% endif %}">
+                                <label for="{{ form.site_description.id_for_label }}">Site Description</label>
+                                {{ form.site_description|add_error_class:'is-invalid' }}
+                                {% if form.site_description.errors %}
+                                {% for error in form.site_description.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Used for SEO meta description.</small>
+                            </div>
+                        </div>
+
+                        <!-- Owner Info Tab -->
+                        <div class="tab-pane fade" id="owner" role="tabpanel" aria-labelledby="owner-tab">
+                            <h5 class="text-muted mb-3"><i class="fas fa-user mr-1"></i> Owner Information</h5>
+
+                            <div class="form-group {% if form.owner_name.errors %}has-error{% endif %}">
+                                <label for="{{ form.owner_name.id_for_label }}">Owner Name</label>
+                                {{ form.owner_name|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:John Doe' }}
+                                {% if form.owner_name.errors %}
+                                {% for error in form.owner_name.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.owner_bio.errors %}has-error{% endif %}">
+                                <label for="{{ form.owner_bio.id_for_label }}">Owner Bio</label>
+                                {{ form.owner_bio|add_error_class:'is-invalid' }}
+                                {% if form.owner_bio.errors %}
+                                {% for error in form.owner_bio.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.owner_image.errors %}has-error{% endif %}">
+                                <label for="{{ form.owner_image.id_for_label }}">Owner Image</label>
+                                <div class="custom-file">
+                                    {{ form.owner_image|add_class:'custom-file-input'|add_error_class:'is-invalid'|attr:'accept:image/*' }}
+                                    <label class="custom-file-label" for="{{ form.owner_image.id_for_label }}">Choose image...</label>
+                                </div>
+                                {% if form.owner_image.errors %}
+                                {% for error in form.owner_image.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Recommended: Square image, at least 300x300px.</small>
+                            </div>
+                        </div>
+
+                        <!-- Mission & Vision Tab -->
+                        <div class="tab-pane fade" id="mission" role="tabpanel" aria-labelledby="mission-tab">
+                            <h5 class="text-muted mb-3"><i class="fas fa-bullseye mr-1"></i> Mission & Vision</h5>
+
+                            <div class="form-group {% if form.mission.errors %}has-error{% endif %}">
+                                <label for="{{ form.mission.id_for_label }}">Mission</label>
+                                {{ form.mission|add_error_class:'is-invalid' }}
+                                {% if form.mission.errors %}
+                                {% for error in form.mission.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.vision.errors %}has-error{% endif %}">
+                                <label for="{{ form.vision.id_for_label }}">Vision</label>
+                                {{ form.vision|add_error_class:'is-invalid' }}
+                                {% if form.vision.errors %}
+                                {% for error in form.vision.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Contact Tab -->
+                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                            <h5 class="text-muted mb-3"><i class="fas fa-envelope mr-1"></i> Contact Information</h5>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.contact_email.errors %}has-error{% endif %}">
+                                        <label for="{{ form.contact_email.id_for_label }}">Contact Email <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                            </div>
+                                            {{ form.contact_email|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:contact@example.com' }}
+                                        </div>
+                                        {% if form.contact_email.errors %}
+                                        {% for error in form.contact_email.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.contact_phone.errors %}has-error{% endif %}">
+                                        <label for="{{ form.contact_phone.id_for_label }}">Contact Phone</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                            </div>
+                                            {{ form.contact_phone|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:+1 234 567 8900' }}
+                                        </div>
+                                        {% if form.contact_phone.errors %}
+                                        {% for error in form.contact_phone.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group {% if form.address.errors %}has-error{% endif %}">
+                                <label for="{{ form.address.id_for_label }}">Address</label>
+                                {{ form.address|add_class:'form-control'|add_error_class:'is-invalid'|attr:'rows:3'|attr:'placeholder:123 Main St, City, Country' }}
+                                {% if form.address.errors %}
+                                {% for error in form.address.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Social Media Tab -->
+                        <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
+                            <h5 class="text-muted mb-3"><i class="fas fa-share-alt mr-1"></i> Social Media Links</h5>
+
+                            <div class="form-group {% if form.facebook_url.errors %}has-error{% endif %}">
+                                <label for="{{ form.facebook_url.id_for_label }}"><i class="fab fa-facebook mr-1 text-primary"></i> Facebook URL</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-facebook"></i></span>
+                                    </div>
+                                    {{ form.facebook_url|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:https://facebook.com/yourpage' }}
+                                </div>
+                                {% if form.facebook_url.errors %}
+                                {% for error in form.facebook_url.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.twitter_url.errors %}has-error{% endif %}">
+                                <label for="{{ form.twitter_url.id_for_label }}"><i class="fab fa-twitter mr-1 text-info"></i> Twitter URL</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-twitter"></i></span>
+                                    </div>
+                                    {{ form.twitter_url|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:https://twitter.com/yourhandle' }}
+                                </div>
+                                {% if form.twitter_url.errors %}
+                                {% for error in form.twitter_url.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.youtube_url.errors %}has-error{% endif %}">
+                                <label for="{{ form.youtube_url.id_for_label }}"><i class="fab fa-youtube mr-1 text-danger"></i> YouTube URL</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-youtube"></i></span>
+                                    </div>
+                                    {{ form.youtube_url|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:https://youtube.com/yourchannel' }}
+                                </div>
+                                {% if form.youtube_url.errors %}
+                                {% for error in form.youtube_url.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group {% if form.instagram_url.errors %}has-error{% endif %}">
+                                <label for="{{ form.instagram_url.id_for_label }}"><i class="fab fa-instagram mr-1" style="color: #E1306C;"></i> Instagram URL</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-instagram"></i></span>
+                                    </div>
+                                    {{ form.instagram_url|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:https://instagram.com/yourprofile' }}
+                                </div>
+                                {% if form.instagram_url.errors %}
+                                {% for error in form.instagram_url.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Integrations Tab -->
+                        <div class="tab-pane fade" id="integrations" role="tabpanel" aria-labelledby="integrations-tab">
+                            <h5 class="text-muted mb-3"><i class="fas fa-plug mr-1"></i> Integrations</h5>
+
+                            <div class="form-group {% if form.google_analytics_id.errors %}has-error{% endif %}">
+                                <label for="{{ form.google_analytics_id.id_for_label }}"><i class="fab fa-google mr-1"></i> Google Analytics ID</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-chart-line"></i></span>
+                                    </div>
+                                    {{ form.google_analytics_id|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:G-XXXXXXXXXX or UA-XXXXXXXX-X' }}
+                                </div>
+                                {% if form.google_analytics_id.errors %}
+                                {% for error in form.google_analytics_id.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Enter your Google Analytics tracking ID.</small>
+                            </div>
+
+                            <div class="form-group {% if form.adsense_client_id.errors %}has-error{% endif %}">
+                                <label for="{{ form.adsense_client_id.id_for_label }}"><i class="fab fa-google mr-1"></i> AdSense Client ID</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-ad"></i></span>
+                                    </div>
+                                    {{ form.adsense_client_id|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:ca-pub-XXXXXXXXXXXXXXXX' }}
+                                </div>
+                                {% if form.adsense_client_id.errors %}
+                                {% for error in form.adsense_client_id.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Enter your Google AdSense publisher ID.</small>
+                            </div>
+
+                            <!-- Any extra fields not in defined sections -->
+                            {% for field in form %}
+                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id' %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                                    {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                                    {% for error in field.errors %}
+                                    <span class="invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                    {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                    <!-- /.tab-content -->
+
+                    <hr>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> Save Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+(function() {
+    'use strict';
+
+    // Custom file input label update
+    $('.custom-file-input').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').html(fileName || 'Choose file...');
+    });
+
+    // Store active tab in localStorage
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        localStorage.setItem('settingsActiveTab', $(e.target).attr('href'));
+    });
+
+    // Restore active tab from localStorage
+    var activeTab = localStorage.getItem('settingsActiveTab');
+    if (activeTab) {
+        $('#settingsTab a[href="' + activeTab + '"]').tab('show');
+    }
+})();
+</script>
+{% endblock %}

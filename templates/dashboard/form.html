@@ -1,0 +1,432 @@
+{% extends 'dashboard/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ action }} {{ model_name }} - Dashboard{% endblock %}
+{% block page_header %}{{ action }} {{ model_name }}{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">{{ action }} {{ model_name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {% if action == 'Create' %}
+                    <i class="fas fa-plus-circle mr-1"></i>
+                    {% else %}
+                    <i class="fas fa-edit mr-1"></i>
+                    {% endif %}
+                    {{ action }} {{ model_name }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                        {% with field_name=field.name %}
+                        <!-- Title / Name - Full width -->
+                        {% if field_name == 'title' or field_name == 'name' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                            {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Slug - Full width with auto-generate note -->
+                        {% elif field_name == 'slug' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                </div>
+                                {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                            </div>
+                            <small class="form-text text-muted"><i class="fas fa-magic mr-1"></i> Auto-generated from title. Edit manually if needed.</small>
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Content / Description / Ad code / Long text - Full width -->
+                        {% elif field_name == 'content' or field_name == 'description' or field_name == 'ad_code' or field_name == 'mission' or field_name == 'vision' or field_name == 'owner_bio' or field_name == 'site_description' or field_name == 'address' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                            {% if field_name == 'ad_code' %}
+                            {{ field|add_class:'form-control'|add_error_class:'is-invalid'|attr:'rows:6' }}
+                            {% else %}
+                            {{ field|add_error_class:'is-invalid' }}
+                            {% endif %}
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category field - start a row, pair with tags -->
+                        {% elif field_name == 'category' %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                                    {{ field|add_class:'form-control custom-select'|add_error_class:'is-invalid' }}
+                                    {% for error in field.errors %}
+                                    <span class="invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <!-- Tags field paired with category -->
+                            {% for other_field in form %}
+                                {% if other_field.name == 'tags' %}
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ other_field.id_for_label }}">{{ other_field.label }}{% if other_field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                                    {{ other_field|add_class:'form-control custom-select'|add_error_class:'is-invalid' }}
+                                    {% for error in other_field.errors %}
+                                    <span class="invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- is_published - start a row, pair with is_featured -->
+                        {% elif field_name == 'is_published' %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        {{ field|add_class:'form-check-input'|add_error_class:'is-invalid' }}
+                                        <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    </div>
+                                    {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% for other_field in form %}
+                                {% if other_field.name == 'is_featured' %}
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        {{ other_field|add_class:'form-check-input'|add_error_class:'is-invalid' }}
+                                        <label class="form-check-label" for="{{ other_field.id_for_label }}">{{ other_field.label }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Difficulty - start a row, pair with time_limit -->
+                        {% elif field_name == 'difficulty' %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                                    {{ field|add_class:'form-control custom-select'|add_error_class:'is-invalid' }}
+                                    {% for error in field.errors %}
+                                    <span class="invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% for other_field in form %}
+                                {% if other_field.name == 'time_limit' %}
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ other_field.id_for_label }}">{{ other_field.label }}</label>
+                                    <div class="input-group">
+                                        {{ other_field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">min</span>
+                                        </div>
+                                    </div>
+                                    {% for error in other_field.errors %}
+                                    <span class="invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Negative Marking - start a row, pair with negative_marking_value -->
+                        {% elif field_name == 'negative_marking' %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        {{ field|add_class:'form-check-input'|add_error_class:'is-invalid' }}
+                                        <label class="form-check-label" for="{{ field.id_for_label }}">
+                                            <i class="fas fa-minus-circle text-danger mr-1"></i> {{ field.label }}
+                                        </label>
+                                    </div>
+                                    {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                    {% endif %}
+                                    {% for error in field.errors %}
+                                    <span class="invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% for other_field in form %}
+                                {% if other_field.name == 'negative_marking_value' %}
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ other_field.id_for_label }}">
+                                        <i class="fas fa-calculator text-warning mr-1"></i> {{ other_field.label }}
+                                    </label>
+                                    <div class="input-group">
+                                        {{ other_field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">% per wrong</span>
+                                        </div>
+                                    </div>
+                                    {% if other_field.help_text %}
+                                    <small class="form-text text-muted">{{ other_field.help_text }}</small>
+                                    {% endif %}
+                                    {% for error in other_field.errors %}
+                                    <span class="invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- File / Image fields -->
+                        {% elif field_name == 'featured_image' or field_name == 'file' or field_name == 'thumbnail' or field_name == 'owner_image' or field_name == 'ad_image' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <div class="custom-file">
+                                {{ field|add_class:'custom-file-input'|add_error_class:'is-invalid' }}
+                                <label class="custom-file-label" for="{{ field.id_for_label }}">Choose file...</label>
+                            </div>
+                            {% if object and field.value %}
+                            <small class="form-text text-muted">
+                                <i class="fas fa-paperclip mr-1"></i> Current: <a href="{{ field.value.url }}" target="_blank">{{ field.value.name }}</a>
+                            </small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Summary / short text fields -->
+                        {% elif field_name == 'summary' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                            {{ field|add_class:'form-control'|add_error_class:'is-invalid'|attr:'rows:3' }}
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- link_url field for Ad Placement -->
+                        {% elif field_name == 'link_url' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                </div>
+                                {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                            </div>
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Skip already rendered paired fields -->
+                        {% elif field_name == 'tags' or field_name == 'is_featured' or field_name == 'time_limit' or field_name == 'negative_marking_value' %}
+                        {# Skip - rendered alongside their partner field #}
+
+                        <!-- All other fields - default rendering -->
+                        {% else %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                            {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
+                            {% for error in field.errors %}
+                            <span class="invalid-feedback d-block">{{ error }}</span>
+                            {% endfor %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+
+                    <hr>
+                    <div class="form-group">
+                        {% if action == 'Create' %}
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-plus mr-1"></i> Create {{ model_name }}
+                        </button>
+                        {% else %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> Save Changes
+                        </button>
+                        {% endif %}
+                        <a href="javascript:history.back()" class="btn btn-default ml-2">
+                            <i class="fas fa-times mr-1"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="col-lg-4">
+        {% if object and object.pk %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> Record Info</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Created</dt>
+                    <dd class="col-sm-8">{{ object.created_at|default:"-" }}</dd>
+                    <dt class="col-sm-4">Updated</dt>
+                    <dd class="col-sm-8">{{ object.updated_at|default:"-" }}</dd>
+                    {% if object.slug %}
+                    <dt class="col-sm-4">Slug</dt>
+                    <dd class="col-sm-8"><code>{{ object.slug }}</code></dd>
+                    {% endif %}
+                    {% if object.is_published is not None %}
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        {% if object.is_published %}
+                        <span class="badge badge-success">Published</span>
+                        {% else %}
+                        <span class="badge badge-secondary">Draft</span>
+                        {% endif %}
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-lightbulb mr-1"></i> Tips</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Slug is auto-generated from the title.</li>
+                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Leave slug blank for auto-generation.</li>
+                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Use rich text editor for content fields.</li>
+                    <li><i class="fas fa-check text-success mr-1"></i> Upload images in JPG/PNG format.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+(function() {
+    'use strict';
+
+    // Auto-generate slug from title/name
+    var slugField = document.getElementById('id_slug');
+    var titleField = document.getElementById('id_title') || document.getElementById('id_name');
+
+    if (titleField && slugField) {
+        var slugManuallyEdited = slugField.value.length > 0;
+
+        slugField.addEventListener('input', function() {
+            slugManuallyEdited = true;
+        });
+
+        titleField.addEventListener('input', function() {
+            if (!slugManuallyEdited) {
+                slugField.value = slugify(titleField.value);
+            }
+        });
+    }
+
+    function slugify(text) {
+        return text.toString().toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    }
+
+    // Custom file input label update
+    $('.custom-file-input').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').html(fileName || 'Choose file...');
+    });
+
+    // Negative marking toggle - show/hide the value field
+    var negMarkingCheckbox = document.getElementById('id_negative_marking');
+    var negMarkingValueCol = null;
+
+    if (negMarkingCheckbox) {
+        // Find the col-md-6 container of the negative_marking_value field
+        var negRow = negMarkingCheckbox.closest('.row');
+        if (negRow) {
+            var cols = negRow.querySelectorAll('.col-md-6');
+            if (cols.length > 1) {
+                negMarkingValueCol = cols[1]; // Second column contains the value field
+            }
+        }
+
+        function toggleNegMarkingValue() {
+            if (negMarkingValueCol) {
+                if (negMarkingCheckbox.checked) {
+                    negMarkingValueCol.style.display = '';
+                } else {
+                    negMarkingValueCol.style.display = 'none';
+                }
+            }
+        }
+
+        // Set initial state
+        toggleNegMarkingValue();
+
+        // Listen for changes
+        negMarkingCheckbox.addEventListener('change', toggleNegMarkingValue);
+    }
+})();
+</script>
+{% endblock %}

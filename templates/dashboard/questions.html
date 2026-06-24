@@ -1,0 +1,212 @@
+{% extends 'dashboard/base.html' %}
+{% load quiz_extras %}
+
+{% block title %}Questions - {{ quiz.title }} - Dashboard{% endblock %}
+{% block page_header %}Questions for {{ quiz.title }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:quizzes' %}">Quizzes</a></li>
+<li class="breadcrumb-item active">{{ quiz.title }} - Questions</li>
+{% endblock %}
+
+{% block content %}
+<!-- Quiz Info Card -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body py-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1"><i class="fas fa-brain mr-1 text-info"></i> {{ quiz.title }}</h5>
+                        <small class="text-muted">
+                            <span class="mr-3"><i class="fas fa-folder mr-1"></i> {{ quiz.category.name|default:"Uncategorized" }}</span>
+                            <span class="mr-3">
+                                <i class="fas fa-signal mr-1"></i>
+                                {% if quiz.difficulty == 'easy' %}
+                                <span class="badge badge-success">Easy</span>
+                                {% elif quiz.difficulty == 'medium' %}
+                                <span class="badge badge-warning">Medium</span>
+                                {% elif quiz.difficulty == 'hard' %}
+                                <span class="badge badge-danger">Hard</span>
+                                {% endif %}
+                            </span>
+                            <span class="mr-3"><i class="fas fa-clock mr-1"></i> {% if quiz.time_limit %}{{ quiz.time_limit }} min{% else %}No time limit{% endif %}</span>
+                            <span>
+                                <i class="fas fa-minus-circle mr-1"></i>
+                                {% if quiz.negative_marking %}
+                                <span class="badge badge-danger">-{{ quiz.negative_marking_value|penalty_display }}%/wrong</span>
+                                {% else %}
+                                <span class="badge badge-secondary">No negative marking</span>
+                                {% endif %}
+                            </span>
+                        </small>
+                    </div>
+                    <div>
+                        <a href="{% url 'dashboard:quiz_edit' quiz.pk %}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-edit mr-1"></i> Edit Quiz
+                        </a>
+                        <a href="{% url 'dashboard:quizzes' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ questions.count|default:"0" }}</h3>
+                <p>Total Questions</p>
+            </div>
+            <div class="icon"><i class="fas fa-question-circle"></i></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{ quiz.attempts|default:"0" }}</h3>
+                <p>Total Attempts</p>
+            </div>
+            <div class="icon"><i class="fas fa-users"></i></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{% if quiz.time_limit %}{{ quiz.time_limit }}m{% else %}N/A{% endif %}</h3>
+                <p>Time Limit</p>
+            </div>
+            <div class="icon"><i class="fas fa-stopwatch"></i></div>
+        </div>
+    </div>
+</div>
+
+<!-- Questions Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-list-ol mr-1"></i> Questions List
+                </h3>
+                <div class="card-tools">
+                    <a href="{% url 'dashboard:question_import' quiz.pk %}" class="btn btn-sm btn-primary mr-1">
+                        <i class="fas fa-file-excel mr-1"></i> Import from Excel
+                    </a>
+                    <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus mr-1"></i> Add New Question
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if questions %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 60px;" class="text-center">#</th>
+                                <th>Question</th>
+                                <th style="width: 80px;" class="text-center">Answer</th>
+                                <th style="width: 200px;">Options Summary</th>
+                                <th style="width: 60px;" class="text-center">Has Explanation</th>
+                                <th style="width: 150px;" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in questions %}
+                            <tr>
+                                <td class="text-center">
+                                    <span class="badge badge-secondary font-size-lg">{{ question.order|default:forloop.counter }}</span>
+                                </td>
+                                <td>
+                                    <div>{{ question.question_text|striptags|truncatechars:120 }}</div>
+                                    {% if question.explanation %}
+                                    <small class="text-muted d-block mt-1">
+                                        <i class="fas fa-lightbulb text-warning mr-1"></i>
+                                        {{ question.explanation|striptags|truncatechars:80 }}
+                                    </small>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge
+                                        {% if question.correct_answer == 'A' %}badge-primary
+                                        {% elif question.correct_answer == 'B' %}badge-success
+                                        {% elif question.correct_answer == 'C' %}badge-info
+                                        {% elif question.correct_answer == 'D' %}badge-warning
+                                        {% else %}badge-secondary{% endif %} font-size-lg">
+                                        {{ question.correct_answer }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>
+                                        <span class="d-block"><strong>A:</strong> {{ question.option_a|truncatechars:35 }}</span>
+                                        <span class="d-block"><strong>B:</strong> {{ question.option_b|truncatechars:35 }}</span>
+                                        <span class="d-block"><strong>C:</strong> {{ question.option_c|truncatechars:35 }}</span>
+                                        <span class="d-block"><strong>D:</strong> {{ question.option_d|truncatechars:35 }}</span>
+                                    </small>
+                                </td>
+                                <td class="text-center">
+                                    {% if question.explanation %}
+                                    <i class="fas fa-check-circle text-success" title="Has explanation"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-muted" title="No explanation"></i>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'dashboard:question_edit' question.pk %}" class="btn btn-sm btn-outline-info" title="Edit Question">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'dashboard:question_delete' question.pk %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete question #{{ question.order|default:forloop.counter }}?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Question">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-question fa-4x text-muted mb-3 d-block"></i>
+                    <h4 class="text-muted">No Questions Yet</h4>
+                    <p class="text-muted mb-3">Start adding questions to this quiz. Each question needs 4 options and a correct answer.</p>
+                    <a href="{% url 'dashboard:question_import' quiz.pk %}" class="btn btn-primary mr-2">
+                        <i class="fas fa-file-excel mr-1"></i> Import from Excel
+                    </a>
+                    <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-success">
+                        <i class="fas fa-plus mr-1"></i> Add First Question
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% if questions and questions.count > 0 %}
+            <div class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'dashboard:quizzes' %}" class="btn btn-default">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Quizzes
+                    </a>
+                    <div>
+                        <a href="{% url 'dashboard:question_import' quiz.pk %}" class="btn btn-primary mr-1">
+                            <i class="fas fa-file-excel mr-1"></i> Import from Excel
+                        </a>
+                        <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-success">
+                            <i class="fas fa-plus mr-1"></i> Add Another Question
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

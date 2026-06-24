@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block og_title %}{{ meta_title }}{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="bg-light py-3 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Notes</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Notes Header & Content -->
+<section class="py-4 py-lg-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h1 class="h2 fw-bold mb-1"><i class="fas fa-book-open text-primary me-2"></i>Study Notes</h1>
+                        <p class="text-muted mb-0">Browse our comprehensive collection of study notes across various subjects.</p>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <form method="get" class="mb-4" role="search">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0" placeholder="Search notes by title or topic..." value="{{ search_query }}" aria-label="Search notes">
+                        {% if current_category %}
+                        <input type="hidden" name="category" value="{{ current_category }}">
+                        {% endif %}
+                        <button class="btn btn-primary" type="submit">Search</button>
+                        {% if search_query %}
+                        <a href="{% url 'notes:list' %}{% if current_category %}?category={{ current_category }}{% endif %}" class="btn btn-outline-secondary" title="Clear search"><i class="fas fa-times"></i></a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                <!-- Ad: Notes Top -->
+                {% if ads.notes_top %}
+                <div class="ad-container text-center mb-4">
+                    {{ ads.notes_top|safe }}
+                </div>
+                {% endif %}
+
+                <!-- Category Filter Pills -->
+                <div class="mb-4">
+                    <h2 class="visually-hidden">Filter by category</h2>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'notes:list' %}{% if search_query %}?q={{ search_query }}{% endif %}"
+                           class="btn btn-sm {% if not current_category %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            <i class="fas fa-th me-1"></i>All
+                        </a>
+                        {% for cat in categories %}
+                        <a href="{% url 'notes:list' %}?category={{ cat.slug }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                           class="btn btn-sm {% if current_category == cat.slug %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            {% if cat.icon %}<i class="{{ cat.icon }} me-1"></i>{% endif %}
+                            {{ cat.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Active Filters Summary -->
+                {% if search_query or current_category %}
+                <div class="alert alert-light border d-flex justify-content-between align-items-center mb-4">
+                    <span class="small">
+                        <i class="fas fa-filter me-1 text-primary"></i>Showing results
+                        {% if current_category %}
+                        in <strong>{{ current_category }}</strong>
+                        {% endif %}
+                        {% if search_query %}
+                        for "<strong>{{ search_query }}</strong>"
+                        {% endif %}
+                    </span>
+                    <a href="{% url 'notes:list' %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-times me-1"></i>Clear filters</a>
+                </div>
+                {% endif %}
+
+                <!-- Notes Grid -->
+                {% if page_obj %}
+                <div class="row g-4">
+                    {% for note in page_obj %}
+                    <div class="col-md-6 col-xl-4">
+                        <article class="card h-100 border-0 shadow-sm note-card overflow-hidden">
+                            {% if note.featured_image %}
+                            <a href="{{ note.get_absolute_url }}" class="text-decoration-none">
+                                <img src="{{ note.featured_image.url }}" class="card-img-top" alt="{{ note.title }}" loading="lazy" style="height:200px;object-fit:cover;">
+                            </a>
+                            {% else %}
+                            <a href="{{ note.get_absolute_url }}" class="text-decoration-none">
+                                <div class="card-img-top bg-primary bg-gradient d-flex align-items-center justify-content-center" style="height:200px;">
+                                    <i class="fas fa-book fa-3x text-white opacity-50"></i>
+                                </div>
+                            </a>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <div class="mb-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ note.category.name }}</span>
+                                    {% if note.is_featured %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning"><i class="fas fa-star me-1"></i>Featured</span>
+                                    {% endif %}
+                                </div>
+                                <h3 class="card-title h6 fw-bold mb-2">
+                                    <a href="{{ note.get_absolute_url }}" class="text-decoration-none text-dark stretched-link">{{ note.title }}</a>
+                                </h3>
+                                <p class="card-text text-muted small mb-3 flex-grow-1">{{ note.summary|truncatewords:20 }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center py-2">
+                                <small class="text-muted"><i class="fas fa-eye me-1"></i>{{ note.views }} views</small>
+                                <small class="text-muted"><i class="fas fa-calendar-alt me-1"></i>{{ note.created_at|date:"M d, Y" }}</small>
+                            </div>
+                        </article>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Notes pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Previous">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                            <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-book-open fa-4x text-muted opacity-25"></i>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">No notes found</h3>
+                    <p class="text-muted mb-4">
+                        {% if search_query %}
+                        We couldn't find any notes matching "<strong>{{ search_query }}</strong>".
+                        {% elif current_category %}
+                        There are no notes in this category yet.
+                        {% else %}
+                        Notes are coming soon. Stay tuned!
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'notes:list' %}" class="btn btn-primary"><i class="fas fa-arrow-left me-2"></i>Browse all notes</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="col-lg-4">
+                <!-- Ad: Sidebar -->
+                {% if ads.sidebar %}
+                <div class="ad-container mb-4">
+                    {{ ads.sidebar|safe }}
+                </div>
+                {% endif %}
+
+                <!-- Categories Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-folder me-2"></i>Categories</h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-unstyled mb-0">
+                            {% for cat in categories %}
+                            <li class="{% if not forloop.last %}border-bottom{% endif %}">
+                                <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="text-decoration-none d-flex justify-content-between align-items-center px-3 py-2 {% if current_category == cat.slug %}bg-primary bg-opacity-10 fw-bold{% endif %}">
+                                    <span>
+                                        {% if cat.icon %}<i class="{{ cat.icon }} me-2 text-primary"></i>{% endif %}
+                                        {{ cat.name }}
+                                    </span>
+                                    <span class="badge bg-light text-dark rounded-pill">{{ cat.notes.count }}</span>
+                                </a>
+                            </li>
+                            {% empty %}
+                            <li class="px-3 py-2 text-muted small">Categories coming soon.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quick Links Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-link me-2 text-primary"></i>Quick Links</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'quiz:list' %}" class="btn btn-outline-success btn-sm text-start">
+                                <i class="fas fa-brain me-2"></i>MCQ Practice
+                            </a>
+                            <a href="{% url 'blog:list' %}" class="btn btn-outline-info btn-sm text-start">
+                                <i class="fas fa-blog me-2"></i>Educational Blog
+                            </a>
+                            <a href="{% url 'downloads:list' %}" class="btn btn-outline-warning btn-sm text-start">
+                                <i class="fas fa-download me-2"></i>Downloads
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .note-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .note-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+    }
+    .note-card .stretched-link::after {
+        z-index: 1;
+    }
+</style>
+{% endblock %}

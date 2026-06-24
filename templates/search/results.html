@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block og_title %}{{ meta_title }}{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<section class="bg-light py-3 border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Search Results</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- Search Results Section -->
+<section class="py-4 py-lg-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <form method="get" action="{% url 'search:search' %}" role="search">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" name="q" class="form-control border-start-0 border-end-0" placeholder="Search notes, blogs, downloads, quizzes..." value="{{ query }}" aria-label="Search query" autofocus>
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+
+                {% if query %}
+                <!-- Results Count -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="text-muted mb-0">
+                        {% if total_results > 0 %}
+                        <strong>{{ total_results }}</strong> result{{ total_results|pluralize }} found for "<strong>{{ query }}</strong>"
+                        {% else %}
+                        No results found for "<strong>{{ query }}</strong>"
+                        {% endif %}
+                    </p>
+                </div>
+
+                {% if total_results > 0 %}
+
+                <!-- Ad: Top -->
+                {% if ads.home_top %}
+                <div class="ad-container text-center mb-4">
+                    {{ ads.home_top|safe }}
+                </div>
+                {% endif %}
+
+                <!-- Notes Results -->
+                {% if notes %}
+                <div class="mb-4">
+                    <h2 class="h5 fw-bold mb-3">
+                        <i class="fas fa-book text-primary me-2"></i>Notes
+                        <span class="badge bg-primary bg-opacity-10 text-primary ms-1">{{ notes|length }}</span>
+                    </h2>
+                    {% for note in notes %}
+                    <div class="card border-0 shadow-sm mb-3 search-result-card">
+                        <div class="card-body py-3">
+                            <div class="d-flex align-items-start">
+                                <div class="rounded bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:40px;height:40px;">
+                                    <i class="fas fa-book text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h3 class="h6 fw-bold mb-1">
+                                        <a href="{{ note.get_absolute_url }}" class="text-decoration-none text-dark">{{ note.title }}</a>
+                                    </h3>
+                                    <p class="text-muted small mb-1">{{ note.summary|truncatewords:25 }}</p>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary"><i class="fas fa-folder me-1"></i>{{ note.category.name }}</span>
+                                        <span class="badge bg-light text-dark border"><i class="fas fa-eye me-1"></i>{{ note.views }}</span>
+                                    </div>
+                                </div>
+                                <span class="badge bg-primary ms-2 flex-shrink-0">Note</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Blog Results -->
+                {% if blogs %}
+                <div class="mb-4">
+                    <h2 class="h5 fw-bold mb-3">
+                        <i class="fas fa-blog text-info me-2"></i>Blog Posts
+                        <span class="badge bg-info bg-opacity-10 text-info ms-1">{{ blogs|length }}</span>
+                    </h2>
+                    {% for post in blogs %}
+                    <div class="card border-0 shadow-sm mb-3 search-result-card">
+                        <div class="card-body py-3">
+                            <div class="d-flex align-items-start">
+                                <div class="rounded bg-info bg-opacity-10 d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:40px;height:40px;">
+                                    <i class="fas fa-blog text-info"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h3 class="h6 fw-bold mb-1">
+                                        <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark">{{ post.title }}</a>
+                                    </h3>
+                                    <p class="text-muted small mb-1">{{ post.summary|truncatewords:25 }}</p>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-info bg-opacity-10 text-info"><i class="fas fa-folder me-1"></i>{{ post.category.name }}</span>
+                                        <span class="badge bg-light text-dark border"><i class="fas fa-calendar-alt me-1"></i>{{ post.created_at|date:"M d, Y" }}</span>
+                                    </div>
+                                </div>
+                                <span class="badge bg-info ms-2 flex-shrink-0">Blog</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Download Results -->
+                {% if downloads %}
+                <div class="mb-4">
+                    <h2 class="h5 fw-bold mb-3">
+                        <i class="fas fa-download text-warning me-2"></i>Downloads
+                        <span class="badge bg-warning bg-opacity-10 text-warning ms-1">{{ downloads|length }}</span>
+                    </h2>
+                    {% for download in downloads %}
+                    <div class="card border-0 shadow-sm mb-3 search-result-card">
+                        <div class="card-body py-3">
+                            <div class="d-flex align-items-start">
+                                <div class="rounded {% if download.file_type == 'pdf' %}bg-danger bg-opacity-10{% elif download.file_type == 'docx' %}bg-primary bg-opacity-10{% elif download.file_type == 'ppt' %}bg-warning bg-opacity-10{% elif download.file_type == 'zip' %}bg-success bg-opacity-10{% else %}bg-secondary bg-opacity-10{% endif %} d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:40px;height:40px;">
+                                    {% if download.file_type == 'pdf' %}
+                                    <i class="fas fa-file-pdf text-danger"></i>
+                                    {% elif download.file_type == 'docx' %}
+                                    <i class="fas fa-file-word text-primary"></i>
+                                    {% elif download.file_type == 'ppt' %}
+                                    <i class="fas fa-file-powerpoint text-warning"></i>
+                                    {% elif download.file_type == 'zip' %}
+                                    <i class="fas fa-file-archive text-success"></i>
+                                    {% else %}
+                                    <i class="fas fa-file text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h3 class="h6 fw-bold mb-1">
+                                        <a href="{{ download.get_absolute_url }}" class="text-decoration-none text-dark">{{ download.title }}</a>
+                                    </h3>
+                                    <p class="text-muted small mb-1">{{ download.summary|truncatewords:25 }}</p>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-warning bg-opacity-10 text-warning"><i class="fas fa-folder me-1"></i>{{ download.category.name }}</span>
+                                        <span class="badge bg-light text-dark border"><i class="fas fa-download me-1"></i>{{ download.download_count }}</span>
+                                        {% if download.file_size %}
+                                        <span class="badge bg-light text-dark border">{{ download.file_size }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <span class="badge bg-warning text-dark ms-2 flex-shrink-0">Download</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Quiz Results -->
+                {% if quizzes %}
+                <div class="mb-4">
+                    <h2 class="h5 fw-bold mb-3">
+                        <i class="fas fa-brain text-success me-2"></i>MCQ Quizzes
+                        <span class="badge bg-success bg-opacity-10 text-success ms-1">{{ quizzes|length }}</span>
+                    </h2>
+                    {% for quiz in quizzes %}
+                    <div class="card border-0 shadow-sm mb-3 search-result-card">
+                        <div class="card-body py-3">
+                            <div class="d-flex align-items-start">
+                                <div class="rounded bg-success bg-opacity-10 d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:40px;height:40px;">
+                                    <i class="fas fa-brain text-success"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h3 class="h6 fw-bold mb-1">
+                                        <a href="{{ quiz.get_absolute_url }}" class="text-decoration-none text-dark">{{ quiz.title }}</a>
+                                    </h3>
+                                    {% if quiz.description %}
+                                    <p class="text-muted small mb-1">{{ quiz.description|truncatewords:25 }}</p>
+                                    {% endif %}
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-success bg-opacity-10 text-success"><i class="fas fa-folder me-1"></i>{{ quiz.category.name }}</span>
+                                        <span class="badge bg-light text-dark border"><i class="fas fa-question-circle me-1"></i>{{ quiz.questions.count }} Qs</span>
+                                        {% if quiz.difficulty == 'easy' %}
+                                        <span class="badge bg-success">Easy</span>
+                                        {% elif quiz.difficulty == 'medium' %}
+                                        <span class="badge bg-warning text-dark">Medium</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Hard</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <span class="badge bg-success ms-2 flex-shrink-0">Quiz</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Ad: Sidebar -->
+                {% if ads.sidebar %}
+                <div class="ad-container text-center mb-4">
+                    {{ ads.sidebar|safe }}
+                </div>
+                {% endif %}
+
+                {% else %}
+                <!-- No Results State -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-4x text-muted opacity-25"></i>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">No results found</h3>
+                    <p class="text-muted mb-4">We couldn't find anything matching "<strong>{{ query }}</strong>". Try a different search term.</p>
+                    <div class="mb-4">
+                        <h4 class="h6 text-muted mb-3">Suggestions:</h4>
+                        <ul class="list-unstyled text-muted small">
+                            <li class="mb-1"><i class="fas fa-check text-primary me-2"></i>Check your spelling</li>
+                            <li class="mb-1"><i class="fas fa-check text-primary me-2"></i>Try more general keywords</li>
+                            <li class="mb-1"><i class="fas fa-check text-primary me-2"></i>Try fewer keywords</li>
+                            <li class="mb-1"><i class="fas fa-check text-primary me-2"></i>Browse by category instead</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quick Browse Suggestions -->
+                <div class="text-center">
+                    <h4 class="h6 mb-3">Or browse our content:</h4>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="{% url 'notes:list' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-book me-1"></i>Notes
+                        </a>
+                        <a href="{% url 'blog:list' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-blog me-1"></i>Blog
+                        </a>
+                        <a href="{% url 'downloads:list' %}" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-download me-1"></i>Downloads
+                        </a>
+                        <a href="{% url 'quiz:list' %}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-brain me-1"></i>Quizzes
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <!-- Initial State - No Query -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-4x text-muted opacity-25"></i>
+                    </div>
+                    <h3 class="h5 fw-bold mb-2">Search our platform</h3>
+                    <p class="text-muted mb-4">Enter a keyword above to search across notes, blogs, downloads, and quizzes.</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="{% url 'notes:list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-book me-1"></i>Browse Notes
+                        </a>
+                        <a href="{% url 'blog:list' %}" class="btn btn-outline-info">
+                            <i class="fas fa-blog me-1"></i>Browse Blog
+                        </a>
+                        <a href="{% url 'downloads:list' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-download me-1"></i>Browse Downloads
+                        </a>
+                        <a href="{% url 'quiz:list' %}" class="btn btn-outline-success">
+                            <i class="fas fa-brain me-1"></i>Browse Quizzes
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-result-card {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .search-result-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.08) !important;
+    }
+</style>
+{% endblock %}

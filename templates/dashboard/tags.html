@@ -1,0 +1,127 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Tags - Dashboard{% endblock %}
+{% block page_header %}Tags{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Tags</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-tags mr-1"></i> Tags</h3>
+                <div class="card-tools">
+                    <a href="{% url 'dashboard:tag_create' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus mr-1"></i> Create Tag
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Name</th>
+                                <th>Slug</th>
+                                <th style="width: 140px;" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tag in page_obj %}
+                            <tr>
+                                <td class="text-center text-muted">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                                <td>
+                                    <span class="badge badge-secondary"><i class="fas fa-tag mr-1"></i> {{ tag.name }}</span>
+                                </td>
+                                <td><code>{{ tag.slug }}</code></td>
+                                <td class="text-center">
+                                    <a href="{% url 'dashboard:tag_edit' tag.pk %}" class="btn btn-sm btn-outline-info" title="Edit Tag">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete Tag" data-toggle="modal" data-target="#deleteModal-{{ tag.pk }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-5">
+                                    <i class="fas fa-tags fa-3x mb-3 d-block"></i>
+                                    <h5>No tags yet</h5>
+                                    <p>Create tags to organize your content.</p>
+                                    <a href="{% url 'dashboard:tag_create' %}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-plus mr-1"></i> Create First Tag
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="card-footer clearfix">
+                <span class="text-muted float-left mt-2">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} tags</span>
+                <ul class="pagination pagination-sm m-0 float-right">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modals -->
+{% for tag in page_obj %}
+<div class="modal fade" id="deleteModal-{{ tag.pk }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel-{{ tag.pk }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel-{{ tag.pk }}"><i class="fas fa-exclamation-triangle text-warning mr-2"></i> Delete Tag</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the tag <strong>"{{ tag.name }}"</strong>?</p>
+                <p class="text-muted mb-0"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <form method="post" action="{% url 'dashboard:tag_delete' tag.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash mr-1"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

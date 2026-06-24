@@ -1,0 +1,444 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Analytics - Dashboard{% endblock %}
+{% block page_header %}Analytics{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Analytics</li>
+{% endblock %}
+
+{% block content %}
+<!-- Summary Cards -->
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-clipboard-check"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Attempts (30d)</span>
+                <span class="info-box-number">{{ total_attempts_30d }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-success"><i class="fas fa-percentage"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Avg Score (30d)</span>
+                <span class="info-box-number">{{ avg_score_30d|floatformat:1 }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-warning"><i class="fas fa-chart-line"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Daily Avg Attempts</span>
+                <span class="info-box-number">
+                    {% if total_attempts_30d > 0 %}
+                    {{ total_attempts_30d|floatformat:0 }}
+                    {% else %}
+                    0
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="info-box">
+            <span class="info-box-icon bg-purple"><i class="fas fa-trophy"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Top Quizzes</span>
+                <span class="info-box-number">{{ top_quizzes|length }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <!-- Quiz Attempts 30-Day Line Chart -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-line mr-1"></i> Quiz Attempts &amp; Avg Score - Last 30 Days</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="attemptsChart" style="min-height: 300px; height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Monthly Quiz Attempts -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-calendar mr-1"></i> Monthly Attempts</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="monthlyChart" style="min-height: 300px; height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Distribution & Difficulty -->
+<div class="row">
+    <!-- Notes by Category - Bar Chart -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-book mr-1"></i> Notes by Category</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="notesCatChart" style="min-height: 250px; height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Blog by Category - Pie Chart -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-blog mr-1"></i> Blogs by Category</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="blogCatChart" style="min-height: 250px; height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Difficulty Breakdown -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-signal mr-1"></i> Difficulty Breakdown</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm m-0">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Quizzes</th>
+                                <th>Attempts</th>
+                                <th>Avg Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ds in difficulty_stats %}
+                            <tr>
+                                <td>
+                                    {% if ds.difficulty == 'easy' %}
+                                    <span class="badge badge-success">Easy</span>
+                                    {% elif ds.difficulty == 'medium' %}
+                                    <span class="badge badge-warning">Medium</span>
+                                    {% elif ds.difficulty == 'hard' %}
+                                    <span class="badge badge-danger">Hard</span>
+                                    {% else %}
+                                    <span class="badge badge-secondary">{{ ds.difficulty }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ds.count }}</td>
+                                <td>{{ ds.total_attempts }}</td>
+                                <td>
+                                    {% if ds.avg_score %}
+                                    {{ ds.avg_score|floatformat:1 }}
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted">No data</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Performing Quizzes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-trophy mr-1"></i> Top Performing Quizzes</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm m-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th>Quiz Title</th>
+                                <th>Category</th>
+                                <th>Difficulty</th>
+                                <th>Questions</th>
+                                <th>Total Attempts</th>
+                                <th>Avg Score</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in top_quizzes %}
+                            <tr>
+                                <td class="text-center font-weight-bold">{{ forloop.counter }}</td>
+                                <td>
+                                    <a href="{{ quiz.get_absolute_url }}" target="_blank">{{ quiz.title|truncatechars:45 }}</a>
+                                </td>
+                                <td><span class="badge badge-purple" style="background-color: #6f42c1;">{{ quiz.category.name }}</span></td>
+                                <td>
+                                    {% if quiz.difficulty == 'easy' %}
+                                    <span class="badge badge-success">Easy</span>
+                                    {% elif quiz.difficulty == 'medium' %}
+                                    <span class="badge badge-warning">Medium</span>
+                                    {% elif quiz.difficulty == 'hard' %}
+                                    <span class="badge badge-danger">Hard</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ quiz.questions.count }}</td>
+                                <td>{{ quiz.attempt_count }}</td>
+                                <td>
+                                    {% if quiz.avg_score %}
+                                    {{ quiz.avg_score|floatformat:1 }}
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if quiz.avg_score and quiz.questions.count > 0 %}
+                                        {% widthratio quiz.avg_score quiz.questions.count 100 as perf_pct %}
+                                        <div class="progress" style="height: 10px; min-width: 80px;">
+                                            <div class="progress-bar {% if perf_pct >= 80 %}bg-success{% elif perf_pct >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {% if perf_pct > 100 %}100{% else %}{{ perf_pct }}{% endif %}%"></div>
+                                        </div>
+                                    {% else %}
+                                        <div class="progress" style="height: 10px; min-width: 80px;">
+                                            <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                    No quiz attempts recorded yet
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Color palette
+    var palette = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#fd7e14', '#e83e8c', '#20c997', '#6610f2'];
+
+    // 30-Day Attempts & Avg Score Chart
+    (function() {
+        var ctx = document.getElementById('attemptsChart');
+        if (ctx) {
+            var labels = {{ chart_labels|safe }};
+            var counts = {{ chart_counts|safe }};
+            var avgPct = {{ chart_avg|safe }};
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Attempts',
+                            data: counts,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Avg Score %',
+                            data: avgPct,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            fill: false,
+                            tension: 0.4,
+                            yAxisID: 'y1',
+                            borderDash: [5, 5],
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Attempts' },
+                            ticks: { stepSize: 1 },
+                            beginAtZero: true,
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Avg Score %' },
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { drawOnChartArea: false },
+                        }
+                    }
+                }
+            });
+        }
+    })();
+
+    // Monthly Attempts Bar Chart
+    (function() {
+        var ctx = document.getElementById('monthlyChart');
+        if (ctx) {
+            var labels = {{ monthly_labels|safe }};
+            var counts = {{ monthly_counts|safe }};
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Attempts',
+                        data: counts,
+                        backgroundColor: 'rgba(0, 123, 255, 0.7)',
+                        borderColor: '#007bff',
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 },
+                            title: { display: true, text: 'Attempts' },
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    })();
+
+    // Notes by Category Bar Chart
+    (function() {
+        var ctx = document.getElementById('notesCatChart');
+        if (ctx) {
+            var notesCat = {{ notes_by_cat }};
+            var labels = [];
+            var counts = [];
+            for (var i = 0; i < notesCat.length; i++) {
+                labels.push(notesCat[i].name);
+                counts.push(notesCat[i].count);
+            }
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Notes',
+                        data: counts,
+                        backgroundColor: palette.slice(0, labels.length).map(function(c) { return c + 'aa'; }),
+                        borderColor: palette.slice(0, labels.length),
+                        borderWidth: 1,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    })();
+
+    // Blog by Category Pie Chart
+    (function() {
+        var ctx = document.getElementById('blogCatChart');
+        if (ctx) {
+            var blogCat = {{ blog_by_cat }};
+            var labels = [];
+            var counts = [];
+            for (var i = 0; i < blogCat.length; i++) {
+                labels.push(blogCat[i].name);
+                counts.push(blogCat[i].count);
+            }
+            if (labels.length === 0) {
+                labels = ['No Data'];
+                counts = [1];
+            }
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: palette.slice(0, labels.length),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

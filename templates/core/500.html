@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ meta_title|default:"Server Error - Learning Platform" }}
+{% endblock %}
+
+{% block meta_description %}
+{{ meta_description|default:"We are experiencing a server error. Please try again later or contact us for assistance." }}
+{% endblock %}
+
+{% block og_title %}
+{{ meta_title|default:"Server Error - Learning Platform" }}
+{% endblock %}
+
+{% block og_description %}
+{{ meta_description|default:"We are experiencing a server error. Please try again later." }}
+{% endblock %}
+
+{% block content %}
+<section class="py-5 min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+
+                <!-- 500 Icon -->
+                <div class="mb-4">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                         style="width:160px;height:160px;">
+                        <span class="display-1 fw-bold text-danger">500</span>
+                    </div>
+                </div>
+
+                <h1 class="fw-bold mb-3">Server Error</h1>
+
+                <p class="text-muted mb-4">
+                    Something went wrong on our end.
+                    We are working to fix it. Please try again in a few moments.
+                </p>
+
+                <!-- Main Actions -->
+                <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+
+                    <!-- SAFE: no Django URL reversing -->
+                    <a href="/" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>Go to Homepage
+                    </a>
+
+                    <a href="javascript:location.reload()" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-redo me-2"></i>Try Again
+                    </a>
+
+                </div>
+
+                <!-- Secondary Links -->
+                <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+
+                    <a href="/notes/" class="btn btn-outline-success">
+                        <i class="fas fa-book me-1"></i>Notes
+                    </a>
+
+                    <a href="/quiz/" class="btn btn-outline-warning">
+                        <i class="fas fa-brain me-1"></i>MCQ Practice
+                    </a>
+
+                    <a href="/blog/" class="btn btn-outline-info">
+                        <i class="fas fa-blog me-1"></i>Blog
+                    </a>
+
+                </div>
+
+                <p class="text-muted small">
+                    If the problem persists,
+                    <a href="/contact/">contact us</a> and let us know what happened.
+                </p>
+
+                <!-- Optional auto-refresh info -->
+                <!--
+                <p class="text-muted small mt-3">
+                    The page will not auto-recover. Please refresh manually.
+                </p>
+                -->
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
