@@ -175,7 +175,7 @@
                             Check your answered questions in the sidebar navigator. Once submitted, you'll immediately see your total score, accuracy %, and complete instructor explanations.
                         </p>
                         <div>
-                            <button type="submit" class="btn btn-explore btn-lg px-5 rounded-pill shadow-sm" id="submit-btn" style="font-family: 'Poppins', sans-serif;">
+                            <button type="button" class="btn btn-explore btn-lg px-5 rounded-pill shadow-sm" id="submit-btn" onclick="openSubmitModal()" style="font-family: 'Poppins', sans-serif;">
                                 <i class="bi bi-send-fill me-2"></i>Submit &amp; View Results
                             </button>
                         </div>
@@ -218,6 +218,11 @@
                         </div>
                     </div>
 
+                    <!-- Sticky Sidebar Submit Button -->
+                    <button type="button" class="btn btn-explore rounded-pill w-100 py-2 mb-3 fw-semibold shadow-sm" onclick="openSubmitModal()" style="font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-send-fill me-2"></i>Submit Test (<span id="sidebar-answered-count">0</span>/{{ total_questions }})
+                    </button>
+
                     <!-- Sidebar Ad -->
                     {% if ads.sidebar %}
                     <div class="ad-container mb-4">
@@ -234,6 +239,69 @@
         </div>
     </div>
 </section>
+
+<!-- Floating Quiz Action Bar (Safe, Always-Accessible Submit) -->
+<div id="floatingQuizDock" class="floating-quiz-dock" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1040;">
+    <div class="d-flex align-items-center gap-2 gap-sm-3 px-3 py-2 rounded-pill shadow-lg border" style="border-color: rgba(255,255,255,0.18) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(15, 23, 42, 0.92); box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;">
+        <div class="d-flex align-items-center gap-2 text-white">
+            <span class="badge rounded-pill bg-light text-dark px-2 py-1 small font-monospace">
+                <span id="floating-answered-count" class="fw-bold" style="color: #0559b7;">0</span>/{{ total_questions }} Answered
+            </span>
+        </div>
+        <button type="button" class="btn btn-explore btn-sm px-3 py-1 rounded-pill fw-semibold shadow-sm" onclick="openSubmitModal()" style="font-size: 0.85rem; font-family: 'Poppins', sans-serif;">
+            <i class="bi bi-send-fill me-1"></i> Submit Quiz
+        </button>
+    </div>
+</div>
+
+<!-- Submit Confirmation Modal (Safe Place) -->
+<div class="modal fade" id="submitConfirmModal" tabindex="-1" aria-labelledby="submitConfirmModalLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark" id="submitConfirmModalLabel" style="font-family: 'Montserrat', sans-serif;">
+                    <i class="bi bi-question-circle-fill text-primary me-2"></i>Submit Practice Test?
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <p class="text-muted small mb-3">You can submit your test anytime. Here is your current progress:</p>
+                <div class="row g-2 text-center mb-3">
+                    <div class="col-4">
+                        <div class="p-2 rounded-3 bg-light border">
+                            <div class="fs-5 fw-bold text-primary" id="modal-total-count">{{ total_questions }}</div>
+                            <small class="text-muted" style="font-size: 0.72rem;">Total Qs</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-25">
+                            <div class="fs-5 fw-bold text-success" id="modal-answered-count">0</div>
+                            <small class="text-success" style="font-size: 0.72rem;">Answered</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 rounded-3 bg-warning bg-opacity-10 border border-warning border-opacity-25">
+                            <div class="fs-5 fw-bold text-warning" id="modal-unanswered-count">{{ total_questions }}</div>
+                            <small class="text-warning" style="font-size: 0.72rem;">Unanswered</small>
+                        </div>
+                    </div>
+                </div>
+                <div id="unanswered-warning" class="alert alert-warning py-2 px-3 small d-none" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> You have unanswered questions! Unanswered questions receive 0 marks.
+                </div>
+                <p class="small text-muted mb-0">Once submitted, you'll immediately see your final score, percentage, and detailed answer explanations.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">
+                    <i class="bi bi-arrow-left me-1"></i> Return to Questions
+                </button>
+                <button type="button" class="btn btn-explore rounded-pill px-4" onclick="confirmFinalSubmit()">
+                    <i class="bi bi-check2-circle me-1"></i> Yes, Submit Now
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_css %}
@@ -282,6 +350,22 @@
         color: #ffffff !important;
         border-color: #0559b7 !important;
         box-shadow: 0 2px 6px rgba(5, 89, 183, 0.3);
+    }
+    .floating-quiz-dock {
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    }
+    .floating-quiz-dock:hover {
+        transform: translateX(-50%) translateY(-2px) !important;
+    }
+    @media (max-width: 576px) {
+        .floating-quiz-dock {
+            width: 90%;
+            max-width: 360px;
+        }
+        .floating-quiz-dock > div {
+            width: 100%;
+            justify-content: space-between;
+        }
     }
 </style>
 {% endblock %}
@@ -349,7 +433,53 @@ document.addEventListener('DOMContentLoaded', function() {
         if (answeredCountBadge) {
             answeredCountBadge.textContent = answeredCount + ' Answered';
         }
+        var floatingCount = document.getElementById('floating-answered-count');
+        if (floatingCount) {
+            floatingCount.textContent = answeredCount;
+        }
+        var sidebarCount = document.getElementById('sidebar-answered-count');
+        if (sidebarCount) {
+            sidebarCount.textContent = answeredCount;
+        }
     }
+
+    // === Floating & Modal Submit Handlers ===
+    window.openSubmitModal = function() {
+        var answered = answeredQuestions.size;
+        var total = totalQuestions;
+        var unanswered = total - answered;
+
+        var mAns = document.getElementById('modal-answered-count');
+        var mUnans = document.getElementById('modal-unanswered-count');
+        var mTot = document.getElementById('modal-total-count');
+        var mWarn = document.getElementById('unanswered-warning');
+
+        if (mAns) mAns.textContent = answered;
+        if (mUnans) mUnans.textContent = unanswered;
+        if (mTot) mTot.textContent = total;
+
+        if (mWarn) {
+            if (unanswered > 0) {
+                mWarn.classList.remove('d-none');
+            } else {
+                mWarn.classList.add('d-none');
+            }
+        }
+
+        var modalEl = document.getElementById('submitConfirmModal');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+    };
+
+    window.confirmFinalSubmit = function() {
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
+        {% if quiz.time_limit > 0 %}
+        if (timerInterval) clearInterval(timerInterval);
+        {% endif %}
+        document.getElementById('quiz-form').submit();
+    };
 
     // === Timer Countdown ===
     {% if quiz.time_limit > 0 %}
