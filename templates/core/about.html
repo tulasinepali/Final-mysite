@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}About Tulasi Nepali - Educator, Trainer &amp; Learning Platform{% endblock %}
-{% block meta_description %}Learn about Tulasi Nepali, educator and Loksewa mentor. Discover our mission to provide high-quality, free educational resources for Computer Operator and competitive exams in Nepal.{% endblock %}
+{% block title %}About {{ site_settings.owner_name|default:"Tulasi Nepali" }} - {{ site_settings.owner_title|default:"Educator & Mentor" }}{% endblock %}
+{% block meta_description %}Learn about {{ site_settings.owner_name|default:"Tulasi Nepali" }}, {{ site_settings.owner_title|default:"educator and mentor" }}. Discover our mission to provide high-quality educational resources in Nepal.{% endblock %}
 
-{% block og_title %}About Tulasi Nepali - Educator &amp; Learning Platform{% endblock %}
-{% block og_description %}Discover the mission and background of Tulasi Nepali, providing free computer and Loksewa exam prep across Nepal.{% endblock %}
+{% block og_title %}About {{ site_settings.owner_name|default:"Tulasi Nepali" }} - {{ site_settings.owner_title|default:"Educator & Mentor" }}{% endblock %}
+{% block og_description %}Discover the mission and background of {{ site_settings.owner_name|default:"Tulasi Nepali" }}, providing free computer and Loksewa exam prep across Nepal.{% endblock %}
 
 {% block content %}
 <!-- SmartStore Page Header -->
@@ -20,16 +20,16 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
                 <span class="badge mb-2 px-3 py-1 rounded-pill" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">
-                    <i class="bi bi-award-fill me-1"></i> Educator &amp; Mentor
+                    <i class="bi bi-award-fill me-1"></i> {{ site_settings.owner_title|default:"Educator & Mentor" }}
                 </span>
-                <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">About Tulasi Nepali</h1>
+                <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">About {{ site_settings.owner_name|default:"Tulasi Nepali" }}</h1>
                 <p class="text-muted mb-0 small" style="font-family: 'Roboto', sans-serif;">
-                    Dedicated to providing structured, completely free exam preparation tools for civil service and computer operator aspirants in Nepal.
+                    {{ site_settings.owner_tagline|default:"Dedicated to empowering learners everywhere with free, high-quality resources in Technology, General Knowledge, and career preparation." }}
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2">
                 <span class="badge rounded-pill px-3 py-2 bg-white text-dark border" style="font-family: 'Poppins', sans-serif;">
-                    <i class="bi bi-people-fill me-1" style="color: #0559b7;"></i>10,000+ Aspirants Reached
+                    <i class="bi bi-patch-check-fill me-1" style="color: #0559b7;"></i>{{ site_settings.owner_experience|default:"10,000+ Curious Learners" }}
                 </span>
             </div>
         </div>
@@ -52,20 +52,20 @@
                     
                     <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n3 px-4 py-2 rounded-pill shadow-sm bg-white border d-flex align-items-center gap-2">
                         <i class="bi bi-patch-check-fill" style="color: #0559b7;"></i>
-                        <span class="small fw-bold text-dark" style="font-family: 'Poppins', sans-serif;">Verified Instructor</span>
+                        <span class="small fw-bold text-dark" style="font-family: 'Poppins', sans-serif;">Verified {{ site_settings.owner_title|default:"Instructor" }}</span>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-7">
                 <span class="badge rounded-pill mb-2 px-3 py-1" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
-                    Meet Your Instructor
+                    Meet Your {{ site_settings.owner_title|default:"Instructor" }}
                 </span>
                 <h2 class="display-6 fw-bold text-dark mb-2" style="font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
-                <h3 class="h5 mb-3" style="color: #0559b7; font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_title|default:"Lead Instructor &amp; Educational Technologist" }}</h3>
+                <h3 class="h5 mb-3" style="color: #0559b7; font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_tagline|default:site_settings.owner_title|default:"Educator & Mentor" }}</h3>
 
                 <p class="text-secondary mb-4" style="font-family: 'Roboto', sans-serif; line-height: 1.8; font-size: 1.02rem;">
-                    {{ site_settings.owner_bio|default:"With extensive hands-on experience in information technology and competitive exam training, Tulasi Nepali developed this platform to eliminate educational barriers. By organizing syllabus-aligned notes, authentic Loksewa model questions, and interactive test engines, this platform ensures that every aspirant in Nepal has access to top-tier preparation material without any subscription fees."|striptags }}
+                    {{ site_settings.owner_bio|default:"With extensive hands-on experience in information technology and education, Tulasi Nepali developed this platform to make learning free and accessible for everyone. Whether you are curious about technology and computer systems, wanting to expand your General Knowledge (GK), or preparing for competitive career exams, this platform offers structured study notes, authentic model MCQs, and practical learning resources with zero barrier to entry."|striptags }}
                 </p>
 
                 <!-- Core Focus Areas Grid -->
@@ -76,19 +76,19 @@
                                 <i class="bi bi-laptop fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Computer Operator</h4>
-                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">Federal &amp; Provincial Syllabi</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Technology &amp; IT</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">Hardware, Software &amp; Networking</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center p-3 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0 bg-white shadow-sm" style="width: 44px; height: 44px; color: #198754;">
-                                <i class="bi bi-building fs-5"></i>
+                                <i class="bi bi-globe2 fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Loksewa Aayog</h4>
-                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">GK, Constitution &amp; Current Affairs</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">General Knowledge (GK)</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">World, Nepal, Science &amp; Affairs</small>
                             </div>
                         </div>
                     </div>
@@ -98,19 +98,19 @@
                                 <i class="bi bi-patch-question fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Instant MCQ Engine</h4>
-                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">Detailed solutions &amp; negative marking</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Interactive MCQ Engine</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">Instant explanations &amp; real evaluation</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center p-3 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0 bg-white shadow-sm" style="width: 44px; height: 44px; color: #0dcaf0;">
-                                <i class="bi bi-file-earmark-pdf fs-5"></i>
+                                <i class="bi bi-award fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Free Offline Files</h4>
-                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">PDF guides, cheatsheets &amp; papers</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Competitive Exam Prep</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">Computer Operator, Loksewa &amp; More</small>
                             </div>
                         </div>
                     </div>

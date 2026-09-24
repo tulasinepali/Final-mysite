@@ -10,7 +10,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             'fields': ('site_name', 'site_tagline', 'site_description', 'site_logo', 'site_favicon')
         }),
         ('Owner Information', {
-            'fields': ('owner_name', 'owner_bio', 'owner_image')
+            'fields': ('owner_name', 'owner_title', 'owner_tagline', 'owner_experience', 'owner_bio', 'owner_image')
         }),
         ('Mission & Vision', {
             'fields': ('mission', 'vision')

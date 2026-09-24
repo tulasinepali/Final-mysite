@@ -32,7 +32,7 @@
                 </span>
                 <h1 class="h2 fw-bold text-white mb-2" style="font-family: 'Montserrat', sans-serif;">{{ quiz.title }}</h1>
                 <p class="text-white-50 small mb-4" style="font-family: 'Roboto', sans-serif;">
-                    Scored under standard Loksewa examination regulations.
+                    Instant performance breakdown &amp; answer evaluation.
                 </p>
 
                 <!-- Circular Score Gauge -->
@@ -133,7 +133,7 @@
                 </div>
                 <div>
                     <h3 class="h6 fw-bold mb-1" style="font-family: 'Montserrat', sans-serif;">Negative Marking Applied: {{ penalty_percent|floatformat:0 }}% per Wrong Answer</h3>
-                    <p class="small text-muted mb-2" style="font-family: 'Roboto', sans-serif;">Standard Loksewa Aayog rules deduct {{ marks_deducted_per_wrong|floatformat:2 }} marks for each wrong option.</p>
+                    <p class="small text-muted mb-2" style="font-family: 'Roboto', sans-serif;">Standard test rules deduct {{ marks_deducted_per_wrong|floatformat:2 }} marks for each wrong option.</p>
                     <div class="d-flex flex-wrap gap-3 small" style="font-family: 'Poppins', sans-serif;">
                         <span>Gross Score: <strong class="text-success">+{{ score }}</strong></span>
                         <span>Deduction: <strong class="text-danger">-{{ negative_marks|floatformat:2 }}</strong></span>

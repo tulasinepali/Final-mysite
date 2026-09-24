@@ -111,40 +111,135 @@
 
                         <!-- Owner Info Tab -->
                         <div class="tab-pane fade" id="owner" role="tabpanel" aria-labelledby="owner-tab">
-                            <h5 class="text-muted mb-3"><i class="fas fa-user mr-1"></i> Owner Information</h5>
-
-                            <div class="form-group {% if form.owner_name.errors %}has-error{% endif %}">
-                                <label for="{{ form.owner_name.id_for_label }}">Owner Name</label>
-                                {{ form.owner_name|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:John Doe' }}
-                                {% if form.owner_name.errors %}
-                                {% for error in form.owner_name.errors %}
-                                <span class="error invalid-feedback d-block">{{ error }}</span>
-                                {% endfor %}
-                                {% endif %}
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <h5 class="text-muted mb-0"><i class="fas fa-user-tie mr-1"></i> Owner Profile & Instructor Information</h5>
+                                    <small class="text-muted">Manage your public identity, title/role (Teacher, Mentor, Trainer), credentials, and profile image displayed across the site.</small>
+                                </div>
                             </div>
 
-                            <div class="form-group {% if form.owner_bio.errors %}has-error{% endif %}">
-                                <label for="{{ form.owner_bio.id_for_label }}">Owner Bio</label>
-                                {{ form.owner_bio|add_error_class:'is-invalid' }}
-                                {% if form.owner_bio.errors %}
-                                {% for error in form.owner_bio.errors %}
-                                <span class="error invalid-feedback d-block">{{ error }}</span>
-                                {% endfor %}
-                                {% endif %}
+                            <!-- Live Profile Preview Card -->
+                            <div class="card bg-light border-0 shadow-sm mb-4">
+                                <div class="card-body">
+                                    <h6 class="text-uppercase text-muted font-weight-bold mb-3 small"><i class="fas fa-eye mr-1"></i> Live Profile Preview</h6>
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-3 position-relative flex-shrink-0">
+                                            {% if form.instance.owner_image %}
+                                                <img src="{{ form.instance.owner_image.url }}" alt="{{ form.instance.owner_name }}" class="rounded-circle shadow-sm" style="width: 76px; height: 76px; object-fit: cover; border: 3px solid #fff;" id="ownerPhotoPreview">
+                                            {% else %}
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold shadow-sm" style="width: 76px; height: 76px; font-size: 26px; border: 3px solid #fff;" id="ownerPhotoPreview">
+                                                    {{ form.instance.owner_name|default:"T"|slice:":1" }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center flex-wrap">
+                                                <h5 class="font-weight-bold mb-0 mr-2 text-dark" id="previewOwnerName">{{ form.instance.owner_name|default:"Tulasi Nepali" }}</h5>
+                                                <span class="badge badge-primary px-2 py-1 font-weight-normal" id="previewOwnerTitle">{{ form.instance.owner_title|default:"Educator & Mentor" }}</span>
+                                            </div>
+                                            <p class="text-muted small mb-1 mt-1" id="previewOwnerTagline">{{ form.instance.owner_tagline|default:"Technology, GK & Competitive Learning Mentor" }}</p>
+                                            <div class="text-secondary small">
+                                                <i class="fas fa-award text-warning mr-1"></i> <span id="previewOwnerExperience">{{ form.instance.owner_experience|default:"IT Specialist & Educator" }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info py-2 px-3 mb-0 mt-3 small">
+                                        <i class="fas fa-info-circle mr-1"></i> <strong>Universal Update:</strong> Changing your role title (e.g. <em>Teacher</em>, <em>Mentor</em>, <em>Computer Operator Trainer</em>, or <em>IT Officer</em>) and credentials here will automatically update all public headers, sidebar authority cards, hero spotlight, and footer links across the entire website.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.owner_name.errors %}has-error{% endif %}">
+                                        <label for="{{ form.owner_name.id_for_label }}" class="font-weight-bold">
+                                            <i class="fas fa-user mr-1 text-primary"></i> Full Name <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.owner_name|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Tulasi Nepali'|attr:'id:owner_name_input' }}
+                                        {% if form.owner_name.errors %}
+                                        {% for error in form.owner_name.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <small class="form-text text-muted">Your public display name on study notes, quizzes, and articles.</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.owner_title.errors %}has-error{% endif %}">
+                                        <label for="{{ form.owner_title.id_for_label }}" class="font-weight-bold">
+                                            <i class="fas fa-id-badge mr-1 text-primary"></i> Role / Title (e.g. Teacher, Mentor, Trainer) <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.owner_title|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Educator & Mentor, Teacher, IT Trainer'|attr:'id:owner_title_input' }}
+                                        {% if form.owner_title.errors %}
+                                        {% for error in form.owner_title.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <small class="form-text text-muted">Replaces "Mentor" or "Teacher" everywhere across the platform.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.owner_tagline.errors %}has-error{% endif %}">
+                                        <label for="{{ form.owner_tagline.id_for_label }}" class="font-weight-bold">
+                                            <i class="fas fa-tag mr-1 text-primary"></i> Headline / Tagline
+                                        </label>
+                                        {{ form.owner_tagline|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Technology, GK & Competitive Learning Mentor'|attr:'id:owner_tagline_input' }}
+                                        {% if form.owner_tagline.errors %}
+                                        {% for error in form.owner_tagline.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <small class="form-text text-muted">Catchy sub-headline displayed below your name on profile cards.</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.owner_experience.errors %}has-error{% endif %}">
+                                        <label for="{{ form.owner_experience.id_for_label }}" class="font-weight-bold">
+                                            <i class="fas fa-certificate mr-1 text-primary"></i> Experience & Credentials Highlight
+                                        </label>
+                                        {{ form.owner_experience|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:IT Specialist & Educator'|attr:'id:owner_experience_input' }}
+                                        {% if form.owner_experience.errors %}
+                                        {% for error in form.owner_experience.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <small class="form-text text-muted">Shown in credibility badges and sidebar author boxes.</small>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group {% if form.owner_image.errors %}has-error{% endif %}">
-                                <label for="{{ form.owner_image.id_for_label }}">Owner Image</label>
+                                <label for="{{ form.owner_image.id_for_label }}" class="font-weight-bold">
+                                    <i class="fas fa-camera mr-1 text-primary"></i> Profile Photo / Avatar
+                                </label>
                                 <div class="custom-file">
-                                    {{ form.owner_image|add_class:'custom-file-input'|add_error_class:'is-invalid'|attr:'accept:image/*' }}
-                                    <label class="custom-file-label" for="{{ form.owner_image.id_for_label }}">Choose image...</label>
+                                    {{ form.owner_image|add_class:'custom-file-input'|add_error_class:'is-invalid'|attr:'accept:image/*'|attr:'id:owner_image_input' }}
+                                    <label class="custom-file-label" for="{{ form.owner_image.id_for_label }}">Choose profile image...</label>
                                 </div>
                                 {% if form.owner_image.errors %}
                                 {% for error in form.owner_image.errors %}
                                 <span class="error invalid-feedback d-block">{{ error }}</span>
                                 {% endfor %}
                                 {% endif %}
-                                <small class="form-text text-muted">Recommended: Square image, at least 300x300px.</small>
+                                <small class="form-text text-muted">Recommended: Square professional photo, at least 300x300px. Shows on Homepage hero spotlight and author cards.</small>
+                            </div>
+
+                            <div class="form-group {% if form.owner_bio.errors %}has-error{% endif %}">
+                                <label for="{{ form.owner_bio.id_for_label }}" class="font-weight-bold">
+                                    <i class="fas fa-align-left mr-1 text-primary"></i> Full Biography / About Me
+                                </label>
+                                {{ form.owner_bio|add_error_class:'is-invalid' }}
+                                {% if form.owner_bio.errors %}
+                                {% for error in form.owner_bio.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Detailed background story, teaching philosophy, and journey shown on the About page.</small>
                             </div>
                         </div>
 
@@ -326,7 +421,7 @@
 
                             <!-- Any extra fields not in defined sections -->
                             {% for field in form %}
-                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog' %}
+                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_title,owner_tagline,owner_experience,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog' %}
                                 <div class="form-group">
                                     <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
                                     {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
@@ -346,7 +441,7 @@
                             <div class="d-flex align-items-center justify-content-between mb-3">
                                 <div>
                                     <h5 class="mb-1"><i class="fas fa-bell text-warning mr-1"></i> Web Push Notifications</h5>
-                                    <small class="text-muted">Broadcast instant notifications to visitors' mobile phones and desktops whenever you publish new Loksewa MCQs or blog posts.</small>
+                                    <small class="text-muted">Broadcast instant notifications to visitors' mobile phones and desktops whenever you publish new Quizzes, Tech guides, or GK notes.</small>
                                 </div>
                                 <span class="badge {% if form.enable_web_push.value %}badge-success{% else %}badge-secondary{% endif %} px-3 py-2" id="pushStatusBadge">
                                     {% if form.enable_web_push.value %}<i class="fas fa-check-circle mr-1"></i> Enabled{% else %}<i class="fas fa-ban mr-1"></i> Disabled{% endif %}
@@ -474,6 +569,38 @@
             }
         });
     }
+
+    // Live preview updates for Owner Profile
+    $('#owner_name_input').on('input', function() {
+        var val = $(this).val().trim();
+        $('#previewOwnerName').text(val || 'Tulasi Nepali');
+    });
+    $('#owner_title_input').on('input', function() {
+        var val = $(this).val().trim();
+        $('#previewOwnerTitle').text(val || 'Educator & Mentor');
+    });
+    $('#owner_tagline_input').on('input', function() {
+        var val = $(this).val().trim();
+        $('#previewOwnerTagline').text(val || 'Technology, GK & Competitive Learning Mentor');
+    });
+    $('#owner_experience_input').on('input', function() {
+        var val = $(this).val().trim();
+        $('#previewOwnerExperience').text(val || 'IT Specialist & Educator');
+    });
+    $('#owner_image_input').on('change', function(e) {
+        if (this.files && this.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(evt) {
+                var $img = $('#ownerPhotoPreview');
+                if ($img.is('img')) {
+                    $img.attr('src', evt.target.result);
+                } else {
+                    $img.replaceWith('<img src="' + evt.target.result + '" class="rounded-circle shadow-sm" style="width: 76px; height: 76px; object-fit: cover; border: 3px solid #fff;" id="ownerPhotoPreview">');
+                }
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
 })();
 </script>
 {% endblock %}

@@ -174,7 +174,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li><a href="{% url 'quiz:list' %}" class="{% if 'quiz' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-check2-circle me-1"></i> MCQ Practice</a></li>
                         <li><a href="{% url 'downloads:list' %}" class="{% if 'downloads' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-download me-1"></i> Downloads</a></li>
                         <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blog &amp; Guides</a></li>
-                        <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About Mentor</a></li>
+                        <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About {{ site_settings.owner_title|default:"Mentor" }}</a></li>
                         <li><a href="{% url 'core:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><i class="bi bi-envelope me-1"></i> Contact</a></li>
                     </ul>
                 </nav>
@@ -235,7 +235,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% endif %}
                             <span class="sitename fs-4">{{ site_settings.owner_name|default:site_settings.site_name|default:"Tulasi Nepali" }}</span>
                         </a>
-                        <p class="footer-desc">{{ site_settings.site_description|striptags|default:"Nepal's dedicated learning and Loksewa exam prep platform curated by Tulasi Nepali. Free high-yield study notes, authentic Computer Operator MCQs, and offline downloadable study resources." }}</p>
+                        <p class="footer-desc">{{ site_settings.site_description|striptags|default:"Nepal's open learning hub curated by Tulasi Nepali. Free study notes, interactive MCQs, downloadable resources, and guides in Technology, Computing, General Knowledge (GK), and Exam Preparation." }}</p>
 
                         <div class="social-links mt-4">
                             <h5 class="fs-6 fw-bold">Connect With Us</h5>
@@ -266,7 +266,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <li><a href="{% url 'quiz:list' %}"><i class="bi bi-chevron-right me-1"></i>MCQ Practice</a></li>
                             <li><a href="{% url 'downloads:list' %}"><i class="bi bi-chevron-right me-1"></i>Downloads</a></li>
                             <li><a href="{% url 'blog:list' %}"><i class="bi bi-chevron-right me-1"></i>Exam Blog</a></li>
-                            <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right me-1"></i>About Mentor</a></li>
+                            <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right me-1"></i>About {{ site_settings.owner_title|default:"Mentor" }}</a></li>
                         </ul>
                     </div>
 
@@ -276,8 +276,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             {% for cat in notes_categories|slice:":5" %}
                             <li><a href="{% url 'notes:list' %}?category={{ cat.slug }}"><i class="bi bi-chevron-right me-1"></i>{{ cat.name }}</a></li>
                             {% empty %}
-                            <li><a href="{% url 'notes:list' %}"><i class="bi bi-chevron-right me-1"></i>Computer Operator</a></li>
-                            <li><a href="{% url 'notes:list' %}"><i class="bi bi-chevron-right me-1"></i>Loksewa General</a></li>
+                            <li><a href="{% url 'notes:list' %}"><i class="bi bi-chevron-right me-1"></i>Technology &amp; IT</a></li>
+                            <li><a href="{% url 'notes:list' %}"><i class="bi bi-chevron-right me-1"></i>General Knowledge (GK)</a></li>
+                            <li><a href="{% url 'notes:list' %}"><i class="bi bi-chevron-right me-1"></i>Competitive Exams</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -446,7 +447,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   type: "push",
                   autoPrompt: true,
                   text: {
-                    actionMessage: "Get instant alerts whenever a new Loksewa Quiz, Study Note, or Syllabus PDF is published!",
+                    actionMessage: "Get instant alerts whenever a new Quiz, Study Note, or Tech & GK Guide is published!",
                     acceptButton: "Allow Alerts",
                     cancelButton: "Maybe Later"
                   },

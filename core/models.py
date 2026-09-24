@@ -5,11 +5,29 @@ from django.urls import reverse
 class SiteSettings(models.Model):
     """Singleton model for site-wide settings"""
     site_name = models.CharField(max_length=200, default='Learning Platform')
-    site_tagline = models.CharField(max_length=300, default='Your Gateway to Knowledge')
-    site_description = models.TextField(default='An educational platform for students')
+    site_tagline = models.CharField(max_length=300, default='Learn Technology, General Knowledge & Exam Preparation')
+    site_description = models.TextField(default='An open educational platform for technology, computing, general knowledge, and competitive exam preparation.')
     site_logo = models.ImageField(upload_to='site/', blank=True, null=True)
     site_favicon = models.ImageField(upload_to='site/', blank=True, null=True)
-    owner_name = models.CharField(max_length=200, default='Admin')
+    owner_name = models.CharField(max_length=200, default='Tulasi Nepali')
+    owner_title = models.CharField(
+        max_length=200,
+        default='Educator & Mentor',
+        blank=True,
+        help_text='Your professional title or role (e.g. Educator & Mentor, Computer Operator Trainer, Teacher, IT Officer)'
+    )
+    owner_tagline = models.CharField(
+        max_length=300,
+        blank=True,
+        default='Technology, GK & Competitive Learning Mentor',
+        help_text='A short tagline or headline displayed with your profile'
+    )
+    owner_experience = models.CharField(
+        max_length=150,
+        blank=True,
+        default='IT Specialist & Educator',
+        help_text='Highlights such as years of experience or credentials'
+    )
     owner_bio = models.TextField(default='')
     owner_image = models.ImageField(upload_to='about/', blank=True, null=True)
     mission = models.TextField(default='')

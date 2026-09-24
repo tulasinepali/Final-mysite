@@ -66,7 +66,10 @@
                         </div>
                         {% endif %}
                         <div>
-                            <div class="fw-bold text-dark" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold text-dark" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</span>
+                                <span class="badge rounded-pill" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-size: 0.72rem; font-family: 'Poppins', sans-serif;">{{ site_settings.owner_title|default:"Educator & Mentor" }}</span>
+                            </div>
                             <div class="text-muted small" style="font-family: 'Poppins', sans-serif;">
                                 <span><i class="bi bi-calendar3 me-1"></i>{{ note.created_at|date:"M d, Y" }}</span>
                                 {% if note.updated_at != note.created_at %}
@@ -143,7 +146,7 @@
                     <!-- Social Share Section -->
                     <div class="p-4 rounded-4 my-4 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
                         <h2 class="h6 fw-bold mb-3 text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            <i class="bi bi-share-fill me-2" style="color: #0559b7;"></i>Share with Loksewa Aspirants:
+                            <i class="bi bi-share-fill me-2" style="color: #0559b7;"></i>Share with Friends &amp; Learners:
                         </h2>
                         <div class="d-flex flex-wrap gap-2">
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"

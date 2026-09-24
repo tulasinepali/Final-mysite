@@ -186,10 +186,10 @@
                             </div>
                             {% endif %}
                             <div>
-                                <span class="badge rounded-pill mb-1 small" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">Verified Instructor</span>
+                                <span class="badge rounded-pill mb-1 small" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">Verified {{ site_settings.owner_title|default:"Instructor" }}</span>
                                 <h3 class="h6 fw-bold mb-1 text-dark" style="font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h3>
                                 <p class="text-muted small mb-2" style="font-family: 'Roboto', sans-serif;">
-                                    {{ site_settings.owner_bio|default:"Computer Operator Trainer and Loksewa exam mentor dedicated to providing quality, free educational resources for aspirants across Nepal."|striptags }}
+                                    {{ site_settings.owner_bio|default:"Educator, IT specialist, and mentor dedicated to providing quality, free educational resources in Technology, General Knowledge, and career preparation for learners across Nepal and beyond."|striptags }}
                                 </p>
                                 <a href="{% url 'core:about' %}" class="btn btn-sm btn-explore rounded-pill px-3" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
                                     Read Full Profile <i class="bi bi-arrow-right ms-1"></i>
@@ -263,7 +263,7 @@
                             </div>
                             <h3 class="h6 fw-bold text-white mb-2" style="font-family: 'Montserrat', sans-serif;">Test Your Knowledge</h3>
                             <p class="small text-white-50 mb-3" style="font-family: 'Roboto', sans-serif;">
-                                Practice timed Loksewa &amp; Computer Operator questions with live scoring.
+                                Practice timed Technology, Computer, and GK questions with live scoring.
                             </p>
                             <a href="{% url 'quiz:list' %}" class="btn btn-warning fw-bold rounded-pill px-4 btn-sm w-100 shadow-sm" style="font-family: 'Poppins', sans-serif;">
                                 Start Free MCQ Quiz <i class="bi bi-arrow-right ms-1"></i>

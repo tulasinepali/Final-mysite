@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ meta_title|default:"Tulasi Nepali - Study Notes, MCQ Practice & Loksewa Preparation" }}{% endblock %}
-{% block meta_description %}{{ meta_description|default:"Master Computer Operator and Loksewa exams with free curated study notes, interactive MCQ practice tests with explanations, and syllabus PDFs by Tulasi Nepali." }}{% endblock %}
+{% block title %}{{ meta_title|default:"Tulasi Nepali - Technology, General Knowledge & Exam Preparation Hub" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Learn Technology, General Knowledge (GK), and competitive exam topics with free structured study notes, interactive MCQ quizzes with explanations, and downloadable guides by Tulasi Nepali." }}{% endblock %}
 
-{% block og_title %}{{ meta_title|default:"Tulasi Nepali - Learning Platform" }}{% endblock %}
-{% block og_description %}{{ meta_description|default:"Free study notes, interactive MCQs, and exam preparation resources curated by Tulasi Nepali." }}{% endblock %}
+{% block og_title %}{{ meta_title|default:"Tulasi Nepali - Open Learning Platform" }}{% endblock %}
+{% block og_description %}{{ meta_description|default:"Free study notes, interactive MCQs, tech tutorials, and GK guides curated for all learners by Tulasi Nepali." }}{% endblock %}
 
 {% block content %}
 <!-- SmartStore Hero Section -->
@@ -16,13 +16,13 @@
             <div class="col-lg-9">
                 <div class="headline-block">
                     <span class="tagline">
-                        <i class="bi bi-patch-check-fill me-1"></i>Curated by {{ site_settings.owner_name|default:"Tulasi Nepali" }} &bull; Loksewa &amp; Tech Hub
+                        <i class="bi bi-patch-check-fill me-1"></i>Curated by {{ site_settings.owner_name|default:"Tulasi Nepali" }} &bull; Technology, GK &amp; Learning Hub
                     </span>
                     <h1 class="main-heading">
-                        Master Computer Operator &amp; <span>Loksewa Exams</span>
+                        Learn Technology, <span>General Knowledge &amp; More</span>
                     </h1>
                     <p class="lead-text">
-                        Free high-yield MCQ practice tests with instant explanations, chapter-wise study notes, and syllabus PDFs &mdash; tailored for serious competitive examination aspirants.
+                        Free chapter-wise study notes, interactive MCQ practice with instant explanations, and downloadable study guides &mdash; built for tech enthusiasts, curious minds, students, and competitive exam candidates.
                     </p>
                     <div class="cta-group">
                         <a href="{% url 'quiz:list' %}" class="btn-explore">
@@ -32,7 +32,7 @@
                             <i class="bi bi-journal-text me-1"></i> Browse Study Notes
                         </a>
                         <a href="{% url 'downloads:list' %}" class="btn-outline-explore">
-                            <i class="bi bi-file-earmark-arrow-down me-1"></i> Syllabus PDFs
+                            <i class="bi bi-file-earmark-arrow-down me-1"></i> Free Downloads
                         </a>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                     <div class="card-visual flex-column align-items-start py-3 px-4 position-relative">
                         <span class="label hot"><i class="bi bi-lightning-charge-fill me-1"></i>Live Question</span>
                         <div class="d-flex align-items-center justify-content-between w-100 mt-4 mb-2">
-                            <span class="small fw-semibold text-primary"><i class="bi bi-laptop me-1"></i>Computer Operator Test</span>
+                            <span class="small fw-semibold text-primary"><i class="bi bi-laptop me-1"></i>Technology &amp; Computer Quiz</span>
                             <span class="badge bg-success bg-opacity-10 text-success small">Interactive</span>
                         </div>
                         <p class="fw-bold text-dark mb-0 fs-6">Q: Which shortcut key is used to duplicate the selected slide in PowerPoint?</p>
@@ -77,7 +77,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center pt-3 mt-2 border-top">
-                            <span class="small text-muted"><i class="bi bi-people me-1"></i>10,000+ candidates practiced</span>
+                            <span class="small text-muted"><i class="bi bi-people me-1"></i>10,000+ questions practiced</span>
                             <a href="{% url 'quiz:list' %}" class="btn btn-sm btn-primary rounded-pill px-3">Full Practice <i class="bi bi-arrow-right ms-1"></i></a>
                         </div>
                     </div>
@@ -96,11 +96,11 @@
                     <div class="card-details">
                         <div>
                             <h4>Structured Study Notes</h4>
-                            <p class="text-muted small mb-3">Chapter-wise Loksewa notes covering Computer Hardware, Software, Networking, Database, Security, and IT Directives.</p>
+                            <p class="text-muted small mb-3">Comprehensive notes on Computer Systems, Technology, Cyber Security, General Knowledge (GK), and Competitive Syllabi.</p>
                             <div class="d-flex flex-wrap gap-2 mb-3">
-                                <span class="badge bg-light text-dark border">Word Processing</span>
-                                <span class="badge bg-light text-dark border">Spreadsheet</span>
-                                <span class="badge bg-light text-dark border">DBMS &amp; SQL</span>
+                                <span class="badge bg-light text-dark border">Technology &amp; IT</span>
+                                <span class="badge bg-light text-dark border">General Knowledge</span>
+                                <span class="badge bg-light text-dark border">Computer Applications</span>
                             </div>
                         </div>
                         <a href="{% url 'notes:list' %}" class="btn btn-outline-primary rounded-pill w-100 fw-semibold">
@@ -121,8 +121,8 @@
                     </div>
                     <div class="card-details">
                         <div>
-                            <h4>Official Syllabi &amp; Papers</h4>
-                            <p class="text-muted small mb-3">Download federal and provincial syllabus PDFs, past model questions, and revision guides without any login requirement.</p>
+                            <h4>Curated PDFs &amp; Guides</h4>
+                            <p class="text-muted small mb-3">Download practical technology guides, GK reference sheets, model question papers, and syllabus booklets without any login barrier.</p>
                         </div>
                         <div class="mt-auto">
                             <a href="{% url 'downloads:list' %}" class="btn btn-outline-primary rounded-pill w-100 fw-semibold">
@@ -152,8 +152,8 @@
                             <div class="perk">
                                 <i class="bi bi-shield-check"></i>
                                 <div>
-                                    <div class="fw-bold">Loksewa Aligned</div>
-                                    <small class="text-muted d-none d-sm-block">Federal &amp; Provincial standards</small>
+                                    <div class="fw-bold">Verified &amp; Practical</div>
+                                    <small class="text-muted d-none d-sm-block">Real-world &amp; syllabus standards</small>
                                 </div>
                             </div>
                         </div>
@@ -475,7 +475,7 @@
     <div class="container">
         <div class="text-center mb-4">
             <span class="tagline">Proven Track Record</span>
-            <h2 class="h3 fw-bold mb-1">Empowering Aspirants Across All 7 Provinces</h2>
+            <h2 class="h3 fw-bold mb-1">Empowering Curious Learners Everywhere</h2>
         </div>
         <div class="row text-center g-4">
             <div class="col-6 col-md-3">
@@ -523,16 +523,21 @@
                     {% endif %}
                     <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n3 px-3 py-2 rounded-pill shadow bg-white border d-flex align-items-center gap-2">
                         <i class="bi bi-patch-check-fill text-primary"></i>
-                        <span class="small fw-bold text-dark">Verified Mentor</span>
+                        <span class="small fw-bold text-dark">Verified {{ site_settings.owner_title|default:"Mentor" }}</span>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-7">
-                <span class="tagline mb-2"><i class="bi bi-person-badge me-1"></i>Meet Your Instructor</span>
-                <h2 class="display-6 fw-bold text-dark mb-3">Hi, I'm {{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
+                <span class="tagline mb-2"><i class="bi bi-person-badge me-1"></i>Meet Your {{ site_settings.owner_title|default:"Instructor" }}</span>
+                <h2 class="display-6 fw-bold text-dark mb-1">Hi, I'm {{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
+                {% if site_settings.owner_title or site_settings.owner_tagline %}
+                <p class="text-primary fw-semibold mb-3 fs-6">
+                    <i class="bi bi-patch-check me-1"></i>{{ site_settings.owner_title|default:"Educator & Mentor" }}{% if site_settings.owner_tagline %} &bull; {{ site_settings.owner_tagline }}{% endif %}
+                </p>
+                {% endif %}
                 <div class="text-muted mb-4 lead" style="font-size: 1.05rem;">
-                    {{ site_settings.owner_bio|safe|default:"Passionate educator and IT specialist dedicated to democratizing exam preparation across Nepal. Building syllabus-aligned notes, model question banks, and free interactive practice tests for Loksewa and Computer Operator candidates." }}
+                    {{ site_settings.owner_bio|safe|default:"Passionate educator and IT specialist dedicated to making technology, computing, general knowledge, and career skills accessible to everyone across Nepal and beyond." }}
                 </div>
 
                 <div class="row g-3 mb-4">
@@ -541,7 +546,7 @@
                             <i class="bi bi-bullseye fs-3 text-primary me-3 mt-1"></i>
                             <div>
                                 <h3 class="h6 fw-bold mb-1">Our Mission</h3>
-                                <small class="text-muted">{{ site_settings.mission|default:"To make exam-ready education accessible and 100% free for every student in Nepal." }}</small>
+                                <small class="text-muted">{{ site_settings.mission|safe|default:"To make quality education in Technology, GK, and modern skills accessible and 100% free for everyone." }}</small>
                             </div>
                         </div>
                     </div>
@@ -550,7 +555,7 @@
                             <i class="bi bi-award fs-3 text-warning me-3 mt-1"></i>
                             <div>
                                 <h3 class="h6 fw-bold mb-1">Our Vision</h3>
-                                <small class="text-muted">{{ site_settings.vision|default:"To be the most trusted, student-first Loksewa preparation platform." }}</small>
+                                <small class="text-muted">{{ site_settings.vision|safe|default:"To empower curious learners, students, and aspirants everywhere with free, modern knowledge." }}</small>
                             </div>
                         </div>
                     </div>

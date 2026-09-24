@@ -23,7 +23,7 @@
                     <i class="bi bi-journal-bookmark-fill me-2" style="color: #0559b7;"></i>High-Yield Study Notes
                 </h1>
                 <p class="text-muted mb-0 small" style="font-family: 'Roboto', sans-serif;">
-                    Comprehensive, syllabus-aligned notes for Loksewa and Computer Operator exams curated by <strong>Tulasi Nepali</strong>.
+                    Comprehensive, structured notes on Technology, Computer Applications, General Knowledge (GK), and Exam Syllabi curated by <strong>{{ site_settings.owner_name|default:"Tulasi Nepali" }}</strong>.
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -228,10 +228,13 @@
                         </div>
                         {% endif %}
                         <h2 class="h6 fw-bold text-white mb-1" style="font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
-                        <span class="badge px-3 py-1 rounded-pill mb-2" style="background: rgba(255,255,255,0.18); color: #fff; font-family: 'Poppins', sans-serif; font-size: 0.75rem;">Loksewa &amp; Tech Mentor</span>
-                        <p class="text-white-50 small mb-0 px-2" style="font-family: 'Roboto', sans-serif;">
-                            Every note is curated and verified according to the latest Public Service Commission syllabus standards.
+                        <span class="badge px-3 py-1 rounded-pill mb-2" style="background: rgba(255,255,255,0.18); color: #fff; font-family: 'Poppins', sans-serif; font-size: 0.75rem;">{{ site_settings.owner_title|default:"Educator &amp; Mentor" }}</span>
+                        <p class="text-white-50 small mb-2 px-2" style="font-family: 'Roboto', sans-serif;">
+                            Curated notes simplifying complex concepts in technology, computing, and general knowledge for curious minds and exam candidates.
                         </p>
+                        <a href="{% url 'core:about' %}" class="btn btn-sm btn-light rounded-pill px-3 fw-semibold" style="color: #0559b7; font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                            About {{ site_settings.owner_title|default:"Instructor" }} <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
                     </div>
                 </div>
 
@@ -272,7 +275,7 @@
                     </div>
                     <h3 class="h6 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Test Your Knowledge</h3>
                     <p class="text-muted small mb-3" style="font-family: 'Roboto', sans-serif;">
-                        Finished reading? Test your recall with our Loksewa Computer Operator MCQ practice sets.
+                        Finished reading? Test your recall with our interactive Technology, GK, and practice MCQ sets.
                     </p>
                     <a href="{% url 'quiz:list' %}" class="btn btn-explore rounded-pill w-100 py-2">
                         Practice MCQs Now <i class="bi bi-arrow-right ms-1"></i>
