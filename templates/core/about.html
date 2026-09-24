@@ -8,143 +8,134 @@
 {% block og_description %}Discover the mission and background of Tulasi Nepali, providing free computer and Loksewa exam prep across Nepal.{% endblock %}
 
 {% block content %}
-<!-- Modern Hero Banner -->
-<section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%); position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -30%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
-    <div style="position: absolute; bottom: -20%; left: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
-
-    <div class="container position-relative py-3">
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white-50 text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page">About</li>
+<!-- SmartStore Page Header -->
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 small" style="font-family: 'Poppins', sans-serif;">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #0559b7;"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">About</li>
             </ol>
         </nav>
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <span class="badge mb-2 px-3 py-2 text-uppercase fw-semibold" style="background: rgba(255,255,255,0.12); color: #38bdf8; letter-spacing: 1px; font-size: 0.78rem; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15);">
-                    <i class="fas fa-award me-1"></i> Educator, Mentor &amp; Digital Learning Innovator
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="badge mb-2 px-3 py-1 rounded-pill" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">
+                    <i class="bi bi-award-fill me-1"></i> Educator &amp; Mentor
                 </span>
-                <h1 class="display-5 fw-bold text-white mb-3">Empowering Aspirants Across Nepal</h1>
-                <p class="lead text-white-50 mb-0" style="font-size: 1.1rem; max-width: 650px;">
-                    Welcome to the personal knowledge hub of <strong>Tulasi Nepali</strong>. Dedicated to providing structured, completely free preparation tools for Computer Operator and Loksewa examinations.
+                <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">About Tulasi Nepali</h1>
+                <p class="text-muted mb-0 small" style="font-family: 'Roboto', sans-serif;">
+                    Dedicated to providing structured, completely free exam preparation tools for civil service and computer operator aspirants in Nepal.
                 </p>
             </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <div class="d-inline-flex flex-column gap-2 text-start p-3 rounded-4" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15);">
-                    <div class="d-flex align-items-center gap-3">
-                        <i class="fas fa-user-graduate fa-lg text-warning"></i>
-                        <div>
-                            <div class="text-white fw-bold">10,000+ Learners</div>
-                            <div class="text-white-50 small">Across all 7 provinces</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill px-3 py-2 bg-white text-dark border" style="font-family: 'Poppins', sans-serif;">
+                    <i class="bi bi-people-fill me-1" style="color: #0559b7;"></i>10,000+ Aspirants Reached
+                </span>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Founder Profile & Biography -->
-<section class="py-5 bg-white">
+<section class="py-5" style="background: #ffffff;">
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-5 text-center">
                 <div class="position-relative d-inline-block">
                     {% if site_settings.owner_image %}
-                    <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name|default:'Tulasi Nepali' }}" class="rounded-4 shadow-lg img-fluid border border-4 border-white" style="max-width: 340px; object-fit: cover;">
+                    <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name|default:'Tulasi Nepali' }}" class="rounded-4 shadow img-fluid border border-4 border-white" style="max-width: 320px; object-fit: cover;">
                     {% else %}
-                    <div class="rounded-4 p-5 shadow-lg d-inline-flex align-items-center justify-content-center text-white" style="width: 320px; height: 360px; background: linear-gradient(135deg, #1e1b4b, #4338ca);">
-                        <i class="fas fa-user-tie fa-2x opacity-75"></i>
+                    <div class="rounded-4 p-5 shadow d-inline-flex align-items-center justify-content-center text-white" style="width: 300px; height: 340px; background: linear-gradient(135deg, #0559b7, #032b5f);">
+                        <i class="bi bi-person-fill" style="font-size: 5rem;"></i>
                     </div>
                     {% endif %}
                     
-                    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n3 px-4 py-2 rounded-pill shadow bg-white border d-flex align-items-center gap-2">
-                        <i class="fas fa-check-circle text-primary"></i>
-                        <span class="small fw-bold text-dark">Verified Instructor</span>
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n3 px-4 py-2 rounded-pill shadow-sm bg-white border d-flex align-items-center gap-2">
+                        <i class="bi bi-patch-check-fill" style="color: #0559b7;"></i>
+                        <span class="small fw-bold text-dark" style="font-family: 'Poppins', sans-serif;">Verified Instructor</span>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-7">
-                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2 fw-semibold">
-                    <i class="fas fa-id-badge me-1"></i> Meet Your Mentor
+                <span class="badge rounded-pill mb-2 px-3 py-1" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                    Meet Your Instructor
                 </span>
-                <h2 class="display-6 fw-bold text-dark mb-3">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
-                <h3 class="h5 text-primary mb-3">{{ site_settings.owner_title|default:"Lead Instructor &amp; Educational Technologist" }}</h3>
+                <h2 class="display-6 fw-bold text-dark mb-2" style="font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
+                <h3 class="h5 mb-3" style="color: #0559b7; font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_title|default:"Lead Instructor &amp; Educational Technologist" }}</h3>
 
-                <p class="text-secondary mb-4" style="line-height: 1.8; font-size: 1.05rem;">
+                <p class="text-secondary mb-4" style="font-family: 'Roboto', sans-serif; line-height: 1.8; font-size: 1.02rem;">
                     {{ site_settings.owner_bio|default:"With extensive hands-on experience in information technology and competitive exam training, Tulasi Nepali developed this platform to eliminate educational barriers. By organizing syllabus-aligned notes, authentic Loksewa model questions, and interactive test engines, this platform ensures that every aspirant in Nepal has access to top-tier preparation material without any subscription fees."|striptags }}
                 </p>
 
                 <!-- Core Focus Areas Grid -->
                 <div class="row g-3 mb-4">
                     <div class="col-sm-6">
-                        <div class="d-flex align-items-center p-3 rounded-4 bg-light border">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(79, 70, 229, 0.1);">
-                                <i class="fas fa-laptop-code text-primary"></i>
+                        <div class="d-flex align-items-center p-3 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0 bg-white shadow-sm" style="width: 44px; height: 44px; color: #0559b7;">
+                                <i class="bi bi-laptop fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark">Computer Operator</h4>
-                                <small class="text-muted">Federal &amp; Provincial Syllabi</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Computer Operator</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">Federal &amp; Provincial Syllabi</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="d-flex align-items-center p-3 rounded-4 bg-light border">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.1);">
-                                <i class="fas fa-landmark text-success"></i>
+                        <div class="d-flex align-items-center p-3 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0 bg-white shadow-sm" style="width: 44px; height: 44px; color: #198754;">
+                                <i class="bi bi-building fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark">Loksewa Aayog</h4>
-                                <small class="text-muted">GK, Constitution &amp; Current Affairs</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Loksewa Aayog</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">GK, Constitution &amp; Current Affairs</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="d-flex align-items-center p-3 rounded-4 bg-light border">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.1);">
-                                <i class="fas fa-brain text-warning"></i>
+                        <div class="d-flex align-items-center p-3 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0 bg-white shadow-sm" style="width: 44px; height: 44px; color: #ffc107;">
+                                <i class="bi bi-patch-question fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark">Instant MCQ Engine</h4>
-                                <small class="text-muted">Detailed solutions &amp; negative marking</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Instant MCQ Engine</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">Detailed solutions &amp; negative marking</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="d-flex align-items-center p-3 rounded-4 bg-light border">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(14, 165, 233, 0.1);">
-                                <i class="fas fa-file-pdf text-info"></i>
+                        <div class="d-flex align-items-center p-3 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0 bg-white shadow-sm" style="width: 44px; height: 44px; color: #0dcaf0;">
+                                <i class="bi bi-file-earmark-pdf fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="h6 fw-bold mb-0 text-dark">Free Offline Downloads</h4>
-                                <small class="text-muted">PDF guides, cheatsheets &amp; papers</small>
+                                <h4 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Free Offline Files</h4>
+                                <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">PDF guides, cheatsheets &amp; papers</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Social Connect Buttons -->
+                <!-- Direct Connect -->
                 <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <span class="small text-muted fw-semibold me-2">Connect Directly:</span>
+                    <span class="small text-muted fw-semibold me-2" style="font-family: 'Poppins', sans-serif;">Connect Directly:</span>
                     {% if site_settings.facebook_url %}
-                    <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                        <i class="fab fa-facebook-f me-1"></i>Facebook
+                    <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-3" style="font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-facebook me-1"></i>Facebook
                     </a>
                     {% endif %}
                     {% if site_settings.youtube_url %}
-                    <a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                        <i class="fab fa-youtube me-1"></i>YouTube
+                    <a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-youtube me-1"></i>YouTube
                     </a>
                     {% endif %}
                     {% if site_settings.owner_linkedin %}
-                    <a href="{{ site_settings.owner_linkedin }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-pill px-3">
-                        <i class="fab fa-linkedin-in me-1"></i>LinkedIn
+                    <a href="{{ site_settings.owner_linkedin }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-pill px-3" style="font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-linkedin me-1"></i>LinkedIn
                     </a>
                     {% endif %}
-                    <a href="{% url 'core:contact' %}" class="btn btn-sm btn-primary rounded-pill px-4">
-                        <i class="fas fa-envelope me-1"></i>Send a Message
+                    <a href="{% url 'core:contact' %}" class="btn btn-sm btn-explore rounded-pill px-4">
+                        <i class="bi bi-envelope-fill me-1"></i>Send Message
                     </a>
                 </div>
             </div>
@@ -153,38 +144,38 @@
 </section>
 
 <!-- Mission & Vision Cards -->
-<section class="py-5" style="background-color: #f8fafc;">
+<section class="py-5" style="background: #edf2f8;">
     <div class="container">
         <div class="text-center mb-5">
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2 fw-semibold">Guiding Philosophy</span>
-            <h2 class="display-6 fw-bold text-dark">Our Mission &amp; Vision</h2>
-            <p class="text-muted">Building an accessible, transparent, and high-quality learning ecosystem for Nepali students.</p>
+            <span class="badge rounded-pill mb-2 px-3 py-1" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">Our Values</span>
+            <h2 class="h3 fw-bold text-dark" style="font-family: 'Montserrat', sans-serif;">Our Mission &amp; Vision</h2>
+            <p class="text-muted small" style="font-family: 'Roboto', sans-serif;">Building an accessible, transparent, and high-quality learning ecosystem for Nepali students.</p>
         </div>
 
         <div class="row g-4">
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white feature-card">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white" style="border: 1px solid #e1e7f0 !important;">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 54px; height: 54px; background: rgba(16, 185, 129, 0.1);">
-                            <i class="fas fa-bullseye fa-xl text-success"></i>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 52px; height: 52px; background: rgba(25, 135, 84, 0.1); color: #198754;">
+                            <i class="bi bi-bullseye fs-3"></i>
                         </div>
-                        <h3 class="h4 fw-bold mb-0 text-dark">Our Mission</h3>
+                        <h3 class="h5 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Our Mission</h3>
                     </div>
-                    <p class="text-secondary mb-0" style="line-height: 1.8;">
+                    <p class="text-secondary mb-0" style="font-family: 'Roboto', sans-serif; line-height: 1.8;">
                         {{ site_settings.mission|default:"To democratize education in Nepal by providing 100% free, curriculum-aligned study materials, interactive practice exams, and downloadable study guides to students across all provinces, regardless of financial barriers."|striptags }}
                     </p>
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white feature-card">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white" style="border: 1px solid #e1e7f0 !important;">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 54px; height: 54px; background: rgba(79, 70, 229, 0.1);">
-                            <i class="fas fa-eye fa-xl text-primary"></i>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 52px; height: 52px; background: rgba(5, 89, 183, 0.1); color: #0559b7;">
+                            <i class="bi bi-eye fs-3"></i>
                         </div>
-                        <h3 class="h4 fw-bold mb-0 text-dark">Our Vision</h3>
+                        <h3 class="h5 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">Our Vision</h3>
                     </div>
-                    <p class="text-secondary mb-0" style="line-height: 1.8;">
+                    <p class="text-secondary mb-0" style="font-family: 'Roboto', sans-serif; line-height: 1.8;">
                         {{ site_settings.vision|default:"To be the premier online educational authority in Nepal for public service preparation, recognized for high-accuracy questions, comprehensive computer science notes, and empowering thousands of successful civil service appointees each year."|striptags }}
                     </p>
                 </div>
@@ -193,56 +184,56 @@
     </div>
 </section>
 
-<!-- What We Offer -->
-<section class="py-5 bg-white">
+<!-- What We Offer: 4 Pillars -->
+<section class="py-5" style="background: #ffffff;">
     <div class="container">
         <div class="text-center mb-5">
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2 fw-semibold">Everything In One Place</span>
-            <h2 class="display-6 fw-bold text-dark">Explore Our Core Pillars</h2>
-            <p class="text-muted">Carefully engineered study modules designed to help you succeed.</p>
+            <span class="badge rounded-pill mb-2 px-3 py-1" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">Study Pillars</span>
+            <h2 class="h3 fw-bold text-dark" style="font-family: 'Montserrat', sans-serif;">Everything In One Place</h2>
+            <p class="text-muted small" style="font-family: 'Roboto', sans-serif;">Carefully engineered study modules designed to help you succeed.</p>
         </div>
 
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 feature-card">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(79, 70, 229, 0.1);">
-                        <i class="fas fa-book-open text-primary fa-lg"></i>
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 catalog-card">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(5, 89, 183, 0.1); color: #0559b7;">
+                        <i class="bi bi-journal-bookmark-fill fs-3"></i>
                     </div>
-                    <h3 class="h5 fw-bold mb-2">Study Notes</h3>
-                    <p class="text-muted small mb-3">Modular, exam-oriented notes covering Windows, Word, Excel, Database, Networking &amp; GK.</p>
-                    <a href="{% url 'notes:list' %}" class="btn btn-sm btn-outline-primary rounded-pill mt-auto">Read Notes</a>
+                    <h3 class="h6 fw-bold mb-2 text-dark" style="font-family: 'Montserrat', sans-serif;">Study Notes</h3>
+                    <p class="text-muted small mb-3 flex-grow-1" style="font-family: 'Roboto', sans-serif;">Modular notes covering Windows, Word, Excel, Database, Networking &amp; GK.</p>
+                    <a href="{% url 'notes:list' %}" class="btn btn-sm btn-outline-explore rounded-pill mt-auto">Read Notes</a>
                 </div>
             </div>
 
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 feature-card">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(16, 185, 129, 0.1);">
-                        <i class="fas fa-brain text-success fa-lg"></i>
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 catalog-card">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(25, 135, 84, 0.1); color: #198754;">
+                        <i class="bi bi-patch-question-fill fs-3"></i>
                     </div>
-                    <h3 class="h5 fw-bold mb-2">MCQ Tests</h3>
-                    <p class="text-muted small mb-3">Timed multiple-choice mock exams with negative marking options and comprehensive explanations.</p>
+                    <h3 class="h6 fw-bold mb-2 text-dark" style="font-family: 'Montserrat', sans-serif;">MCQ Tests</h3>
+                    <p class="text-muted small mb-3 flex-grow-1" style="font-family: 'Roboto', sans-serif;">Timed mock exams with negative marking options and comprehensive explanations.</p>
                     <a href="{% url 'quiz:list' %}" class="btn btn-sm btn-outline-success rounded-pill mt-auto">Practice Now</a>
                 </div>
             </div>
 
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 feature-card">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(245, 158, 11, 0.1);">
-                        <i class="fas fa-file-download text-warning fa-lg"></i>
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 catalog-card">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(255, 193, 7, 0.15); color: #d97706;">
+                        <i class="bi bi-cloud-arrow-down-fill fs-3"></i>
                     </div>
-                    <h3 class="h5 fw-bold mb-2">PDF Downloads</h3>
-                    <p class="text-muted small mb-3">Free offline access to model question sets, past exam papers, and syllabus blueprints.</p>
-                    <a href="{% url 'downloads:list' %}" class="btn btn-sm btn-outline-warning rounded-pill mt-auto">Download PDFs</a>
+                    <h3 class="h6 fw-bold mb-2 text-dark" style="font-family: 'Montserrat', sans-serif;">PDF Downloads</h3>
+                    <p class="text-muted small mb-3 flex-grow-1" style="font-family: 'Roboto', sans-serif;">Free offline access to model question sets, past exam papers, and syllabus blueprints.</p>
+                    <a href="{% url 'downloads:list' %}" class="btn btn-sm btn-outline-warning text-dark rounded-pill mt-auto">Get Files</a>
                 </div>
             </div>
 
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 feature-card">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(14, 165, 233, 0.1);">
-                        <i class="fas fa-newspaper text-info fa-lg"></i>
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 catalog-card">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 52px; height: 52px; background: rgba(13, 202, 240, 0.1); color: #0dcaf0;">
+                        <i class="bi bi-newspaper fs-3"></i>
                     </div>
-                    <h3 class="h5 fw-bold mb-2">Guidance Blog</h3>
-                    <p class="text-muted small mb-3">Career guidance, exam strategy breakdowns, preparation timelines, and technology articles.</p>
+                    <h3 class="h6 fw-bold mb-2 text-dark" style="font-family: 'Montserrat', sans-serif;">Guidance Blog</h3>
+                    <p class="text-muted small mb-3 flex-grow-1" style="font-family: 'Roboto', sans-serif;">Career guidance, exam strategy breakdowns, preparation timelines, and technology articles.</p>
                     <a href="{% url 'blog:list' %}" class="btn btn-sm btn-outline-info rounded-pill mt-auto">Read Blog</a>
                 </div>
             </div>
@@ -251,18 +242,18 @@
 </section>
 
 <!-- Call to Action -->
-<section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);">
+<section class="py-5" style="background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);">
     <div class="container text-center text-white py-3">
-        <h2 class="display-6 fw-bold mb-3">Have a Question or Feedback?</h2>
-        <p class="lead text-white-50 mb-4" style="max-width: 600px; margin: 0 auto;">
-            We are always eager to assist you with your exam prep inquiries or suggestions for new topic coverage.
+        <h2 class="h3 fw-bold mb-2" style="font-family: 'Montserrat', sans-serif;">Have Questions or Content Suggestions?</h2>
+        <p class="text-white-50 small mb-4" style="max-width: 580px; margin: 0 auto; font-family: 'Roboto', sans-serif;">
+            We are always eager to assist with exam preparation inquiries or discuss suggestions for new topics.
         </p>
-        <div class="d-flex flex-wrap gap-3 justify-content-center">
-            <a href="{% url 'core:contact' %}" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
-                <i class="fas fa-envelope me-2"></i>Contact Tulasi Nepali
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <a href="{% url 'core:contact' %}" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm" style="color: #0559b7; font-family: 'Poppins', sans-serif;">
+                <i class="bi bi-envelope-fill me-2"></i>Contact Tulasi Nepali
             </a>
-            <a href="{% url 'quiz:list' %}" class="btn btn-outline-light btn-lg rounded-pill px-5">
-                <i class="fas fa-brain me-2"></i>Start Free Quiz
+            <a href="{% url 'quiz:list' %}" class="btn btn-outline-light rounded-pill px-4" style="font-family: 'Poppins', sans-serif;">
+                <i class="bi bi-patch-question me-2"></i>Start Free Quiz
             </a>
         </div>
     </div>

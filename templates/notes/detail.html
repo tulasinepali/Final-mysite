@@ -26,106 +26,104 @@
 
 {% block content %}
 <!-- Reading Progress Bar -->
-<div id="reading-progress-bar" style="position: fixed; top: 0; left: 0; height: 4px; width: 0%; background: linear-gradient(90deg, #4f46e5, #06b6d4); z-index: 9999; transition: width 0.1s ease;"></div>
+<div id="reading-progress-bar" style="position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: #0559b7; z-index: 9999; transition: width 0.1s ease;"></div>
 
-<!-- Breadcrumb -->
-<section class="bg-light py-3 border-bottom">
+<!-- SmartStore Breadcrumb & Page Header -->
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
     <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}" class="text-decoration-none text-muted">Study Notes</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}?category={{ note.category.slug }}" class="text-decoration-none text-muted">{{ note.category.name }}</a></li>
-                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">{{ note.title|truncatewords:5 }}</li>
+            <ol class="breadcrumb mb-2 small" style="font-family: 'Poppins', sans-serif;">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #0559b7;"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}" class="text-decoration-none" style="color: #0559b7;">Study Notes</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}?category={{ note.category.slug }}" class="text-decoration-none" style="color: #0559b7;">{{ note.category.name }}</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">{{ note.title|truncatewords:4 }}</li>
             </ol>
         </nav>
-    </div>
-</section>
 
-<!-- Ad: Notes Top -->
-{% if ads.notes_top %}
-<div class="container mt-3">
-    <div class="ad-container text-center">
-        {{ ads.notes_top|safe }}
-    </div>
-</div>
-{% endif %}
-
-<!-- Note Header Section -->
-<header class="py-4 py-lg-5 bg-white border-bottom">
-    <div class="container">
-        <div class="row justify-content-center">
+        <div class="row">
             <div class="col-lg-10">
                 <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-                    <a href="{% url 'notes:list' %}?category={{ note.category.slug }}" class="badge rounded-pill bg-primary bg-opacity-10 text-primary text-decoration-none px-3 py-2 fw-semibold">
-                        <i class="fas fa-folder me-1"></i>{{ note.category.name }}
+                    <a href="{% url 'notes:list' %}?category={{ note.category.slug }}" class="badge rounded-pill text-decoration-none px-3 py-2 fw-semibold" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-folder me-1"></i>{{ note.category.name }}
                     </a>
                     {% for tag in note.tags.all %}
-                    <span class="badge rounded-pill bg-light text-muted border px-3 py-2">#{{ tag.name }}</span>
+                    <span class="badge rounded-pill bg-white text-muted border px-3 py-2" style="font-family: 'Poppins', sans-serif;">#{{ tag.name }}</span>
                     {% endfor %}
                 </div>
 
-                <h1 class="display-6 fw-bold mb-3 text-dark" style="line-height: 1.25;">{{ note.title }}</h1>
+                <h1 class="display-6 fw-bold text-dark mb-3" style="font-family: 'Montserrat', sans-serif; line-height: 1.25;">
+                    {{ note.title }}
+                </h1>
 
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                <!-- Instructor Meta Bar -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top" style="border-color: #e1e7f0 !important;">
                     <div class="d-flex align-items-center">
                         {% if site_settings.owner_image %}
                         <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="rounded-circle me-3 shadow-sm border" style="width: 44px; height: 44px; object-fit: cover;">
                         {% else %}
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 44px; height: 44px;">
-                            <i class="fas fa-user-tie"></i>
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 44px; height: 44px; background: #0559b7;">
+                            <i class="bi bi-person-fill"></i>
                         </div>
                         {% endif %}
                         <div>
-                            <div class="fw-bold text-dark">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</div>
-                            <div class="text-muted small">
-                                <span><i class="far fa-calendar-alt me-1"></i>{{ note.created_at|date:"M d, Y" }}</span>
+                            <div class="fw-bold text-dark" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</div>
+                            <div class="text-muted small" style="font-family: 'Poppins', sans-serif;">
+                                <span><i class="bi bi-calendar3 me-1"></i>{{ note.created_at|date:"M d, Y" }}</span>
                                 {% if note.updated_at != note.created_at %}
-                                <span class="ms-2"><i class="fas fa-edit me-1"></i>Updated {{ note.updated_at|date:"M d, Y" }}</span>
+                                <span class="ms-2"><i class="bi bi-pencil-square me-1"></i>Updated {{ note.updated_at|date:"M d, Y" }}</span>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center gap-3 text-muted small">
-                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
-                            <i class="far fa-eye me-1 text-primary"></i>{{ note.views }} views
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-white text-dark border px-3 py-2 rounded-pill" style="font-family: 'Poppins', sans-serif;">
+                            <i class="bi bi-eye me-1" style="color: #0559b7;"></i>{{ note.views }} views
                         </span>
-                        <a href="{% url 'notes:print' note.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" target="_blank" rel="noopener">
-                            <i class="fas fa-print me-1"></i>Print Friendly
+                        <a href="{% url 'notes:print' note.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" target="_blank" rel="noopener" style="font-family: 'Poppins', sans-serif;">
+                            <i class="bi bi-printer me-1"></i>Print Friendly
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</header>
+</div>
 
-<!-- Note Detail Section -->
-<section class="py-4 py-lg-5">
+<!-- AdSense: Notes Top Banner -->
+{% if ads.notes_top %}
+<div class="container mt-4">
+    <div class="ad-container text-center">
+        {{ ads.notes_top|safe }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Note Body & Interactive Sidebar -->
+<section class="py-4 py-lg-5" style="background: #ffffff;">
     <div class="container">
         <div class="row g-4 justify-content-center">
-            <!-- Main Content -->
+            <!-- Article Body -->
             <div class="col-lg-8">
-                <article class="bg-white p-4 p-md-5 rounded-4 shadow-sm border">
+                <article class="bg-white p-4 p-md-5 rounded-4 shadow-sm border" style="border-color: #e1e7f0 !important;">
                     <!-- Featured Image -->
                     {% if note.featured_image %}
-                    <div class="mb-4 rounded-4 overflow-hidden shadow-sm">
+                    <div class="mb-4 rounded-3 overflow-hidden shadow-sm">
                         <img src="{{ note.featured_image.url }}" class="img-fluid w-100" alt="{{ note.title }}" loading="lazy" style="max-height: 480px; object-fit: cover;">
                     </div>
                     {% endif %}
 
-                    <!-- Reader Controls Bar -->
-                    <div class="d-flex justify-content-between align-items-center p-3 mb-4 rounded-3 bg-light border">
+                    <!-- SmartStore Reader Toolbar -->
+                    <div class="d-flex justify-content-between align-items-center p-3 mb-4 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="small text-muted fw-semibold"><i class="fas fa-text-height me-1"></i>Text Size:</span>
-                            <button type="button" class="btn btn-sm btn-white border px-2 py-1 rounded" id="btn-font-decrease" title="Smaller font">A-</button>
-                            <button type="button" class="btn btn-sm btn-white border px-2 py-1 rounded" id="btn-font-reset" title="Default font">A</button>
-                            <button type="button" class="btn btn-sm btn-white border px-2 py-1 rounded" id="btn-font-increase" title="Larger font">A+</button>
+                            <span class="small text-muted fw-semibold" style="font-family: 'Poppins', sans-serif;"><i class="bi bi-fonts me-1"></i>Font:</span>
+                            <button type="button" class="btn btn-sm bg-white border px-2 py-1 rounded" id="btn-font-decrease" title="Smaller font">A-</button>
+                            <button type="button" class="btn btn-sm bg-white border px-2 py-1 rounded" id="btn-font-reset" title="Default font">A</button>
+                            <button type="button" class="btn btn-sm bg-white border px-2 py-1 rounded" id="btn-font-increase" title="Larger font">A+</button>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-sm btn-white border rounded px-3 copy-link-btn" data-url="{{ request.build_absolute_uri }}">
-                                <i class="fas fa-link me-1"></i>Copy Link
+                            <button type="button" class="btn btn-sm bg-white border rounded px-3 copy-link-btn" data-url="{{ request.build_absolute_uri }}" style="font-family: 'Poppins', sans-serif;">
+                                <i class="bi bi-link-45deg me-1"></i>Copy Link
                             </button>
                         </div>
                     </div>
@@ -135,37 +133,39 @@
                         {{ note.content|safe }}
                     </div>
 
-                    <!-- Ad: Notes Middle -->
+                    <!-- AdSense: Notes Middle Banner -->
                     {% if ads.notes_middle %}
                     <div class="ad-container text-center my-4 py-3">
                         {{ ads.notes_middle|safe }}
                     </div>
                     {% endif %}
 
-                    <!-- Share Section -->
-                    <div class="p-4 rounded-4 bg-light my-4 border">
-                        <h2 class="h6 fw-bold mb-3"><i class="fas fa-share-alt me-2 text-primary"></i>Share this note with fellow aspirants:</h2>
+                    <!-- Social Share Section -->
+                    <div class="p-4 rounded-4 my-4 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
+                        <h2 class="h6 fw-bold mb-3 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                            <i class="bi bi-share-fill me-2" style="color: #0559b7;"></i>Share with Loksewa Aspirants:
+                        </h2>
                         <div class="d-flex flex-wrap gap-2">
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
-                               class="btn btn-sm text-white rounded-pill px-3" style="background:#1877f2;" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-facebook-f me-1"></i>Facebook
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#1877f2; font-family: 'Poppins', sans-serif;" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-facebook me-1"></i>Facebook
                             </a>
                             <a href="https://api.whatsapp.com/send?text={{ note.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}"
-                               class="btn btn-sm text-white rounded-pill px-3" style="background:#25d366;" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#25d366; font-family: 'Poppins', sans-serif;" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-whatsapp me-1"></i>WhatsApp
                             </a>
                             <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ note.title|urlencode }}"
-                               class="btn btn-sm text-white rounded-pill px-3" style="background:#1da1f2;" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-twitter me-1"></i>Twitter / X
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#000000; font-family: 'Poppins', sans-serif;" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-twitter-x me-1"></i>X (Twitter)
                             </a>
                             <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}"
-                               class="btn btn-sm text-white rounded-pill px-3" style="background:#0a66c2;" target="_blank" rel="noopener noreferrer">
-                                <i class="fab fa-linkedin-in me-1"></i>LinkedIn
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#0a66c2; font-family: 'Poppins', sans-serif;" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-linkedin me-1"></i>LinkedIn
                             </a>
                         </div>
                     </div>
 
-                    <!-- Ad: Notes Bottom -->
+                    <!-- AdSense: Notes Bottom Banner -->
                     {% if ads.notes_bottom %}
                     <div class="ad-container text-center my-4">
                         {{ ads.notes_bottom|safe }}
@@ -173,29 +173,31 @@
                     {% endif %}
                 </article>
 
-                <!-- Related Notes -->
+                <!-- Related Study Notes Grid -->
                 {% if related_notes %}
                 <section class="mt-5">
-                    <h2 class="h5 fw-bold mb-4"><i class="fas fa-book-reader text-primary me-2"></i>Related Study Notes</h2>
+                    <h2 class="h5 fw-bold mb-4 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                        <i class="bi bi-journal-check me-2" style="color: #0559b7;"></i>Related Study Notes
+                    </h2>
                     <div class="row g-3">
                         {% for related in related_notes %}
                         <div class="col-md-6">
-                            <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden feature-card">
+                            <article class="card h-100 catalog-card">
                                 {% if related.featured_image %}
                                 <a href="{{ related.get_absolute_url }}">
-                                    <img src="{{ related.featured_image.url }}" class="card-img-top" alt="{{ related.title }}" loading="lazy" style="height: 160px; object-fit: cover;">
+                                    <img src="{{ related.featured_image.url }}" class="card-img-top" alt="{{ related.title }}" loading="lazy" style="height: 150px; object-fit: cover;">
                                 </a>
                                 {% else %}
-                                <div class="d-flex align-items-center justify-content-center text-white" style="height: 160px; background: linear-gradient(135deg, #1e1b4b, #312e81);">
-                                    <i class="fas fa-book fa-lg opacity-40"></i>
+                                <div class="d-flex align-items-center justify-content-center text-white" style="height: 150px; background: linear-gradient(135deg, #0559b7, #032b5f);">
+                                    <i class="bi bi-journal-text opacity-50" style="font-size: 2.5rem;"></i>
                                 </div>
                                 {% endif %}
                                 <div class="card-body p-3">
-                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill mb-1 small">{{ related.category.name }}</span>
+                                    <span class="badge rounded-pill mb-1 small" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">{{ related.category.name }}</span>
                                     <h3 class="h6 fw-bold mb-1">
-                                        <a href="{{ related.get_absolute_url }}" class="text-decoration-none text-dark hover-primary">{{ related.title|truncatewords:8 }}</a>
+                                        <a href="{{ related.get_absolute_url }}" class="text-decoration-none text-dark stretched-link" style="font-family: 'Montserrat', sans-serif;">{{ related.title|truncatewords:8 }}</a>
                                     </h3>
-                                    <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>{{ related.created_at|date:"M d, Y" }}</small>
+                                    <small class="text-muted" style="font-family: 'Poppins', sans-serif;"><i class="bi bi-calendar3 me-1"></i>{{ related.created_at|date:"M d, Y" }}</small>
                                 </div>
                             </article>
                         </div>
@@ -205,43 +207,47 @@
                 {% endif %}
             </div>
 
-            <!-- Sidebar -->
+            <!-- Sticky Sidebar -->
             <aside class="col-lg-4">
-                <div class="sticky-top" style="top: 80px; z-index: 10;">
-                    <!-- Table of Contents -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4" id="toc-card" style="display:none;">
-                        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
-                            <h2 class="h6 fw-bold mb-0 text-dark"><i class="fas fa-list-ul text-primary me-2"></i>In this Note</h2>
+                <div class="sticky-top" style="top: 85px; z-index: 10;">
+                    <!-- Table of Contents Widget -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4" id="toc-card" style="display:none; border: 1px solid #e1e7f0 !important;">
+                        <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+                            <h2 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                                <i class="bi bi-list-nested me-2" style="color: #0559b7;"></i>In this Chapter
+                            </h2>
                         </div>
                         <div class="card-body px-4 pt-1 pb-4">
                             <nav id="toc-nav" class="small"></nav>
                         </div>
                     </div>
 
-                    <!-- Ad: Sidebar -->
+                    <!-- Practice Related MCQ CTA -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);">
+                        <div class="card-body p-4 text-white text-center">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3" style="background: rgba(255,255,255,0.15);">
+                                <i class="bi bi-patch-question-fill text-warning" style="font-size: 1.8rem;"></i>
+                            </div>
+                            <h3 class="h6 fw-bold text-white mb-2" style="font-family: 'Montserrat', sans-serif;">Practice Related MCQs</h3>
+                            <p class="small text-white-50 mb-3" style="font-family: 'Roboto', sans-serif;">
+                                Reinforce what you just learned with our targeted Computer Operator MCQ sets with instant answers.
+                            </p>
+                            <a href="{% url 'quiz:list' %}" class="btn btn-warning fw-bold rounded-pill px-4 btn-sm w-100 shadow-sm" style="font-family: 'Poppins', sans-serif;">
+                                Start Free MCQ Quiz <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- AdSense: Sidebar Banner -->
                     {% if ads.sidebar %}
                     <div class="ad-container mb-4">
                         {{ ads.sidebar|safe }}
                     </div>
                     {% endif %}
 
-                    <!-- Practice Related MCQ -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);">
-                        <div class="card-body p-4 text-white text-center">
-                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3" style="background: rgba(255,255,255,0.1);">
-                                <i class="fas fa-brain fa-lg text-warning"></i>
-                            </div>
-                            <h3 class="h6 fw-bold text-white mb-2">Practice Questions</h3>
-                            <p class="small text-white-50 mb-3">Reinforce what you just learned with our targeted Computer Operator MCQ sets.</p>
-                            <a href="{% url 'quiz:list' %}" class="btn btn-warning fw-bold rounded-pill px-4 btn-sm w-100">
-                                Practice MCQs Now <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-
                     <!-- Return to Notes -->
-                    <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary rounded-pill w-100 py-2">
-                        <i class="fas fa-arrow-left me-2"></i>Browse All Study Notes
+                    <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary rounded-pill w-100 py-2" style="font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-arrow-left me-2"></i>Browse All Study Notes
                     </a>
                 </div>
             </aside>
@@ -253,26 +259,26 @@
 {% block extra_css %}
 <style>
     .note-content {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'Roboto', sans-serif;
         font-size: 1.08rem;
         line-height: 1.85;
-        color: #1e293b;
+        color: #212529;
     }
     .note-content h2 {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 1.6rem;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.55rem;
         font-weight: 700;
-        color: #0f172a;
+        color: #111827;
         margin-top: 2.2rem;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid #f1f5f9;
+        border-bottom: 2px solid #edf2f8;
     }
     .note-content h3 {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 1.3rem;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.25rem;
         font-weight: 600;
-        color: #1e293b;
+        color: #1f2937;
         margin-top: 1.8rem;
         margin-bottom: 0.75rem;
     }
@@ -280,18 +286,18 @@
         margin-bottom: 1.25rem;
     }
     .note-content blockquote {
-        border-left: 4px solid #4f46e5;
-        background-color: #f8fafc;
+        border-left: 4px solid #0559b7;
+        background-color: #edf2f8;
         padding: 1.25rem 1.5rem;
         margin: 1.75rem 0;
-        border-radius: 0 0.75rem 0.75rem 0;
+        border-radius: 0 0.5rem 0.5rem 0;
         font-style: italic;
         color: #334155;
     }
     .note-content img {
         max-width: 100%;
         height: auto;
-        border-radius: 0.75rem;
+        border-radius: 0.5rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         margin: 1.5rem 0;
     }
@@ -305,12 +311,13 @@
     .note-content table th,
     .note-content table td {
         padding: 0.75rem 1rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e1e7f0;
     }
     .note-content table th {
-        background-color: #f8fafc;
+        background-color: #edf2f8;
         font-weight: 600;
-        color: #0f172a;
+        color: #111827;
+        font-family: 'Montserrat', sans-serif;
     }
     #toc-nav a {
         display: block;
@@ -319,10 +326,11 @@
         text-decoration: none;
         border-radius: 0.35rem;
         transition: all 0.15s ease;
+        font-family: 'Poppins', sans-serif;
     }
     #toc-nav a:hover, #toc-nav a.active {
-        color: #4f46e5;
-        background-color: #f1f5f9;
+        color: #0559b7;
+        background-color: #edf2f8;
         font-weight: 600;
     }
 </style>
@@ -394,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var url = this.getAttribute('data-url');
             navigator.clipboard.writeText(url).then(function() {
                 var originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check me-1 text-success"></i>Copied!';
+                copyBtn.innerHTML = '<i class="bi bi-check-lg me-1 text-success"></i>Copied!';
                 setTimeout(function() {
                     copyBtn.innerHTML = originalHTML;
                 }, 2000);

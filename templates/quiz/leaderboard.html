@@ -6,42 +6,40 @@
 {% block meta_description %}Top scores for {{ quiz.title }} - see how you rank against other candidates.{% endblock %}
 
 {% block content %}
-<!-- Modern Hero Banner -->
-<section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%); position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -30%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
-    
-    <div class="container position-relative py-3">
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white-50 text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'quiz:list' %}" class="text-white-50 text-decoration-none">MCQ Practice</a></li>
-                <li class="breadcrumb-item"><a href="{{ quiz.get_absolute_url }}" class="text-white-50 text-decoration-none">{{ quiz.title|truncatewords:4 }}</a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page">Leaderboard</li>
+<!-- SmartStore Breadcrumb & Header -->
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 small" style="font-family: 'Poppins', sans-serif;">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #0559b7;"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'quiz:list' %}" class="text-decoration-none" style="color: #0559b7;">MCQ Practice</a></li>
+                <li class="breadcrumb-item"><a href="{{ quiz.get_absolute_url }}" class="text-decoration-none" style="color: #0559b7;">{{ quiz.title|truncatewords:4 }}</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Leaderboard</li>
             </ol>
         </nav>
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <span class="badge mb-2 px-3 py-2 text-uppercase fw-semibold" style="background: rgba(255,255,255,0.12); color: #f59e0b; letter-spacing: 1px; font-size: 0.78rem; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15);">
-                    <i class="fas fa-trophy me-1"></i> Hall of Fame &amp; Top Scorers
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="badge mb-2 px-3 py-1 rounded-pill" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">
+                    <i class="bi bi-trophy-fill me-1"></i> Hall of Fame
                 </span>
-                <h1 class="display-6 fw-bold text-white mb-2">{{ quiz.title }}</h1>
-                <div class="d-flex flex-wrap gap-2 pt-2">
-                    <span class="badge rounded-pill bg-light text-dark px-3 py-2">{{ quiz.category.name }}</span>
-                    <span class="badge rounded-pill bg-light text-dark px-3 py-2">{{ quiz.questions.count }} Questions</span>
-                    <span class="badge rounded-pill bg-warning text-dark px-3 py-2 text-capitalize">{{ quiz.difficulty }}</span>
+                <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">{{ quiz.title }}</h1>
+                <div class="d-flex flex-wrap gap-2 pt-1">
+                    <span class="badge rounded-pill bg-white text-dark border px-3 py-1" style="font-family: 'Poppins', sans-serif;">{{ quiz.category.name }}</span>
+                    <span class="badge rounded-pill bg-white text-dark border px-3 py-1" style="font-family: 'Poppins', sans-serif;">{{ quiz.questions.count }} Questions</span>
+                    <span class="badge rounded-pill bg-warning text-dark px-3 py-1 text-capitalize fw-bold" style="font-family: 'Poppins', sans-serif;">{{ quiz.difficulty }}</span>
                 </div>
             </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <a href="{{ quiz.get_absolute_url }}" class="btn btn-primary btn-lg rounded-pill px-4 shadow">
-                    <i class="fas fa-play me-2"></i>Challenge Top Score
+            <div>
+                <a href="{{ quiz.get_absolute_url }}" class="btn btn-explore btn-lg rounded-pill px-4 shadow-sm" style="font-family: 'Poppins', sans-serif;">
+                    <i class="bi bi-play-circle-fill me-2"></i>Challenge Score
                 </a>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Leaderboard Content -->
-<section class="py-5" style="background-color: #f8fafc;">
+<section class="py-5" style="background: #ffffff;">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-9">
@@ -51,13 +49,13 @@
                     {% if top_attempts|length >= 2 %}
                     <!-- 2nd Place -->
                     <div class="col-4 col-md-4">
-                        <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white h-100" style="border-top: 4px solid #94a3b8 !important;">
+                        <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white h-100" style="border: 1px solid #e1e7f0 !important; border-top: 4px solid #94a3b8 !important;">
                             <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 44px; height: 44px; background: rgba(148, 163, 184, 0.15);">
-                                <i class="fas fa-medal fa-lg" style="color: #94a3b8;"></i>
+                                <i class="bi bi-award-fill fs-4" style="color: #94a3b8;"></i>
                             </div>
-                            <span class="badge bg-secondary rounded-pill mb-1">Rank 2</span>
-                            <div class="h4 fw-bold text-dark mb-0">{{ top_attempts.1.final_score|floatformat:2 }}</div>
-                            <small class="text-muted">{{ top_attempts.1.percentage }}%</small>
+                            <span class="badge bg-secondary rounded-pill mb-1" style="font-family: 'Poppins', sans-serif;">Rank 2</span>
+                            <div class="h4 fw-bold text-dark mb-0" style="font-family: 'JetBrains Mono', monospace;">{{ top_attempts.1.final_score|floatformat:2 }}</div>
+                            <small class="text-muted" style="font-family: 'Poppins', sans-serif;">{{ top_attempts.1.percentage }}%</small>
                         </div>
                     </div>
                     {% endif %}
@@ -65,13 +63,13 @@
                     {% if top_attempts|length >= 1 %}
                     <!-- 1st Place Champion -->
                     <div class="col-4 col-md-4">
-                        <div class="card border-0 shadow-lg rounded-4 text-center p-4 bg-white" style="border-top: 5px solid #f59e0b !important; transform: scale(1.05);">
-                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2 shadow" style="width: 52px; height: 52px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
-                                <i class="fas fa-crown fa-lg"></i>
+                        <div class="card border-0 shadow rounded-4 text-center p-4 bg-white" style="border: 2px solid #ffc107 !important; transform: scale(1.05);">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2 shadow-sm" style="width: 52px; height: 52px; background: #ffc107; color: #000;">
+                                <i class="bi bi-trophy-fill fs-3"></i>
                             </div>
-                            <span class="badge bg-warning text-dark rounded-pill mb-1 fw-bold">1st Place</span>
-                            <div class="display-6 fw-bold text-dark mb-0">{{ top_attempts.0.final_score|floatformat:2 }}</div>
-                            <div class="badge bg-success rounded-pill px-3 py-1">{{ top_attempts.0.percentage }}% Accuracy</div>
+                            <span class="badge bg-warning text-dark rounded-pill mb-1 fw-bold" style="font-family: 'Poppins', sans-serif;">1st Place</span>
+                            <div class="display-6 fw-bold text-dark mb-0" style="font-family: 'JetBrains Mono', monospace;">{{ top_attempts.0.final_score|floatformat:2 }}</div>
+                            <div class="badge bg-success rounded-pill px-3 py-1" style="font-family: 'Poppins', sans-serif;">{{ top_attempts.0.percentage }}% Accuracy</div>
                         </div>
                     </div>
                     {% endif %}
@@ -79,31 +77,33 @@
                     {% if top_attempts|length >= 3 %}
                     <!-- 3rd Place -->
                     <div class="col-4 col-md-4">
-                        <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white h-100" style="border-top: 4px solid #d97706 !important;">
-                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 44px; height: 44px; background: rgba(217, 119, 6, 0.15);">
-                                <i class="fas fa-medal fa-lg" style="color: #cd7f32;"></i>
+                        <div class="card border-0 shadow-sm rounded-4 text-center p-3 bg-white h-100" style="border: 1px solid #e1e7f0 !important; border-top: 4px solid #cd7f32 !important;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 44px; height: 44px; background: rgba(205, 127, 50, 0.15);">
+                                <i class="bi bi-award-fill fs-4" style="color: #cd7f32;"></i>
                             </div>
-                            <span class="badge bg-secondary rounded-pill mb-1">Rank 3</span>
-                            <div class="h4 fw-bold text-dark mb-0">{{ top_attempts.2.final_score|floatformat:2 }}</div>
-                            <small class="text-muted">{{ top_attempts.2.percentage }}%</small>
+                            <span class="badge bg-secondary rounded-pill mb-1" style="font-family: 'Poppins', sans-serif;">Rank 3</span>
+                            <div class="h4 fw-bold text-dark mb-0" style="font-family: 'JetBrains Mono', monospace;">{{ top_attempts.2.final_score|floatformat:2 }}</div>
+                            <small class="text-muted" style="font-family: 'Poppins', sans-serif;">{{ top_attempts.2.percentage }}%</small>
                         </div>
                     </div>
                     {% endif %}
                 </div>
 
                 <!-- Full Leaderboard Table -->
-                <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden" style="border: 1px solid #e1e7f0 !important;">
                     <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
-                        <h2 class="h5 fw-bold mb-0 text-dark"><i class="fas fa-ranking-star text-primary me-2"></i>Rankings Table</h2>
+                        <h2 class="h5 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                            <i class="bi bi-bar-chart-fill me-2" style="color: #0559b7;"></i>Rankings Table
+                        </h2>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover mb-0 align-middle">
-                            <thead class="bg-light">
+                            <thead style="background: #edf2f8;">
                                 <tr>
-                                    <th scope="col" class="text-center ps-4" style="width: 80px;">Rank</th>
-                                    <th scope="col">Candidate Score</th>
-                                    <th scope="col" class="text-center">Accuracy</th>
-                                    <th scope="col" class="text-end pe-4">Attempt Date</th>
+                                    <th scope="col" class="text-center ps-4" style="width: 80px; font-family: 'Montserrat', sans-serif;">Rank</th>
+                                    <th scope="col" style="font-family: 'Montserrat', sans-serif;">Candidate Score</th>
+                                    <th scope="col" class="text-center" style="font-family: 'Montserrat', sans-serif;">Accuracy</th>
+                                    <th scope="col" class="text-end pe-4" style="font-family: 'Montserrat', sans-serif;">Attempt Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -111,25 +111,25 @@
                                 <tr>
                                     <td class="text-center ps-4">
                                         {% if forloop.counter == 1 %}
-                                        <span class="badge rounded-circle bg-warning text-dark p-2" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-crown"></i></span>
+                                        <span class="badge rounded-circle bg-warning text-dark p-2" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;"><i class="bi bi-trophy-fill"></i></span>
                                         {% elif forloop.counter == 2 %}
                                         <span class="badge rounded-circle bg-secondary text-white p-2" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">2</span>
                                         {% elif forloop.counter == 3 %}
                                         <span class="badge rounded-circle bg-dark text-white p-2" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">3</span>
                                         {% else %}
-                                        <span class="text-muted fw-bold">{{ forloop.counter }}</span>
+                                        <span class="text-muted fw-bold" style="font-family: 'JetBrains Mono', monospace;">{{ forloop.counter }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-dark">{{ attempt.final_score|floatformat:2 }}</span>
+                                        <span class="fw-bold text-dark" style="font-family: 'JetBrains Mono', monospace;">{{ attempt.final_score|floatformat:2 }}</span>
                                         <span class="text-muted small">/ {% widthratio attempt.total_questions 1 2 %} Marks</span>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge rounded-pill {% if attempt.percentage >= 80 %}bg-success{% elif attempt.percentage >= 50 %}bg-warning text-dark{% else %}bg-danger{% endif %} px-3 py-1">
+                                        <span class="badge rounded-pill {% if attempt.percentage >= 80 %}bg-success{% elif attempt.percentage >= 50 %}bg-warning text-dark{% else %}bg-danger{% endif %} px-3 py-1" style="font-family: 'Poppins', sans-serif;">
                                             {{ attempt.percentage }}%
                                         </span>
                                     </td>
-                                    <td class="text-end pe-4 text-muted small">
+                                    <td class="text-end pe-4 text-muted small" style="font-family: 'Poppins', sans-serif;">
                                         {{ attempt.completed_at|date:"M d, Y" }}
                                     </td>
                                 </tr>
@@ -141,23 +141,23 @@
 
                 {% else %}
                 <!-- Empty State -->
-                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px; background: rgba(245, 158, 11, 0.1);">
-                        <i class="fas fa-trophy fa-2x text-warning"></i>
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white" style="border: 1px solid #e1e7f0 !important; background: #edf2f8;">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3 bg-white shadow-sm" style="width: 60px; height: 60px;">
+                        <i class="bi bi-trophy text-warning fs-3"></i>
                     </div>
-                    <h3 class="h5 fw-bold mb-2">No attempts recorded yet</h3>
-                    <p class="text-muted mb-4">Be the first candidate to test your knowledge and claim rank #1 on the leaderboard!</p>
+                    <h3 class="h5 fw-bold mb-2 text-dark" style="font-family: 'Montserrat', sans-serif;">No attempts recorded yet</h3>
+                    <p class="text-muted small mb-4" style="font-family: 'Roboto', sans-serif;">Be the first candidate to test your knowledge and claim rank #1 on the leaderboard!</p>
                     <div>
-                        <a href="{{ quiz.get_absolute_url }}" class="btn btn-primary rounded-pill px-5 shadow">
-                            <i class="fas fa-play me-2"></i>Take This Quiz Now
+                        <a href="{{ quiz.get_absolute_url }}" class="btn btn-explore rounded-pill px-5 shadow-sm" style="font-family: 'Poppins', sans-serif;">
+                            <i class="bi bi-play-circle-fill me-2"></i>Take This Quiz Now
                         </a>
                     </div>
                 </div>
                 {% endif %}
 
                 <div class="text-center mt-4">
-                    <a href="{% url 'quiz:list' %}" class="btn btn-outline-secondary rounded-pill px-4">
-                        <i class="fas fa-arrow-left me-2"></i>Back to All Quizzes
+                    <a href="{% url 'quiz:list' %}" class="btn btn-outline-secondary rounded-pill px-4" style="font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-arrow-left me-2"></i>Back to All Quizzes
                     </a>
                 </div>
             </div>

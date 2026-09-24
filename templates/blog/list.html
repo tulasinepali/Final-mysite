@@ -8,46 +8,36 @@
 {% block og_description %}{{ meta_description|default:"Insights, exam strategies, and computer guides by Tulasi Nepali." }}{% endblock %}
 
 {% block content %}
-<!-- Modern Hero Banner -->
-<section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%); position: relative; overflow: hidden;">
-    <div style="position: absolute; top: -40%; right: -20%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
-    <div style="position: absolute; bottom: -30%; left: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
-    
-    <div class="container position-relative py-3">
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white-50 text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page">Blog</li>
+<!-- SmartStore Page Header -->
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 small" style="font-family: 'Poppins', sans-serif;">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #0559b7;"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Blog</li>
             </ol>
         </nav>
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <span class="badge mb-2 px-3 py-2 text-uppercase fw-semibold" style="background: rgba(255,255,255,0.12); color: #38bdf8; letter-spacing: 1px; font-size: 0.78rem; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15);">
-                    <i class="fas fa-newspaper me-1"></i> Knowledge Hub &amp; Exam Insights
-                </span>
-                <h1 class="display-6 fw-bold text-white mb-2">Educational Blog &amp; Tech Articles</h1>
-                <p class="lead text-white-50 mb-0" style="font-size: 1.05rem;">
-                    Exam strategies, Computer Operator preparation insights, and high-yield study techniques curated by <strong>Tulasi Nepali</strong>.
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">
+                    <i class="bi bi-journal-text me-2" style="color: #0559b7;"></i>Educational Blog &amp; Tech Articles
+                </h1>
+                <p class="text-muted mb-0 small" style="font-family: 'Roboto', sans-serif;">
+                    Exam strategies, preparation insights, and high-yield Computer Operator techniques authored by <strong>Tulasi Nepali</strong>.
                 </p>
             </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <div class="d-inline-flex align-items-center gap-3 p-3 rounded-4" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 48px; height: 48px; background: linear-gradient(135deg, #4f46e5, #06b6d4);">
-                        <i class="fas fa-pen-nib fa-lg"></i>
-                    </div>
-                    <div class="text-start">
-                        <div class="text-white fw-bold fs-5">{{ page_obj.paginator.count|default:"Fresh" }} Articles</div>
-                        <div class="text-white-50 small">Regularly Updated</div>
-                    </div>
-                </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill px-3 py-2 bg-white text-dark border" style="font-family: 'Poppins', sans-serif;">
+                    <i class="bi bi-pen-fill me-1" style="color: #0559b7;"></i>{{ page_obj.paginator.count|default:"Fresh" }} Articles
+                </span>
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Featured Posts Carousel -->
 {% if featured_posts %}
-<section class="py-4 mt-n3">
+<section class="py-4" style="background: #ffffff;">
     <div class="container">
         <div id="featuredPostsCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
@@ -55,25 +45,27 @@
                 <button type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
                 {% endfor %}
             </div>
-            <div class="carousel-inner rounded-4 overflow-hidden shadow-lg border">
+            <div class="carousel-inner rounded-4 overflow-hidden shadow-sm" style="border: 1px solid #e1e7f0;">
                 {% for post in featured_posts %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                     <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-white d-block position-relative">
                         {% if post.featured_image %}
-                        <img src="{{ post.featured_image.url }}" class="d-block w-100" alt="{{ post.title }}" style="height:380px;object-fit:cover;">
+                        <img src="{{ post.featured_image.url }}" class="d-block w-100" alt="{{ post.title }}" style="height:360px;object-fit:cover;">
                         {% else %}
-                        <div class="d-block w-100 d-flex align-items-center justify-content-center" style="height:380px; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
-                            <i class="fas fa-newspaper fa-2x text-white opacity-25"></i>
+                        <div class="d-block w-100 d-flex align-items-center justify-content-center" style="height:360px; background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);">
+                            <i class="bi bi-newspaper text-white opacity-25" style="font-size: 4rem;"></i>
                         </div>
                         {% endif %}
-                        <div class="carousel-caption text-start p-4 p-md-5" style="background: linear-gradient(transparent, rgba(15, 23, 42, 0.95) 70%); right: 0; bottom: 0; left: 0; border-radius: 0 0 1rem 1rem;">
-                            <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-bold"><i class="fas fa-star me-1"></i>Featured Article</span>
-                            <h2 class="h3 fw-bold mb-2 text-white">{{ post.title }}</h2>
-                            <p class="small mb-2 text-white-50 d-none d-md-block" style="max-width: 700px;">{{ post.summary|truncatewords:22 }}</p>
-                            <div class="d-flex align-items-center gap-3 text-white-50 small">
-                                <span><i class="fas fa-calendar-alt me-1 text-info"></i>{{ post.created_at|date:"M d, Y" }}</span>
-                                <span><i class="fas fa-folder me-1 text-info"></i>{{ post.category.name }}</span>
-                                <span><i class="fas fa-eye me-1 text-info"></i>{{ post.views }} views</span>
+                        <div class="carousel-caption text-start p-4 p-md-5" style="background: linear-gradient(transparent, rgba(0, 0, 0, 0.9) 75%); right: 0; bottom: 0; left: 0;">
+                            <span class="badge bg-warning text-dark mb-2 px-3 py-1 fw-bold" style="font-family: 'Poppins', sans-serif;">
+                                <i class="bi bi-star-fill me-1"></i>Featured Guide
+                            </span>
+                            <h2 class="h3 fw-bold mb-2 text-white" style="font-family: 'Montserrat', sans-serif;">{{ post.title }}</h2>
+                            <p class="small mb-2 text-white-50 d-none d-md-block" style="max-width: 650px; font-family: 'Roboto', sans-serif;">{{ post.summary|truncatewords:20 }}</p>
+                            <div class="d-flex align-items-center gap-3 text-white-50 small" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                                <span><i class="bi bi-calendar3 me-1 text-info"></i>{{ post.created_at|date:"M d, Y" }}</span>
+                                <span><i class="bi bi-folder me-1 text-info"></i>{{ post.category.name }}</span>
+                                <span><i class="bi bi-eye me-1 text-info"></i>{{ post.views }} views</span>
                             </div>
                         </div>
                     </a>
@@ -81,11 +73,11 @@
                 {% endfor %}
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon p-3 rounded-circle" style="background-color: rgba(0,0,0,0.4);" aria-hidden="true"></span>
+                <span class="carousel-control-prev-icon p-3 rounded-circle" style="background-color: rgba(0,0,0,0.5);" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon p-3 rounded-circle" style="background-color: rgba(0,0,0,0.4);" aria-hidden="true"></span>
+                <span class="carousel-control-next-icon p-3 rounded-circle" style="background-color: rgba(0,0,0,0.5);" aria-hidden="true"></span>
                 <span class="visually-hidden">Next</span>
             </button>
         </div>
@@ -93,45 +85,44 @@
 </section>
 {% endif %}
 
-<!-- Main Content Area -->
-<section class="py-4 py-lg-5">
+<!-- Main Blog Content Area -->
+<section class="py-4 py-lg-5" style="background: #ffffff;">
     <div class="container">
         <div class="row g-4">
             <!-- Left / Main Column -->
             <div class="col-lg-8">
-                <!-- Search & Filters -->
-                <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
-                    <form method="get" role="search">
+                <!-- Search & Filters Toolbar -->
+                <div class="p-3 mb-4 rounded-3 border bg-white shadow-sm" style="border-color: #e1e7f0 !important;">
+                    <form method="get" class="mb-3" role="search">
                         <div class="input-group">
-                            <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="fas fa-search"></i></span>
-                            <input type="text" name="q" class="form-control border-0 bg-transparent shadow-none" placeholder="Search blog articles, topics, keywords..." value="{{ search_query }}" aria-label="Search blog">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                            <input type="text" name="q" class="form-control border-start-0" placeholder="Search blog articles, topics, keywords..." value="{{ search_query }}" aria-label="Search blog">
                             {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}">{% endif %}
                             {% if current_tag %}<input type="hidden" name="tag" value="{{ current_tag }}">{% endif %}
-                            <button class="btn btn-primary px-4 rounded-3" type="submit">Search</button>
+                            <button class="btn btn-explore" type="submit">Search</button>
                             {% if search_query %}
-                            <a href="{% url 'blog:list' %}{% if current_category %}?category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}" class="btn btn-outline-secondary rounded-3 ms-1" title="Clear search"><i class="fas fa-times"></i></a>
+                            <a href="{% url 'blog:list' %}{% if current_category %}?category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}" class="btn btn-outline-secondary" title="Clear search"><i class="bi bi-x-lg"></i></a>
                             {% endif %}
                         </div>
                     </form>
 
-                    <!-- Category Pills Horizontal Scroll -->
-                    <div class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top align-items-center">
-                        <span class="small text-muted fw-semibold me-1"><i class="fas fa-filter me-1"></i>Topics:</span>
+                    <!-- Category Pills -->
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <span class="small text-muted fw-semibold me-1" style="font-family: 'Poppins', sans-serif;"><i class="bi bi-funnel me-1"></i>Topic:</span>
                         <a href="{% url 'blog:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}"
-                           class="btn btn-sm rounded-pill px-3 {% if not current_category %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                           class="btn btn-sm rounded-pill px-3 {% if not current_category %}btn-explore{% else %}btn-outline-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.82rem;">
                             All
                         </a>
                         {% for cat in categories %}
                         <a href="{% url 'blog:list' %}?category={{ cat.slug }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}"
-                           class="btn btn-sm rounded-pill px-3 {% if current_category == cat.slug %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                            {% if cat.icon %}<i class="{{ cat.icon }} me-1"></i>{% endif %}
+                           class="btn btn-sm rounded-pill px-3 {% if current_category == cat.slug %}btn-explore{% else %}btn-outline-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.82rem;">
                             {{ cat.name }}
                         </a>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- Ad: Blog Top -->
+                <!-- AdSense: Blog Top -->
                 {% if ads.blog_top %}
                 <div class="ad-container text-center mb-4">
                     {{ ads.blog_top|safe }}
@@ -140,14 +131,16 @@
 
                 <!-- Active Filters Notification -->
                 {% if search_query or current_category or current_tag %}
-                <div class="alert alert-light border rounded-4 d-flex justify-content-between align-items-center mb-4 shadow-sm">
-                    <span class="small">
-                        <i class="fas fa-info-circle me-1 text-primary"></i>Showing results
+                <div class="alert alert-light border rounded-3 d-flex justify-content-between align-items-center mb-4 p-3" style="border-color: #e1e7f0 !important; background: #edf2f8;">
+                    <span class="small text-dark" style="font-family: 'Roboto', sans-serif;">
+                        <i class="bi bi-info-circle-fill me-1" style="color: #0559b7;"></i>Showing articles
                         {% if current_category %}in <strong>{{ current_category }}</strong>{% endif %}
                         {% if current_tag %}tagged <strong>#{{ current_tag }}</strong>{% endif %}
-                        {% if search_query %}for "<strong>{{ search_query }}</strong>"{% endif %}
+                        {% if search_query %}matching "<strong>{{ search_query }}</strong>"{% endif %}
                     </span>
-                    <a href="{% url 'blog:list' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fas fa-times me-1"></i>Reset</a>
+                    <a href="{% url 'blog:list' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="font-size: 0.78rem;">
+                        <i class="bi bi-x me-1"></i>Reset
+                    </a>
                 </div>
                 {% endif %}
 
@@ -156,66 +149,68 @@
                 <div class="row g-4">
                     {% for post in page_obj %}
                     <div class="col-md-6">
-                        <article class="card h-100 border-0 shadow-sm feature-card rounded-4 overflow-hidden d-flex flex-column">
-                            <div class="position-relative overflow-hidden" style="height: 200px;">
+                        <article class="card h-100 catalog-card d-flex flex-column">
+                            <div class="position-relative overflow-hidden" style="height: 190px;">
                                 {% if post.featured_image %}
                                 <a href="{{ post.get_absolute_url }}">
-                                    <img src="{{ post.featured_image.url }}" class="w-100 h-100" alt="{{ post.title }}" loading="lazy" style="object-fit: cover; transition: transform 0.4s ease;">
+                                    <img src="{{ post.featured_image.url }}" class="w-100 h-100" alt="{{ post.title }}" loading="lazy" style="object-fit: cover;">
                                 </a>
                                 {% else %}
-                                <a href="{{ post.get_absolute_url }}" class="d-flex align-items-center justify-content-center w-100 h-100 text-decoration-none" style="background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);">
-                                    <i class="fas fa-newspaper fa-2x text-white opacity-40"></i>
+                                <a href="{{ post.get_absolute_url }}" class="d-flex align-items-center justify-content-center w-100 h-100 text-decoration-none" style="background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);">
+                                    <i class="bi bi-newspaper text-white opacity-40" style="font-size: 3rem;"></i>
                                 </a>
                                 {% endif %}
                                 <div class="position-absolute top-0 start-0 m-3 d-flex gap-1 flex-wrap">
-                                    <span class="badge px-3 py-1 rounded-pill" style="background: rgba(15, 23, 42, 0.75); color: #fff; backdrop-filter: blur(6px); font-size: 0.75rem;">
+                                    <span class="badge rounded-pill px-3 py-1 shadow-sm" style="background: #0559b7; color: #fff; font-family: 'Poppins', sans-serif; font-size: 0.75rem;">
                                         {{ post.category.name }}
                                     </span>
                                     {% if post.is_featured %}
-                                    <span class="badge bg-warning text-dark px-2 py-1 rounded-pill"><i class="fas fa-star me-1"></i>Featured</span>
+                                    <span class="badge rounded-pill bg-warning text-dark px-2 py-1 shadow-sm" style="font-family: 'Poppins', sans-serif; font-size: 0.72rem;">
+                                        <i class="bi bi-star-fill me-1"></i>Featured
+                                    </span>
                                     {% endif %}
                                 </div>
                             </div>
 
                             <div class="card-body p-4 d-flex flex-column flex-grow-1">
-                                <div class="text-muted small mb-2 d-flex align-items-center gap-3">
-                                    <span><i class="far fa-calendar-alt me-1"></i>{{ post.created_at|date:"M d, Y" }}</span>
-                                    <span><i class="far fa-eye me-1"></i>{{ post.views }} views</span>
+                                <div class="text-muted small mb-2 d-flex align-items-center gap-3" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">
+                                    <span><i class="bi bi-calendar3 me-1" style="color: #0559b7;"></i>{{ post.created_at|date:"M d, Y" }}</span>
+                                    <span><i class="bi bi-eye me-1" style="color: #0559b7;"></i>{{ post.views }} views</span>
                                 </div>
 
                                 <h2 class="h5 fw-bold mb-2">
-                                    <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark hover-primary stretched-link">
+                                    <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark stretched-link" style="font-family: 'Montserrat', sans-serif; line-height: 1.35;">
                                         {{ post.title }}
                                     </a>
                                 </h2>
 
-                                <p class="text-muted small mb-3 flex-grow-1" style="line-height: 1.6;">
-                                    {{ post.summary|truncatewords:20 }}
+                                <p class="text-muted small mb-3 flex-grow-1" style="font-family: 'Roboto', sans-serif; line-height: 1.6;">
+                                    {{ post.summary|truncatewords:18 }}
                                 </p>
 
                                 {% if post.tags.all %}
                                 <div class="d-flex flex-wrap gap-1 mb-3 position-relative" style="z-index: 2;">
                                     {% for tag in post.tags.all|slice:":3" %}
-                                    <a href="{% url 'blog:list' %}?tag={{ tag.slug }}" class="badge bg-light text-muted border text-decoration-none rounded-pill px-2 py-1" style="font-size: 0.72rem;">
+                                    <a href="{% url 'blog:list' %}?tag={{ tag.slug }}" class="badge bg-light text-muted border text-decoration-none rounded-pill px-2 py-1" style="font-size: 0.72rem; font-family: 'Poppins', sans-serif;">
                                         #{{ tag.name }}
                                     </a>
                                     {% endfor %}
                                 </div>
                                 {% endif %}
 
-                                <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                                <div class="pt-3 border-top d-flex justify-content-between align-items-center" style="border-color: #e1e7f0 !important;">
                                     <div class="d-flex align-items-center">
                                         {% if site_settings.owner_image %}
-                                        <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;">
+                                        <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="rounded-circle me-2 border" style="width: 24px; height: 24px; object-fit: cover;">
                                         {% else %}
-                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px; font-size: 0.65rem;">
-                                            <i class="fas fa-user"></i>
+                                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px; font-size: 0.65rem; background: #0559b7;">
+                                            <i class="bi bi-person"></i>
                                         </div>
                                         {% endif %}
-                                        <span class="small text-muted fw-medium">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</span>
+                                        <span class="small text-muted fw-medium" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</span>
                                     </div>
-                                    <span class="text-primary small fw-semibold">
-                                        Read Article <i class="fas fa-arrow-right ms-1"></i>
+                                    <span class="small fw-semibold" style="color: #0559b7; font-family: 'Poppins', sans-serif;">
+                                        Read <i class="bi bi-arrow-right ms-1"></i>
                                     </span>
                                 </div>
                             </div>
@@ -224,14 +219,14 @@
                     {% endfor %}
                 </div>
 
-                <!-- Modern Pagination -->
+                <!-- SmartStore Pagination -->
                 {% if page_obj.has_other_pages %}
                 <nav aria-label="Blog pagination" class="mt-5">
                     <ul class="pagination justify-content-center gap-1">
                         {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;" href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Previous">
-                                <i class="fas fa-chevron-left"></i>
+                            <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; border-color: #e1e7f0; color: #0559b7;" href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Previous">
+                                <i class="bi bi-chevron-left"></i>
                             </a>
                         </li>
                         {% endif %}
@@ -239,19 +234,19 @@
                         {% for num in page_obj.paginator.page_range %}
                             {% if page_obj.number == num %}
                             <li class="page-item active" aria-current="page">
-                                <span class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm bg-primary border-primary" style="width: 40px; height: 40px;">{{ num }}</span>
+                                <span class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; background: #0559b7; border-color: #0559b7; color: #fff;">{{ num }}</span>
                             </li>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+                                <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; border-color: #e1e7f0; color: #334155;" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
                             </li>
                             {% endif %}
                         {% endfor %}
 
                         {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;" href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Next">
-                                <i class="fas fa-chevron-right"></i>
+                            <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; border-color: #e1e7f0; color: #0559b7;" href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Next">
+                                <i class="bi bi-chevron-right"></i>
                             </a>
                         </li>
                         {% endif %}
@@ -261,14 +256,14 @@
 
                 {% else %}
                 <!-- Empty State -->
-                <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center" style="background: #edf2f8;">
                     <div class="mb-3">
-                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
-                            <i class="fas fa-newspaper fa-lg text-muted opacity-50"></i>
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-white shadow-sm" style="width: 64px; height: 64px;">
+                            <i class="bi bi-journal-x text-muted" style="font-size: 2rem;"></i>
                         </div>
                     </div>
-                    <h3 class="h5 fw-bold mb-2">No Articles Found</h3>
-                    <p class="text-muted mb-4">
+                    <h3 class="h5 fw-bold mb-2 text-dark" style="font-family: 'Montserrat', sans-serif;">No Articles Found</h3>
+                    <p class="text-muted small mb-4" style="max-width: 480px; margin: 0 auto; font-family: 'Roboto', sans-serif;">
                         {% if search_query %}
                         No posts matched "<strong>{{ search_query }}</strong>". Try searching with different terms.
                         {% else %}
@@ -276,36 +271,38 @@
                         {% endif %}
                     </p>
                     <div>
-                        <a href="{% url 'blog:list' %}" class="btn btn-primary rounded-pill px-4"><i class="fas fa-arrow-left me-2"></i>Browse All Articles</a>
+                        <a href="{% url 'blog:list' %}" class="btn btn-explore rounded-pill px-4">
+                            <i class="bi bi-arrow-left me-2"></i>Browse All Articles
+                        </a>
                     </div>
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Sidebar -->
+            <!-- SmartStore Sidebar -->
             <aside class="col-lg-4">
                 <!-- Author Spotlight Card -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-                    <div class="p-4 text-center" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="border: 1px solid #e1e7f0 !important;">
+                    <div class="p-4 text-center" style="background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);">
                         {% if site_settings.owner_image %}
-                        <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="rounded-circle shadow-lg mb-3 border border-3 border-white" style="width: 90px; height: 90px; object-fit: cover;">
+                        <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="rounded-circle shadow mb-3 border border-3 border-white" style="width: 80px; height: 80px; object-fit: cover;">
                         {% else %}
                         <div class="rounded-circle bg-white bg-opacity-20 d-inline-flex align-items-center justify-content-center mb-3 text-white" style="width: 70px; height: 70px;">
-                            <i class="fas fa-user-tie fa-lg"></i>
+                            <i class="bi bi-person-fill" style="font-size: 2rem;"></i>
                         </div>
                         {% endif %}
-                        <h2 class="h5 fw-bold text-white mb-1">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
-                        <span class="badge px-3 py-1 rounded-pill mb-2" style="background: rgba(255,255,255,0.15); color: #38bdf8;">Verified Educator &amp; Mentor</span>
-                        <p class="text-white-50 small mb-3 px-2">
-                            Dedicated to helping aspirants conquer Computer Operator and Loksewa examinations through structured, high-yield guidance.
+                        <h2 class="h6 fw-bold text-white mb-1" style="font-family: 'Montserrat', sans-serif;">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
+                        <span class="badge px-3 py-1 rounded-pill mb-2" style="background: rgba(255,255,255,0.18); color: #fff; font-family: 'Poppins', sans-serif; font-size: 0.75rem;">Verified Educator &amp; Mentor</span>
+                        <p class="text-white-50 small mb-3 px-2" style="font-family: 'Roboto', sans-serif;">
+                            Dedicated to helping aspirants conquer Loksewa and Computer Operator exams through high-yield guidance.
                         </p>
-                        <a href="{% url 'core:about' %}" class="btn btn-sm btn-outline-light rounded-pill px-4">
-                            View Full Profile <i class="fas fa-arrow-right ms-1"></i>
+                        <a href="{% url 'core:about' %}" class="btn btn-sm btn-light rounded-pill px-4 fw-semibold" style="color: #0559b7; font-family: 'Poppins', sans-serif;">
+                            View Full Profile <i class="bi bi-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>
 
-                <!-- Ad: Blog Sidebar -->
+                <!-- AdSense: Blog Sidebar -->
                 {% if ads.blog_sidebar %}
                 <div class="ad-container mb-4">
                     {{ ads.blog_sidebar|safe }}
@@ -313,17 +310,18 @@
                 {% endif %}
 
                 <!-- Categories Widget -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4">
-                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
-                        <h2 class="h6 fw-bold mb-0 text-dark"><i class="fas fa-folder text-primary me-2"></i>Categories</h2>
+                <div class="card border-0 shadow-sm rounded-4 mb-4" style="border: 1px solid #e1e7f0 !important;">
+                    <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+                        <h2 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                            <i class="bi bi-folder-fill me-2" style="color: #0559b7;"></i>Blog Categories
+                        </h2>
                     </div>
-                    <div class="card-body px-4 pt-2 pb-4">
+                    <div class="card-body px-4 pt-1 pb-4">
                         <div class="list-group list-group-flush">
                             {% for cat in categories %}
-                            <a href="{% url 'blog:list' %}?category={{ cat.slug }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom border-light {% if current_category == cat.slug %}fw-bold text-primary{% else %}text-secondary{% endif %}">
+                            <a href="{% url 'blog:list' %}?category={{ cat.slug }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if current_category == cat.slug %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.88rem; border-color: #f1f5f9 !important;">
                                 <span>
-                                    {% if cat.icon %}<i class="{{ cat.icon }} me-2 text-primary opacity-75"></i>{% else %}<i class="fas fa-angle-right me-2 text-muted"></i>{% endif %}
-                                    {{ cat.name }}
+                                    <i class="bi bi-newspaper me-2" style="color: #0559b7;"></i>{{ cat.name }}
                                 </span>
                                 <span class="badge rounded-pill bg-light text-muted border">{{ cat.blog_posts.count }}</span>
                             </a>
@@ -334,24 +332,19 @@
                     </div>
                 </div>
 
-                <!-- Ad: Global Sidebar -->
-                {% if ads.sidebar %}
-                <div class="ad-container mb-4">
-                    {{ ads.sidebar|safe }}
-                </div>
-                {% endif %}
-
                 <!-- Tags Widget -->
                 {% if tags %}
-                <div class="card border-0 shadow-sm rounded-4 mb-4">
-                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
-                        <h2 class="h6 fw-bold mb-0 text-dark"><i class="fas fa-tags text-primary me-2"></i>Popular Topics</h2>
+                <div class="card border-0 shadow-sm rounded-4 mb-4" style="border: 1px solid #e1e7f0 !important;">
+                    <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+                        <h2 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                            <i class="bi bi-tags-fill me-2" style="color: #0559b7;"></i>Popular Topics
+                        </h2>
                     </div>
-                    <div class="card-body px-4 pt-2 pb-4">
+                    <div class="card-body px-4 pt-1 pb-4">
                         <div class="d-flex flex-wrap gap-2">
                             {% for tag in tags %}
                             <a href="{% url 'blog:list' %}?tag={{ tag.slug }}{% if current_category %}&category={{ current_category }}{% endif %}"
-                               class="badge rounded-pill {% if current_tag == tag.slug %}bg-primary text-white{% else %}bg-light text-secondary border{% endif %} text-decoration-none py-2 px-3">
+                               class="badge rounded-pill {% if current_tag == tag.slug %}btn-explore{% else %}bg-light text-secondary border{% endif %} text-decoration-none py-2 px-3" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">
                                 #{{ tag.name }}
                             </a>
                             {% endfor %}
@@ -360,39 +353,21 @@
                 </div>
                 {% endif %}
 
-                <!-- Quick Resource Links -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light">
-                    <div class="card-body p-4">
-                        <h2 class="h6 fw-bold mb-3"><i class="fas fa-bolt text-warning me-2"></i>Essential Resources</h2>
-                        <div class="d-grid gap-2">
-                            <a href="{% url 'quiz:list' %}" class="btn btn-white bg-white text-start shadow-sm border-0 rounded-3 py-2">
-                                <i class="fas fa-brain text-success me-2"></i><strong>MCQ Practice Sets</strong>
-                                <small class="d-block text-muted ps-4">Practice timed tests with instant review</small>
-                            </a>
-                            <a href="{% url 'notes:list' %}" class="btn btn-white bg-white text-start shadow-sm border-0 rounded-3 py-2">
-                                <i class="fas fa-book text-primary me-2"></i><strong>Study Notes Library</strong>
-                                <small class="d-block text-muted ps-4">High-yield syllabus-aligned notes</small>
-                            </a>
-                            <a href="{% url 'downloads:list' %}" class="btn btn-white bg-white text-start shadow-sm border-0 rounded-3 py-2">
-                                <i class="fas fa-download text-warning me-2"></i><strong>Free PDF Downloads</strong>
-                                <small class="d-block text-muted ps-4">Model questions, syllabus &amp; papers</small>
-                            </a>
-                        </div>
+                <!-- Practice Quiz CTA -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center" style="background: #edf2f8; border: 1px solid #e1e7f0 !important;">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-white shadow-sm mb-3" style="width: 52px; height: 52px;">
+                        <i class="bi bi-patch-question-fill" style="color: #0559b7; font-size: 1.5rem;"></i>
                     </div>
+                    <h3 class="h6 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Practice MCQs</h3>
+                    <p class="text-muted small mb-3" style="font-family: 'Roboto', sans-serif;">
+                        Test your examination readiness with our free timed quizzes.
+                    </p>
+                    <a href="{% url 'quiz:list' %}" class="btn btn-explore rounded-pill w-100 py-2">
+                        Start Free Quiz <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
                 </div>
             </aside>
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .hover-primary:hover {
-        color: #4f46e5 !important;
-    }
-    .feature-card:hover img {
-        transform: scale(1.05);
-    }
-</style>
 {% endblock %}
