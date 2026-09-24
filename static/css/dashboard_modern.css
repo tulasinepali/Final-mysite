@@ -1,0 +1,314 @@
+/* ============================================================
+   Modern SaaS Admin Dashboard Theme
+   Overrides AdminLTE 3 with a sleek, stunning interface
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --dash-font-heading: 'Plus Jakarta Sans', sans-serif;
+    --dash-font-body: 'Inter', sans-serif;
+    --dash-primary: #4f46e5;
+    --dash-primary-hover: #4338ca;
+    --dash-bg: #f8fafc;
+    --dash-sidebar: #0f172a;
+    --dash-sidebar-hover: #1e293b;
+    --dash-card-border: rgba(226, 232, 240, 0.8);
+    --dash-radius: 1rem;
+}
+
+body {
+    font-family: var(--dash-font-body) !important;
+    background-color: var(--dash-bg) !important;
+    color: #1e293b !important;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-text, .nav-link {
+    font-family: var(--dash-font-heading) !important;
+}
+
+/* ----------------------------------------------------------
+   Modern Sidebar
+   ---------------------------------------------------------- */
+.main-sidebar {
+    background-color: var(--dash-sidebar) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+.brand-link {
+    background-color: #0b1120 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 1.15rem 1rem !important;
+    display: flex !important;
+    align-items: center;
+}
+
+.brand-link .brand-text {
+    font-weight: 700 !important;
+    letter-spacing: -0.3px;
+    color: #ffffff !important;
+    font-size: 1.1rem;
+}
+
+.sidebar .nav-sidebar .nav-item {
+    margin-bottom: 3px;
+}
+
+.sidebar .nav-sidebar .nav-link {
+    border-radius: 0.65rem !important;
+    padding: 0.65rem 1rem !important;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+    font-size: 0.92rem;
+    transition: all 0.2s ease !important;
+}
+
+.sidebar .nav-sidebar .nav-link:hover {
+    background-color: var(--dash-sidebar-hover) !important;
+    color: #ffffff !important;
+    transform: translateX(3px);
+}
+
+.sidebar .nav-sidebar .nav-link.active {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4) !important;
+}
+
+.sidebar .nav-sidebar .nav-link i {
+    font-size: 1rem !important;
+    margin-right: 0.65rem !important;
+}
+
+/* ----------------------------------------------------------
+   Modern Top Navbar
+   ---------------------------------------------------------- */
+.main-header.navbar {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    padding: 0.75rem 1.25rem !important;
+}
+
+.main-header .nav-link {
+    color: #475569 !important;
+    font-weight: 500 !important;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
+}
+
+.main-header .nav-link:hover {
+    color: var(--dash-primary) !important;
+    background-color: #f1f5f9;
+}
+
+/* ----------------------------------------------------------
+   Modern Stat & Metric Cards (Replaces old AdminLTE small-box)
+   ---------------------------------------------------------- */
+.small-box {
+    border-radius: var(--dash-radius) !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative;
+    padding: 1.5rem 1.25rem 0.5rem !important;
+}
+
+.small-box:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.14) !important;
+}
+
+.small-box .inner h3 {
+    font-size: 2.25rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -1px;
+    margin-bottom: 0.25rem !important;
+}
+
+.small-box .inner p {
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    opacity: 0.92;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.small-box .icon {
+    top: 15px !important;
+    right: 15px !important;
+    opacity: 0.25 !important;
+    transition: all 0.3s ease;
+}
+
+.small-box:hover .icon {
+    opacity: 0.4 !important;
+    transform: scale(1.1);
+}
+
+.small-box .icon i {
+    font-size: 4rem !important;
+}
+
+.small-box-footer {
+    background: rgba(0, 0, 0, 0.12) !important;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.4rem 0 !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.2px;
+}
+
+/* Info Boxes */
+.info-box {
+    border-radius: var(--dash-radius) !important;
+    border: 1px solid var(--dash-card-border) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    background: #ffffff !important;
+    transition: all 0.25s ease !important;
+    padding: 1rem !important;
+}
+
+.info-box:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.08) !important;
+    border-color: #cbd5e1 !important;
+}
+
+.info-box-icon {
+    border-radius: 0.75rem !important;
+    width: 60px !important;
+    height: 60px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-box-number {
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    color: #0f172a;
+}
+
+.info-box-text {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    text-transform: uppercase;
+}
+
+/* ----------------------------------------------------------
+   Modern Content Cards & Tables
+   ---------------------------------------------------------- */
+.card {
+    border-radius: var(--dash-radius) !important;
+    border: 1px solid var(--dash-card-border) !important;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05) !important;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 1.15rem 1.5rem !important;
+}
+
+.card-title {
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    color: #0f172a !important;
+}
+
+.table th {
+    font-size: 0.78rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.6px !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    border-top: none !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+    padding: 0.85rem 1rem !important;
+}
+
+.table td {
+    vertical-align: middle !important;
+    padding: 0.95rem 1rem !important;
+    border-top: 1px solid #f1f5f9 !important;
+    color: #334155;
+    font-size: 0.9rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8fafc !important;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.55rem !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+/* Modern Gradient Stat Boxes */
+.bg-info, .small-box.bg-info {
+    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-cyan, .small-box.bg-cyan {
+    background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-success, .small-box.bg-success {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-warning, .small-box.bg-warning {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-purple, .info-box-icon.bg-purple {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-teal, .info-box-icon.bg-teal {
+    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-danger, .small-box.bg-danger {
+    background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%) !important;
+    color: #ffffff !important;
+}
+
+/* Badges */
+.badge {
+    border-radius: 9999px !important;
+    padding: 0.35rem 0.75rem !important;
+    font-weight: 600 !important;
+}
+

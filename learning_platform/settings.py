@@ -10,10 +10,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&k%7q=c&w%isyo&9_r2+=oasik=b-9v*z+$7962nju3)$d39y3'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+import os
 
-ALLOWED_HOSTS = ['tulasinepali.com.np','www.tulasinepali.com.np']
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
+
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        'tulasinepali.com.np',
+        'www.tulasinepali.com.np',
+    ]
 
 # Application definition
 

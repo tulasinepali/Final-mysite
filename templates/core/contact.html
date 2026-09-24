@@ -1,173 +1,243 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ meta_title|default:"Contact Us - Learning Platform" }}{% endblock %}
-{% block meta_description %}{{ meta_description|default:"Get in touch with us. Send us your questions, feedback, or suggestions. We are here to help you with your educational journey." }}{% endblock %}
+{% block title %}Contact Tulasi Nepali - Feedback, Support &amp; Inquiries{% endblock %}
+{% block meta_description %}Get in touch with Tulasi Nepali. Send study material requests, question clarifications, feedback, or collaboration queries.{% endblock %}
 
-{% block og_title %}{{ meta_title|default:"Contact Us - Learning Platform" }}{% endblock %}
-{% block og_description %}{{ meta_description|default:"Get in touch with us. Send us your questions, feedback, or suggestions." }}{% endblock %}
-
-{% block breadcrumb %}
-<div class="bg-light py-3">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Contact Us</li>
-            </ol>
-        </nav>
-    </div>
-</div>
-{% endblock %}
+{% block og_title %}Contact Tulasi Nepali - Learning Platform{% endblock %}
+{% block og_description %}Have questions or suggestions? Reach out directly to Tulasi Nepali.{% endblock %}
 
 {% block content %}
-<section class="py-5">
-    <div class="container">
-        <div class="row g-5">
-            <!-- Contact Form -->
+<!-- Modern Hero Banner -->
+<section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -30%; right: -15%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+    <div style="position: absolute; bottom: -20%; left: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+
+    <div class="container position-relative py-3">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-white-50 text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">Contact</li>
+            </ol>
+        </nav>
+        <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="fw-bold mb-2">Contact Us</h1>
-                <p class="text-muted mb-4">We would love to hear from you. Whether you have questions about our study materials, need help with MCQ practice, want to suggest new topics for our notes section, or have feedback about the platform, our team is here to help. Fill out the form below and we will get back to you as soon as possible, typically within 24 to 48 hours.</p>
-
-                <div class="alert alert-info mb-4">
-                    <h2 class="h6 fw-bold mb-2"><i class="fas fa-info-circle me-2"></i>How Can We Help?</h2>
-                    <p class="small mb-1"><strong>Study Material Requests:</strong> Need notes on a specific topic or MCQ practice for a particular subject? Let us know and we will do our best to create it for you.</p>
-                    <p class="small mb-1"><strong>Bug Reports:</strong> Found an error in our notes, a broken download link, or a quiz question with the wrong answer? Report it here so we can fix it promptly.</p>
-                    <p class="small mb-1"><strong>General Feedback:</strong> We value your suggestions for improving the platform. Your input helps us make Learning Platform better for everyone.</p>
-                    <p class="small mb-0"><strong>Partnership Inquiries:</strong> Interested in collaborating with us to create educational content? We welcome contributions from educators and content creators.</p>
+                <span class="badge mb-2 px-3 py-2 text-uppercase fw-semibold" style="background: rgba(255,255,255,0.12); color: #38bdf8; letter-spacing: 1px; font-size: 0.78rem; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15);">
+                    <i class="fas fa-headset me-1"></i> We're Here to Help
+                </span>
+                <h1 class="display-5 fw-bold text-white mb-2">Get in Touch with Tulasi Nepali</h1>
+                <p class="lead text-white-50 mb-0" style="font-size: 1.05rem;">
+                    Have questions regarding Computer Operator questions, found an issue, or want to suggest new content? Send a direct message below.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <div class="d-inline-flex align-items-center gap-3 p-3 rounded-4" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #06b6d4);">
+                        <i class="fas fa-clock fa-lg"></i>
+                    </div>
+                    <div class="text-start">
+                        <div class="text-white fw-bold">24-48 Hours</div>
+                        <div class="text-white-50 small">Guaranteed Response</div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                {% if form_success %}
-                <div class="alert alert-success d-flex align-items-center" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <div>Thank you for your message! We have received it and will get back to you shortly.</div>
-                </div>
-                {% endif %}
+<!-- Main Contact Form & Sidebar -->
+<section class="py-5" style="background-color: #f8fafc;">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <!-- Left: Contact Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                    <div class="mb-4">
+                        <h2 class="h4 fw-bold text-dark mb-1">Send a Direct Message</h2>
+                        <p class="text-muted small">Please provide clear details so we can assist you effectively.</p>
+                    </div>
 
-                <form method="post" action="{% url 'core:contact' %}" novalidate>
-                    {% csrf_token %}
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="id_name" class="form-label fw-medium">Full Name <span class="text-danger">*</span></label>
-                            {{ form.name }}
-                            {% for error in form.name.errors %}
-                            <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                        <div class="col-md-6">
-                            <label for="id_email" class="form-label fw-medium">Email Address <span class="text-danger">*</span></label>
-                            {{ form.email }}
-                            {% for error in form.email.errors %}
-                            <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                        <div class="col-12">
-                            <label for="id_subject" class="form-label fw-medium">Subject <span class="text-danger">*</span></label>
-                            {{ form.subject }}
-                            {% for error in form.subject.errors %}
-                            <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                        <div class="col-12">
-                            <label for="id_message" class="form-label fw-medium">Message <span class="text-danger">*</span></label>
-                            {{ form.message }}
-                            {% for error in form.message.errors %}
-                            <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-paper-plane me-2"></i>Send Message</button>
+                    {% if form_success %}
+                    <div class="alert alert-success border-0 rounded-4 d-flex align-items-center p-4 mb-4 shadow-sm" role="alert" style="background: #ecfdf5; border-left: 5px solid #10b981 !important;">
+                        <i class="fas fa-check-circle text-success fa-2x me-3 flex-shrink-0"></i>
+                        <div>
+                            <h3 class="h6 fw-bold text-success mb-1">Message Delivered Successfully!</h3>
+                            <p class="mb-0 text-secondary small">Thank you for reaching out. Tulasi Nepali or our administrative team will reply to your email shortly.</p>
                         </div>
                     </div>
-                </form>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'core:contact' %}" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="id_name" class="form-label fw-semibold text-dark small">Your Full Name <span class="text-danger">*</span></label>
+                                {{ form.name }}
+                                {% for error in form.name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="id_email" class="form-label fw-semibold text-dark small">Your Email Address <span class="text-danger">*</span></label>
+                                {{ form.email }}
+                                {% for error in form.email.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-12">
+                                <label for="id_subject" class="form-label fw-semibold text-dark small">Subject / Topic <span class="text-danger">*</span></label>
+                                {{ form.subject }}
+                                {% for error in form.subject.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-12">
+                                <label for="id_message" class="form-label fw-semibold text-dark small">Your Message <span class="text-danger">*</span></label>
+                                {{ form.message }}
+                                {% for error in form.message.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-12 pt-2">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <!-- Contact Info Sidebar -->
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h2 class="h5 fw-bold mb-4">Contact Information</h2>
+            <!-- Right: Contact Information Sidebar -->
+            <aside class="col-lg-4">
+                <!-- Info Card -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <h2 class="h6 fw-bold text-dark mb-4"><i class="fas fa-address-book text-primary me-2"></i>Contact Information</h2>
 
-                        {% if site_settings.contact_email %}
-                        <div class="d-flex mb-3">
-                            <div class="bg-primary bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;min-width:45px;">
-                                <i class="fas fa-envelope text-primary"></i>
-                            </div>
-                            <div>
-                                <h3 class="h6 fw-bold mb-1">Email</h3>
-                                <a href="mailto:{{ site_settings.contact_email }}" class="text-muted text-decoration-none small">{{ site_settings.contact_email }}</a>
-                            </div>
+                    {% if site_settings.contact_email %}
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(79, 70, 229, 0.1);">
+                            <i class="fas fa-envelope text-primary"></i>
                         </div>
-                        {% endif %}
-
-                        {% if site_settings.contact_phone %}
-                        <div class="d-flex mb-3">
-                            <div class="bg-success bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;min-width:45px;">
-                                <i class="fas fa-phone text-success"></i>
-                            </div>
-                            <div>
-                                <h3 class="h6 fw-bold mb-1">Phone</h3>
-                                <a href="tel:{{ site_settings.contact_phone }}" class="text-muted text-decoration-none small">{{ site_settings.contact_phone }}</a>
-                            </div>
+                        <div>
+                            <span class="d-block small text-muted">Email Address</span>
+                            <a href="mailto:{{ site_settings.contact_email }}" class="fw-bold text-dark text-decoration-none hover-primary">{{ site_settings.contact_email }}</a>
                         </div>
-                        {% endif %}
+                    </div>
+                    {% endif %}
 
-                        {% if site_settings.address %}
-                        <div class="d-flex mb-3">
-                            <div class="bg-warning bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;min-width:45px;">
-                                <i class="fas fa-map-marker-alt text-warning"></i>
-                            </div>
-                            <div>
-                                <h3 class="h6 fw-bold mb-1">Address</h3>
-                                <span class="text-muted small">{{ site_settings.address }}</span>
-                            </div>
+                    {% if site_settings.contact_phone %}
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.1);">
+                            <i class="fas fa-phone text-success"></i>
                         </div>
-                        {% endif %}
+                        <div>
+                            <span class="d-block small text-muted">Phone / Inquiries</span>
+                            <a href="tel:{{ site_settings.contact_phone }}" class="fw-bold text-dark text-decoration-none hover-primary">{{ site_settings.contact_phone }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
 
-                        <div class="d-flex">
-                            <div class="bg-info bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;min-width:45px;">
-                                <i class="fas fa-clock text-info"></i>
-                            </div>
-                            <div>
-                                <h3 class="h6 fw-bold mb-1">Response Time</h3>
-                                <span class="text-muted small">Usually within 24-48 hours</span>
-                            </div>
+                    {% if site_settings.address %}
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.1);">
+                            <i class="fas fa-map-marker-alt text-warning"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small text-muted">Location</span>
+                            <span class="fw-bold text-dark">{{ site_settings.address }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex align-items-start">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 44px; height: 44px; background: rgba(14, 165, 233, 0.1);">
+                            <i class="fas fa-shield-alt text-info"></i>
+                        </div>
+                        <div>
+                            <span class="d-block small text-muted">Privacy Assurance</span>
+                            <span class="small text-secondary">Your email is never shared or used for spam.</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Social Media -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h2 class="h5 fw-bold mb-3">Follow Us</h2>
-                        <div class="d-flex gap-3">
-                            {% if site_settings.facebook_url %}
-                            <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm" aria-label="Facebook"><i class="fab fa-facebook-f me-1"></i>Facebook</a>
-                            {% endif %}
-                            {% if site_settings.twitter_url %}
-                            <a href="{{ site_settings.twitter_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info btn-sm" aria-label="Twitter"><i class="fab fa-twitter me-1"></i>Twitter</a>
-                            {% endif %}
-                            {% if site_settings.youtube_url %}
-                            <a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger btn-sm" aria-label="YouTube"><i class="fab fa-youtube me-1"></i>YouTube</a>
-                            {% endif %}
-                            {% if site_settings.instagram_url %}
-                            <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm" aria-label="Instagram"><i class="fab fa-instagram me-1"></i>Instagram</a>
-                            {% endif %}
-                        </div>
+                <!-- Connect on Socials -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <h2 class="h6 fw-bold text-dark mb-3"><i class="fas fa-share-nodes text-primary me-2"></i>Connect Online</h2>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if site_settings.facebook_url %}
+                        <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="fab fa-facebook-f me-1"></i>Facebook
+                        </a>
+                        {% endif %}
+                        {% if site_settings.youtube_url %}
+                        <a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                            <i class="fab fa-youtube me-1"></i>YouTube
+                        </a>
+                        {% endif %}
+                        {% if site_settings.owner_linkedin %}
+                        <a href="{{ site_settings.owner_linkedin }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-pill px-3">
+                            <i class="fab fa-linkedin-in me-1"></i>LinkedIn
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
+            </aside>
+        </div>
+    </div>
+</section>
 
-                <!-- Map Placeholder -->
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-0 overflow-hidden rounded">
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height:220px;">
-                            <div class="text-center text-muted">
-                                <i class="fas fa-map-marked-alt fa-3x mb-2"></i>
-                                <p class="small mb-0">Map location</p>
-                                {% if site_settings.address %}
-                                <small>{{ site_settings.address }}</small>
-                                {% endif %}
+<!-- Frequently Asked Questions Accordion -->
+<section class="py-5 bg-white border-top">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2 fw-semibold">Quick Answers</span>
+            <h2 class="display-6 fw-bold text-dark">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion accordion-flush" id="faqAccordion">
+                    <div class="accordion-item border rounded-3 mb-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="faqHeading1">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
+                                Are all study materials and MCQs on this website completely free?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-secondary small" style="line-height: 1.8;">
+                                Yes, 100%! All study notes, practice quizzes, and downloadable PDF model question sets authored by Tulasi Nepali are entirely free to access for students and aspirants across Nepal.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border rounded-3 mb-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="faqHeading2">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
+                                How can I request notes or quizzes for a specific exam syllabus?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-secondary small" style="line-height: 1.8;">
+                                Simply fill out the contact form above with the subject "Study Material Request" and include the syllabus details or topic names. We regularly review requests and add new content accordingly.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border rounded-3 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="faqHeading3">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
+                                What should I do if I find a typographical error or incorrect answer in an MCQ?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-secondary small" style="line-height: 1.8;">
+                                We strive for 100% accuracy, but if you notice an error, please let us know via the form above with the quiz title and question number. We verify and correct errata promptly!
                             </div>
                         </div>
                     </div>
@@ -176,4 +246,23 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hover-primary:hover {
+        color: #4f46e5 !important;
+    }
+    .form-control, textarea.form-control {
+        border-radius: 0.75rem !important;
+        border: 1px solid #cbd5e1 !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus {
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15) !important;
+    }
+</style>
 {% endblock %}

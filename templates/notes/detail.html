@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ note.get_meta_title }} - Study Notes{% endblock %}
+{% block title %}{{ note.get_meta_title }} - Study Notes | Tulasi Nepali{% endblock %}
 {% block meta_description %}{{ note.get_meta_description }}{% endblock %}
 
 {% block og_title %}{{ note.get_meta_title }}{% endblock %}
@@ -25,15 +25,18 @@
 {% endblock %}
 
 {% block content %}
+<!-- Reading Progress Bar -->
+<div id="reading-progress-bar" style="position: fixed; top: 0; left: 0; height: 4px; width: 0%; background: linear-gradient(90deg, #4f46e5, #06b6d4); z-index: 9999; transition: width 0.1s ease;"></div>
+
 <!-- Breadcrumb -->
 <section class="bg-light py-3 border-bottom">
     <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}" class="text-decoration-none">Notes</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}?category={{ note.category.slug }}" class="text-decoration-none">{{ note.category.name }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ note.title|truncatewords:5 }}</li>
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}" class="text-decoration-none text-muted">Study Notes</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'notes:list' %}?category={{ note.category.slug }}" class="text-decoration-none text-muted">{{ note.category.name }}</a></li>
+                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">{{ note.title|truncatewords:5 }}</li>
             </ol>
         </nav>
     </div>
@@ -41,94 +44,124 @@
 
 <!-- Ad: Notes Top -->
 {% if ads.notes_top %}
-<section class="py-3">
-    <div class="container">
-        <div class="ad-container text-center">
-            {{ ads.notes_top|safe }}
-        </div>
+<div class="container mt-3">
+    <div class="ad-container text-center">
+        {{ ads.notes_top|safe }}
     </div>
-</section>
+</div>
 {% endif %}
 
-<!-- Note Detail -->
+<!-- Note Header Section -->
+<header class="py-4 py-lg-5 bg-white border-bottom">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+                    <a href="{% url 'notes:list' %}?category={{ note.category.slug }}" class="badge rounded-pill bg-primary bg-opacity-10 text-primary text-decoration-none px-3 py-2 fw-semibold">
+                        <i class="fas fa-folder me-1"></i>{{ note.category.name }}
+                    </a>
+                    {% for tag in note.tags.all %}
+                    <span class="badge rounded-pill bg-light text-muted border px-3 py-2">#{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+
+                <h1 class="display-6 fw-bold mb-3 text-dark" style="line-height: 1.25;">{{ note.title }}</h1>
+
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                    <div class="d-flex align-items-center">
+                        {% if site_settings.owner_image %}
+                        <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="rounded-circle me-3 shadow-sm border" style="width: 44px; height: 44px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 44px; height: 44px;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <div class="fw-bold text-dark">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</div>
+                            <div class="text-muted small">
+                                <span><i class="far fa-calendar-alt me-1"></i>{{ note.created_at|date:"M d, Y" }}</span>
+                                {% if note.updated_at != note.created_at %}
+                                <span class="ms-2"><i class="fas fa-edit me-1"></i>Updated {{ note.updated_at|date:"M d, Y" }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 text-muted small">
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                            <i class="far fa-eye me-1 text-primary"></i>{{ note.views }} views
+                        </span>
+                        <a href="{% url 'notes:print' note.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3" target="_blank" rel="noopener">
+                            <i class="fas fa-print me-1"></i>Print Friendly
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Note Detail Section -->
 <section class="py-4 py-lg-5">
     <div class="container">
-        <div class="row g-4">
+        <div class="row g-4 justify-content-center">
             <!-- Main Content -->
             <div class="col-lg-8">
-                <article class="note-detail">
-                    <!-- Note Header -->
-                    <header class="mb-4">
-                        <div class="d-flex flex-wrap gap-2 mb-3">
-                            <span class="badge bg-primary"><i class="fas fa-folder me-1"></i>{{ note.category.name }}</span>
-                            {% for tag in note.tags.all %}
-                            <span class="badge bg-light text-dark border"><i class="fas fa-tag me-1"></i>{{ tag.name }}</span>
-                            {% endfor %}
-                        </div>
-
-                        <h1 class="fw-bold mb-3">{{ note.title }}</h1>
-
-                        <div class="d-flex flex-wrap align-items-center gap-3 text-muted small mb-3">
-                            <span><i class="fas fa-calendar-alt me-1"></i>{{ note.created_at|date:"F d, Y" }}</span>
-                            <span><i class="fas fa-eye me-1"></i>{{ note.views }} views</span>
-                            {% if note.updated_at != note.created_at %}
-                            <span><i class="fas fa-edit me-1"></i>Updated {{ note.updated_at|date:"F d, Y" }}</span>
-                            {% endif %}
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex flex-wrap gap-2 mb-4">
-                            <a href="{% url 'notes:print' note.slug %}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener">
-                                <i class="fas fa-print me-1"></i>Print
-                            </a>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText(window.location.href).then(function(){alert('Link copied to clipboard!');});">
-                                <i class="fas fa-link me-1"></i>Copy Link
-                            </button>
-                        </div>
-                    </header>
-
+                <article class="bg-white p-4 p-md-5 rounded-4 shadow-sm border">
                     <!-- Featured Image -->
                     {% if note.featured_image %}
-                    <div class="mb-4 rounded overflow-hidden">
-                        <img src="{{ note.featured_image.url }}" class="img-fluid w-100" alt="{{ note.title }}" loading="lazy" style="max-height:450px;object-fit:cover;">
+                    <div class="mb-4 rounded-4 overflow-hidden shadow-sm">
+                        <img src="{{ note.featured_image.url }}" class="img-fluid w-100" alt="{{ note.title }}" loading="lazy" style="max-height: 480px; object-fit: cover;">
                     </div>
                     {% endif %}
 
-                    <!-- Note Content (First Half) -->
+                    <!-- Reader Controls Bar -->
+                    <div class="d-flex justify-content-between align-items-center p-3 mb-4 rounded-3 bg-light border">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small text-muted fw-semibold"><i class="fas fa-text-height me-1"></i>Text Size:</span>
+                            <button type="button" class="btn btn-sm btn-white border px-2 py-1 rounded" id="btn-font-decrease" title="Smaller font">A-</button>
+                            <button type="button" class="btn btn-sm btn-white border px-2 py-1 rounded" id="btn-font-reset" title="Default font">A</button>
+                            <button type="button" class="btn btn-sm btn-white border px-2 py-1 rounded" id="btn-font-increase" title="Larger font">A+</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-white border rounded px-3 copy-link-btn" data-url="{{ request.build_absolute_uri }}">
+                                <i class="fas fa-link me-1"></i>Copy Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Note Content Body -->
                     <div class="note-content mb-4" id="note-content">
                         {{ note.content|safe }}
                     </div>
 
-                    <!-- Ad: Notes Middle (after content) -->
+                    <!-- Ad: Notes Middle -->
                     {% if ads.notes_middle %}
                     <div class="ad-container text-center my-4 py-3">
                         {{ ads.notes_middle|safe }}
                     </div>
                     {% endif %}
 
-                    <!-- Share Buttons -->
-                    <div class="share-section my-4 py-3 border-top border-bottom">
-                        <h2 class="h6 fw-bold mb-3"><i class="fas fa-share-alt me-2 text-primary"></i>Share this note</h2>
+                    <!-- Share Section -->
+                    <div class="p-4 rounded-4 bg-light my-4 border">
+                        <h2 class="h6 fw-bold mb-3"><i class="fas fa-share-alt me-2 text-primary"></i>Share this note with fellow aspirants:</h2>
                         <div class="d-flex flex-wrap gap-2">
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
-                               class="btn btn-sm btn-facebook text-white" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#1877f2;" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-facebook-f me-1"></i>Facebook
                             </a>
-                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ note.title|urlencode }}"
-                               class="btn btn-sm btn-twitter text-white" target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter">
-                                <i class="fab fa-twitter me-1"></i>Twitter
-                            </a>
                             <a href="https://api.whatsapp.com/send?text={{ note.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}"
-                               class="btn btn-sm btn-whatsapp text-white" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#25d366;" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-whatsapp me-1"></i>WhatsApp
                             </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ note.title|urlencode }}"
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#1da1f2;" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-twitter me-1"></i>Twitter / X
+                            </a>
                             <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}"
-                               class="btn btn-sm btn-linkedin text-white" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn">
+                               class="btn btn-sm text-white rounded-pill px-3" style="background:#0a66c2;" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-linkedin-in me-1"></i>LinkedIn
                             </a>
-                            <button class="btn btn-sm btn-outline-secondary copy-link-btn" data-url="{{ request.build_absolute_uri }}" aria-label="Copy link to clipboard">
-                                <i class="fas fa-link me-1"></i>Copy Link
-                            </button>
                         </div>
                     </div>
 
@@ -142,31 +175,27 @@
 
                 <!-- Related Notes -->
                 {% if related_notes %}
-                <section class="related-notes mt-5">
-                    <h2 class="h4 fw-bold mb-4"><i class="fas fa-book-reader text-primary me-2"></i>Related Notes</h2>
+                <section class="mt-5">
+                    <h2 class="h5 fw-bold mb-4"><i class="fas fa-book-reader text-primary me-2"></i>Related Study Notes</h2>
                     <div class="row g-3">
                         {% for related in related_notes %}
-                        <div class="col-md-6 col-lg-3">
-                            <article class="card h-100 border-0 shadow-sm overflow-hidden">
+                        <div class="col-md-6">
+                            <article class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden feature-card">
                                 {% if related.featured_image %}
-                                <a href="{{ related.get_absolute_url }}" class="text-decoration-none">
-                                    <img src="{{ related.featured_image.url }}" class="card-img-top" alt="{{ related.title }}" loading="lazy" style="height:120px;object-fit:cover;">
+                                <a href="{{ related.get_absolute_url }}">
+                                    <img src="{{ related.featured_image.url }}" class="card-img-top" alt="{{ related.title }}" loading="lazy" style="height: 160px; object-fit: cover;">
                                 </a>
                                 {% else %}
-                                <a href="{{ related.get_absolute_url }}" class="text-decoration-none">
-                                    <div class="card-img-top bg-primary bg-gradient d-flex align-items-center justify-content-center" style="height:120px;">
-                                        <i class="fas fa-book fa-2x text-white opacity-50"></i>
-                                    </div>
-                                </a>
+                                <div class="d-flex align-items-center justify-content-center text-white" style="height: 160px; background: linear-gradient(135deg, #1e1b4b, #312e81);">
+                                    <i class="fas fa-book fa-2x opacity-40"></i>
+                                </div>
                                 {% endif %}
                                 <div class="card-body p-3">
-                                    <span class="badge bg-primary bg-opacity-10 text-primary mb-1">{{ related.category.name }}</span>
-                                    <h3 class="h6 fw-bold mb-0">
-                                        <a href="{{ related.get_absolute_url }}" class="text-decoration-none text-dark">{{ related.title|truncatewords:8 }}</a>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill mb-1 small">{{ related.category.name }}</span>
+                                    <h3 class="h6 fw-bold mb-1">
+                                        <a href="{{ related.get_absolute_url }}" class="text-decoration-none text-dark hover-primary">{{ related.title|truncatewords:8 }}</a>
                                     </h3>
-                                </div>
-                                <div class="card-footer bg-transparent border-top-0 py-2 px-3">
-                                    <small class="text-muted"><i class="fas fa-eye me-1"></i>{{ related.views }}</small>
+                                    <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>{{ related.created_at|date:"M d, Y" }}</small>
                                 </div>
                             </article>
                         </div>
@@ -178,52 +207,42 @@
 
             <!-- Sidebar -->
             <aside class="col-lg-4">
-                <!-- Ad: Sidebar -->
-                {% if ads.sidebar %}
-                <div class="ad-container mb-4">
-                    {{ ads.sidebar|safe }}
-                </div>
-                {% endif %}
-
-                <!-- Table of Contents (auto-generated via JS) -->
-                <div class="card border-0 shadow-sm mb-4" id="toc-card" style="display:none;">
-                    <div class="card-header bg-primary text-white">
-                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-list me-2"></i>Table of Contents</h2>
-                    </div>
-                    <div class="card-body p-0">
-                        <nav id="toc-nav" class="py-2"></nav>
-                    </div>
-                </div>
-
-                <!-- Categories Widget -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-bottom">
-                        <h2 class="h6 fw-bold mb-0"><i class="fas fa-folder text-primary me-2"></i>Categories</h2>
-                    </div>
-                    <div class="card-body p-0">
-                        <ul class="list-unstyled mb-0">
-                            {% for cat in notes_categories %}
-                            <li class="px-3 py-2 border-bottom">
-                                <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="text-decoration-none d-flex justify-content-between align-items-center">
-                                    <span class="small">{{ cat.name }}</span>
-                                    <span class="badge bg-light text-dark">{{ cat.notes.count }}</span>
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        <div class="px-3 py-2">
-                            <a href="{% url 'notes:list' %}" class="btn btn-sm btn-outline-primary w-100"><i class="fas fa-arrow-left me-1"></i>All Categories</a>
+                <div class="sticky-top" style="top: 80px; z-index: 10;">
+                    <!-- Table of Contents -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4" id="toc-card" style="display:none;">
+                        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+                            <h2 class="h6 fw-bold mb-0 text-dark"><i class="fas fa-list-ul text-primary me-2"></i>In this Note</h2>
+                        </div>
+                        <div class="card-body px-4 pt-1 pb-4">
+                            <nav id="toc-nav" class="small"></nav>
                         </div>
                     </div>
-                </div>
 
-                <!-- Back to Notes -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body">
-                        <a href="{% url 'notes:list' %}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-arrow-left me-2"></i>Browse All Notes
-                        </a>
+                    <!-- Ad: Sidebar -->
+                    {% if ads.sidebar %}
+                    <div class="ad-container mb-4">
+                        {{ ads.sidebar|safe }}
                     </div>
+                    {% endif %}
+
+                    <!-- Practice Related MCQ -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);">
+                        <div class="card-body p-4 text-white text-center">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3" style="background: rgba(255,255,255,0.1);">
+                                <i class="fas fa-brain fa-2x text-warning"></i>
+                            </div>
+                            <h3 class="h6 fw-bold text-white mb-2">Practice Questions</h3>
+                            <p class="small text-white-50 mb-3">Reinforce what you just learned with our targeted Computer Operator MCQ sets.</p>
+                            <a href="{% url 'quiz:list' %}" class="btn btn-warning fw-bold rounded-pill px-4 btn-sm w-100">
+                                Practice MCQs Now <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Return to Notes -->
+                    <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary rounded-pill w-100 py-2">
+                        <i class="fas fa-arrow-left me-2"></i>Browse All Study Notes
+                    </a>
                 </div>
             </aside>
         </div>
@@ -234,114 +253,77 @@
 {% block extra_css %}
 <style>
     .note-content {
-        font-family: 'Merriweather', Georgia, serif;
-        font-size: 1.05rem;
-        line-height: 1.8;
-        color: #333;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 1.08rem;
+        line-height: 1.85;
+        color: #1e293b;
     }
     .note-content h2 {
-        font-family: 'Inter', sans-serif;
-        font-size: 1.5rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 1.6rem;
         font-weight: 700;
-        margin-top: 2rem;
+        color: #0f172a;
+        margin-top: 2.2rem;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e9ecef;
+        border-bottom: 2px solid #f1f5f9;
     }
     .note-content h3 {
-        font-family: 'Inter', sans-serif;
-        font-size: 1.25rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 1.3rem;
         font-weight: 600;
-        margin-top: 1.5rem;
+        color: #1e293b;
+        margin-top: 1.8rem;
         margin-bottom: 0.75rem;
     }
-    .note-content h4 {
-        font-family: 'Inter', sans-serif;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-top: 1.25rem;
-        margin-bottom: 0.5rem;
-    }
     .note-content p {
-        margin-bottom: 1rem;
-    }
-    .note-content ul, .note-content ol {
-        padding-left: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    .note-content li {
-        margin-bottom: 0.25rem;
+        margin-bottom: 1.25rem;
     }
     .note-content blockquote {
-        border-left: 4px solid #0d6efd;
-        padding: 1rem 1.25rem;
-        margin: 1.5rem 0;
-        background-color: #f8f9fa;
-        border-radius: 0 0.375rem 0.375rem 0;
+        border-left: 4px solid #4f46e5;
+        background-color: #f8fafc;
+        padding: 1.25rem 1.5rem;
+        margin: 1.75rem 0;
+        border-radius: 0 0.75rem 0.75rem 0;
+        font-style: italic;
+        color: #334155;
     }
     .note-content img {
         max-width: 100%;
         height: auto;
-        border-radius: 0.375rem;
-        margin: 1rem 0;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        margin: 1.5rem 0;
     }
     .note-content table {
         width: 100%;
-        margin-bottom: 1rem;
+        margin: 1.5rem 0;
         border-collapse: collapse;
+        border-radius: 0.5rem;
+        overflow: hidden;
     }
     .note-content table th,
     .note-content table td {
-        padding: 0.75rem;
-        border: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
     }
     .note-content table th {
-        background-color: #f8f9fa;
+        background-color: #f8fafc;
         font-weight: 600;
+        color: #0f172a;
     }
-    .note-content pre {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.375rem;
-        overflow-x: auto;
-    }
-    .note-content code {
-        background-color: #f1f3f5;
-        padding: 0.125rem 0.375rem;
-        border-radius: 0.25rem;
-        font-size: 0.9em;
-    }
-    .note-content pre code {
-        background: none;
-        padding: 0;
-    }
-    .note-content a {
-        color: #0d6efd;
-        text-decoration: underline;
-    }
-    .note-content a:hover {
-        color: #0a58ca;
-    }
-    .btn-facebook { background-color: #1877f2; border-color: #1877f2; }
-    .btn-facebook:hover { background-color: #166fe5; border-color: #166fe5; }
-    .btn-twitter { background-color: #1da1f2; border-color: #1da1f2; }
-    .btn-twitter:hover { background-color: #0d95e8; border-color: #0d95e8; }
-    .btn-whatsapp { background-color: #25d366; border-color: #25d366; }
-    .btn-whatsapp:hover { background-color: #20c05c; border-color: #20c05c; }
-    .btn-linkedin { background-color: #0a66c2; border-color: #0a66c2; }
-    .btn-linkedin:hover { background-color: #095ba8; border-color: #095ba8; }
     #toc-nav a {
         display: block;
-        padding: 0.375rem 1rem;
-        color: #495057;
+        padding: 0.4rem 0.5rem;
+        color: #64748b;
         text-decoration: none;
-        font-size: 0.875rem;
-        border-left: 3px solid transparent;
+        border-radius: 0.35rem;
+        transition: all 0.15s ease;
     }
-    #toc-nav a:hover {
-        background-color: #f8f9fa;
-        border-left-color: #0d6efd;
-        color: #0d6efd;
+    #toc-nav a:hover, #toc-nav a.active {
+        color: #4f46e5;
+        background-color: #f1f5f9;
+        font-weight: 600;
     }
 </style>
 {% endblock %}
@@ -349,7 +331,18 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-generate Table of Contents from headings
+    // 1. Reading Progress Bar
+    var progressBar = document.getElementById('reading-progress-bar');
+    window.addEventListener('scroll', function() {
+        var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        var scrolled = (winScroll / height) * 100;
+        if (progressBar) {
+            progressBar.style.width = scrolled + '%';
+        }
+    });
+
+    // 2. Table of Contents
     var content = document.getElementById('note-content');
     var tocCard = document.getElementById('toc-card');
     var tocNav = document.getElementById('toc-nav');
@@ -358,13 +351,13 @@ document.addEventListener('DOMContentLoaded', function() {
         var headings = content.querySelectorAll('h2, h3');
         if (headings.length > 1) {
             headings.forEach(function(heading, index) {
-                var id = 'section-' + index;
+                var id = 'heading-' + index;
                 heading.id = id;
                 var link = document.createElement('a');
                 link.href = '#' + id;
                 link.textContent = heading.textContent;
                 if (heading.tagName === 'H3') {
-                    link.style.paddingLeft = '2rem';
+                    link.style.paddingLeft = '1.25rem';
                 }
                 tocNav.appendChild(link);
             });
@@ -372,20 +365,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Copy link button
+    // 3. Font Size Adjuster
+    var currentSize = 1.08;
+    var noteEl = document.getElementById('note-content');
+    var btnDec = document.getElementById('btn-font-decrease');
+    var btnReset = document.getElementById('btn-font-reset');
+    var btnInc = document.getElementById('btn-font-increase');
+
+    if (noteEl) {
+        if (btnDec) btnDec.addEventListener('click', function() {
+            if (currentSize > 0.9) currentSize -= 0.1;
+            noteEl.style.fontSize = currentSize + 'rem';
+        });
+        if (btnReset) btnReset.addEventListener('click', function() {
+            currentSize = 1.08;
+            noteEl.style.fontSize = currentSize + 'rem';
+        });
+        if (btnInc) btnInc.addEventListener('click', function() {
+            if (currentSize < 1.4) currentSize += 0.1;
+            noteEl.style.fontSize = currentSize + 'rem';
+        });
+    }
+
+    // 4. Copy Link Button
     var copyBtn = document.querySelector('.copy-link-btn');
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
             var url = this.getAttribute('data-url');
             navigator.clipboard.writeText(url).then(function() {
                 var originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
-                copyBtn.classList.remove('btn-outline-secondary');
-                copyBtn.classList.add('btn-success');
+                copyBtn.innerHTML = '<i class="fas fa-check me-1 text-success"></i>Copied!';
                 setTimeout(function() {
                     copyBtn.innerHTML = originalHTML;
-                    copyBtn.classList.remove('btn-success');
-                    copyBtn.classList.add('btn-outline-secondary');
                 }, 2000);
             });
         });

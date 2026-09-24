@@ -24,8 +24,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Modern Dashboard Theme -->
+    <link rel="stylesheet" href="{% static 'css/dashboard_modern.css' %}">
 
     {% block extra_head %}{% endblock %}
 
@@ -122,9 +122,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <!-- Main Sidebar -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <!--<a href="{% url 'dashboard:home' %}" class="brand-link">-->
-        <!--    <img src="https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">-->
-            <!--<span class="brand-text font-weight-light">Learning Platform</span>-->
+        <a href="{% url 'dashboard:home' %}" class="brand-link">
+            {% if site_settings.site_logo %}
+            <img src="{{ site_settings.site_logo.url }}" alt="Logo" class="brand-image img-circle elevation-2" style="opacity: .95; width:34px; height:34px; object-fit:contain;">
+            {% else %}
+            <div class="brand-image d-flex align-items-center justify-content-center bg-primary text-white rounded-circle font-weight-bold" style="width:34px; height:34px; font-size:0.9rem;">TN</div>
+            {% endif %}
+            <span class="brand-text ml-2">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</span>
         </a>
 
         <!-- Sidebar -->

@@ -2,9 +2,9 @@
 {% load static %}
 {% load quiz_extras %}
 
-{% block title %}{{ meta_title }}{% endblock %}
+{% block title %}Results: {{ quiz.title }} - MCQ Practice | Tulasi Nepali{% endblock %}
 {% block meta_description %}{{ meta_description }}{% endblock %}
-{% block og_title %}{{ meta_title }}{% endblock %}
+{% block og_title %}Results: {{ quiz.title }}{% endblock %}
 {% block og_description %}{{ meta_description }}{% endblock %}
 
 {% block content %}
@@ -12,329 +12,294 @@
 <section class="bg-light py-3 border-bottom">
     <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none"><i class="fas fa-home me-1"></i>Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'quiz:list' %}" class="text-decoration-none">MCQ Practice</a></li>
-                <li class="breadcrumb-item"><a href="{{ quiz.get_absolute_url }}" class="text-decoration-none">{{ quiz.title|truncatewords:4 }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Results</li>
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'quiz:list' %}" class="text-decoration-none text-muted">MCQ Practice</a></li>
+                <li class="breadcrumb-item"><a href="{{ quiz.get_absolute_url }}" class="text-decoration-none text-muted">{{ quiz.title|truncatewords:4 }}</a></li>
+                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Results</li>
             </ol>
         </nav>
     </div>
 </section>
 
-<!-- Quiz Results Section -->
-<section class="py-4 py-lg-5">
-    <div class="container">
+<!-- Score Summary Hero -->
+<section class="py-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%); position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -30%; right: -15%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+    <div style="position: absolute; bottom: -20%; left: -10%; width: 350px; height: 350px; background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+
+    <div class="container position-relative">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <!-- Results Title -->
-                <div class="text-center mb-4">
-                    <h1 class="h3 fw-bold"><i class="fas fa-poll me-2"></i>Quiz Results</h1>
-                    <p class="text-muted">{{ quiz.title }}</p>
+            <div class="col-lg-8 text-center text-white">
+                <span class="badge mb-3 px-3 py-2 text-uppercase fw-semibold" style="background: rgba(255,255,255,0.12); color: #38bdf8; letter-spacing: 1px; font-size: 0.78rem; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15);">
+                    <i class="fas fa-poll me-1"></i> Performance Assessment Complete
+                </span>
+                <h1 class="display-6 fw-bold mb-2">{{ quiz.title }}</h1>
+                <p class="text-white-50 small mb-4">Evaluated based on standard Loksewa examination scoring guidelines.</p>
+
+                <!-- Circular Score Gauge -->
+                <div class="d-inline-flex flex-column align-items-center justify-content-center mb-4 p-4 rounded-circle shadow-lg"
+                     style="width: 200px; height: 200px; background: radial-gradient(circle, #1e1b4b 0%, #0f172a 100%); border: 8px solid {% if percentage >= 80 %}#10b981{% elif percentage >= 50 %}#f59e0b{% else %}#ef4444{% endif %}; box-shadow: 0 0 35px {% if percentage >= 80 %}rgba(16, 185, 129, 0.35){% elif percentage >= 50 %}rgba(245, 158, 11, 0.35){% else %}rgba(239, 68, 68, 0.35){% endif %};">
+                    <span class="display-5 fw-bold text-white mb-0">{{ percentage }}%</span>
+                    <span class="small text-white-50 mt-1 fw-semibold">{{ final_score|floatformat:2 }} / {{ total_marks }} Marks</span>
                 </div>
 
-                <!-- Score Circle / Visual -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body py-5 text-center">
-                        <div class="score-circle mx-auto mb-4 {% if percentage > 80 %}score-excellent{% elif percentage >= 50 %}score-good{% else %}score-poor{% endif %}">
-                            <div class="score-inner d-flex flex-column align-items-center justify-content-center">
-                                <span class="score-number fw-bold">{{ final_score|floatformat:2 }}/{{ total_marks }}</span>
-                                <span class="score-percent fw-bold">{{ percentage }}%</span>
-                            </div>
-                        </div>
-
-                        <!-- Performance Message -->
-                        {% if percentage > 80 %}
-                        <h2 class="h4 fw-bold text-success mb-2"><i class="fas fa-trophy me-2"></i>Excellent!</h2>
-                        <p class="text-muted mb-0">Outstanding performance! You have a strong understanding of this topic.</p>
-                        {% elif percentage >= 50 %}
-                        <h2 class="h4 fw-bold text-warning mb-2"><i class="fas fa-thumbs-up me-2"></i>Good Job!</h2>
-                        <p class="text-muted mb-0">You're on the right track. Review the questions you got wrong to improve further.</p>
-                        {% else %}
-                        <h2 class="h4 fw-bold text-danger mb-2"><i class="fas fa-book-reader me-2"></i>Keep Practicing!</h2>
-                        <p class="text-muted mb-0">Don't give up! Review the material and try again to improve your score.</p>
-                        {% endif %}
-
-                        <!-- Score Breakdown -->
-                        <div class="row g-3 mt-3 justify-content-center">
-                            <div class="col-auto">
-                                <div class="px-3 py-2 rounded bg-success bg-opacity-10">
-                                    <span class="d-block text-success fw-bold fs-5">{{ correct_count }}</span>
-                                    <span class="small text-muted">Correct</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="px-3 py-2 rounded bg-danger bg-opacity-10">
-                                    <span class="d-block text-danger fw-bold fs-5">{{ incorrect_count }}</span>
-                                    <span class="small text-muted">Incorrect</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="px-3 py-2 rounded bg-secondary bg-opacity-10">
-                                    <span class="d-block text-secondary fw-bold fs-5">{{ unanswered_count }}</span>
-                                    <span class="small text-muted">Unanswered</span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="px-3 py-2 rounded bg-primary bg-opacity-10">
-                                    <span class="d-block text-primary fw-bold fs-5">{{ total_marks }}</span>
-                                    <span class="small text-muted">Total Marks</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Negative Marking Breakdown -->
-                        {% if quiz.negative_marking %}
-                        <div class="alert {% if negative_marks > 0 %}alert-danger{% else %}alert-info{% endif %} border-0 mt-4 py-3">
-                            <h6 class="fw-bold mb-2"><i class="fas fa-minus-circle me-2"></i>Negative Marking Applied ({{ penalty_percent|floatformat:0 }}% per wrong answer)</h6>
-                            <div class="row g-2 text-start">
-                                <div class="col-6">
-                                    <span class="text-muted small">Correct answers:</span>
-                                    <span class="fw-bold text-success">{{ correct_count }} x {{ marks_per_question }} = +{{ score }} mark{{ score|pluralize }}</span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="text-muted small">Wrong answers:</span>
-                                    {% if incorrect_count > 0 %}
-                                    <span class="fw-bold text-danger">{{ incorrect_count }} x {{ marks_deducted_per_wrong|floatformat:2 }} = -{{ negative_marks|floatformat:2 }} mark{{ negative_marks|floatformat:2|pluralize }}</span>
-                                    {% else %}
-                                    <span class="fw-bold text-success">0 wrong answers = No deduction</span>
-                                    {% endif %}
-                                </div>
-                                <!--<div class="col-6">-->
-                                    <!--<span class="text-muted small">Unanswered:</span>-->
-                                    <!--<span class="fw-bold text-secondary">{{ unanswered_count }} x 0 = 0 marks (no penalty)</span>-->
-                                <!--</div>-->
-                                <!--<div class="col-6">-->
-                                <!--    <span class="text-muted small">Penalty per wrong answer:</span>-->
-                                <!--    <span class="fw-bold text-danger">{{ penalty_percent|floatformat:0 }}% of {{ marks_per_question }} = -{{ marks_deducted_per_wrong|floatformat:2 }} marks</span>-->
-                                <!--</div>-->
-                                <div class="col-12 mt-2 pt-2 border-top">
-                                    <span class="text-muted small">Score Calculation:</span>
-                                    <span class="fw-bold fs-5">
-                                        {{ score }} (correct){% if negative_marks > 0 %} - {{ negative_marks|floatformat:2 }} (penalty){% endif %} = <span class="{% if negative_marks > 0 %}text-danger{% else %}text-success{% endif %}">{{ final_score|floatformat:2 }}</span> / {{ total_marks }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
+                <!-- Performance Tier Message -->
+                <div class="mb-4">
+                    {% if percentage >= 80 %}
+                    <h2 class="h4 fw-bold text-success mb-1"><i class="fas fa-trophy me-2"></i>Outstanding Performance!</h2>
+                    <p class="text-white-50 small mb-0">Exceptional mastery of this topic. You are fully prepared for this section in the exam!</p>
+                    {% elif percentage >= 50 %}
+                    <h2 class="h4 fw-bold text-warning mb-1"><i class="fas fa-thumbs-up me-2"></i>Good Progress!</h2>
+                    <p class="text-white-50 small mb-0">You're on the right track! Review the incorrect answers below to solidify your understanding.</p>
+                    {% else %}
+                    <h2 class="h4 fw-bold text-danger mb-1"><i class="fas fa-book-reader me-2"></i>Needs Practice!</h2>
+                    <p class="text-white-50 small mb-0">Don't be discouraged! Check the explanations below and review the relevant study notes before retesting.</p>
+                    {% endif %}
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="d-flex flex-wrap gap-3 justify-content-center mb-4">
-                    <a href="{{ quiz.get_absolute_url }}" class="btn btn-success btn-lg">
-                        <i class="fas fa-redo me-2"></i>Retry Quiz
+                <!-- Action CTA Buttons inside Hero -->
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    <a href="{{ quiz.get_absolute_url }}" class="btn btn-primary rounded-pill px-4 shadow">
+                        <i class="fas fa-redo me-2"></i>Retake Quiz
                     </a>
-                    <a href="{% url 'quiz:list' %}" class="btn btn-outline-primary btn-lg">
-                        <i class="fas fa-brain me-2"></i>Try Another Quiz
+                    <a href="{% url 'quiz:list' %}" class="btn btn-outline-light rounded-pill px-4">
+                        <i class="fas fa-brain me-2"></i>Practice More Quizzes
                     </a>
-                    <a href="{% url 'quiz:leaderboard' quiz.slug %}" class="btn btn-outline-warning btn-lg">
-                        <i class="fas fa-trophy me-2"></i>Leaderboard
+                    {% if quiz.slug %}
+                    <a href="{% url 'quiz:leaderboard' quiz.slug %}" class="btn btn-outline-warning rounded-pill px-3">
+                        <i class="fas fa-trophy me-1"></i>Leaderboard
                     </a>
-                </div>
-
-                <!-- Share Score Buttons -->
-                <div class="text-center mb-4">
-                    <p class="text-muted small mb-2">Share your score:</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary" aria-label="Share on Facebook">
-                            <i class="fab fa-facebook-f me-1"></i>Facebook
-                        </a>
-                        <a href="https://twitter.com/intent/tweet?text=I scored {{ percentage }}% on {{ quiz.title }}! Try it yourself&url={{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info" aria-label="Share on Twitter">
-                            <i class="fab fa-twitter me-1"></i>Twitter
-                        </a>
-                        <a href="https://wa.me/?text=I scored {{ percentage }}% on {{ quiz.title }}! Try it yourself: {{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success" aria-label="Share on WhatsApp">
-                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
-                        </a>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="copy-score-btn" aria-label="Copy score to clipboard">
-                            <i class="fas fa-copy me-1"></i>Copy
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Ad: Quiz Result -->
-                {% if ads.quiz_result %}
-                <div class="ad-container text-center mb-4">
-                    {{ ads.quiz_result|safe }}
-                </div>
-                {% endif %}
-
-                <!-- Detailed Question Review -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-bottom">
-                        <h2 class="h5 fw-bold mb-0"><i class="fas fa-list-check me-2 text-primary"></i>Detailed Review</h2>
-                    </div>
-                    <div class="card-body p-0">
-                        {% for question in questions %}
-                        {% with user_answer=user_answers|get_item:question.id %}
-                        <div class="p-3 {% if not forloop.last %}border-bottom{% endif %}">
-                            <!-- Question Header -->
-                            <div class="d-flex align-items-start mb-2">
-                                <span class="badge {% if user_answer == question.correct_answer %}bg-success{% elif user_answer %}bg-danger{% else %}bg-secondary{% endif %} me-2 d-flex align-items-center justify-content-center mt-1" style="min-width:28px;height:28px;border-radius:50%;flex-shrink:0;">
-                                    {% if user_answer == question.correct_answer %}
-                                    <i class="fas fa-check"></i>
-                                    {% elif user_answer %}
-                                    <i class="fas fa-times"></i>
-                                    {% else %}
-                                    <i class="fas fa-minus"></i>
-                                    {% endif %}
-                                </span>
-                                <div>
-                                    <p class="fw-bold mb-1">Question {{ forloop.counter }}: {{ question.question_text }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Options Review -->
-                            <div class="ms-4 mb-2">
-                                <div class="row g-2">
-                                    <!-- Option A -->
-                                    <div class="col-12 col-md-6">
-                                        <div class="p-2 rounded small {% if question.correct_answer == 'A' %}bg-success bg-opacity-10 border border-success{% elif user_answer == 'A' %}bg-danger bg-opacity-10 border border-danger{% else %}bg-light border{% endif %}">
-                                            <span class="badge {% if question.correct_answer == 'A' %}bg-success{% elif user_answer == 'A' %}bg-danger{% else %}bg-secondary{% endif %} me-1">A</span>
-                                            {{ question.option_a }}
-                                            {% if question.correct_answer == 'A' %}<i class="fas fa-check text-success ms-1"></i>{% endif %}
-                                            {% if user_answer == 'A' and question.correct_answer != 'A' %}<i class="fas fa-times text-danger ms-1"></i>{% endif %}
-                                        </div>
-                                    </div>
-                                    <!-- Option B -->
-                                    <div class="col-12 col-md-6">
-                                        <div class="p-2 rounded small {% if question.correct_answer == 'B' %}bg-success bg-opacity-10 border border-success{% elif user_answer == 'B' %}bg-danger bg-opacity-10 border border-danger{% else %}bg-light border{% endif %}">
-                                            <span class="badge {% if question.correct_answer == 'B' %}bg-success{% elif user_answer == 'B' %}bg-danger{% else %}bg-secondary{% endif %} me-1">B</span>
-                                            {{ question.option_b }}
-                                            {% if question.correct_answer == 'B' %}<i class="fas fa-check text-success ms-1"></i>{% endif %}
-                                            {% if user_answer == 'B' and question.correct_answer != 'B' %}<i class="fas fa-times text-danger ms-1"></i>{% endif %}
-                                        </div>
-                                    </div>
-                                    <!-- Option C -->
-                                    <div class="col-12 col-md-6">
-                                        <div class="p-2 rounded small {% if question.correct_answer == 'C' %}bg-success bg-opacity-10 border border-success{% elif user_answer == 'C' %}bg-danger bg-opacity-10 border border-danger{% else %}bg-light border{% endif %}">
-                                            <span class="badge {% if question.correct_answer == 'C' %}bg-success{% elif user_answer == 'C' %}bg-danger{% else %}bg-secondary{% endif %} me-1">C</span>
-                                            {{ question.option_c }}
-                                            {% if question.correct_answer == 'C' %}<i class="fas fa-check text-success ms-1"></i>{% endif %}
-                                            {% if user_answer == 'C' and question.correct_answer != 'C' %}<i class="fas fa-times text-danger ms-1"></i>{% endif %}
-                                        </div>
-                                    </div>
-                                    <!-- Option D -->
-                                    <div class="col-12 col-md-6">
-                                        <div class="p-2 rounded small {% if question.correct_answer == 'D' %}bg-success bg-opacity-10 border border-success{% elif user_answer == 'D' %}bg-danger bg-opacity-10 border border-danger{% else %}bg-light border{% endif %}">
-                                            <span class="badge {% if question.correct_answer == 'D' %}bg-success{% elif user_answer == 'D' %}bg-danger{% else %}bg-secondary{% endif %} me-1">D</span>
-                                            {{ question.option_d }}
-                                            {% if question.correct_answer == 'D' %}<i class="fas fa-check text-success ms-1"></i>{% endif %}
-                                            {% if user_answer == 'D' and question.correct_answer != 'D' %}<i class="fas fa-times text-danger ms-1"></i>{% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- User Answer vs Correct Answer -->
-                            <div class="ms-4 mb-2 small">
-                                {% if user_answer %}
-                                <span class="me-3">Your answer: <strong class="{% if user_answer == question.correct_answer %}text-success{% else %}text-danger{% endif %}">{{ user_answer }}</strong></span>
-                                {% else %}
-                                <span class="me-3 text-muted">Your answer: <strong class="text-secondary">Not answered</strong></span>
-                                {% endif %}
-                                <span>Correct answer: <strong class="text-success">{{ question.correct_answer }}</strong></span>
-                                {% if quiz.negative_marking and user_answer and user_answer != question.correct_answer %}
-                                <span class="ms-3 text-danger"><i class="fas fa-minus-circle me-1"></i>-{{ marks_deducted_per_wrong|floatformat:2 }} marks deducted ({{ penalty_percent|floatformat:0 }}% of {{ marks_per_question }})</span>
-                                {% endif %}
-                            </div>
-
-                            <!-- Explanation -->
-                            {% if question.explanation %}
-                            <div class="ms-4">
-                                <div class="alert alert-info border-0 py-2 px-3 small mb-0">
-                                    <i class="fas fa-lightbulb text-warning me-2"></i><strong>Explanation:</strong> {{ question.explanation }}
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% endwith %}
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Bottom Action Buttons -->
-                <div class="d-flex flex-wrap gap-3 justify-content-center mb-4">
-                    <a href="{{ quiz.get_absolute_url }}" class="btn btn-success">
-                        <i class="fas fa-redo me-2"></i>Retry Quiz
-                    </a>
-                    <a href="{% url 'quiz:list' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-brain me-2"></i>Try Another Quiz
-                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </section>
-{% endblock %}
 
-{% block extra_css %}
-<style>
-    .score-circle {
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
-        border: 8px solid;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-    .score-excellent {
-        border-color: #198754;
-        background-color: rgba(25, 135, 84, 0.05);
-    }
-    .score-excellent .score-number {
-        color: #198754;
-        font-size: 2rem;
-    }
-    .score-excellent .score-percent {
-        color: #198754;
-        font-size: 1rem;
-    }
-    .score-good {
-        border-color: #ffc107;
-        background-color: rgba(255, 193, 7, 0.05);
-    }
-    .score-good .score-number {
-        color: #e0a800;
-        font-size: 2rem;
-    }
-    .score-good .score-percent {
-        color: #e0a800;
-        font-size: 1rem;
-    }
-    .score-poor {
-        border-color: #dc3545;
-        background-color: rgba(220, 53, 69, 0.05);
-    }
-    .score-poor .score-number {
-        color: #dc3545;
-        font-size: 2rem;
-    }
-    .score-poor .score-percent {
-        color: #dc3545;
-        font-size: 1rem;
-    }
-    .score-inner {
-        line-height: 1.2;
-    }
-</style>
+<!-- Score Breakdown Metric Cards -->
+<section class="py-4 mt-n4">
+    <div class="container">
+        <div class="row g-3 justify-content-center">
+            <!-- Correct -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center h-100">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.1);">
+                        <i class="fas fa-check text-success fa-lg"></i>
+                    </div>
+                    <span class="fs-4 fw-bold text-success d-block">{{ correct_count }}</span>
+                    <span class="small text-muted fw-medium">Correct ({{ score }} Marks)</span>
+                </div>
+            </div>
+
+            <!-- Incorrect -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center h-100">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 44px; height: 44px; background: rgba(239, 68, 68, 0.1);">
+                        <i class="fas fa-times text-danger fa-lg"></i>
+                    </div>
+                    <span class="fs-4 fw-bold text-danger d-block">{{ incorrect_count }}</span>
+                    <span class="small text-muted fw-medium">Incorrect</span>
+                </div>
+            </div>
+
+            <!-- Unanswered -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center h-100">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 44px; height: 44px; background: rgba(100, 116, 139, 0.1);">
+                        <i class="fas fa-minus text-secondary fa-lg"></i>
+                    </div>
+                    <span class="fs-4 fw-bold text-secondary d-block">{{ unanswered_count }}</span>
+                    <span class="small text-muted fw-medium">Unanswered (0 Marks)</span>
+                </div>
+            </div>
+
+            <!-- Total Marks -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center h-100">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 44px; height: 44px; background: rgba(79, 70, 229, 0.1);">
+                        <i class="fas fa-award text-primary fa-lg"></i>
+                    </div>
+                    <span class="fs-4 fw-bold text-primary d-block">{{ final_score|floatformat:2 }}</span>
+                    <span class="small text-muted fw-medium">Final Score / {{ total_marks }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Negative Marking Explanation Panel (if enabled) -->
+        {% if quiz.negative_marking %}
+        <div class="card border-0 shadow-sm rounded-4 p-4 mt-3 bg-white border-start border-4 border-danger">
+            <div class="d-flex align-items-start gap-3">
+                <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                    <i class="fas fa-minus-circle text-danger"></i>
+                </div>
+                <div>
+                    <h3 class="h6 fw-bold mb-1">Negative Marking Applied: {{ penalty_percent|floatformat:0 }}% per Wrong Answer</h3>
+                    <p class="small text-muted mb-2">Standard Public Service Commission (Loksewa) rules deduct {{ marks_deducted_per_wrong|floatformat:2 }} marks for every incorrect response.</p>
+                    <div class="d-flex flex-wrap gap-3 small">
+                        <span>Correct: <strong class="text-success">+{{ score }}</strong> marks</span>
+                        <span>Deduction: <strong class="text-danger">-{{ negative_marks|floatformat:2 }}</strong> marks</span>
+                        <span>Total Score: <strong class="text-dark">{{ final_score|floatformat:2 }} / {{ total_marks }}</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- AdSense Placement: Quiz Result (High Conversion Zone) -->
+{% if ads.quiz_result %}
+<section class="py-3">
+    <div class="container">
+        <div class="ad-container text-center">
+            {{ ads.quiz_result|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Social Share & Review Controls -->
+<section class="py-4">
+    <div class="container">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white text-center">
+            <span class="small text-muted fw-semibold mb-2 d-block">Proud of your score? Share with study partners:</span>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="https://api.whatsapp.com/send?text=I scored {{ percentage }}% on {{ quiz.title }} at Tulasi Nepali Learning Platform! Test your score: {{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm text-white rounded-pill px-3" style="background:#25d366;">
+                    <i class="fab fa-whatsapp me-1"></i>Share on WhatsApp
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm text-white rounded-pill px-3" style="background:#1877f2;">
+                    <i class="fab fa-facebook-f me-1"></i>Share on Facebook
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="copy-score-btn">
+                    <i class="fas fa-copy me-1"></i>Copy Result Summary
+                </button>
+            </div>
+        </div>
+
+        <!-- Detailed Review Section -->
+        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; background: linear-gradient(135deg, #4f46e5, #06b6d4);">
+                        <i class="fas fa-list-check small"></i>
+                    </div>
+                    <h2 class="h5 fw-bold mb-0 text-dark">Comprehensive Question Review</h2>
+                </div>
+                <div class="text-muted small">
+                    Review every question, verified answers, and detailed explanations below.
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                {% for question in questions %}
+                {% with user_answer=user_answers|get_item:question.id %}
+                <div class="p-4 {% if not forloop.last %}border-bottom border-light{% endif %}" id="review-q-{{ question.id }}">
+                    <!-- Question Header & Status -->
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <span class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0 fw-bold shadow-sm"
+                              style="width: 34px; height: 34px; background: {% if user_answer == question.correct_answer %}#10b981{% elif user_answer %}#ef4444{% else %}#64748b{% endif %};">
+                            {% if user_answer == question.correct_answer %}
+                            <i class="fas fa-check small"></i>
+                            {% elif user_answer %}
+                            <i class="fas fa-times small"></i>
+                            {% else %}
+                            <i class="fas fa-minus small"></i>
+                            {% endif %}
+                        </span>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge rounded-pill bg-light text-muted border px-2 py-1 small">Question {{ forloop.counter }}</span>
+                                {% if user_answer == question.correct_answer %}
+                                <span class="badge rounded-pill bg-success bg-opacity-10 text-success fw-semibold px-2 py-1 small">+2.0 Marks</span>
+                                {% elif user_answer %}
+                                <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger fw-semibold px-2 py-1 small">Wrong (-{{ marks_deducted_per_wrong|floatformat:2 }})</span>
+                                {% else %}
+                                <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-2 py-1 small">Not Answered (0.0)</span>
+                                {% endif %}
+                            </div>
+                            <p class="fs-6 fw-semibold text-dark mb-0">{{ question.question_text }}</p>
+                        </div>
+                    </div>
+
+                    <!-- 4 Options Visual Review -->
+                    <div class="ms-md-5 mb-3">
+                        <div class="row g-2">
+                            <!-- Option A -->
+                            <div class="col-12 col-md-6">
+                                <div class="p-3 rounded-3 small border d-flex align-items-center justify-content-between {% if question.correct_answer == 'A' %}bg-success bg-opacity-10 border-success text-success fw-bold{% elif user_answer == 'A' %}bg-danger bg-opacity-10 border-danger text-danger{% else %}bg-light text-muted{% endif %}">
+                                    <div><span class="badge bg-secondary me-2">A</span> {{ question.option_a }}</div>
+                                    {% if question.correct_answer == 'A' %}<i class="fas fa-check-circle text-success fs-5"></i>{% endif %}
+                                    {% if user_answer == 'A' and question.correct_answer != 'A' %}<i class="fas fa-times-circle text-danger fs-5"></i>{% endif %}
+                                </div>
+                            </div>
+                            <!-- Option B -->
+                            <div class="col-12 col-md-6">
+                                <div class="p-3 rounded-3 small border d-flex align-items-center justify-content-between {% if question.correct_answer == 'B' %}bg-success bg-opacity-10 border-success text-success fw-bold{% elif user_answer == 'B' %}bg-danger bg-opacity-10 border-danger text-danger{% else %}bg-light text-muted{% endif %}">
+                                    <div><span class="badge bg-secondary me-2">B</span> {{ question.option_b }}</div>
+                                    {% if question.correct_answer == 'B' %}<i class="fas fa-check-circle text-success fs-5"></i>{% endif %}
+                                    {% if user_answer == 'B' and question.correct_answer != 'B' %}<i class="fas fa-times-circle text-danger fs-5"></i>{% endif %}
+                                </div>
+                            </div>
+                            <!-- Option C -->
+                            <div class="col-12 col-md-6">
+                                <div class="p-3 rounded-3 small border d-flex align-items-center justify-content-between {% if question.correct_answer == 'C' %}bg-success bg-opacity-10 border-success text-success fw-bold{% elif user_answer == 'C' %}bg-danger bg-opacity-10 border-danger text-danger{% else %}bg-light text-muted{% endif %}">
+                                    <div><span class="badge bg-secondary me-2">C</span> {{ question.option_c }}</div>
+                                    {% if question.correct_answer == 'C' %}<i class="fas fa-check-circle text-success fs-5"></i>{% endif %}
+                                    {% if user_answer == 'C' and question.correct_answer != 'C' %}<i class="fas fa-times-circle text-danger fs-5"></i>{% endif %}
+                                </div>
+                            </div>
+                            <!-- Option D -->
+                            <div class="col-12 col-md-6">
+                                <div class="p-3 rounded-3 small border d-flex align-items-center justify-content-between {% if question.correct_answer == 'D' %}bg-success bg-opacity-10 border-success text-success fw-bold{% elif user_answer == 'D' %}bg-danger bg-opacity-10 border-danger text-danger{% else %}bg-light text-muted{% endif %}">
+                                    <div><span class="badge bg-secondary me-2">D</span> {{ question.option_d }}</div>
+                                    {% if question.correct_answer == 'D' %}<i class="fas fa-check-circle text-success fs-5"></i>{% endif %}
+                                    {% if user_answer == 'D' and question.correct_answer != 'D' %}<i class="fas fa-times-circle text-danger fs-5"></i>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Explanation Card (if present) -->
+                    {% if question.explanation %}
+                    <div class="ms-md-5">
+                        <div class="p-3 rounded-3 small" style="background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border-left: 4px solid #3b82f6;">
+                            <strong class="text-primary d-block mb-1"><i class="fas fa-lightbulb text-warning me-1"></i>Instructor's Explanation:</strong>
+                            <span class="text-secondary">{{ question.explanation }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Bottom Action Strip -->
+        <div class="d-flex flex-wrap gap-3 justify-content-center my-5">
+            <a href="{{ quiz.get_absolute_url }}" class="btn btn-primary btn-lg rounded-pill px-5 shadow">
+                <i class="fas fa-redo me-2"></i>Retry This Quiz
+            </a>
+            <a href="{% url 'quiz:list' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-5">
+                <i class="fas fa-brain me-2"></i>Browse Other Quizzes
+            </a>
+        </div>
+    </div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Copy score button
     var copyBtn = document.getElementById('copy-score-btn');
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
-            var scoreText = 'I scored {{ percentage }}% ({{ final_score|floatformat:2 }}/{{ total_marks }}) on {{ quiz.title }}! Try it at {{ request.build_absolute_uri }}';
-            navigator.clipboard.writeText(scoreText).then(function() {
-                copyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+            var scoreSummary = 'I scored {{ percentage }}% ({{ final_score|floatformat:2 }}/{{ total_marks }}) on "{{ quiz.title }}" on Tulasi Nepali Platform! Try it here: ' + window.location.href;
+            navigator.clipboard.writeText(scoreSummary).then(function() {
+                var orig = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check me-1 text-success"></i>Summary Copied!';
                 setTimeout(function() {
-                    copyBtn.innerHTML = '<i class="fas fa-copy me-1"></i>Copy';
-                }, 2000);
+                    copyBtn.innerHTML = orig;
+                }, 2500);
             });
         });
     }

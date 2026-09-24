@@ -10,5 +10,5 @@ urlpatterns = [
     path('privacy-policy/', views.privacy_policy, name='privacy'),
     path('terms-conditions/', views.terms_conditions, name='terms'),
     path('sitemap.html', views.sitemap_view, name='sitemap'),
-    # path('robots.txt', views.robots_txt, name='robots'),
+    path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
 ]

@@ -7,37 +7,32 @@ from notes.models import Note
 from blog.models import BlogPost
 from downloads.models import Download
 from quiz.models import Quiz, QuizAttempt
+from django.contrib.auth.models import User
+
 
 def home(request):
-    """Home page with hero, quick nav, featured content, stats, about section"""
-    # Featured content
     featured_notes = Note.objects.filter(is_published=True, is_featured=True)[:4]
     latest_notes = Note.objects.filter(is_published=True).order_by('-created_at')[:6]
     trending_blogs = BlogPost.objects.filter(is_published=True).order_by('-views')[:6]
     popular_downloads = Download.objects.filter(is_published=True).order_by('-download_count')[:6]
     recent_quizzes = Quiz.objects.filter(is_published=True).order_by('-created_at')[:4]
-    
-    # Statistics
     total_notes = Note.objects.filter(is_published=True).count()
     total_blogs = BlogPost.objects.filter(is_published=True).count()
     total_downloads = Download.objects.filter(is_published=True).count()
-    total_mcqs = Quiz.objects.filter(is_published=True).aggregate(
-        total=Count('questions')
-    )['total'] or 0
-    
-    # About section
+    total_mcqs = Quiz.objects.filter(is_published=True).aggregate(total=Count('questions'))['total'] or 0
+    total_users = User.objects.count()
     site_settings = SiteSettings.objects.first()
-    
     context = {
-        'featured_notes': featured_notes,
-        'latest_notes': latest_notes,
-        'trending_blogs': trending_blogs,
-        'popular_downloads': popular_downloads,
+        'featured_notes': featured_notes, 'latest_notes': latest_notes,
+        'trending_blogs': trending_blogs, 'popular_downloads': popular_downloads,
         'recent_quizzes': recent_quizzes,
-        'total_notes': total_notes,
-        'total_blogs': total_blogs,
-        'total_downloads': total_downloads,
-        'total_mcqs': total_mcqs,
+        'stats': {
+            'total_notes': total_notes,
+            'total_blogs': total_blogs,
+            'total_downloads': total_downloads,
+            'total_mcqs': total_mcqs,
+            'total_users': total_users,
+        },
         'site_settings': site_settings,
         'meta_title': 'Learning Platform - Your Gateway to Knowledge',
         'meta_description': 'Access free notes, practice MCQs, download study materials, and read educational blogs. No login required for MCQ practice!',
@@ -71,7 +66,7 @@ def contact(request):
             })
     else:
         form = ContactForm()
-    
+
     context = {
         'form': form,
         'meta_title': 'Contact Us - Learning Platform',
@@ -106,6 +101,24 @@ def sitemap_view(request):
         'quizzes': quizzes,
     }
     return render(request, 'core/sitemap.html', context)
+
+def sitemap_xml(request):
+    """Generate XML sitemap for search engines"""
+    from django.http import HttpResponse
+    from django.template.loader import render_to_string
+
+    xml_content = render_to_string(
+        'core/sitemap.xml',
+        {
+            'all_notes': Note.objects.filter(is_published=True),
+            'all_blogs': BlogPost.objects.filter(is_published=True),
+            'all_downloads': Download.objects.filter(is_published=True),
+            'all_quizzes': Quiz.objects.filter(is_published=True),
+        },
+        request=request,
+    )
+
+    return HttpResponse(xml_content, content_type='application/xml')
 
 def robots_txt(request):
     from django.http import HttpResponse

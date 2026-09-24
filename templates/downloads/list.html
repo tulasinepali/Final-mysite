@@ -89,11 +89,11 @@
                 <div class="row g-4">
                     {% for download in page_obj %}
                     <div class="col-md-6 col-xl-4">
-                        <article class="card h-100 border-0 shadow-sm download-card overflow-hidden">
-                            <div class="card-body d-flex flex-column">
+                        <article class="card h-100 feature-card shadow-sm download-card overflow-hidden">
+                            <div class="card-body d-flex flex-column p-4">
                                 <!-- File Type Icon & Category -->
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="file-type-icon rounded d-flex align-items-center justify-content-center {% if download.file_type == 'pdf' %}bg-danger bg-opacity-10{% elif download.file_type == 'docx' %}bg-primary bg-opacity-10{% elif download.file_type == 'ppt' %}bg-warning bg-opacity-10{% elif download.file_type == 'zip' %}bg-success bg-opacity-10{% else %}bg-secondary bg-opacity-10{% endif %}" style="width:48px;height:48px;min-width:48px;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="file-type-icon rounded-3 d-flex align-items-center justify-content-center {% if download.file_type == 'pdf' %}bg-danger bg-opacity-10{% elif download.file_type == 'docx' %}bg-primary bg-opacity-10{% elif download.file_type == 'ppt' %}bg-warning bg-opacity-10{% elif download.file_type == 'zip' %}bg-success bg-opacity-10{% else %}bg-secondary bg-opacity-10{% endif %}" style="width:48px;height:48px;min-width:48px;">
                                         {% if download.file_type == 'pdf' %}
                                         <i class="fas fa-file-pdf fa-lg text-danger"></i>
                                         {% elif download.file_type == 'docx' %}
@@ -106,7 +106,7 @@
                                         <i class="fas fa-file fa-lg text-secondary"></i>
                                         {% endif %}
                                     </div>
-                                    <span class="badge bg-warning bg-opacity-10 text-warning">{{ download.category.name }}</span>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-1">{{ download.category.name }}</span>
                                 </div>
 
                                 <!-- Title -->
@@ -115,19 +115,19 @@
                                 </h3>
 
                                 <!-- Description -->
-                                <p class="card-text text-muted small mb-3 flex-grow-1">{{ download.description|truncatewords:20 }}</p>
+                                <p class="card-text text-muted small mb-3 flex-grow-1">{{ download.description|truncatewords:15|striptags }}</p>
 
                                 <!-- File Info -->
-                                <div class="d-flex flex-wrap gap-2 mb-3">
-                                    <span class="badge {% if download.file_type == 'pdf' %}bg-danger{% elif download.file_type == 'docx' %}bg-primary{% elif download.file_type == 'ppt' %}bg-warning text-dark{% elif download.file_type == 'zip' %}bg-success{% else %}bg-secondary{% endif %}">{{ download.get_file_type_display }}</span>
-                                    {% if download.file_size %}<span class="badge bg-light text-dark border"><i class="fas fa-hdd me-1"></i>{{ download.file_size }}</span>{% endif %}
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    <span class="badge {% if download.file_type == 'pdf' %}bg-danger{% elif download.file_type == 'docx' %}bg-primary{% elif download.file_type == 'ppt' %}bg-warning text-dark{% elif download.file_type == 'zip' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">{{ download.get_file_type_display }}</span>
+                                    {% if download.file_size %}<span class="badge bg-light text-dark border rounded-pill"><i class="fas fa-hdd me-1"></i>{{ download.file_size }}</span>{% endif %}
                                 </div>
                             </div>
 
-                            <div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center py-2">
-                                <small class="text-muted"><i class="fas fa-download me-1"></i>{{ download.download_count }} downloads</small>
-                                <a href="{% url 'downloads:download_file' download.slug %}" class="btn btn-sm btn-warning text-white" onclick="event.stopPropagation();">
-                                    <i class="fas fa-download me-1"></i>Download
+                            <div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center p-3">
+                                <small class="text-muted"><i class="fas fa-download me-1 text-primary"></i>{{ download.download_count }} downloads</small>
+                                <a href="{% url 'downloads:download_file' download.slug %}" class="btn btn-sm btn-primary rounded-pill px-3" onclick="event.stopPropagation();">
+                                    <i class="fas fa-arrow-down me-1"></i>Get File
                                 </a>
                             </div>
                         </article>
