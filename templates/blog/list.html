@@ -63,7 +63,7 @@
                         <img src="{{ post.featured_image.url }}" class="d-block w-100" alt="{{ post.title }}" style="height:380px;object-fit:cover;">
                         {% else %}
                         <div class="d-block w-100 d-flex align-items-center justify-content-center" style="height:380px; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
-                            <i class="fas fa-newspaper fa-5x text-white opacity-25"></i>
+                            <i class="fas fa-newspaper fa-2x text-white opacity-25"></i>
                         </div>
                         {% endif %}
                         <div class="carousel-caption text-start p-4 p-md-5" style="background: linear-gradient(transparent, rgba(15, 23, 42, 0.95) 70%); right: 0; bottom: 0; left: 0; border-radius: 0 0 1rem 1rem;">
@@ -164,7 +164,7 @@
                                 </a>
                                 {% else %}
                                 <a href="{{ post.get_absolute_url }}" class="d-flex align-items-center justify-content-center w-100 h-100 text-decoration-none" style="background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);">
-                                    <i class="fas fa-newspaper fa-3x text-white opacity-40"></i>
+                                    <i class="fas fa-newspaper fa-2x text-white opacity-40"></i>
                                 </a>
                                 {% endif %}
                                 <div class="position-absolute top-0 start-0 m-3 d-flex gap-1 flex-wrap">
@@ -263,8 +263,8 @@
                 <!-- Empty State -->
                 <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
                     <div class="mb-3">
-                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                            <i class="fas fa-newspaper fa-2x text-muted opacity-50"></i>
+                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                            <i class="fas fa-newspaper fa-lg text-muted opacity-50"></i>
                         </div>
                     </div>
                     <h3 class="h5 fw-bold mb-2">No Articles Found</h3>
@@ -290,8 +290,8 @@
                         {% if site_settings.owner_image %}
                         <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="rounded-circle shadow-lg mb-3 border border-3 border-white" style="width: 90px; height: 90px; object-fit: cover;">
                         {% else %}
-                        <div class="rounded-circle bg-white bg-opacity-20 d-inline-flex align-items-center justify-content-center mb-3 text-white" style="width: 90px; height: 90px;">
-                            <i class="fas fa-user-tie fa-2x"></i>
+                        <div class="rounded-circle bg-white bg-opacity-20 d-inline-flex align-items-center justify-content-center mb-3 text-white" style="width: 70px; height: 70px;">
+                            <i class="fas fa-user-tie fa-lg"></i>
                         </div>
                         {% endif %}
                         <h2 class="h5 fw-bold text-white mb-1">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>

@@ -128,8 +128,8 @@
             <div class="col-lg-3 col-md-6">
                 <div class="card feature-card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
-                        <div class="feature-icon bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
-                            <i class="fas fa-book fa-2x text-primary"></i>
+                        <div class="feature-icon bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:52px;height:52px;">
+                            <i class="fas fa-book fa-lg text-primary"></i>
                         </div>
                         <h3 class="h5 fw-bold mb-2">Study Notes</h3>
                         <p class="text-muted small mb-3">Well-organized notes covering key topics to help you understand concepts better.</p>
@@ -142,8 +142,8 @@
             <div class="col-lg-3 col-md-6">
                 <div class="card feature-card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
-                        <div class="feature-icon bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
-                            <i class="fas fa-brain fa-2x text-success"></i>
+                        <div class="feature-icon bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:52px;height:52px;">
+                            <i class="fas fa-brain fa-lg text-success"></i>
                         </div>
                         <h3 class="h5 fw-bold mb-2">MCQ Practice</h3>
                         <p class="text-muted small mb-3">Test your knowledge with topic-wise MCQs and get instant results with explanations.</p>
@@ -156,8 +156,8 @@
             <div class="col-lg-3 col-md-6">
                 <div class="card feature-card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
-                        <div class="feature-icon bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
-                            <i class="fas fa-download fa-2x text-warning"></i>
+                        <div class="feature-icon bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:52px;height:52px;">
+                            <i class="fas fa-download fa-lg text-warning"></i>
                         </div>
                         <h3 class="h5 fw-bold mb-2">Downloads</h3>
                         <p class="text-muted small mb-3">Download PDFs, study guides, and other resources for offline learning.</p>
@@ -170,8 +170,8 @@
             <div class="col-lg-3 col-md-6">
                 <div class="card feature-card h-100 border-0 shadow-sm">
                     <div class="card-body text-center p-4">
-                        <div class="feature-icon bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;">
-                            <i class="fas fa-blog fa-2x text-info"></i>
+                        <div class="feature-icon bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:52px;height:52px;">
+                            <i class="fas fa-blog fa-lg text-info"></i>
                         </div>
                         <h3 class="h5 fw-bold mb-2">Educational Blog</h3>
                         <p class="text-muted small mb-3">Stay informed with articles on study tips, career guidance, and exam strategies.</p>
@@ -243,7 +243,7 @@
                                 <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy" style="height:140px;object-fit:cover;">
                                 {% else %}
                                 <div class="card-img-top bg-info bg-opacity-10 d-flex align-items-center justify-content-center" style="height:140px;">
-                                    <i class="fas fa-newspaper fa-2x text-info"></i>
+                                    <i class="fas fa-newspaper fa-lg text-info"></i>
                                 </div>
                                 {% endif %}
                                 <div class="card-body">
@@ -360,28 +360,28 @@
         <div class="row text-center g-4">
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <i class="fas fa-book fa-2x mb-3 opacity-75"></i>
+                    <i class="fas fa-book fa-lg mb-2 opacity-75"></i>
                     <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_notes|default:'0' }}">0</div>
                     <div class="stat-label small opacity-75">Study Notes</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <i class="fas fa-brain fa-2x mb-3 opacity-75"></i>
+                    <i class="fas fa-brain fa-lg mb-2 opacity-75"></i>
                     <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_mcqs|default:'0' }}">0</div>
                     <div class="stat-label small opacity-75">MCQ Questions</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <i class="fas fa-download fa-2x mb-3 opacity-75"></i>
+                    <i class="fas fa-download fa-lg mb-2 opacity-75"></i>
                     <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_downloads|default:'0' }}">0</div>
                     <div class="stat-label small opacity-75">Downloads</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <i class="fas fa-users fa-2x mb-3 opacity-75"></i>
+                    <i class="fas fa-users fa-lg mb-2 opacity-75"></i>
                     <div class="stat-number h2 fw-bold mb-0" data-count="{{ visitor_count|default:"0" }}">0</div>
                     <div class="stat-label small opacity-75">Happy Students</div>
                 </div>

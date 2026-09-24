@@ -1501,3 +1501,64 @@ footer a:hover {
 .question-card:hover {
     box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08) !important;
 }
+
+/* ----------------------------------------------------------
+   Icon Standardization & Proportional Sizing
+   ---------------------------------------------------------- */
+i.fas, i.far, i.fab, i.fa {
+    display: inline-block;
+    vertical-align: -0.08em;
+    line-height: 1;
+}
+
+svg.svg-inline--fa {
+    width: 1em !important;
+    height: 1em !important;
+    vertical-align: -0.125em;
+    display: inline-block;
+}
+
+/* Restrain oversized icon scaling classes */
+.fa-xs { font-size: 0.75em !important; }
+.fa-sm { font-size: 0.85em !important; }
+.fa-lg { font-size: 1.15em !important; }
+.fa-xl { font-size: 1.25em !important; }
+.fa-2x { font-size: 1.35em !important; }
+.fa-3x { font-size: 1.6em !important; }
+.fa-4x { font-size: 2em !important; }
+.fa-5x { font-size: 2.3em !important; }
+.fa-6x { font-size: 2.6em !important; }
+
+/* Navbar icons */
+.navbar .nav-link i {
+    font-size: 0.88rem !important;
+    margin-right: 0.35rem;
+}
+
+/* Buttons & Badges icons */
+.btn i {
+    font-size: 0.88em;
+}
+
+.badge i {
+    font-size: 0.85em;
+}
+
+/* Feature Icon Circle Wrappers */
+.feature-icon {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px;
+}
+
+.feature-icon i {
+    font-size: 1.35rem !important;
+}
+
+/* Ensure FontAwesome SVG renders never exceed boundary */
+svg.svg-inline--fa {
+    max-height: 2em;
+    width: auto;
+    vertical-align: -0.125em;
+}
+
