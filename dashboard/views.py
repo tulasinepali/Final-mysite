@@ -36,12 +36,12 @@ def dashboard_home(request):
     total_blog_views = BlogPost.objects.aggregate(total=Sum('views'))['total'] or 0
     total_download_count = Download.objects.aggregate(total=Sum('download_count'))['total'] or 0
 
-    recent_notes = Note.objects.order_by('-created_at')[:5]
-    recent_blogs = BlogPost.objects.order_by('-created_at')[:5]
-    recent_attempts = QuizAttempt.objects.select_related('quiz').order_by('-completed_at')[:8]
+    recent_notes = Note.objects.order_by('-created_at')[:3]
+    recent_blogs = BlogPost.objects.order_by('-created_at')[:3]
+    recent_attempts = QuizAttempt.objects.select_related('quiz').order_by('-completed_at')[:3]
     recent_messages = ContactMessage.objects.order_by('-created_at')[:5]
-    popular_notes = Note.objects.order_by('-views')[:5]
-    popular_downloads = Download.objects.order_by('-download_count')[:5]
+    popular_notes = Note.objects.order_by('-views')[:3]
+    popular_downloads = Download.objects.order_by('-download_count')[:3]
 
     from django.utils import timezone
     from datetime import timedelta

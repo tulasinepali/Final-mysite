@@ -226,7 +226,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for note in recent_notes %}
+                            {% for note in recent_notes|slice:":3" %}
                             <tr>
                                 <td>
                                     <div class="font-weight-semibold text-dark">{{ note.title|truncatechars:35 }}</div>
@@ -279,7 +279,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for post in recent_blogs %}
+                            {% for post in recent_blogs|slice:":3" %}
                             <tr>
                                 <td>
                                     <div class="font-weight-semibold text-dark">{{ post.title|truncatechars:35 }}</div>
@@ -323,7 +323,7 @@
                 <a href="{% url 'dashboard:downloads' %}" class="btn btn-sm btn-outline-primary">Manage</a>
             </div>
             <div class="card-body">
-                {% for dl in popular_downloads %}
+                {% for dl in popular_downloads|slice:":3" %}
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <div>
@@ -371,7 +371,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for attempt in recent_attempts %}
+                            {% for attempt in recent_attempts|slice:":3" %}
                             <tr>
                                 <td>
                                     <div class="font-weight-semibold text-dark">{{ attempt.quiz.title|truncatechars:28 }}</div>
