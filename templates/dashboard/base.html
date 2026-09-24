@@ -4,306 +4,310 @@
 <head>
     <meta name="google-adsense-account" content="ca-pub-3956705237421931">
     <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KCFVW48R');</script>
-<!-- End Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KCFVW48R');</script>
+    <!-- End Google Tag Manager -->
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Dashboard - Tulasi Nepali{% endblock %}</title>
-     {% if site_settings.site_favicon %}<link rel="icon" href="{{ site_settings.site_favicon.url }}" type="image/x-icon">{% else %}<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">{% endif %}
+    {% if site_settings.site_favicon %}<link rel="icon" href="{{ site_settings.site_favicon.url }}" type="image/x-icon">{% else %}<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">{% endif %}
 
+    <!-- Google Fonts: Manrope + Sora + JetBrains Mono (FlexAdmin Signature) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap Icons (FlexAdmin Standard) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
-    <!-- IonIcons -->
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Bootstrap 4 & AdminLTE base layout -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <!-- AdminLTE -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <!-- Modern Dashboard Theme -->
+    <!-- FlexAdmin Custom Theme -->
     <link rel="stylesheet" href="{% static 'css/dashboard_modern.css' %}">
 
     {% block extra_head %}{% endblock %}
 
-    <!-- CKEditor 5 AdminLTE Compatibility -->
+    <!-- CKEditor 5 Compatibility -->
     <style>
-        /* CKEditor 5 fixes for AdminLTE dashboard */
         .ck.ck-editor { width: 100% !important; }
         .ck.ck-editor__main > .ck-editor__editable { min-height: 300px; background: #fff !important; }
-        .ck.ck-toolbar { background: #f8f9fa !important; border: 1px solid #ddd !important; }
-        .ck.ck-editor__editable:focus { border-color: #80bdff !important; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25) !important; }
-        /* Fix CKEditor 5 inside card-body */
+        .ck.ck-toolbar { background: #f8fafc !important; border: 1px solid #dde5f1 !important; border-radius: 8px 8px 0 0; }
+        .ck.ck-editor__editable:focus { border-color: var(--accent-color) !important; box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.18) !important; }
         .card-body .ck.ck-editor { margin-bottom: 0.5rem; }
-        /* Ensure z-index for dropdowns in toolbar */
         .ck.ck-toolbar .ck.ck-dropdown__panel { z-index: 1050 !important; }
     </style>
 </head>
-<body class="hold-transition sidebar-dark-primary layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
-    <!-- Navbar -->
+    <!-- FlexAdmin Top Header -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <!-- Left navbar links -->
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="{% url 'dashboard:home' %}" class="nav-link">Dashboard</a>
-            </li>
-        </ul>
+        <!-- Left: Toggle & Brand Link -->
+        <div class="d-flex align-items-center">
+            <a class="sidebar-toggle" data-widget="pushmenu" href="#" role="button" title="Toggle Sidebar">
+                <i class="bi bi-layout-sidebar-inset"></i>
+            </a>
+            <a href="{% url 'dashboard:home' %}" class="header-brand d-none d-sm-flex">
+                <span class="brand-title">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</span>
+                <span class="brand-badge">Command Center</span>
+            </a>
+        </div>
 
-        <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto">
-            <!-- Messages Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="far fa-envelope"></i>
-                    {% if unread_messages %}
-                    <span class="badge badge-danger navbar-badge">{{ unread_messages }}</span>
-                    {% endif %}
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <a href="{% url 'dashboard:messages' %}" class="dropdown-item">
-                        <i class="fas fa-envelope mr-2"></i> {% if unread_messages %}{{ unread_messages }} Unread{% else %}View Messages{% endif %}
-                    </a>
-                </div>
-            </li>
-            <!-- Notifications Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="far fa-bell"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <span class="dropdown-item dropdown-header">Notifications</span>
-                    <div class="dropdown-divider"></div>
-                    <a href="{% url 'dashboard:analytics' %}" class="dropdown-item">
-                        <i class="fas fa-chart-line mr-2"></i> View Analytics
-                    </a>
-                </div>
-            </li>
-            <!-- User Account -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#">
-                    <i class="far fa-user"></i> <span class="d-none d-md-inline">{{ request.user.get_full_name|default:request.user.username }}</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <span class="dropdown-header">Account</span>
-                    <div class="dropdown-divider"></div>
-                    <a href="{% url 'dashboard:settings' %}" class="dropdown-item">
-                        <i class="fas fa-cog mr-2"></i> Settings
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="/admin/" class="dropdown-item">
-                        <i class="fas fa-tools mr-2"></i> Django Admin
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <form method="post" action="{% url 'logout' %}" style="margin:0;">
-    {% csrf_token %}
-    <button type="submit" class="dropdown-item dropdown-footer border-0 bg-transparent w-100 text-left">
-        <i class="fas fa-sign-out-alt mr-2"></i> Logout
-    </button>
-</form>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                    <i class="fas fa-expand-arrows-alt"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-    <!-- /.navbar -->
+        <!-- Center: Search Input -->
+        <div class="header-search d-none d-md-block">
+            <form class="search-form" action="{% url 'search:search' %}" method="GET" target="_blank">
+                <i class="bi bi-search search-icon"></i>
+                <input type="search" name="q" placeholder="Search notes, quizzes, topics..." autocomplete="off">
+                <kbd class="search-shortcut">/</kbd>
+            </form>
+        </div>
 
-    <!-- Main Sidebar -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <!-- Brand Logo -->
-        <a href="{% url 'dashboard:home' %}" class="brand-link">
-            {% if site_settings.site_logo %}
-            <img src="{{ site_settings.site_logo.url }}" alt="Logo" class="brand-image img-circle elevation-2" style="opacity: .95; width:34px; height:34px; object-fit:contain;">
-            {% else %}
-            <div class="brand-image d-flex align-items-center justify-content-center bg-primary text-white rounded-circle font-weight-bold" style="width:34px; height:34px; font-size:0.9rem;">TN</div>
-            {% endif %}
-            <span class="brand-text ml-2">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</span>
-        </a>
+        <!-- Right: Actions & User Dropdown -->
+        <div class="ml-auto d-flex align-items-center">
+            <div class="header-action-cluster mr-2">
+                <!-- View Public Website -->
+                <a href="/" target="_blank" class="header-action" title="View Public Website">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                </a>
 
-        <!-- Sidebar -->
-        <div class="sidebar os-host os-theme-light os-host-overflow os-host-overflow-y os-host-resize-disabled os-host-scrollbar-horizontal-hidden os-host-scrollbar-vertical-hidden">
-            <!-- User panel -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-             {% if site_settings.owner_image %}
-                <div class="image">
-                    <img src="{{ site_settings.owner_image.url }}" class="img-circle elevation-2" alt="User Image">
-                    {% endif %}
+                <!-- Messages Dropdown -->
+                <div class="dropdown">
+                    <a class="header-action" data-toggle="dropdown" href="#" role="button" title="Messages">
+                        <i class="bi bi-chat-left-text"></i>
+                        {% if unread_messages %}
+                        <span class="header-badge">{{ unread_messages }}</span>
+                        {% endif %}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" style="min-width: 280px;">
+                        <div class="px-3 py-2 border-bottom d-flex align-items-center justify-content-between">
+                            <span class="font-weight-bold" style="font-size: 0.85rem;">Messages</span>
+                            <span class="badge badge-soft-primary">{{ unread_messages }} unread</span>
+                        </div>
+                        <a href="{% url 'dashboard:messages' %}" class="dropdown-item py-2 d-flex align-items-center">
+                            <i class="bi bi-envelope mr-2 text-primary"></i> View All Inquiries
+                        </a>
+                    </div>
                 </div>
-                <div class="info">
-                    <a href="{% url 'dashboard:home' %}" class="d-block">{{ request.user.get_full_name|default:request.user.username }}</a>
-                </div>
-            </div>
 
-            <!-- SidebarSearch Form -->
-            <div class="form-inline">
-                <div class="input-group" data-widget="sidebar-search">
-                    <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                    <div class="input-group-append">
-                        <button class="btn btn-sidebar">
-                            <i class="fas fa-search fa-fw"></i>
-                        </button>
+                <!-- Notifications / Analytics -->
+                <div class="dropdown">
+                    <a class="header-action" data-toggle="dropdown" href="#" role="button" title="Analytics & Signals">
+                        <i class="bi bi-bell"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" style="min-width: 260px;">
+                        <div class="px-3 py-2 border-bottom">
+                            <span class="font-weight-bold" style="font-size: 0.85rem;">Live Signals</span>
+                        </div>
+                        <a href="{% url 'dashboard:analytics' %}" class="dropdown-item py-2 d-flex align-items-center">
+                            <i class="bi bi-graph-up mr-2 text-info"></i> Performance Analytics
+                        </a>
+                        <a href="{% url 'dashboard:ads' %}" class="dropdown-item py-2 d-flex align-items-center">
+                            <i class="bi bi-badge-ad mr-2 text-success"></i> Ad Placements Status
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar Menu -->
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <!-- Dashboard Home -->
+            <div class="header-divider d-none d-sm-block"></div>
+
+            <!-- User Dropdown -->
+            <div class="dropdown">
+                <a class="user-trigger" data-toggle="dropdown" href="#" role="button">
+                    {% if site_settings.owner_image %}
+                    <img src="{{ site_settings.owner_image.url }}" alt="Avatar" class="user-avatar">
+                    {% else %}
+                    <div class="user-avatar d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold" style="font-size: 0.8rem;">TN</div>
+                    {% endif %}
+                    <div class="user-brief d-none d-md-flex">
+                        <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                        <span class="user-role">Super Admin</span>
+                    </div>
+                    <i class="bi bi-chevron-down d-none d-md-inline" style="font-size: 0.72rem; color: var(--muted-color); margin-left: 2px;"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" style="min-width: 220px;">
+                    <div class="px-3 py-2 border-bottom">
+                        <div class="font-weight-bold" style="font-size: 0.85rem;">{{ request.user.get_full_name|default:request.user.username }}</div>
+                        <small class="text-muted">{{ request.user.email|default:"admin@tulasinepali.com.np" }}</small>
+                    </div>
+                    <a href="{% url 'dashboard:settings' %}" class="dropdown-item d-flex align-items-center mt-1">
+                        <i class="bi bi-sliders mr-2 text-muted"></i> Site Settings
+                    </a>
+                    <a href="/admin/" class="dropdown-item d-flex align-items-center">
+                        <i class="bi bi-shield-lock mr-2 text-muted"></i> Django Admin
+                    </a>
+                    <div class="dropdown-divider my-1"></div>
+                    <form method="post" action="{% url 'logout' %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item text-danger d-flex align-items-center border-0 bg-transparent w-100">
+                            <i class="bi bi-box-arrow-right mr-2"></i> Sign Out
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- FlexAdmin Sidebar -->
+    <aside class="main-sidebar">
+        <!-- Brand Link -->
+        <a href="{% url 'dashboard:home' %}" class="brand-link">
+            {% if site_settings.site_logo %}
+            <img src="{{ site_settings.site_logo.url }}" alt="Logo" class="brand-image">
+            {% else %}
+            <div class="brand-image d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold" style="background: var(--accent-color) !important;">TN</div>
+            {% endif %}
+            <div>
+                <span class="brand-text">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</span>
+                <span class="brand-subtitle">Admin Workspace</span>
+            </div>
+        </a>
+
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <nav>
+                <ul class="nav nav-sidebar flex-column">
+
+                    <!-- MAIN SECTION -->
+                    <li class="nav-header">MAIN</li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:home' %}" class="nav-link {% if active_page == 'home' %}active{% endif %}">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard Home</p>
+                            <span class="nav-icon"><i class="bi bi-grid-fill"></i></span>
+                            <p>Dashboard</p>
+                            <span class="badge badge-soft-primary">Live</span>
                         </a>
                     </li>
 
-                    <!-- NOTES header -->
-                    <li class="nav-header">NOTES</li>
+                    <!-- CONTENT SECTION -->
+                    <li class="nav-header">CONTENT MANAGEMENT</li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:notes' %}" class="nav-link {% if active_page == 'notes' %}active{% endif %}">
-                            <i class="nav-icon fas fa-book"></i>
-                            <p>All Notes</p>
+                            <span class="nav-icon"><i class="bi bi-journal-text"></i></span>
+                            <p>Study Notes</p>
                         </a>
                     </li>
-
-                    <!-- BLOG header -->
-                    <li class="nav-header">BLOG</li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:blogs' %}" class="nav-link {% if active_page == 'blogs' %}active{% endif %}">
-                            <i class="nav-icon fas fa-blog"></i>
-                            <p>All Blogs</p>
+                            <span class="nav-icon"><i class="bi bi-newspaper"></i></span>
+                            <p>Blog Articles</p>
                         </a>
                     </li>
-
-                    <!-- DOWNLOADS header -->
-                    <li class="nav-header">DOWNLOADS</li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:downloads' %}" class="nav-link {% if active_page == 'downloads' %}active{% endif %}">
-                            <i class="nav-icon fas fa-download"></i>
-                            <p>All Downloads</p>
+                            <span class="nav-icon"><i class="bi bi-download"></i></span>
+                            <p>Resource Downloads</p>
                         </a>
                     </li>
 
-                    <!-- QUIZ header -->
-                    <li class="nav-header">QUIZ</li>
+                    <!-- EXAM & MCQS SECTION -->
+                    <li class="nav-header">EXAMS &amp; MCQS</li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:quizzes' %}" class="nav-link {% if active_page == 'quizzes' %}active{% endif %}">
-                            <i class="nav-icon fas fa-brain"></i>
-                            <p>All Quizzes</p>
+                            <span class="nav-icon"><i class="bi bi-patch-question-fill"></i></span>
+                            <p>MCQ Quizzes</p>
                         </a>
                     </li>
 
-                    <!-- MANAGEMENT header -->
-                    <li class="nav-header">MANAGEMENT</li>
+                    <!-- TAXONOMY & ADS SECTION -->
+                    <li class="nav-header">STRUCTURE &amp; MONETIZATION</li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:categories' %}" class="nav-link {% if active_page == 'categories' %}active{% endif %}">
-                            <i class="nav-icon fas fa-folder"></i>
+                            <span class="nav-icon"><i class="bi bi-folder2"></i></span>
                             <p>Categories</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:tags' %}" class="nav-link {% if active_page == 'tags' %}active{% endif %}">
-                            <i class="nav-icon fas fa-tags"></i>
-                            <p>Tags</p>
+                            <span class="nav-icon"><i class="bi bi-tags"></i></span>
+                            <p>Topic Tags</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:ads' %}" class="nav-link {% if active_page == 'ads' %}active{% endif %}">
-                            <i class="nav-icon fas fa-ad"></i>
+                            <span class="nav-icon"><i class="bi bi-badge-ad-fill"></i></span>
                             <p>Ad Placements</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:messages' %}" class="nav-link {% if active_page == 'messages' %}active{% endif %}">
-                            <i class="nav-icon fas fa-envelope"></i>
-                            <p>
-                                Messages
-                                {% if unread_messages %}
-                                <span class="badge badge-danger right">{{ unread_messages }}</span>
-                                {% endif %}
-                            </p>
+                            <span class="nav-icon"><i class="bi bi-chat-dots-fill"></i></span>
+                            <p>Contact Inquiries</p>
+                            {% if unread_messages %}
+                            <span class="badge badge-danger">{{ unread_messages }}</span>
+                            {% endif %}
                         </a>
                     </li>
 
-                    <!-- SYSTEM header -->
-                    <li class="nav-header">SYSTEM</li>
+                    <!-- SYSTEM SECTION -->
+                    <li class="nav-header">SYSTEM &amp; CONTROLS</li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:settings' %}" class="nav-link {% if active_page == 'settings' %}active{% endif %}">
-                            <i class="nav-icon fas fa-cog"></i>
+                            <span class="nav-icon"><i class="bi bi-sliders"></i></span>
                             <p>Site Settings</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:analytics' %}" class="nav-link {% if active_page == 'analytics' %}active{% endif %}">
-                            <i class="nav-icon fas fa-chart-bar"></i>
-                            <p>Analytics</p>
+                            <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
+                            <p>Analytics Overview</p>
                         </a>
                     </li>
-
-                    <!-- Separator -->
-                    <li class="nav-item mt-2">
-                        <hr class="my-1" style="border-color: rgba(255,255,255,0.15);">
-                    </li>
-
-                    <!-- View Site -->
                     <li class="nav-item">
-                        <a href="/" class="nav-link" target="_blank" rel="noopener noreferrer">
-                            <i class="nav-icon fas fa-globe"></i>
-                            <p>View Site <i class="fas fa-external-link-alt fa-xs ml-1"></i></p>
+                        <a href="/admin/" class="nav-link" target="_blank" rel="noopener noreferrer">
+                            <span class="nav-icon"><i class="bi bi-shield-lock-fill"></i></span>
+                            <p>Django Admin</p>
+                            <i class="bi bi-box-arrow-up-right ml-auto text-muted" style="font-size: 0.65rem;"></i>
                         </a>
                     </li>
                 </ul>
             </nav>
-            <!-- /.sidebar-menu -->
+
+            <!-- Sidebar Footer Help Card -->
+            <a href="/" target="_blank" class="sidebar-help-card">
+                <span class="help-icon"><i class="bi bi-globe"></i></span>
+                <div class="flex-grow-1">
+                    <div>Public Site</div>
+                    <small class="text-muted">tulasinepali.com.np</small>
+                </div>
+                <i class="bi bi-arrow-up-right" style="font-size: 0.75rem;"></i>
+            </a>
         </div>
-        <!-- /.sidebar -->
     </aside>
 
-    <!-- Content Wrapper -->
+    <!-- Main Content Wrapper -->
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">{% block page_header %}Dashboard{% endblock %}</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            {% block breadcrumb %}
-                            <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Home</li>
-                            {% endblock %}
-                        </ol>
-                    </div>
-                </div>
+        <!-- Content Header / Breadcrumbs -->
+        <div class="fx-page-header">
+            <div>
+                <h1 class="page-title">{% block page_header %}Dashboard{% endblock %}</h1>
+                <p class="fx-subtitle mb-0">{% block page_subtitle %}Live management cockpit for Tulasi Nepali Learning Platform{% endblock %}</p>
+            </div>
+            <div class="page-header-actions">
+                {% block page_actions %}
+                <a href="/" target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-box-arrow-up-right mr-1"></i> View Live Site
+                </a>
+                {% endblock %}
             </div>
         </div>
-        <!-- /.content-header -->
 
-        <!-- Django Messages -->
+        <!-- Django Flash Messages -->
         {% if messages %}
-        <div class="container-fluid mt-2">
+        <div class="mb-3">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {% if message.tags == 'success' %}<i class="fas fa-check-circle mr-1"></i>
-                {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle mr-1"></i>
-                {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle mr-1"></i>
-                {% elif message.tags == 'info' %}<i class="fas fa-info-circle mr-1"></i>
-                {% elif message.tags == 'debug' %}<i class="fas fa-bug mr-1"></i>
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center" role="alert" style="border-left: 4px solid var(--accent-color) !important;">
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill text-success mr-2 font-weight-bold"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}<i class="bi bi-exclamation-octagon-fill text-danger mr-2"></i>
+                {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill text-warning mr-2"></i>
+                {% else %}<i class="bi bi-info-circle-fill text-info mr-2"></i>
                 {% endif %}
-                {{ message }}
+                <span class="flex-grow-1 font-weight-semibold" style="font-size: 0.88rem;">{{ message }}</span>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -312,34 +316,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </div>
         {% endif %}
 
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                {% block content %}{% endblock %}
-            </div>
-        </section>
-        <!-- /.content -->
+        <!-- Main Block Content -->
+        {% block content %}{% endblock %}
     </div>
-    <!-- /.content-wrapper -->
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <strong>Copyright &copy; 2024 <a href="/">Learning Platform</a>.</strong>
-        All rights reserved.
-        <div class="float-right d-none d-sm-inline-block">
-            <b>Version</b> 1.0.0
+    <!-- FlexAdmin Footer -->
+    <footer class="main-footer d-flex align-items-center justify-content-between flex-wrap">
+        <div>
+            &copy; 2026 <strong>{{ site_settings.owner_name|default:"Tulasi Nepali" }}</strong>. Personal Knowledge &amp; Examination Hub.
+        </div>
+        <div class="d-none d-sm-inline-block text-muted">
+            Designed in <span class="font-weight-bold" style="color: var(--accent-color);">FlexAdmin</span> Style
         </div>
     </footer>
-
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
 </div>
-<!-- ./wrapper -->
 
-<!-- REQUIRED SCRIPTS -->
+<!-- SCRIPTS -->
 <!-- jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
@@ -350,8 +342,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 {% block extra_scripts %}{% endblock %}
-
-<!-- Page-specific JavaScript block -->
 {% block javascript %}{% endblock %}
 </body>
 </html>
