@@ -323,37 +323,48 @@
     #scroll-top {
         display: none !important;
     }
+    /* Single Floating Submit Button: Centered on PC, Right-aligned on Mobile */
     .floating-submit-btn {
         position: fixed;
         bottom: 24px;
-        right: 24px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
         z-index: 1040;
         background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);
         color: #ffffff !important;
         border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 50px;
-        padding: 10px 22px;
-        font-size: 0.88rem;
+        padding: 10px 24px;
+        font-size: 0.9rem;
         font-weight: 600;
         font-family: 'Poppins', sans-serif;
         box-shadow: 0 8px 24px rgba(5, 89, 183, 0.4) !important;
-        transition: all 0.25s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        white-space: nowrap;
     }
     .floating-submit-btn:hover {
-        transform: translateY(-2px);
+        transform: translateX(-50%) translateY(-2px);
         box-shadow: 0 12px 28px rgba(5, 89, 183, 0.55) !important;
         background: linear-gradient(135deg, #044896 0%, #021e42 100%);
     }
-    @media (max-width: 576px) {
+
+    /* Mobile Devices: Place at the right side */
+    @media (max-width: 767.98px) {
         .floating-submit-btn {
-            bottom: 16px;
+            left: auto;
             right: 16px;
+            bottom: 16px;
+            transform: none;
             padding: 8px 18px;
             font-size: 0.82rem;
+        }
+        .floating-submit-btn:hover {
+            transform: translateY(-2px);
         }
     }
 </style>
