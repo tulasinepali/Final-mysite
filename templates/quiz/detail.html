@@ -218,11 +218,6 @@
                         </div>
                     </div>
 
-                    <!-- Sticky Sidebar Submit Button -->
-                    <button type="button" class="btn btn-explore rounded-pill w-100 py-2 mb-3 fw-semibold shadow-sm" onclick="openSubmitModal()" style="font-family: 'Poppins', sans-serif;">
-                        <i class="bi bi-send-fill me-2"></i>Submit Test (<span id="sidebar-answered-count">0</span>/{{ total_questions }})
-                    </button>
-
                     <!-- Sidebar Ad -->
                     {% if ads.sidebar %}
                     <div class="ad-container mb-4">
@@ -240,19 +235,10 @@
     </div>
 </section>
 
-<!-- Floating Quiz Action Bar (Safe, Always-Accessible Submit) -->
-<div id="floatingQuizDock" class="floating-quiz-dock" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1040;">
-    <div class="d-flex align-items-center gap-2 gap-sm-3 px-3 py-2 rounded-pill shadow-lg border" style="border-color: rgba(255,255,255,0.18) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(15, 23, 42, 0.92); box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;">
-        <div class="d-flex align-items-center gap-2 text-white">
-            <span class="badge rounded-pill bg-light text-dark px-2 py-1 small font-monospace">
-                <span id="floating-answered-count" class="fw-bold" style="color: #0559b7;">0</span>/{{ total_questions }} Answered
-            </span>
-        </div>
-        <button type="button" class="btn btn-explore btn-sm px-3 py-1 rounded-pill fw-semibold shadow-sm" onclick="openSubmitModal()" style="font-size: 0.85rem; font-family: 'Poppins', sans-serif;">
-            <i class="bi bi-send-fill me-1"></i> Submit Quiz
-        </button>
-    </div>
-</div>
+<!-- The Single Floating Submit Button (Safe, Fixed Bottom-Right) -->
+<button type="button" id="floatingQuizSubmitBtn" class="floating-submit-btn shadow-lg" onclick="openSubmitModal()">
+    <i class="bi bi-send-fill me-1"></i> Submit Quiz (<span id="floating-answered-count">0</span>/{{ total_questions }})
+</button>
 
 <!-- Submit Confirmation Modal (Safe Place) -->
 <div class="modal fade" id="submitConfirmModal" tabindex="-1" aria-labelledby="submitConfirmModalLabel" aria-hidden="true" style="z-index: 1060;">
@@ -351,20 +337,41 @@
         border-color: #0559b7 !important;
         box-shadow: 0 2px 6px rgba(5, 89, 183, 0.3);
     }
-    .floating-quiz-dock {
-        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    /* Hide scroll-to-top button on quiz page to ensure only ONE floating button exists */
+    #scroll-top {
+        display: none !important;
     }
-    .floating-quiz-dock:hover {
-        transform: translateX(-50%) translateY(-2px) !important;
+    .floating-submit-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1040;
+        background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 50px;
+        padding: 10px 22px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        box-shadow: 0 8px 24px rgba(5, 89, 183, 0.4) !important;
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    .floating-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(5, 89, 183, 0.55) !important;
+        background: linear-gradient(135deg, #044896 0%, #021e42 100%);
     }
     @media (max-width: 576px) {
-        .floating-quiz-dock {
-            width: 90%;
-            max-width: 360px;
-        }
-        .floating-quiz-dock > div {
-            width: 100%;
-            justify-content: space-between;
+        .floating-submit-btn {
+            bottom: 16px;
+            right: 16px;
+            padding: 8px 18px;
+            font-size: 0.82rem;
         }
     }
 </style>
