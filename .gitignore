@@ -19,9 +19,12 @@ stderr.log
 # Archives
 *.zip
 
-# Temporary files
+# Temporary & Backup files
 tmp/
 upload/
+*.cpanel_backup
+*.backup
+*_backup.zip
 
 # IDE
 .vscode/

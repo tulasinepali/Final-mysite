@@ -8,37 +8,98 @@
 {% block og_description %}{{ meta_description|default:"Access free study notes, practice MCQs, download educational materials, and read informative blogs." }}{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
+<!-- Hero Section: Modern Personal Authority & Learning Hub -->
 <section class="hero-section d-flex align-items-center">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h1 class="hero-title mb-3">{{ site_settings.hero_title|default:"Master Your Studies with Smart Learning" }}</h1>
-                <p class="hero-subtitle mb-4">{{ site_settings.hero_subtitle|default:"Access comprehensive study notes, practice MCQs, download resources, and stay updated with our educational blog — all in one place." }}</p>
+    <div class="container position-relative z-1">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7 text-center text-lg-start">
+                <div class="hero-badge mb-3 d-inline-flex">
+                    <span class="pulse-dot"></span>
+                    <span>Curated by {{ site_settings.owner_name|default:"Tulasi Nepali" }} &bull; Exam Prep Hub</span>
+                </div>
+                <h1 class="hero-title">
+                    Master Your Studies &amp; Exams with <span class="hero-title-highlight">Curated Learning</span>
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    High-yield MCQ practice tests, chapter-wise study notes, and syllabus PDFs for Computer Operator, Loksewa (लोक सेवा), and academic preparation &mdash; built for serious students.
+                </p>
                 <form class="hero-search mb-4" action="{% url 'search:search' %}" method="get" role="search">
                     <div class="input-group input-group-lg">
-                        <input type="search" name="q" class="form-control" placeholder="Search notes, topics, MCQs..." aria-label="Search the platform">
+                        <input type="search" name="q" class="form-control" placeholder="Search Computer Operator, Loksewa, MCQs..." aria-label="Search the platform">
                         <button class="btn btn-primary" type="submit"><i class="fas fa-search me-2"></i>Search</button>
                     </div>
                 </form>
-                <div class="hero-quick-links d-flex flex-wrap gap-2">
-                    <a href="{% url 'notes:list' %}" class="btn btn-light btn-lg hero-quick-btn">
-                        <i class="fas fa-book text-primary me-2"></i>Notes
+                <div class="d-flex align-items-center justify-content-center justify-content-lg-start flex-wrap gap-2 pt-1">
+                    <span class="text-white-50 small me-1"><i class="fas fa-bolt text-warning me-1"></i>Quick Links:</span>
+                    <a href="{% url 'notes:list' %}" class="btn hero-quick-btn">
+                        <i class="fas fa-book-open text-primary me-1"></i>Study Notes
                     </a>
-                    <a href="{% url 'quiz:list' %}" class="btn btn-light btn-lg hero-quick-btn">
-                        <i class="fas fa-brain text-success me-2"></i>MCQ Practice
+                    <a href="{% url 'quiz:list' %}" class="btn hero-quick-btn">
+                        <i class="fas fa-brain text-success me-1"></i>MCQ Practice
                     </a>
-                    <a href="{% url 'downloads:list' %}" class="btn btn-light btn-lg hero-quick-btn">
-                        <i class="fas fa-download text-warning me-2"></i>Downloads
+                    <a href="{% url 'downloads:list' %}" class="btn hero-quick-btn">
+                        <i class="fas fa-file-download text-warning me-1"></i>Downloads
                     </a>
-                    <a href="{% url 'blog:list' %}" class="btn btn-light btn-lg hero-quick-btn">
-                        <i class="fas fa-blog text-info me-2"></i>Blog
+                    <a href="{% url 'blog:list' %}" class="btn hero-quick-btn">
+                        <i class="fas fa-newspaper text-info me-1"></i>Blog
                     </a>
                 </div>
             </div>
-            <div class="col-lg-5 d-none d-lg-block text-center">
-                <div class="hero-illustration">
-                    <i class="fas fa-graduation-cap"></i>
+
+            <!-- Interactive Hero Preview Card -->
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-card-container">
+                    <div class="floating-badge floating-badge-1">
+                        <i class="fas fa-check-circle text-success fa-lg"></i>
+                        <span>5,000+ Practice MCQs</span>
+                    </div>
+                    
+                    <div class="hero-preview-card">
+                        <div class="hero-card-header">
+                            <div class="d-flex align-items-center">
+                                {% if site_settings.owner_image %}
+                                <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name }}" class="tutor-avatar me-2">
+                                {% else %}
+                                <div class="tutor-avatar bg-primary text-white d-flex align-items-center justify-content-center fw-bold me-2">TN</div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-bold small text-white">{{ site_settings.owner_name|default:"Tulasi Nepali" }}</div>
+                                    <div class="text-white-50" style="font-size: 0.72rem;">Verified Educator &bull; 5+ Yrs</div>
+                                </div>
+                            </div>
+                            <span class="tutor-badge"><i class="fas fa-shield-alt me-1"></i>Verified</span>
+                        </div>
+
+                        <div class="hero-question-box">
+                            <div class="d-flex justify-content-between text-white-50 mb-1" style="font-size: 0.75rem;">
+                                <span><i class="fas fa-laptop-code text-info me-1"></i>Computer Operator Practice</span>
+                                <span class="text-success"><i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>Live Test</span>
+                            </div>
+                            <p class="small text-white fw-semibold mb-2">Q: Which shortcut key is used to duplicate the selected slide in PowerPoint?</p>
+                            <div class="hero-option-chip">
+                                <span>A. Ctrl + M</span>
+                                <span class="text-white-50" style="font-size: 0.7rem;">New Slide</span>
+                            </div>
+                            <div class="hero-option-chip correct">
+                                <span><i class="fas fa-check-circle me-1 text-success"></i>B. Ctrl + D</span>
+                                <span class="badge bg-success bg-opacity-75 text-white" style="font-size: 0.7rem;">94% Correct</span>
+                            </div>
+                            <div class="hero-option-chip mb-0">
+                                <span>C. Ctrl + Shift + N</span>
+                                <span class="text-white-50" style="font-size: 0.7rem;">Invalid</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-1" style="font-size: 0.78rem;">
+                            <span class="text-white-50"><i class="fas fa-user-graduate me-1 text-warning"></i>10,000+ students practiced</span>
+                            <a href="{% url 'quiz:list' %}" class="text-info text-decoration-none fw-semibold">Try Full Quiz <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="floating-badge floating-badge-2">
+                        <i class="fas fa-download text-warning fa-lg"></i>
+                        <span>Free Syllabus &amp; Past Papers</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -321,7 +382,7 @@
             <div class="col-6 col-md-3">
                 <div class="stat-item">
                     <i class="fas fa-users fa-2x mb-3 opacity-75"></i>
-                    <div class="stat-number h2 fw-bold mb-0" data-count="{{ stats.total_users|default:'0' }}">0</div>
+                    <div class="stat-number h2 fw-bold mb-0" data-count="{{ visitor_count|default:"0" }}">0</div>
                     <div class="stat-label small opacity-75">Happy Students</div>
                 </div>
             </div>
@@ -329,41 +390,59 @@
     </div>
 </section>
 
-<!-- About / Mission Section -->
-<section class="py-5">
+<!-- About / Educator Spotlight Section -->
+<section class="py-5 bg-white">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <div class="about-illustration text-center">
-                    <div class="bg-primary bg-opacity-10 rounded-4 p-5 d-inline-block">
-                        <i class="fas fa-chalkboard-teacher fa-5x text-primary"></i>
+            <div class="col-lg-5 text-center">
+                <div class="author-photo-wrapper">
+                    {% if site_settings.owner_image %}
+                    <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name|default:'Tulasi Nepali' }}" class="author-photo">
+                    {% else %}
+                    <div class="author-photo bg-primary text-white d-flex align-items-center justify-content-center fw-bold h1 mb-0" style="margin: 0 auto;">TN</div>
+                    {% endif %}
+                    <div class="author-verified-tag">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verified Educator</span>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <h2 class="fw-bold mb-3">About {{ site_settings.site_name|default:"Learning Platform" }}</h2>
-                <p class="text-muted mb-4">{{ site_settings.about_summary|default:"We are dedicated to providing quality educational resources that help students achieve their academic goals. Our platform offers comprehensive study notes, MCQ practice sessions, downloadable resources, and insightful blog articles — all designed to make learning effective and enjoyable." }}</p>
+            <div class="col-lg-7">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold mb-2">
+                    <i class="fas fa-user-tie me-1"></i>Meet Your Instructor
+                </span>
+                <h2 class="fw-bold mb-3">Hi, I'm {{ site_settings.owner_name|default:"Tulasi Nepali" }}</h2>
+                <div class="text-muted mb-4 lead" style="font-size: 1.05rem;">
+                    {{ site_settings.owner_bio|safe|default:"Passionate educator with over 5 years of experience in teaching and content creation. Dedicated to making quality education accessible to all students preparing for Loksewa, Computer Operator, and academic exams." }}
+                </div>
                 <div class="row g-3 mb-4">
                     <div class="col-sm-6">
-                        <div class="d-flex align-items-start">
-                            <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                        <div class="d-flex align-items-start p-3 rounded-3 bg-light">
+                            <i class="fas fa-bullseye text-primary fa-lg me-3 mt-1"></i>
                             <div>
                                 <h3 class="h6 fw-bold mb-1">Our Mission</h3>
-                                <small class="text-muted">To make quality education accessible to every student, anywhere.</small>
+                                <small class="text-muted">{{ site_settings.mission|default:"To make quality, exam-ready education accessible and affordable to every student." }}</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="d-flex align-items-start">
-                            <i class="fas fa-eye text-primary me-2 mt-1"></i>
+                        <div class="d-flex align-items-start p-3 rounded-3 bg-light">
+                            <i class="fas fa-award text-warning fa-lg me-3 mt-1"></i>
                             <div>
                                 <h3 class="h6 fw-bold mb-1">Our Vision</h3>
-                                <small class="text-muted">To become the go-to platform for exam preparation and self-learning.</small>
+                                <small class="text-muted">{{ site_settings.vision|default:"To become Nepal's premier personal learning platform for competitive exam mastery." }}</small>
                             </div>
                         </div>
                     </div>
                 </div>
-                <a href="{% url 'core:about' %}" class="btn btn-primary"><i class="fas fa-arrow-right me-2"></i>Learn More About Us</a>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'core:about' %}" class="btn btn-primary px-4 py-2 rounded-pill">
+                        <i class="fas fa-id-card me-2"></i>Full Biography &amp; Story
+                    </a>
+                    <a href="{% url 'notes:list' %}" class="btn btn-outline-primary px-4 py-2 rounded-pill">
+                        <i class="fas fa-book-reader me-2"></i>Explore My Notes
+                    </a>
+                </div>
             </div>
         </div>
     </div>

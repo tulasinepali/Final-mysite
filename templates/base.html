@@ -3,6 +3,9 @@
 <html lang="en">
 <head>
     <meta name="google-adsense-account" content="ca-pub-3956705237421931">
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
     <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -60,8 +63,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
@@ -72,9 +77,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
-        "name": "{{ site_settings.site_name|default:'Learning Platform' }}",
+        "name": "{{ site_settings.site_name|default:'Tulasi Nepali - Learning Platform' }}",
         "url": "{{ request.scheme }}://{{ request.get_host }}",
-        "description": "{{ meta_description|default:'An educational platform for students to learn, practice MCQs, and download study materials.' }}"
+        "description": "{{ meta_description|default:'An educational platform curated by Tulasi Nepali for students to learn, practice MCQs, and download exam preparation materials.' }}"
         {% if site_settings.contact_email %},"email": "{{ site_settings.contact_email }}"{% endif %}
         {% if site_settings.address %},"address": "{{ site_settings.address }}"{% endif %}
     }
@@ -90,42 +95,63 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="readingProgress" class="reading-progress-bar"></div>
 
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'core:home' %}">
-                <img src="{{ site_settings.site_logo.url }}" alt="Logo" class="me-2" style="height: 42px;">
-                <span class="text-primary">{{ site_settings.site_name|default:"Learning Platform" }}</span>
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
+                {% if site_settings.site_logo %}
+                <img src="{{ site_settings.site_logo.url }}" alt="Logo" class="site-logo me-2 rounded-2" style="height: 40px; width: auto; max-width: 140px; object-fit: contain;">
+                {% else %}
+                <div class="brand-avatar me-2 d-flex align-items-center justify-content-center bg-primary text-white fw-bold rounded-3" style="width: 38px; height: 38px; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);">TN</div>
+                {% endif %}
+                <div class="brand-text d-flex flex-column text-start">
+                    <span class="brand-name fw-bolder text-dark lh-1" style="font-size: 1.15rem; letter-spacing: -0.3px;">{{ site_settings.owner_name|default:site_settings.site_name|default:"Tulasi Nepali" }}</span>
+                    <span class="brand-sub text-primary fw-semibold mt-1" style="font-size: 0.72rem; letter-spacing: 0.5px; text-transform: uppercase;">Learning Platform</span>
+                </div>
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:home' %}"><i class="fas fa-home me-1"></i> Home</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
+                            <i class="fas fa-home me-1 text-primary"></i> Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'notes:list' %}"><i class="fas fa-book me-1"></i> Notes</a>
+                        <a class="nav-link {% if 'notes' in request.resolver_match.app_names %}active{% endif %}" href="{% url 'notes:list' %}">
+                            <i class="fas fa-book-open me-1 text-primary"></i> Notes
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'blog:list' %}"><i class="fas fa-blog me-1"></i> Blog</a>
+                        <a class="nav-link {% if 'quiz' in request.resolver_match.app_names %}active{% endif %}" href="{% url 'quiz:list' %}">
+                            <i class="fas fa-brain me-1 text-success"></i> MCQ Practice
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'downloads:list' %}"><i class="fas fa-download me-1"></i> Downloads</a>
+                        <a class="nav-link {% if 'downloads' in request.resolver_match.app_names %}active{% endif %}" href="{% url 'downloads:list' %}">
+                            <i class="fas fa-file-download me-1 text-warning"></i> Downloads
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'quiz:list' %}"><i class="fas fa-brain me-1"></i> MCQ Practice</a>
+                        <a class="nav-link {% if 'blog' in request.resolver_match.app_names %}active{% endif %}" href="{% url 'blog:list' %}">
+                            <i class="fas fa-newspaper me-1 text-info"></i> Blog
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:about' %}"><i class="fas fa-info-circle me-1"></i> About</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">
+                            <i class="fas fa-user-circle me-1 text-secondary"></i> About
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:contact' %}"><i class="fas fa-envelope me-1"></i> Contact</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'core:contact' %}">
+                            <i class="fas fa-envelope me-1 text-secondary"></i> Contact
+                        </a>
                     </li>
                 </ul>
                 <form class="d-flex navbar-search" action="{% url 'search:search' %}" method="get" role="search">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Search notes, blogs..." aria-label="Search">
-                    <button class="btn btn-outline-primary" type="submit" aria-label="Submit search"><i class="fas fa-search"></i></button>
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search notes, MCQs, blogs..." aria-label="Search">
+                    <button class="btn btn-primary" type="submit" aria-label="Submit search"><i class="fas fa-search"></i></button>
                 </form>
             </div>
         </div>
@@ -165,8 +191,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <h2 class="text-white h5 mb-3"><img src="{{ site_settings.site_logo.url }}" alt="Logo" class="me-2" style="height: 24px;">{{ site_settings.site_name|default:"Learning Platform" }}</h2>
-                    <p class="text-secondary">{{ site_settings.site_description|striptags|default:"An educational platform for students to learn, practice MCQs, and download study materials." }}</p>
+                    <h2 class="text-white h5 mb-3 d-flex align-items-center">
+                        {% if site_settings.site_logo %}
+                        <img src="{{ site_settings.site_logo.url }}" alt="Logo" class="me-2 rounded-1" style="height: 28px; width: auto; object-fit: contain;">
+                        {% else %}
+                        <span class="badge bg-primary me-2">TN</span>
+                        {% endif %}
+                        <span>{{ site_settings.owner_name|default:site_settings.site_name|default:"Tulasi Nepali" }}</span>
+                    </h2>
+                    <p class="text-secondary small">{{ site_settings.site_description|striptags|default:"A premier educational hub curated by Tulasi Nepali for students to learn, practice MCQs, and download Loksewa, Computer Operator, and academic materials." }}</p>
                     <div class="social-links mt-3">
                         {% if site_settings.facebook_url %}
                         <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" class="text-secondary me-3" aria-label="Facebook"><i class="fab fa-facebook-f fa-lg"></i></a>
