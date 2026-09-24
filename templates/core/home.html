@@ -323,47 +323,7 @@
                 </div>
                 {% endif %}
 
-                <!-- Trending Blogs -->
-                <div class="mb-5">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h2 class="h4 fw-bold mb-1"><i class="bi bi-newspaper text-info me-2"></i>Exam Tips &amp; Insights</h2>
-                            <small class="text-muted">Guidance to sharpen your examination readiness</small>
-                        </div>
-                        <a href="{% url 'blog:list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All <i class="bi bi-chevron-right ms-1"></i></a>
-                    </div>
-
-                    <div class="row g-3">
-                        {% for post in trending_blogs|slice:":3" %}
-                        <div class="col-md-4">
-                            <div class="catalog-card h-100">
-                                {% if post.featured_image %}
-                                <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy" style="height:140px;object-fit:cover;">
-                                {% else %}
-                                <div class="bg-light d-flex align-items-center justify-content-center" style="height:140px;">
-                                    <i class="bi bi-newspaper fs-2 text-primary opacity-50"></i>
-                                </div>
-                                {% endif %}
-                                <div class="card-body">
-                                    <span class="badge bg-light text-dark border px-2 py-1 mb-2 small">{{ post.category.name }}</span>
-                                    <h3 class="h6 fw-bold mb-2">
-                                        <a href="{{ post.get_absolute_url }}" class="text-dark">{{ post.title }}</a>
-                                    </h3>
-                                    <div class="mt-auto small text-muted">
-                                        <i class="bi bi-clock me-1"></i>{{ post.created_at|date:"M d, Y" }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% empty %}
-                        <div class="col-12">
-                            <div class="alert alert-light border">New blog articles coming soon.</div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Popular Downloads -->
+                <!-- Popular Downloads (Directly beside Recent Quizzes & Topics) -->
                 <div>
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
@@ -396,7 +356,7 @@
                 </div>
             </div>
 
-            <!-- Right Sidebar -->
+            <!-- Right Sidebar: Recent Practice Tests & Browse Topics (Equal Height) -->
             <div class="col-lg-4">
                 <!-- Sidebar Top Ad -->
                 {% if ads.home_sidebar %}
@@ -407,19 +367,19 @@
                 </div>
                 {% endif %}
 
-                <!-- Recent Quizzes Widget (Compact Height) -->
-                <div class="catalog-card mb-3">
-                    <div class="py-2 px-3 border-bottom d-flex align-items-center justify-content-between">
+                <!-- Recent Quizzes Widget (Equal Height) -->
+                <div class="catalog-card mb-3 d-flex flex-column" style="height: 215px;">
+                    <div class="py-2 px-3 border-bottom d-flex align-items-center justify-content-between flex-shrink-0" style="height: 38px;">
                         <h2 class="h6 fw-bold mb-0 text-dark" style="font-size: 0.9rem;"><i class="bi bi-patch-question text-success me-2"></i>Recent Practice Tests</h2>
                         <a href="{% url 'quiz:list' %}" class="small text-primary fw-semibold" style="font-size: 0.78rem;">All Tests</a>
                     </div>
-                    <div class="list-group list-group-flush">
+                    <div class="list-group list-group-flush flex-grow-1 d-flex flex-column justify-content-between">
                         {% for quiz in recent_quizzes|slice:":3" %}
-                        <a href="{{ quiz.get_absolute_url }}" class="list-group-item list-group-item-action py-2 px-3">
-                            <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ quiz.get_absolute_url }}" class="list-group-item list-group-item-action py-2 px-3 flex-grow-1 d-flex align-items-center">
+                            <div class="d-flex justify-content-between align-items-center w-100">
                                 <div class="me-2 text-truncate">
-                                    <div class="fw-semibold text-dark text-truncate" style="font-size: 0.84rem;">{{ quiz.title }}</div>
-                                    <small class="text-muted d-block" style="font-size: 0.73rem;">{{ quiz.question_count }} Qs &bull; {{ quiz.get_difficulty_display }}</small>
+                                    <div class="fw-semibold text-dark text-truncate" style="font-size: 0.83rem;">{{ quiz.title }}</div>
+                                    <small class="text-muted d-block" style="font-size: 0.72rem;">{{ quiz.question_count }} Qs &bull; {{ quiz.get_difficulty_display }}</small>
                                 </div>
                                 <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 flex-shrink-0" style="font-size: 0.72rem;">
                                     Start <i class="bi bi-play-fill"></i>
@@ -427,33 +387,33 @@
                             </div>
                         </a>
                         {% empty %}
-                        <div class="list-group-item text-center text-muted small py-2">Quizzes coming soon.</div>
+                        <div class="list-group-item text-center text-muted small py-3 my-auto">Quizzes coming soon.</div>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- Browse Topics Widget (Under Recent Practice Tests - 3 Points in Row 3 Column 3) -->
-                <div class="catalog-card mb-3">
-                    <div class="py-2 px-3 border-bottom d-flex align-items-center justify-content-between">
+                <!-- Browse Topics Widget (Equal Height - 3 Points in Row 3 Column 3) -->
+                <div class="catalog-card mb-3 d-flex flex-column" style="height: 215px;">
+                    <div class="py-2 px-3 border-bottom d-flex align-items-center justify-content-between flex-shrink-0" style="height: 38px;">
                         <h2 class="h6 fw-bold mb-0 text-dark" style="font-size: 0.9rem;"><i class="bi bi-grid text-primary me-2"></i>Browse Topics</h2>
                         <a href="{% url 'notes:list' %}" class="small text-primary fw-semibold" style="font-size: 0.78rem;">All Topics</a>
                     </div>
-                    <div class="p-2">
-                        <div class="row g-2">
+                    <div class="p-3 flex-grow-1 d-flex align-items-center">
+                        <div class="row g-2 w-100 h-100 align-items-stretch">
                             {% for cat in notes_categories|slice:":3" %}
                             <div class="col-4">
-                                <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="d-flex flex-column align-items-center justify-content-center p-2 rounded-2 border bg-light text-decoration-none text-center h-100" style="transition: all 0.2s ease;">
-                                    <i class="bi bi-folder2-open text-primary mb-1" style="font-size: 1.1rem;"></i>
-                                    <span class="fw-semibold text-dark text-truncate w-100" style="font-size: 0.72rem;" title="{{ cat.name }}">{{ cat.name }}</span>
+                                <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="d-flex flex-column align-items-center justify-content-center p-2 rounded-2 border bg-light text-decoration-none text-center h-100 w-100" style="transition: all 0.2s ease;">
+                                    <i class="bi bi-folder2-open text-primary mb-2 fs-4"></i>
+                                    <span class="fw-semibold text-dark text-truncate w-100 d-block" style="font-size: 0.75rem;" title="{{ cat.name }}">{{ cat.name }}</span>
+                                    <span class="badge bg-white text-muted border rounded-pill mt-1" style="font-size: 0.65rem;">Explore</span>
                                 </a>
                             </div>
                             {% empty %}
-                            <div class="col-12 text-center text-muted small py-2">Categories coming soon</div>
+                            <div class="col-12 text-center text-muted small my-auto">Categories coming soon</div>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
-
 
                 <!-- Sidebar Bottom Ad -->
                 {% if ads.home_sidebar_bottom %}
@@ -463,6 +423,48 @@
                     </div>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- Trending Blogs / Exam Tips & Insights (Full Width, Stays Above Empowering Aspirants) -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="h4 fw-bold mb-1"><i class="bi bi-newspaper text-info me-2"></i>Exam Tips &amp; Insights</h2>
+                        <small class="text-muted">Guidance to sharpen your examination readiness</small>
+                    </div>
+                    <a href="{% url 'blog:list' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All <i class="bi bi-chevron-right ms-1"></i></a>
+                </div>
+
+                <div class="row g-3">
+                    {% for post in trending_blogs|slice:":3" %}
+                    <div class="col-md-4">
+                        <div class="catalog-card h-100">
+                            {% if post.featured_image %}
+                            <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}" loading="lazy" style="height:140px;object-fit:cover;">
+                            {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height:140px;">
+                                <i class="bi bi-newspaper fs-2 text-primary opacity-50"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <span class="badge bg-light text-dark border px-2 py-1 mb-2 small">{{ post.category.name }}</span>
+                                <h3 class="h6 fw-bold mb-2">
+                                    <a href="{{ post.get_absolute_url }}" class="text-dark">{{ post.title }}</a>
+                                </h3>
+                                <div class="mt-auto small text-muted">
+                                    <i class="bi bi-clock me-1"></i>{{ post.created_at|date:"M d, Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-light border">New blog articles coming soon.</div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
