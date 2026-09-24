@@ -6,11 +6,13 @@ from django.db.models.functions import TruncDate
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 import json
+import csv
 from django.utils.safestring import mark_safe
 import openpyxl
 from openpyxl import Workbook
 
-from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement
+from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber
+from core.emails import send_broadcast_to_subscribers
 from notes.models import Note
 from blog.models import BlogPost
 from downloads.models import Download
@@ -18,6 +20,7 @@ from quiz.models import Quiz, Question, QuizAttempt
 from .forms import (
     SiteSettingsForm, CategoryForm, TagForm, NoteForm, BlogPostForm,
     DownloadForm, QuizForm, QuestionForm, AdPlacementForm, QuestionImportForm,
+    BroadcastEmailForm,
 )
 
 
@@ -31,6 +34,7 @@ def dashboard_home(request):
     total_quizzes = Quiz.objects.count()
     total_questions = Question.objects.count()
     total_quiz_attempts = QuizAttempt.objects.count()
+    total_subscribers = Subscriber.objects.filter(is_active=True).count()
     unread_messages = ContactMessage.objects.filter(is_read=False).count()
     total_views = Note.objects.aggregate(total=Sum('views'))['total'] or 0
     total_blog_views = BlogPost.objects.aggregate(total=Sum('views'))['total'] or 0
@@ -64,6 +68,7 @@ def dashboard_home(request):
         'total_notes': total_notes, 'total_blogs': total_blogs,
         'total_downloads': total_downloads, 'total_quizzes': total_quizzes,
         'total_questions': total_questions, 'total_quiz_attempts': total_quiz_attempts,
+        'total_subscribers': total_subscribers,
         'unread_messages': unread_messages, 'total_views': total_views,
         'total_blog_views': total_blog_views, 'total_download_count': total_download_count,
         'recent_notes': recent_notes, 'recent_blogs': recent_blogs,
@@ -792,6 +797,189 @@ def dashboard_settings(request):
         form = SiteSettingsForm(instance=settings)
     context = {'form': form, 'active_page': 'settings', 'action': 'Edit', 'model_name': 'Site Settings'}
     return render(request, 'dashboard/settings_form.html', context)
+
+
+# ========== SUBSCRIBERS & BROADCAST ==========
+
+@staff_member_required
+def dashboard_subscribers(request):
+    subscribers = Subscriber.objects.all()
+    status_filter = request.GET.get('status')
+    if status_filter == 'active':
+        subscribers = subscribers.filter(is_active=True)
+    elif status_filter == 'inactive':
+        subscribers = subscribers.filter(is_active=False)
+
+    search = request.GET.get('q')
+    if search:
+        subscribers = subscribers.filter(email__icontains=search.strip())
+
+    total_count = Subscriber.objects.count()
+    active_count = Subscriber.objects.filter(is_active=True).count()
+    inactive_count = total_count - active_count
+
+    paginator = Paginator(subscribers.order_by('-created_at'), 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj,
+        'total_count': total_count,
+        'active_count': active_count,
+        'inactive_count': inactive_count,
+        'active_page': 'subscribers',
+        'status_filter': status_filter,
+        'search_query': search or '',
+    }
+    return render(request, 'dashboard/subscribers_list.html', context)
+
+
+@staff_member_required
+def subscriber_toggle_active(request, pk):
+    sub = get_object_or_404(Subscriber, pk=pk)
+    if request.method == 'POST':
+        sub.is_active = not sub.is_active
+        sub.save(update_fields=['is_active'])
+        status_label = "activated" if sub.is_active else "deactivated"
+        messages.success(request, f"Subscriber {sub.email} has been {status_label}.")
+    return redirect('dashboard:subscribers')
+
+
+@staff_member_required
+def subscriber_delete(request, pk):
+    sub = get_object_or_404(Subscriber, pk=pk)
+    if request.method == 'POST':
+        email = sub.email
+        sub.delete()
+        messages.success(request, f"Subscriber {email} removed successfully.")
+    return redirect('dashboard:subscribers')
+
+
+@staff_member_required
+def subscriber_export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="subscribers_export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Email', 'Status', 'Date Subscribed', 'Subscription Source'])
+
+    for sub in Subscriber.objects.all().order_by('-created_at'):
+        status = 'Active' if sub.is_active else 'Inactive'
+        date_str = sub.created_at.strftime('%Y-%m-%d %H:%M:%S') if sub.created_at else ''
+        writer.writerow([sub.email, status, date_str, sub.source])
+
+    return response
+
+
+@staff_member_required
+def dashboard_broadcast_email(request):
+    site_settings = SiteSettings.objects.first()
+    active_count = Subscriber.objects.filter(is_active=True).count()
+
+    prefill_type = request.GET.get('prefill_type')
+    prefill_id = request.GET.get('prefill_id')
+    initial_data = {}
+
+    if prefill_type and prefill_id:
+        try:
+            if prefill_type == 'quiz':
+                q = Quiz.objects.get(pk=prefill_id)
+                initial_data = {
+                    'subject': f"[{site_settings.site_name if site_settings else 'Platform'}] 🚀 New Quiz: {q.title}",
+                    'headline': f"Practice Test: {q.title}",
+                    'body_content': f"<p>Hello Learner,</p><p>A brand new practice quiz is now live! Test your preparation with our timed exam simulator and detailed answer keys.</p><p><strong>Category:</strong> {q.category.name if q.category else 'General'}</p>",
+                    'cta_text': "Start Practice Quiz Now",
+                    'cta_url': request.build_absolute_uri(q.get_absolute_url()),
+                }
+            elif prefill_type == 'note':
+                n = Note.objects.get(pk=prefill_id)
+                initial_data = {
+                    'subject': f"[{site_settings.site_name if site_settings else 'Platform'}] 📚 New Study Note: {n.title}",
+                    'headline': f"Study Guide: {n.title}",
+                    'body_content': f"<p>Hello Learner,</p><p>{n.summary or 'A comprehensive new study note has been published.'}</p><p>Explore key definitions, syllabus highlights, and expert revision notes.</p>",
+                    'cta_text': "Read Complete Study Note",
+                    'cta_url': request.build_absolute_uri(n.get_absolute_url()),
+                }
+            elif prefill_type == 'blog':
+                b = BlogPost.objects.get(pk=prefill_id)
+                initial_data = {
+                    'subject': f"[{site_settings.site_name if site_settings else 'Platform'}] 📝 New Article: {b.title}",
+                    'headline': f"Article: {b.title}",
+                    'body_content': f"<p>Hello Learner,</p><p>{b.summary or 'A fresh article has been published on our platform.'}</p><p>Read the complete guide for valuable tips and insights.</p>",
+                    'cta_text': "Read Full Article",
+                    'cta_url': request.build_absolute_uri(b.get_absolute_url()),
+                }
+            elif prefill_type == 'download':
+                d = Download.objects.get(pk=prefill_id)
+                initial_data = {
+                    'subject': f"[{site_settings.site_name if site_settings else 'Platform'}] 📥 New Resource: {d.title}",
+                    'headline': f"Download: {d.title}",
+                    'body_content': f"<p>Hello Learner,</p><p>A new free resource file ({d.file_type.upper()}) is ready for download: <strong>{d.title}</strong>.</p><p>{d.summary or d.description or 'Download it from our resource library.'}</p>",
+                    'cta_text': "Download PDF Resource",
+                    'cta_url': request.build_absolute_uri(d.get_absolute_url()),
+                }
+        except Exception:
+            pass
+
+    if request.method == 'POST':
+        form = BroadcastEmailForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            headline = form.cleaned_data.get('headline') or subject
+            body_content = form.cleaned_data['body_content']
+            cta_text = form.cleaned_data.get('cta_text')
+            cta_url = form.cleaned_data.get('cta_url')
+            send_test_only = form.cleaned_data.get('send_test_only')
+            test_email = form.cleaned_data.get('test_email')
+
+            if send_test_only:
+                recipients = [test_email]
+                success, sent_count, err_msg = send_broadcast_to_subscribers(
+                    subject=f"[PREVIEW TEST] {subject}",
+                    headline=headline,
+                    body_html=body_content,
+                    cta_text=cta_text,
+                    cta_url=cta_url,
+                    recipient_list=recipients
+                )
+                if success:
+                    messages.success(request, f"Test email successfully sent to {test_email}! Verify your inbox, then uncheck 'Send Test' to blast to all subscribers.")
+                else:
+                    messages.error(request, f"Failed to send test email: {err_msg}")
+            else:
+                if active_count == 0:
+                    messages.warning(request, "There are currently 0 active subscribers to send to.")
+                else:
+                    success, sent_count, err_msg = send_broadcast_to_subscribers(
+                        subject=subject,
+                        headline=headline,
+                        body_html=body_content,
+                        cta_text=cta_text,
+                        cta_url=cta_url,
+                    )
+                    if success:
+                        messages.success(request, f"🎉 Email successfully dispatched to {sent_count} active subscriber(s)!")
+                        return redirect('dashboard:subscribers')
+                    else:
+                        messages.error(request, f"Dispatch encountered an error: {err_msg}")
+    else:
+        form = BroadcastEmailForm(initial=initial_data)
+
+    recent_notes = Note.objects.filter(is_published=True).order_by('-created_at')[:4]
+    recent_quizzes = Quiz.objects.filter(is_published=True).order_by('-created_at')[:4]
+    recent_blogs = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:4]
+    recent_downloads = Download.objects.filter(is_published=True).order_by('-created_at')[:4]
+
+    context = {
+        'form': form,
+        'active_count': active_count,
+        'site_settings': site_settings,
+        'active_page': 'broadcast',
+        'recent_notes': recent_notes,
+        'recent_quizzes': recent_quizzes,
+        'recent_blogs': recent_blogs,
+        'recent_downloads': recent_downloads,
+    }
+    return render(request, 'dashboard/broadcast_email.html', context)
 
 
 # ========== AD PLACEMENTS CRUD ==========

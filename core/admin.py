@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SiteSettings, Category, Tag, ContactMessage, AdPlacement
+from .models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber
 
 
 @admin.register(SiteSettings)
@@ -27,6 +27,13 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         ('Web Push Notifications', {
             'fields': ('enable_web_push', 'onesignal_app_id', 'onesignal_rest_api_key', 'auto_push_on_quiz', 'auto_push_on_blog'),
             'description': 'Configure browser push notifications for visitors when new quizzes or blog posts are published.'
+        }),
+        ('Email & Subscriber Notifications', {
+            'fields': (
+                'sender_email', 'email_host', 'email_port', 'email_host_user', 'email_host_password', 'email_use_tls',
+                'auto_email_on_quiz', 'auto_email_on_note', 'auto_email_on_blog', 'auto_email_on_download'
+            ),
+            'description': 'Configure SMTP credentials and auto-notification triggers for email subscribers.'
         }),
     )
 
@@ -77,3 +84,22 @@ class AdPlacementAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'placement']
     list_editable = ['is_active']
     search_fields = ['name']
+
+
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ['email', 'is_active', 'source', 'created_at']
+    list_filter = ['is_active', 'source', 'created_at']
+    list_editable = ['is_active']
+    search_fields = ['email']
+    ordering = ['-created_at']
+    actions = ['activate_subscribers', 'deactivate_subscribers']
+
+    def activate_subscribers(self, request, queryset):
+        queryset.update(is_active=True)
+    activate_subscribers.short_description = "Mark selected subscribers as active"
+
+    def deactivate_subscribers(self, request, queryset):
+        queryset.update(is_active=False)
+    deactivate_subscribers.short_description = "Mark selected subscribers as inactive"
+

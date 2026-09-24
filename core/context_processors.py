@@ -1,10 +1,16 @@
-from .models import SiteSettings, Category, AdPlacement, VisitorCount
+from .models import SiteSettings, Category, AdPlacement, VisitorCount, Subscriber
 
 
 def site_settings(request):
     """Make site settings available in all templates."""
     settings, _ = SiteSettings.objects.get_or_create(pk=1)
-    return {'site_settings': settings}
+    sub_count = 0
+    if request.user.is_authenticated and request.user.is_staff:
+        try:
+            sub_count = Subscriber.objects.filter(is_active=True).count()
+        except Exception:
+            sub_count = 0
+    return {'site_settings': settings, 'total_subscribers': sub_count}
 
 
 def global_categories(request):

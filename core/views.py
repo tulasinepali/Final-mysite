@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Count, Sum
-from core.models import SiteSettings, ContactMessage
+from django.http import JsonResponse
+from django.contrib import messages
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from core.models import SiteSettings, ContactMessage, Subscriber
 from core.forms import ContactForm
 from notes.models import Note
 from blog.models import BlogPost
@@ -136,3 +140,59 @@ def custom_404(request, exception):
 
 def custom_500(request):
     return render(request, 'core/500.html', {'meta_title': 'Server Error'}, status=500)
+
+
+def subscribe_newsletter(request):
+    """
+    Handle visitor newsletter and updates subscription.
+    Supports both standard form submission and AJAX JSON requests.
+    """
+    if request.method != 'POST':
+        return redirect('core:home')
+
+    email = request.POST.get('email', '').strip().lower()
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('accept', '')
+
+    if not email:
+        msg = "Please provide a valid email address."
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': msg}, status=400)
+        messages.error(request, msg)
+        return redirect(request.META.get('HTTP_REFERER', 'core:home'))
+
+    try:
+        validate_email(email)
+    except ValidationError:
+        msg = "Please enter a valid email address format (e.g. name@example.com)."
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': msg}, status=400)
+        messages.error(request, msg)
+        return redirect(request.META.get('HTTP_REFERER', 'core:home'))
+
+    subscriber, created = Subscriber.objects.get_or_create(
+        email=email,
+        defaults={'source': request.POST.get('source', 'homepage_newsletter'), 'is_active': True}
+    )
+
+    if created:
+        msg = "🎉 Thank you for subscribing! You'll now receive updates about new quizzes, notes, blogs, and downloads."
+        status_type = 'success'
+    elif not subscriber.is_active:
+        subscriber.is_active = True
+        subscriber.save(update_fields=['is_active'])
+        msg = "Welcome back! Your subscription has been reactivated."
+        status_type = 'success'
+    else:
+        msg = "You are already subscribed to our updates! Stay tuned."
+        status_type = 'info'
+
+    if is_ajax:
+        return JsonResponse({'status': status_type, 'message': msg})
+
+    if status_type == 'success':
+        messages.success(request, msg)
+    else:
+        messages.info(request, msg)
+
+    return redirect(request.META.get('HTTP_REFERER', 'core:home'))
+

@@ -57,11 +57,19 @@ class BlogPost(models.Model):
             try:
                 from core.models import SiteSettings
                 from core.push_notifications import send_web_push_notification
+                from core.emails import trigger_auto_email_notification
                 settings = SiteSettings.objects.first()
                 if settings and settings.enable_web_push and settings.auto_push_on_blog:
                     send_web_push_notification(
                         title=f"📝 New Post: {self.title}",
-                        message=self.summary[:120] if self.summary else "Read our latest Loksewa preparation guide now.",
+                        message=self.summary[:120] if self.summary else "Read our latest guide and article now.",
+                        url=self.get_absolute_url()
+                    )
+                if settings and settings.auto_email_on_blog:
+                    trigger_auto_email_notification(
+                        content_type='blog',
+                        title=self.title,
+                        description=self.summary,
                         url=self.get_absolute_url()
                     )
             except Exception:

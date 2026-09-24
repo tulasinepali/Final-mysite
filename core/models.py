@@ -68,12 +68,78 @@ class SiteSettings(models.Model):
         help_text='Automatically broadcast push notification when a new blog post is published'
     )
 
+    # Email & Subscriber Notification Settings
+    sender_email = models.EmailField(
+        blank=True,
+        default='',
+        help_text='The "From" email address displayed to subscribers (leave blank to use contact email)'
+    )
+    email_host = models.CharField(
+        max_length=150,
+        blank=True,
+        default='',
+        help_text='SMTP Host, e.g. smtp.gmail.com or smtp.zoho.com'
+    )
+    email_port = models.PositiveIntegerField(
+        default=587,
+        blank=True,
+        help_text='SMTP Port (usually 587 for TLS or 465 for SSL)'
+    )
+    email_host_user = models.CharField(
+        max_length=150,
+        blank=True,
+        default='',
+        help_text='SMTP Username / Email address'
+    )
+    email_host_password = models.CharField(
+        max_length=150,
+        blank=True,
+        default='',
+        help_text='SMTP Password or App Password'
+    )
+    email_use_tls = models.BooleanField(
+        default=True,
+        help_text='Use TLS encryption (recommended for port 587)'
+    )
+    auto_email_on_quiz = models.BooleanField(
+        default=False,
+        help_text='Automatically email subscribers when a new Quiz is published'
+    )
+    auto_email_on_note = models.BooleanField(
+        default=False,
+        help_text='Automatically email subscribers when a new Study Note is published'
+    )
+    auto_email_on_blog = models.BooleanField(
+        default=False,
+        help_text='Automatically email subscribers when a new Blog article is published'
+    )
+    auto_email_on_download = models.BooleanField(
+        default=False,
+        help_text='Automatically email subscribers when a new Download file is published'
+    )
+
     class Meta:
         verbose_name = 'Site Settings'
         verbose_name_plural = 'Site Settings'
 
     def __str__(self):
         return self.site_name
+
+
+class Subscriber(models.Model):
+    """Email alert and newsletter subscriber"""
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    source = models.CharField(max_length=100, default='homepage_newsletter', blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Subscriber'
+        verbose_name_plural = 'Subscribers'
+
+    def __str__(self):
+        return self.email
 
 
 class Category(models.Model):

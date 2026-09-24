@@ -68,6 +68,11 @@
                                 <i class="fas fa-bell mr-1 text-warning"></i> Push Notifications
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false">
+                                <i class="fas fa-envelope-open-text mr-1 text-primary"></i> Email &amp; Alerts
+                            </a>
+                        </li>
                     </ul>
 
                     <!-- Tab Content -->
@@ -421,7 +426,7 @@
 
                             <!-- Any extra fields not in defined sections -->
                             {% for field in form %}
-                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_title,owner_tagline,owner_experience,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog' %}
+                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_title,owner_tagline,owner_experience,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog,sender_email,email_host,email_port,email_host_user,email_host_password,email_use_tls,auto_email_on_quiz,auto_email_on_note,auto_email_on_blog,auto_email_on_download' %}
                                 <div class="form-group">
                                     <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
                                     {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
@@ -511,6 +516,156 @@
                                         </label>
                                     </div>
                                     <small class="text-muted d-block pl-4">Sends a push alert with article headline and direct link.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email & Newsletter Alerts Tab -->
+                        <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <h5 class="mb-1"><i class="fas fa-envelope-open-text text-primary mr-1"></i> Email Sender &amp; Subscriber Alerts</h5>
+                                    <small class="text-muted">Configure your assigned sender email address, custom SMTP credentials, and automatic email alert broadcasts for subscribers.</small>
+                                </div>
+                            </div>
+
+                            <!-- Assigned Sender Address Section -->
+                            <div class="card bg-light border mb-4">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold text-dark mb-2">
+                                        <i class="fas fa-paper-plane text-primary mr-1"></i> Assigned Sender Email Address
+                                    </h6>
+                                    <p class="small text-muted mb-3">
+                                        This email address will be displayed as the <strong>From</strong> address in subscriber inboxes when sending quiz alerts, blog updates, or newsletters.
+                                    </p>
+                                    <div class="form-group mb-0">
+                                        <label for="{{ form.sender_email.id_for_label }}" class="font-weight-bold">
+                                            Sender Email (e.g. your personal Gmail or domain email)
+                                        </label>
+                                        {{ form.sender_email|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:e.g. tulasinepali@gmail.com or info@tulasinepali.com.np' }}
+                                        {% if form.sender_email.errors %}
+                                        {% for error in form.sender_email.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <small class="form-text text-muted">Leave empty to use your general Contact Email ({{ form.instance.contact_email|default:'admin@learningplatform.com' }}).</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custom SMTP Server Settings -->
+                            <div class="card border mb-4">
+                                <div class="card-header bg-white py-2">
+                                    <h6 class="mb-0 font-weight-bold text-dark">
+                                        <i class="fas fa-server text-secondary mr-1"></i> SMTP Server Settings (Optional / Custom)
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="small text-muted mb-3">
+                                        If you want to send emails directly via Gmail, Zoho, cPanel, or SendGrid, fill in your SMTP details below.
+                                        <em>(For Gmail: use <code>smtp.gmail.com</code>, Port <code>587</code>, your Gmail address, and a 16-character <strong>App Password</strong> from Google Account Security).</em>
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="{{ form.email_host.id_for_label }}">SMTP Host</label>
+                                                {{ form.email_host|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:e.g. smtp.gmail.com' }}
+                                                {% for error in form.email_host.errors %}
+                                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="{{ form.email_port.id_for_label }}">SMTP Port</label>
+                                                {{ form.email_port|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:587' }}
+                                                {% for error in form.email_port.errors %}
+                                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.email_host_user.id_for_label }}">SMTP Username / Email</label>
+                                                {{ form.email_host_user|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:yourname@gmail.com' }}
+                                                {% for error in form.email_host_user.errors %}
+                                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.email_host_password.id_for_label }}">SMTP Password / App Password</label>
+                                                {{ form.email_host_password|add_class:'form-control'|add_error_class:'is-invalid' }}
+                                                {% for error in form.email_host_password.errors %}
+                                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="custom-control custom-switch mt-1">
+                                        {{ form.email_use_tls|add_class:'custom-control-input'|attr:'id:emailUseTlsToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="emailUseTlsToggle">
+                                            Use TLS Encryption (Recommended for port 587)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Automatic Email Broadcast Toggles -->
+                            <h6 class="text-uppercase text-muted font-weight-bold mb-3 small">
+                                <i class="fas fa-magic mr-1"></i> Automated Email Triggers on Publish
+                            </h6>
+
+                            <div class="card border mb-3">
+                                <div class="card-body py-3">
+                                    <div class="custom-control custom-switch">
+                                        {{ form.auto_email_on_quiz|add_class:'custom-control-input'|attr:'id:autoEmailQuizToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="autoEmailQuizToggle">
+                                            Automatically email subscribers when a new Quiz is published
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">Dispatches an email announcement to all active subscribers with quiz title, category, and direct link.</small>
+                                </div>
+                            </div>
+
+                            <div class="card border mb-3">
+                                <div class="card-body py-3">
+                                    <div class="custom-control custom-switch">
+                                        {{ form.auto_email_on_note|add_class:'custom-control-input'|attr:'id:autoEmailNoteToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="autoEmailNoteToggle">
+                                            Automatically email subscribers when a new Study Note is published
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">Dispatches an email alert with study note summary and reading link.</small>
+                                </div>
+                            </div>
+
+                            <div class="card border mb-3">
+                                <div class="card-body py-3">
+                                    <div class="custom-control custom-switch">
+                                        {{ form.auto_email_on_blog|add_class:'custom-control-input'|attr:'id:autoEmailBlogToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="autoEmailBlogToggle">
+                                            Automatically email subscribers when a new Blog article is published
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">Dispatches an email alert with article headline, preview snippet, and link.</small>
+                                </div>
+                            </div>
+
+                            <div class="card border mb-3">
+                                <div class="card-body py-3">
+                                    <div class="custom-control custom-switch">
+                                        {{ form.auto_email_on_download|add_class:'custom-control-input'|attr:'id:autoEmailDownloadToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="autoEmailDownloadToggle">
+                                            Automatically email subscribers when a new Resource / Download is published
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">Dispatches an email alert with the resource file title and download link.</small>
                                 </div>
                             </div>
                         </div>

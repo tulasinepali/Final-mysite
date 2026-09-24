@@ -1,0 +1,313 @@
+{% extends 'dashboard/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Broadcast Email Announcement - Dashboard{% endblock %}
+{% block page_header %}Broadcast Announcement{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:subscribers' %}">Subscribers</a></li>
+<li class="breadcrumb-item active">Broadcast Email</li>
+{% endblock %}
+
+{% block content %}
+<!-- Sender & Delivery Notice Bar -->
+<div class="card border-0 shadow-sm mb-4 bg-light">
+    <div class="card-body py-3">
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <div class="d-flex align-items-center mb-2 mb-md-0">
+                <div class="mr-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                    <i class="bi bi-broadcast"></i>
+                </div>
+                <div>
+                    <div class="font-weight-bold text-dark">
+                        Assigned Sender Address:
+                        <span class="badge badge-primary px-2 py-1 ml-1" style="font-size: 0.85rem;">
+                            {{ site_settings.owner_name|default:"Tulasi Nepali" }} &lt;{{ site_settings.sender_email|default:site_settings.contact_email|default:"info@tulasinepali.com.np" }}&gt;
+                        </span>
+                    </div>
+                    <small class="text-muted">
+                        Sending to <strong class="text-success">{{ active_count }} active subscriber{{ active_count|pluralize }}</strong>.
+                        Subscribers receive individual blind carbon copy (BCC) delivery.
+                    </small>
+                </div>
+            </div>
+            <div>
+                <a href="{% url 'dashboard:settings' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-gear mr-1"></i> Configure Sender &amp; SMTP
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Main Email Composer Column -->
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                <h5 class="card-title mb-0 font-weight-bold text-dark">
+                    <i class="bi bi-pencil-square mr-1 text-primary"></i> Compose Email Announcement
+                </h5>
+                <span class="badge badge-soft-info px-2 py-1 font-weight-normal">Responsive HTML Template</span>
+            </div>
+            <div class="card-body">
+                <form method="post" id="broadcastForm" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill mr-1"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Subject -->
+                    <div class="form-group mb-3">
+                        <label for="{{ form.subject.id_for_label }}" class="font-weight-bold">
+                            Subject Line <span class="text-danger">*</span>
+                        </label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                        {% for error in form.subject.errors %}
+                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                        {% endfor %}
+                        {% endif %}
+                        <small class="form-text text-muted">{{ form.subject.help_text }}</small>
+                    </div>
+
+                    <!-- Headline inside email -->
+                    <div class="form-group mb-3">
+                        <label for="{{ form.headline.id_for_label }}" class="font-weight-bold">
+                            Hero Headline (Inside Email)
+                        </label>
+                        {{ form.headline }}
+                        {% if form.headline.errors %}
+                        {% for error in form.headline.errors %}
+                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                        {% endfor %}
+                        {% endif %}
+                        <small class="form-text text-muted">{{ form.headline.help_text }}</small>
+                    </div>
+
+                    <!-- Body Content -->
+                    <div class="form-group mb-3">
+                        <label for="{{ form.body_content.id_for_label }}" class="font-weight-bold">
+                            Email Body Message <span class="text-danger">*</span>
+                        </label>
+                        {{ form.body_content }}
+                        {% if form.body_content.errors %}
+                        {% for error in form.body_content.errors %}
+                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                        {% endfor %}
+                        {% endif %}
+                        <small class="form-text text-muted">{{ form.body_content.help_text }}</small>
+                    </div>
+
+                    <!-- Call to Action Button Details -->
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body py-3">
+                            <h6 class="font-weight-bold text-dark mb-2">
+                                <i class="bi bi-link-45deg mr-1 text-primary"></i> Action Button (Optional)
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-5 mb-2 mb-md-0">
+                                    <label class="small font-weight-bold text-muted">Button Label</label>
+                                    {{ form.cta_text }}
+                                    {% if form.cta_text.errors %}
+                                    {% for error in form.cta_text.errors %}
+                                    <span class="error invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="small font-weight-bold text-muted">Destination Link URL</label>
+                                    {{ form.cta_url }}
+                                    {% if form.cta_url.errors %}
+                                    {% for error in form.cta_url.errors %}
+                                    <span class="error invalid-feedback d-block">{{ error }}</span>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview / Test Mode Options -->
+                    <div class="card border mb-4">
+                        <div class="card-body py-3">
+                            <div class="custom-control custom-checkbox mb-2">
+                                {{ form.send_test_only|add_class:'custom-control-input'|attr:'id:sendTestOnlyCheckbox' }}
+                                <label class="custom-control-label font-weight-bold text-dark" for="sendTestOnlyCheckbox">
+                                    <i class="bi bi-shield-check mr-1 text-info"></i> Send Test Preview First (Safe Mode)
+                                </label>
+                            </div>
+                            <small class="text-muted d-block pl-4 mb-2">
+                                Sends only to the test email address below so you can inspect how it looks in your Gmail or mail app before sending to your subscriber audience.
+                            </small>
+                            <div id="testEmailContainer" class="pl-4 mt-2" style="max-width: 400px;">
+                                <label class="small font-weight-bold text-muted">Test Recipient Email:</label>
+                                {{ form.test_email }}
+                                {% if form.test_email.errors %}
+                                {% for error in form.test_email.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex align-items-center justify-content-between">
+                        <a href="{% url 'dashboard:subscribers' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left mr-1"></i> Back to Subscribers
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold shadow-sm" id="submitBroadcastBtn">
+                            <i class="bi bi-send-fill mr-1"></i> Dispatch Email Broadcast
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Pre-fill / Template Selector Column -->
+    <div class="col-lg-4">
+        <!-- 1-Click Content Announcements -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h6 class="card-title mb-0 font-weight-bold text-dark">
+                    <i class="bi bi-magic mr-1 text-warning"></i> 1-Click Fast Templates
+                </h6>
+                <small class="text-muted">Pre-fill composer from your latest published content:</small>
+            </div>
+            <div class="card-body p-0">
+                <!-- Quizzes -->
+                <div class="p-3 border-bottom">
+                    <div class="font-weight-bold small text-uppercase text-muted mb-2">
+                        <i class="bi bi-patch-question-fill text-primary mr-1"></i> Practice Quizzes
+                    </div>
+                    {% for q in recent_quizzes %}
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small text-truncate mr-2 font-weight-500" style="max-width: 190px;" title="{{ q.title }}">{{ q.title }}</span>
+                        <a href="?prefill_type=quiz&prefill_id={{ q.id }}" class="btn btn-xs btn-outline-primary py-0 px-2 font-weight-bold" style="font-size: 0.72rem;">
+                            Load &raquo;
+                        </a>
+                    </div>
+                    {% empty %}
+                    <span class="small text-muted">No quizzes available</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Study Notes -->
+                <div class="p-3 border-bottom">
+                    <div class="font-weight-bold small text-uppercase text-muted mb-2">
+                        <i class="bi bi-journal-text text-success mr-1"></i> Study Notes
+                    </div>
+                    {% for n in recent_notes %}
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small text-truncate mr-2 font-weight-500" style="max-width: 190px;" title="{{ n.title }}">{{ n.title }}</span>
+                        <a href="?prefill_type=note&prefill_id={{ n.id }}" class="btn btn-xs btn-outline-success py-0 px-2 font-weight-bold" style="font-size: 0.72rem;">
+                            Load &raquo;
+                        </a>
+                    </div>
+                    {% empty %}
+                    <span class="small text-muted">No notes available</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Blog Articles -->
+                <div class="p-3 border-bottom">
+                    <div class="font-weight-bold small text-uppercase text-muted mb-2">
+                        <i class="bi bi-newspaper text-info mr-1"></i> Blog Guides
+                    </div>
+                    {% for b in recent_blogs %}
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small text-truncate mr-2 font-weight-500" style="max-width: 190px;" title="{{ b.title }}">{{ b.title }}</span>
+                        <a href="?prefill_type=blog&prefill_id={{ b.id }}" class="btn btn-xs btn-outline-info py-0 px-2 font-weight-bold" style="font-size: 0.72rem;">
+                            Load &raquo;
+                        </a>
+                    </div>
+                    {% empty %}
+                    <span class="small text-muted">No blog articles available</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Downloads -->
+                <div class="p-3">
+                    <div class="font-weight-bold small text-uppercase text-muted mb-2">
+                        <i class="bi bi-download text-secondary mr-1"></i> Downloads
+                    </div>
+                    {% for d in recent_downloads %}
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small text-truncate mr-2 font-weight-500" style="max-width: 190px;" title="{{ d.title }}">{{ d.title }}</span>
+                        <a href="?prefill_type=download&prefill_id={{ d.id }}" class="btn btn-xs btn-outline-secondary py-0 px-2 font-weight-bold" style="font-size: 0.72rem;">
+                            Load &raquo;
+                        </a>
+                    </div>
+                    {% empty %}
+                    <span class="small text-muted">No downloads available</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Help & Delivery Information Card -->
+        <div class="card border-0 shadow-sm bg-light">
+            <div class="card-body">
+                <h6 class="font-weight-bold text-dark mb-2">
+                    <i class="bi bi-info-circle-fill mr-1 text-primary"></i> Best Practices
+                </h6>
+                <ul class="small text-muted pl-3 mb-0" style="line-height: 1.6;">
+                    <li><strong>Audience Privacy:</strong> Emails are delivered with your address as the sender and subscribers hidden via BCC.</li>
+                    <li><strong>Send Test First:</strong> Always tick "Send Test Preview First" to check the appearance in your own inbox.</li>
+                    <li><strong>Sender Address:</strong> Change your assigned email anytime under <a href="{% url 'dashboard:settings' %}">Site Settings</a>.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+(function() {
+    'use strict';
+    var testCheckbox = document.getElementById('sendTestOnlyCheckbox');
+    var testContainer = document.getElementById('testEmailContainer');
+    var submitBtn = document.getElementById('submitBroadcastBtn');
+
+    function updateBtnState() {
+        if (testCheckbox && testCheckbox.checked) {
+            submitBtn.className = 'btn btn-info px-4 py-2 font-weight-bold shadow-sm';
+            submitBtn.innerHTML = '<i class="bi bi-send-check mr-1"></i> Send Test Email Preview';
+        } else {
+            submitBtn.className = 'btn btn-primary px-4 py-2 font-weight-bold shadow-sm';
+            submitBtn.innerHTML = '<i class="bi bi-send-fill mr-1"></i> Dispatch to All Active Subscribers';
+        }
+    }
+
+    if (testCheckbox) {
+        testCheckbox.addEventListener('change', updateBtnState);
+        updateBtnState();
+    }
+
+    // Confirmation on full blast
+    var form = document.getElementById('broadcastForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (testCheckbox && !testCheckbox.checked) {
+                var confirmMsg = "Are you sure you want to broadcast this announcement to {{ active_count }} active subscriber(s)?";
+                if (!confirm(confirmMsg)) {
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

@@ -68,6 +68,13 @@ urlpatterns = [
     # Settings
     path('settings/', views.dashboard_settings, name='settings'),
 
+    # Subscribers & Broadcast
+    path('subscribers/', views.dashboard_subscribers, name='subscribers'),
+    path('subscribers/<int:pk>/toggle/', views.subscriber_toggle_active, name='subscriber_toggle_active'),
+    path('subscribers/<int:pk>/delete/', views.subscriber_delete, name='subscriber_delete'),
+    path('subscribers/export/', views.subscriber_export_csv, name='subscriber_export_csv'),
+    path('subscribers/broadcast/', views.dashboard_broadcast_email, name='broadcast_email'),
+
     # Ad Placements
     path('ads/', views.dashboard_ads, name='ads'),
     path('ads/create/', views.ad_create, name='ad_create'),

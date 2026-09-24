@@ -17,6 +17,7 @@ class SiteSettingsForm(forms.ModelForm):
             'mission': CKEditor5Widget(config_name='default'),
             'vision': CKEditor5Widget(config_name='default'),
             'address': forms.Textarea(attrs={'rows': 2}),
+            'email_host_password': forms.PasswordInput(render_value=True, attrs={'placeholder': '••••••••••••••••'}),
         }
 
 
@@ -190,3 +191,69 @@ class AdPlacementForm(forms.ModelForm):
         self.fields['ad_code'].required = False
         self.fields['ad_image'].required = False
         self.fields['link_url'].required = False
+
+
+class BroadcastEmailForm(forms.Form):
+    subject = forms.CharField(
+        max_length=200,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g. 🚀 New Computer Operator & Tech Practice Quiz is Live!'
+        }),
+        help_text='The subject line of the email displayed in subscribers\' inboxes.'
+    )
+    headline = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g. Test Your Knowledge with Our Latest Practice Exam'
+        }),
+        help_text='Main banner title inside the email template.'
+    )
+    body_content = forms.CharField(
+        required=True,
+        widget=CKEditor5Widget(config_name='default'),
+        help_text='The main message or announcement for your subscribers.'
+    )
+    cta_text = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g. Start Free MCQ Quiz Now'
+        }),
+        help_text='Action button label (optional).'
+    )
+    cta_url = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'https://tulasinepali.com.np/quiz/...'
+        }),
+        help_text='Destination link when subscribers click the action button.'
+    )
+    send_test_only = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Send Test Email Only",
+        help_text="Send this announcement only to the test email address below to inspect before blasting to everyone."
+    )
+    test_email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'your-email@gmail.com'
+        }),
+        help_text="Target email address for the test preview."
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        send_test = cleaned_data.get('send_test_only')
+        test_email = cleaned_data.get('test_email')
+        if send_test and not test_email:
+            self.add_error('test_email', 'Please provide a test recipient email address when test mode is selected.')
+        return cleaned_data
+

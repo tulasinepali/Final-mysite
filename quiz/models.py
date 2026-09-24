@@ -64,11 +64,19 @@ class Quiz(models.Model):
             try:
                 from core.models import SiteSettings
                 from core.push_notifications import send_web_push_notification
+                from core.emails import trigger_auto_email_notification
                 settings = SiteSettings.objects.first()
                 if settings and settings.enable_web_push and settings.auto_push_on_quiz:
                     send_web_push_notification(
                         title=f"🔔 New Quiz: {self.title}",
-                        message=f"New Loksewa practice test is now live! Test your preparation.",
+                        message="New interactive practice quiz is now live! Test your knowledge.",
+                        url=self.get_absolute_url()
+                    )
+                if settings and settings.auto_email_on_quiz:
+                    trigger_auto_email_notification(
+                        content_type='quiz',
+                        title=self.title,
+                        description=self.description,
                         url=self.get_absolute_url()
                     )
             except Exception:

@@ -579,18 +579,22 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-6 text-center">
-                <span class="tagline mb-2">Stay Updated</span>
-                <h2 class="h3 fw-bold mb-2">Never Miss an Exam Alert</h2>
-                <p class="text-muted mb-4 small">Get new Computer Operator notes, mock tests, and vacancy notices delivered straight to your inbox.</p>
-                <form class="row g-2 justify-content-center" action="{% url 'core:home' %}" method="post">
+                <span class="tagline mb-2">Stay Ahead</span>
+                <h2 class="h3 fw-bold mb-2">Never Miss a Learning Update or Alert</h2>
+                <p class="text-muted mb-4 small">Get new Technology study notes, interactive mock quizzes, GK guides, and downloadable resources delivered straight to your inbox.</p>
+                <form id="newsletterSubscribeForm" class="row g-2 justify-content-center" action="{% url 'core:subscribe' %}" method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="source" value="homepage_newsletter">
                     <div class="col-sm-8">
-                        <input type="email" class="form-control rounded-pill px-4 py-2 border" placeholder="Enter your email address" aria-label="Email address" required>
+                        <input type="email" name="email" id="subscribeEmailInput" class="form-control rounded-pill px-4 py-2 border" placeholder="Enter your email address" aria-label="Email address" required>
                     </div>
                     <div class="col-sm-4">
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 w-100"><i class="bi bi-send me-1"></i> Subscribe</button>
+                        <button type="submit" id="subscribeSubmitBtn" class="btn btn-primary rounded-pill px-4 py-2 w-100">
+                            <i class="bi bi-send me-1"></i> Subscribe
+                        </button>
                     </div>
                 </form>
+                <div id="subscribeFeedback" class="small mt-3 d-none"></div>
                 <small class="text-muted mt-2 d-block">We respect your privacy. No spam ever.</small>
             </div>
         </div>
@@ -666,6 +670,59 @@
                 });
             }, { threshold: 0.2 });
             obs.observe(statsSec);
+        }
+
+        // Newsletter AJAX Subscription Handler
+        const subForm = document.getElementById('newsletterSubscribeForm');
+        if (subForm) {
+            subForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const emailInput = document.getElementById('subscribeEmailInput');
+                const submitBtn = document.getElementById('subscribeSubmitBtn');
+                const feedback = document.getElementById('subscribeFeedback');
+                const emailVal = emailInput.value.trim();
+
+                if (!emailVal) return;
+
+                const originalBtnHtml = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Subscribing...';
+                feedback.className = 'small mt-3 d-none';
+
+                const formData = new FormData(subForm);
+
+                fetch(subForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+
+                    if (data.status === 'success') {
+                        feedback.className = 'alert alert-success py-2 px-3 small mt-3 d-block';
+                        feedback.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ' + data.message;
+                        emailInput.value = '';
+                    } else if (data.status === 'info') {
+                        feedback.className = 'alert alert-info py-2 px-3 small mt-3 d-block';
+                        feedback.innerHTML = '<i class="bi bi-info-circle-fill me-1"></i> ' + data.message;
+                    } else {
+                        feedback.className = 'alert alert-danger py-2 px-3 small mt-3 d-block';
+                        feedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> ' + (data.message || 'Error subscribing.');
+                    }
+                })
+                .catch(err => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                    feedback.className = 'alert alert-danger py-2 px-3 small mt-3 d-block';
+                    feedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> An error occurred. Please try again.';
+                });
+            });
         }
     });
 </script>

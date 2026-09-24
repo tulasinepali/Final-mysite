@@ -244,6 +244,25 @@
                         </a>
                     </li>
 
+                    <!-- COMMUNICATION & AUDIENCE SECTION -->
+                    <li class="nav-header">COMMUNICATION &amp; AUDIENCE</li>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:subscribers' %}" class="nav-link {% if active_page == 'subscribers' %}active{% endif %}">
+                            <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+                            <p>Subscribers</p>
+                            {% if total_subscribers %}
+                            <span class="badge badge-soft-primary">{{ total_subscribers }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:broadcast_email' %}" class="nav-link {% if active_page == 'broadcast' %}active{% endif %}">
+                            <span class="nav-icon"><i class="bi bi-broadcast"></i></span>
+                            <p>Broadcast Email</p>
+                            <span class="badge badge-success">Send</span>
+                        </a>
+                    </li>
+
                     <!-- SYSTEM SECTION -->
                     <li class="nav-header">SYSTEM &amp; CONTROLS</li>
                     <li class="nav-item">

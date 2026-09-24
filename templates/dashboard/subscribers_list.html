@@ -1,0 +1,270 @@
+{% extends 'dashboard/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Subscribers & Email Alerts - Dashboard{% endblock %}
+{% block page_header %}Subscribers &amp; Email Alerts{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Subscribers</li>
+{% endblock %}
+
+{% block content %}
+<!-- Stat Counters Row -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon bg-primary text-white mr-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.3rem;">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Total Subscribers</h6>
+                    <h3 class="mb-0 font-weight-bold text-dark">{{ total_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon bg-success text-white mr-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.3rem;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Active Audience</h6>
+                    <h3 class="mb-0 font-weight-bold text-success">{{ active_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="stat-icon bg-secondary text-white mr-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.3rem;">
+                    <i class="bi bi-pause-circle-fill"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Inactive / Paused</h6>
+                    <h3 class="mb-0 font-weight-bold text-secondary">{{ inactive_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-3">
+        <div class="card stat-card border-0 shadow-sm bg-gradient-primary text-white" style="background: linear-gradient(135deg, #0559b7 0%, #0d3880 100%);">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-white-50 text-uppercase mb-1" style="font-size: 0.75rem;">Email Dispatch</h6>
+                    <h5 class="mb-0 font-weight-bold text-white">Broadcast Alerts</h5>
+                </div>
+                <a href="{% url 'dashboard:broadcast_email' %}" class="btn btn-light btn-sm font-weight-bold shadow-sm px-3">
+                    <i class="bi bi-send-fill mr-1 text-primary"></i> Compose
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Table Card -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between">
+        <h5 class="card-title mb-0 font-weight-bold text-dark">
+            <i class="bi bi-envelope-check-fill mr-2 text-primary"></i> Subscriber Directory
+        </h5>
+        <div class="btn-group mt-2 mt-md-0">
+            <a href="{% url 'dashboard:subscriber_export_csv' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-file-earmark-spreadsheet mr-1"></i> Export to CSV
+            </a>
+            <a href="{% url 'dashboard:broadcast_email' %}" class="btn btn-primary btn-sm ml-2 font-weight-bold">
+                <i class="bi bi-broadcast mr-1"></i> Broadcast Announcement
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Filter Bar -->
+        <form method="get" class="form-inline mb-3">
+            <div class="form-group mr-2 mb-2">
+                <label class="mr-2 text-muted small font-weight-bold">Status:</label>
+                <select name="status" class="form-control form-control-sm">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active Only ({{ active_count }})</option>
+                    <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive ({{ inactive_count }})</option>
+                </select>
+            </div>
+            <div class="form-group mr-2 mb-2">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="q" class="form-control" placeholder="Search by email..." value="{{ search_query }}">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% if search_query or status_filter %}
+            <a href="{% url 'dashboard:subscribers' %}" class="btn btn-sm btn-outline-secondary mb-2" title="Reset Filters">
+                <i class="bi bi-x-circle mr-1"></i> Reset
+            </a>
+            {% endif %}
+        </form>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th style="width: 60px;">#</th>
+                        <th>Subscriber Email</th>
+                        <th>Source</th>
+                        <th>Date Subscribed</th>
+                        <th style="width: 120px;" class="text-center">Status</th>
+                        <th style="width: 180px;" class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in page_obj %}
+                    <tr>
+                        <td class="text-muted">{{ forloop.counter0|add:page_obj.start_index }}</td>
+                        <td>
+                            <div class="font-weight-bold text-dark">
+                                <a href="mailto:{{ sub.email }}" class="text-dark text-decoration-none">
+                                    <i class="bi bi-envelope mr-1 text-primary"></i> {{ sub.email }}
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-light border text-muted px-2 py-1">
+                                {{ sub.source|default:"homepage" }}
+                            </span>
+                        </td>
+                        <td class="text-muted small">
+                            <i class="bi bi-clock mr-1"></i> {{ sub.created_at|date:"M d, Y g:i A" }}
+                        </td>
+                        <td class="text-center">
+                            {% if sub.is_active %}
+                            <span class="badge badge-soft-success px-2 py-1 font-weight-bold">
+                                <i class="bi bi-check-circle-fill mr-1"></i> Active
+                            </span>
+                            {% else %}
+                            <span class="badge badge-soft-secondary px-2 py-1">
+                                <i class="bi bi-slash-circle mr-1"></i> Inactive
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            <form method="post" action="{% url 'dashboard:subscriber_toggle_active' sub.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                {% if sub.is_active %}
+                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Pause / Deactivate">
+                                    <i class="bi bi-pause-fill"></i>
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Activate">
+                                    <i class="bi bi-play-fill"></i>
+                                </button>
+                                {% endif %}
+                            </form>
+                            <button type="button" class="btn btn-sm btn-outline-danger ml-1" title="Delete Subscriber"
+                                data-toggle="modal" data-target="#deleteModal"
+                                data-delete-url="{% url 'dashboard:subscriber_delete' sub.pk %}"
+                                data-item-name="{{ sub.email }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <div class="mb-2">
+                                <i class="bi bi-envelope-paper display-4 text-muted"></i>
+                            </div>
+                            <h5 class="text-muted font-weight-bold">No subscribers found</h5>
+                            <p class="small text-muted mb-0">
+                                {% if search_query or status_filter %}
+                                Try adjusting your search query or filters.
+                                {% else %}
+                                Visitors who enter their email in the homepage newsletter box will appear here automatically.
+                                {% endif %}
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav class="mt-4 d-flex justify-content-between align-items-center">
+            <span class="small text-muted">
+                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} subscribers
+            </span>
+            <ul class="pagination pagination-sm mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        &laquo;
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        &raquo;
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Universal Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel"><i class="bi bi-exclamation-triangle-fill mr-1"></i> Confirm Delete</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0">Are you sure you want to permanently delete subscriber <strong id="deleteItemName" class="text-danger"></strong>?</p>
+                <small class="text-muted">They will no longer receive any email updates or quiz notifications.</small>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" action="" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Yes, Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$('#deleteModal').on('show.bs.modal', function(event) {
+    var button = $(event.relatedTarget);
+    var deleteUrl = button.data('delete-url');
+    var itemName = button.data('item-name');
+    var modal = $(this);
+    modal.find('#deleteForm').attr('action', deleteUrl);
+    modal.find('#deleteItemName').text(itemName);
+});
+</script>
+{% endblock %}

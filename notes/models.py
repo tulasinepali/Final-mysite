@@ -39,3 +39,29 @@ class Note(models.Model):
 
     def get_meta_description(self):
         return self.meta_description or self.summary
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        was_published = False
+        if not is_new:
+            try:
+                orig = Note.objects.get(pk=self.pk)
+                was_published = orig.is_published
+            except Note.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
+
+        if self.is_published and not was_published:
+            try:
+                from core.models import SiteSettings
+                from core.emails import trigger_auto_email_notification
+                settings = SiteSettings.objects.first()
+                if settings and settings.auto_email_on_note:
+                    trigger_auto_email_notification(
+                        content_type='note',
+                        title=self.title,
+                        description=self.summary,
+                        url=self.get_absolute_url()
+                    )
+            except Exception:
+                pass

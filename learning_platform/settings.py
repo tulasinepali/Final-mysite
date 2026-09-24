@@ -251,3 +251,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 X_FRAME_OPTIONS = "DENY"
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Tulasi Nepali <info@tulasinepali.com.np>'
