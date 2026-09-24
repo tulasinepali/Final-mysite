@@ -414,7 +414,7 @@
                         <a href="{% url 'quiz:list' %}" class="small text-primary fw-semibold">All Tests</a>
                     </div>
                     <div class="list-group list-group-flush">
-                        {% for quiz in recent_quizzes|slice:":5" %}
+                        {% for quiz in recent_quizzes|slice:":3" %}
                         <a href="{{ quiz.get_absolute_url }}" class="list-group-item list-group-item-action py-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -432,20 +432,23 @@
                     </div>
                 </div>
 
-                <!-- Browse Topics Widget (Under Recent Practice Tests) -->
+                <!-- Browse Topics Widget (Under Recent Practice Tests - 3 Points in Row 3 Column 3) -->
                 <div class="catalog-card mb-4">
                     <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
                         <h2 class="h6 fw-bold mb-0 text-dark"><i class="bi bi-grid text-primary me-2"></i>Browse Topics</h2>
                         <a href="{% url 'notes:list' %}" class="small text-primary fw-semibold">All Topics</a>
                     </div>
                     <div class="p-3">
-                        <div class="d-flex flex-wrap gap-2">
-                            {% for cat in notes_categories %}
-                            <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="badge bg-light text-dark border text-decoration-none py-2 px-3 rounded-pill">
-                                {{ cat.name }}
-                            </a>
+                        <div class="row g-2">
+                            {% for cat in notes_categories|slice:":3" %}
+                            <div class="col-4">
+                                <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="d-flex flex-column align-items-center justify-content-center p-2 rounded-3 border bg-light text-decoration-none text-center h-100" style="transition: all 0.2s ease;">
+                                    <i class="bi bi-folder2-open text-primary mb-1 fs-5"></i>
+                                    <span class="small fw-semibold text-dark text-truncate w-100" style="font-size: 0.75rem;" title="{{ cat.name }}">{{ cat.name }}</span>
+                                </a>
+                            </div>
                             {% empty %}
-                            <span class="text-muted small">Categories coming soon</span>
+                            <div class="col-12 text-center text-muted small py-2">Categories coming soon</div>
                             {% endfor %}
                         </div>
                     </div>
