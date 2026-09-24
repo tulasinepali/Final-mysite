@@ -407,44 +407,44 @@
                 </div>
                 {% endif %}
 
-                <!-- Recent Quizzes Widget -->
-                <div class="catalog-card mb-4">
-                    <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
-                        <h2 class="h6 fw-bold mb-0 text-dark"><i class="bi bi-patch-question text-success me-2"></i>Recent Practice Tests</h2>
-                        <a href="{% url 'quiz:list' %}" class="small text-primary fw-semibold">All Tests</a>
+                <!-- Recent Quizzes Widget (Compact Height) -->
+                <div class="catalog-card mb-3">
+                    <div class="py-2 px-3 border-bottom d-flex align-items-center justify-content-between">
+                        <h2 class="h6 fw-bold mb-0 text-dark" style="font-size: 0.9rem;"><i class="bi bi-patch-question text-success me-2"></i>Recent Practice Tests</h2>
+                        <a href="{% url 'quiz:list' %}" class="small text-primary fw-semibold" style="font-size: 0.78rem;">All Tests</a>
                     </div>
                     <div class="list-group list-group-flush">
                         {% for quiz in recent_quizzes|slice:":3" %}
-                        <a href="{{ quiz.get_absolute_url }}" class="list-group-item list-group-item-action py-3">
+                        <a href="{{ quiz.get_absolute_url }}" class="list-group-item list-group-item-action py-2 px-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-semibold small text-dark">{{ quiz.title }}</div>
-                                    <small class="text-muted">{{ quiz.question_count }} Qs &bull; {{ quiz.get_difficulty_display }}</small>
+                                <div class="me-2 text-truncate">
+                                    <div class="fw-semibold text-dark text-truncate" style="font-size: 0.84rem;">{{ quiz.title }}</div>
+                                    <small class="text-muted d-block" style="font-size: 0.73rem;">{{ quiz.question_count }} Qs &bull; {{ quiz.get_difficulty_display }}</small>
                                 </div>
-                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 small">
+                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 flex-shrink-0" style="font-size: 0.72rem;">
                                     Start <i class="bi bi-play-fill"></i>
                                 </span>
                             </div>
                         </a>
                         {% empty %}
-                        <div class="list-group-item text-center text-muted small py-3">Quizzes coming soon.</div>
+                        <div class="list-group-item text-center text-muted small py-2">Quizzes coming soon.</div>
                         {% endfor %}
                     </div>
                 </div>
 
                 <!-- Browse Topics Widget (Under Recent Practice Tests - 3 Points in Row 3 Column 3) -->
-                <div class="catalog-card mb-4">
-                    <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
-                        <h2 class="h6 fw-bold mb-0 text-dark"><i class="bi bi-grid text-primary me-2"></i>Browse Topics</h2>
-                        <a href="{% url 'notes:list' %}" class="small text-primary fw-semibold">All Topics</a>
+                <div class="catalog-card mb-3">
+                    <div class="py-2 px-3 border-bottom d-flex align-items-center justify-content-between">
+                        <h2 class="h6 fw-bold mb-0 text-dark" style="font-size: 0.9rem;"><i class="bi bi-grid text-primary me-2"></i>Browse Topics</h2>
+                        <a href="{% url 'notes:list' %}" class="small text-primary fw-semibold" style="font-size: 0.78rem;">All Topics</a>
                     </div>
-                    <div class="p-3">
+                    <div class="p-2">
                         <div class="row g-2">
                             {% for cat in notes_categories|slice:":3" %}
                             <div class="col-4">
-                                <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="d-flex flex-column align-items-center justify-content-center p-2 rounded-3 border bg-light text-decoration-none text-center h-100" style="transition: all 0.2s ease;">
-                                    <i class="bi bi-folder2-open text-primary mb-1 fs-5"></i>
-                                    <span class="small fw-semibold text-dark text-truncate w-100" style="font-size: 0.75rem;" title="{{ cat.name }}">{{ cat.name }}</span>
+                                <a href="{% url 'notes:list' %}?category={{ cat.slug }}" class="d-flex flex-column align-items-center justify-content-center p-2 rounded-2 border bg-light text-decoration-none text-center h-100" style="transition: all 0.2s ease;">
+                                    <i class="bi bi-folder2-open text-primary mb-1" style="font-size: 1.1rem;"></i>
+                                    <span class="fw-semibold text-dark text-truncate w-100" style="font-size: 0.72rem;" title="{{ cat.name }}">{{ cat.name }}</span>
                                 </a>
                             </div>
                             {% empty %}
