@@ -24,7 +24,31 @@ class SiteSettings(models.Model):
     google_analytics_id = models.CharField(max_length=50, blank=True)
     adsense_client_id = models.CharField(max_length=100, blank=True)
     
-    
+    # Web Push Notification Settings
+    enable_web_push = models.BooleanField(
+        default=False,
+        help_text='Master switch to enable or disable browser push notifications for visitors'
+    )
+    onesignal_app_id = models.CharField(
+        max_length=150,
+        blank=True,
+        default='',
+        help_text='OneSignal App ID (from your free OneSignal dashboard at onesignal.com)'
+    )
+    onesignal_rest_api_key = models.CharField(
+        max_length=150,
+        blank=True,
+        default='',
+        help_text='OneSignal REST API Key for automated backend push broadcasts'
+    )
+    auto_push_on_quiz = models.BooleanField(
+        default=True,
+        help_text='Automatically broadcast push notification when a new quiz is published'
+    )
+    auto_push_on_blog = models.BooleanField(
+        default=True,
+        help_text='Automatically broadcast push notification when a new blog post is published'
+    )
 
     class Meta:
         verbose_name = 'Site Settings'

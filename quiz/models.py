@@ -49,6 +49,32 @@ class Quiz(models.Model):
     def get_meta_description(self):
         return self.meta_description or self.description
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        was_published = False
+        if not is_new:
+            try:
+                orig = Quiz.objects.get(pk=self.pk)
+                was_published = orig.is_published
+            except Quiz.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
+
+        if self.is_published and not was_published:
+            try:
+                from core.models import SiteSettings
+                from core.push_notifications import send_web_push_notification
+                settings = SiteSettings.objects.first()
+                if settings and settings.enable_web_push and settings.auto_push_on_quiz:
+                    send_web_push_notification(
+                        title=f"🔔 New Quiz: {self.title}",
+                        message=f"New Loksewa practice test is now live! Test your preparation.",
+                        url=self.get_absolute_url()
+                    )
+            except Exception:
+                pass
+
+
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')

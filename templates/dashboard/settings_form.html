@@ -63,6 +63,11 @@
                                 <i class="fas fa-plug mr-1"></i> Integrations
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="push-tab" data-toggle="tab" href="#push" role="tab" aria-controls="push" aria-selected="false">
+                                <i class="fas fa-bell mr-1 text-warning"></i> Push Notifications
+                            </a>
+                        </li>
                     </ul>
 
                     <!-- Tab Content -->
@@ -321,7 +326,7 @@
 
                             <!-- Any extra fields not in defined sections -->
                             {% for field in form %}
-                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id' %}
+                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog' %}
                                 <div class="form-group">
                                     <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
                                     {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
@@ -334,6 +339,85 @@
                                 </div>
                                 {% endif %}
                             {% endfor %}
+                        </div>
+
+                        <!-- Push Notifications Tab -->
+                        <div class="tab-pane fade" id="push" role="tabpanel" aria-labelledby="push-tab">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <h5 class="mb-1"><i class="fas fa-bell text-warning mr-1"></i> Web Push Notifications</h5>
+                                    <small class="text-muted">Broadcast instant notifications to visitors' mobile phones and desktops whenever you publish new Loksewa MCQs or blog posts.</small>
+                                </div>
+                                <span class="badge {% if form.enable_web_push.value %}badge-success{% else %}badge-secondary{% endif %} px-3 py-2" id="pushStatusBadge">
+                                    {% if form.enable_web_push.value %}<i class="fas fa-check-circle mr-1"></i> Enabled{% else %}<i class="fas fa-ban mr-1"></i> Disabled{% endif %}
+                                </span>
+                            </div>
+
+                            <div class="card bg-light border mb-4">
+                                <div class="card-body">
+                                    <div class="custom-control custom-switch custom-switch-lg mb-2">
+                                        {{ form.enable_web_push|add_class:'custom-control-input'|attr:'id:enableWebPushToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="enableWebPushToggle">
+                                            Enable Browser Push Notifications for Visitors
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">
+                                        When turned <strong>ON</strong>, visitors will see a prompt asking permission to receive alerts about new practice tests and study materials. When turned <strong>OFF</strong>, push notification scripts are completely deactivated site-wide.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="form-group {% if form.onesignal_app_id.errors %}has-error{% endif %}">
+                                <label for="{{ form.onesignal_app_id.id_for_label }}">
+                                    <i class="fas fa-key mr-1 text-primary"></i> OneSignal App ID
+                                </label>
+                                {{ form.onesignal_app_id|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:e.g. 5eb5a37e-b458-11e3-ac11-000c2940e62c' }}
+                                {% if form.onesignal_app_id.errors %}
+                                {% for error in form.onesignal_app_id.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Get your free App ID from <a href="https://onesignal.com" target="_blank" rel="noopener noreferrer">onesignal.com</a> (Free for up to 10,000 subscribers).</small>
+                            </div>
+
+                            <div class="form-group {% if form.onesignal_rest_api_key.errors %}has-error{% endif %}">
+                                <label for="{{ form.onesignal_rest_api_key.id_for_label }}">
+                                    <i class="fas fa-shield-alt mr-1 text-danger"></i> OneSignal REST API Key <span class="badge badge-light border">Optional</span>
+                                </label>
+                                {{ form.onesignal_rest_api_key|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:os_v2_app_xxxxxxxxxxxxxxxxxxxxxxxx'|attr:'type:password' }}
+                                {% if form.onesignal_rest_api_key.errors %}
+                                {% for error in form.onesignal_rest_api_key.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Required only if you want Django to automatically dispatch push notifications to all subscribers the moment you click publish.</small>
+                            </div>
+
+                            <h6 class="font-weight-bold text-dark mt-4 mb-3"><i class="fas fa-robot mr-1"></i> Automated Dispatch Options</h6>
+
+                            <div class="card border mb-3">
+                                <div class="card-body py-3">
+                                    <div class="custom-control custom-switch">
+                                        {{ form.auto_push_on_quiz|add_class:'custom-control-input'|attr:'id:autoPushQuizToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="autoPushQuizToggle">
+                                            Auto-broadcast when a new Quiz is published
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">Sends a push alert to all subscribers with quiz title and direct link to start practice.</small>
+                                </div>
+                            </div>
+
+                            <div class="card border mb-3">
+                                <div class="card-body py-3">
+                                    <div class="custom-control custom-switch">
+                                        {{ form.auto_push_on_blog|add_class:'custom-control-input'|attr:'id:autoPushBlogToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="autoPushBlogToggle">
+                                            Auto-broadcast when a new Blog article is published
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">Sends a push alert with article headline and direct link.</small>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -372,6 +456,23 @@
     var activeTab = localStorage.getItem('settingsActiveTab');
     if (activeTab) {
         $('#settingsTab a[href="' + activeTab + '"]').tab('show');
+    }
+
+    // Dynamic Push Notification Status Badge update
+    var pushToggle = document.getElementById('enableWebPushToggle');
+    if (pushToggle) {
+        pushToggle.addEventListener('change', function() {
+            var badge = document.getElementById('pushStatusBadge');
+            if (badge) {
+                if (this.checked) {
+                    badge.className = 'badge badge-success px-3 py-2';
+                    badge.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Enabled';
+                } else {
+                    badge.className = 'badge badge-secondary px-3 py-2';
+                    badge.innerHTML = '<i class="fas fa-ban mr-1"></i> Disabled';
+                }
+            }
+        });
     }
 })();
 </script>

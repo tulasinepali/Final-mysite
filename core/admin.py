@@ -24,8 +24,10 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         ('Analytics & Ads', {
             'fields': ('google_analytics_id', 'adsense_client_id')
         }),
-
-
+        ('Web Push Notifications', {
+            'fields': ('enable_web_push', 'onesignal_app_id', 'onesignal_rest_api_key', 'auto_push_on_quiz', 'auto_push_on_blog'),
+            'description': 'Configure browser push notifications for visitors when new quizzes or blog posts are published.'
+        }),
     )
 
     def has_add_permission(self, request):

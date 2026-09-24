@@ -424,5 +424,43 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     })();
     </script>
     {% endif %}
+
+    <!-- OneSignal Web Push Notifications (Controlled by Admin Panel Toggle) -->
+    {% if site_settings.enable_web_push and site_settings.onesignal_app_id %}
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "{{ site_settings.onesignal_app_id }}",
+          notifyButton: {
+            enable: true,
+            position: 'bottom-left',
+            theme: 'default',
+            size: 'medium'
+          },
+          promptOptions: {
+            slidedown: {
+              prompts: [
+                {
+                  type: "push",
+                  autoPrompt: true,
+                  text: {
+                    actionMessage: "Get instant alerts whenever a new Loksewa Quiz, Study Note, or Syllabus PDF is published!",
+                    acceptButton: "Allow Alerts",
+                    cancelButton: "Maybe Later"
+                  },
+                  delay: {
+                    pageViews: 1,
+                    timeDelay: 3
+                  }
+                }
+              ]
+            }
+          }
+        });
+      });
+    </script>
+    {% endif %}
 </body>
 </html>
