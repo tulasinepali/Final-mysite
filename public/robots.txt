@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+Allow: /notes/
+Allow: /quiz/
+Allow: /blog/
+Allow: /downloads/
+Allow: /about/
+Allow: /contact/
+Allow: /search/
+Allow: /privacy-policy/
+Allow: /terms-conditions/
+Allow: /sitemap.html
+
+# Block admin, login, and internal pages from crawlers
+Disallow: /admin/
+Disallow: /login/
+Disallow: /logout/
+Disallow: /dashboard/
+Disallow: /ckeditor5/
+Disallow: /media/site/
+Disallow: /static/
+
+# Sitemaps
+Sitemap: https://tulasinepali.com.np/sitemap.xml

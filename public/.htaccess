@@ -3,3 +3,67 @@ Options +FollowSymLinks
 PassengerEnabled on
 PassengerAppRoot /home/tulasine/learning-platformfinal
 PassengerPython /home/tulasine/virtualenv/learning-platformfinal/3.10/bin/python
+
+# ── Security Headers ───────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # HSTS — force HTTPS for 1 year (fixes "No HSTS header" flag)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # X-Frame-Options — prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # X-Content-Type-Options — prevent MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Referrer-Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Permissions-Policy — disable unneeded browser features
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+    # Content Security Policy — allows AdSense, GTM, GA, Fonts, Bootstrap CDN
+    Header always set Content-Security-Policy "default-src 'self'; \
+script-src 'self' 'unsafe-inline' 'unsafe-eval' \
+  https://cdn.jsdelivr.net \
+  https://cdnjs.cloudflare.com \
+  https://pagead2.googlesyndication.com \
+  https://adservice.google.com \
+  https://www.googletagmanager.com \
+  https://www.googletagservices.com \
+  https://www.google-analytics.com \
+  https://googleads.g.doubleclick.net \
+  https://tpc.googlesyndication.com \
+  https://ep1.adtrafficquality.google \
+  https://ep2.adtrafficquality.google \
+  https://cdn.ampproject.org \
+  https://cdn.onesignal.com \
+  https://www.google.com; \
+style-src 'self' 'unsafe-inline' \
+  https://cdn.jsdelivr.net \
+  https://cdnjs.cloudflare.com \
+  https://fonts.googleapis.com; \
+font-src 'self' \
+  https://cdn.jsdelivr.net \
+  https://cdnjs.cloudflare.com \
+  https://fonts.gstatic.com \
+  data:; \
+img-src 'self' data: blob: \
+  https://www.google.com \
+  https://www.gstatic.com \
+  https://pagead2.googlesyndication.com \
+  https://googleads.g.doubleclick.net \
+  https://www.google-analytics.com; \
+frame-src \
+  https://googleads.g.doubleclick.net \
+  https://tpc.googlesyndication.com \
+  https://www.google.com \
+  https://ep2.adtrafficquality.google; \
+connect-src 'self' \
+  https://www.google-analytics.com \
+  https://www.googletagmanager.com \
+  https://pagead2.googlesyndication.com \
+  https://ep1.adtrafficquality.google \
+  https://ep2.adtrafficquality.google; \
+object-src 'none'; \
+base-uri 'self';"
+</IfModule>

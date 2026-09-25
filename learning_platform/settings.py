@@ -250,7 +250,73 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-X_FRAME_OPTIONS = "DENY"
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# HSTS — tells browsers to only use HTTPS for 1 year (fixes "No HSTS" flag)
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Redirect HTTP → HTTPS (handled by server, but Django enforces it too)
+SECURE_SSL_REDIRECT = not DEBUG  # Only redirect in production
+
+# CSP Settings (django-csp middleware)
+# Allow AdSense, GTM, Google Analytics, Fonts, Bootstrap CDN
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = (
+    "'self'", "'unsafe-inline'", "'unsafe-eval'",
+    "https://cdn.jsdelivr.net",
+    "https://cdnjs.cloudflare.com",
+    "https://pagead2.googlesyndication.com",
+    "https://adservice.google.com",
+    "https://www.googletagmanager.com",
+    "https://www.googletagservices.com",
+    "https://www.google-analytics.com",
+    "https://googleads.g.doubleclick.net",
+    "https://tpc.googlesyndication.com",
+    "https://ep1.adtrafficquality.google",
+    "https://ep2.adtrafficquality.google",
+    "https://cdn.ampproject.org",
+    "https://cdn.onesignal.com",
+    "https://www.google.com",
+)
+CSP_STYLE_SRC = (
+    "'self'", "'unsafe-inline'",
+    "https://cdn.jsdelivr.net",
+    "https://cdnjs.cloudflare.com",
+    "https://fonts.googleapis.com",
+)
+CSP_FONT_SRC = (
+    "'self'",
+    "https://cdn.jsdelivr.net",
+    "https://cdnjs.cloudflare.com",
+    "https://fonts.gstatic.com",
+    "data:",
+)
+CSP_IMG_SRC = (
+    "'self'", "data:", "blob:",
+    "https://www.google.com",
+    "https://www.gstatic.com",
+    "https://pagead2.googlesyndication.com",
+    "https://googleads.g.doubleclick.net",
+    "https://www.google-analytics.com",
+)
+CSP_FRAME_SRC = (
+    "https://googleads.g.doubleclick.net",
+    "https://tpc.googlesyndication.com",
+    "https://www.google.com",
+    "https://ep2.adtrafficquality.google",
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+    "https://www.google-analytics.com",
+    "https://www.googletagmanager.com",
+    "https://pagead2.googlesyndication.com",
+    "https://ep1.adtrafficquality.google",
+    "https://ep2.adtrafficquality.google",
+)
+CSP_OBJECT_SRC = ("'none'",)
+CSP_BASE_URI = ("'self'",)
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend'
