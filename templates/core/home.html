@@ -517,7 +517,7 @@
             <div class="col-lg-5 text-center">
                 <div class="position-relative d-inline-block">
                     {% if site_settings.owner_image %}
-                    <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name|default:'Tulasi Nepali' }}" class="rounded-4 shadow-lg border border-4 border-white img-fluid" style="max-width: 320px; object-fit: cover;">
+                    <img src="{{ site_settings.owner_image.url }}" alt="{{ site_settings.owner_name|default:'Tulasi Nepali' }}" class="rounded-4 shadow-lg border border-4 border-white img-fluid" width="320" height="381" style="max-width: 320px; object-fit: cover;" loading="lazy">
                     {% else %}
                     <div class="rounded-4 bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-lg" style="width: 280px; height: 320px; font-size: 3rem; margin: 0 auto;">TN</div>
                     {% endif %}

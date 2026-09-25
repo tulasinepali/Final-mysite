@@ -6,11 +6,11 @@
    SmartStore CSS Variables & Design Tokens
    ---------------------------------------------------------- */
 :root {
-    /* Fonts */
-    --default-font: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Fonts — Poppins (body/nav) + Montserrat (headings) */
+    --default-font: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
     --heading-font: "Montserrat", sans-serif;
     --nav-font: "Poppins", sans-serif;
-    --mono-font: "JetBrains Mono", monospace;
+    --mono-font: "Courier New", Courier, monospace;
 
     /* SmartStore Signature Royal/Cobalt Blue & Light Palette */
     --background-color: #ffffff;
