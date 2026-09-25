@@ -52,14 +52,19 @@
         </div>
     </div>
     <div class="col-xl-3 col-sm-6 mb-3">
-        <div class="card stat-card border-0 shadow-sm bg-gradient-primary text-white" style="background: linear-gradient(135deg, #0559b7 0%, #0d3880 100%);">
-            <div class="card-body d-flex align-items-center justify-content-between">
-                <div>
-                    <h6 class="text-white-50 text-uppercase mb-1" style="font-size: 0.75rem;">Email Dispatch</h6>
-                    <h5 class="mb-0 font-weight-bold text-white">Broadcast Alerts</h5>
+        <div class="card stat-card border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-primary text-white mr-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-size: 1.3rem;">
+                        <i class="bi bi-broadcast"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase mb-1 font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px; color: #0559b7 !important;">Email Dispatch</h6>
+                        <h5 class="mb-0 font-weight-bold" style="color: #0559b7 !important; font-size: 1.05rem;">Broadcast Alerts</h5>
+                    </div>
                 </div>
-                <a href="{% url 'dashboard:broadcast_email' %}" class="btn btn-light btn-sm font-weight-bold shadow-sm px-3">
-                    <i class="bi bi-send-fill mr-1 text-primary"></i> Compose
+                <a href="{% url 'dashboard:broadcast_email' %}" class="btn btn-primary btn-sm font-weight-bold shadow-sm px-3" title="Compose Broadcast">
+                    <i class="bi bi-send-fill mr-1"></i> Compose
                 </a>
             </div>
         </div>
