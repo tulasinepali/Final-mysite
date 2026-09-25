@@ -234,13 +234,17 @@ class VisitorCount(models.Model):
 
     @classmethod
     def get_count(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
+        """Return current visitor count, creating the record if it doesn't exist."""
+        obj, _ = cls.objects.get_or_create(pk=1, defaults={'count': 0})
         return obj.count
 
     @classmethod
     def increment(cls):
-        obj, created = cls.objects.get_or_create(pk=1, defaults={'count': 1})
-        if not created:
-            obj.count += 1
-            obj.save(update_fields=['count', 'updated_at'])
-        return obj.count
+        """Legacy method kept for compatibility. Middleware now uses F() directly."""
+        from django.db.models import F
+        updated = cls.objects.filter(pk=1).update(count=F('count') + 1)
+        if updated == 0:
+            obj, _ = cls.objects.get_or_create(pk=1, defaults={'count': 1})
+            return obj.count
+        return cls.objects.get(pk=1).count
+
