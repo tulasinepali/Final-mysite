@@ -387,10 +387,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <i class="bi bi-arrow-up-short fs-4"></i>
     </a>
 
-    <!-- Bootstrap JS — deferred, does not block render -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <!-- Custom JS — deferred -->
-    <script src="{% static 'js/main.js' %}" defer></script>
+    <!-- Bootstrap JS — load normally (deferring increases TBT) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS — load normally -->
+    <script src="{% static 'js/main.js' %}"></script>
     <script>
         // Global SmartStore Search Shortcut '/'
         document.addEventListener('keydown', function(e) {
@@ -477,39 +477,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
     </script>
     {% endif %}
-
-    <!-- Cookie Consent Banner (GDPR Compliance) -->
-    <div id="cookieConsentBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999;
-         background:#0d1117; color:#e6edf3; padding:14px 20px; box-shadow:0 -4px 16px rgba(0,0,0,0.4); border-top:1px solid rgba(255,255,255,0.1);">
-        <div class="container">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                <p class="mb-0 small" style="max-width:720px; color:#e6edf3;">
-                    <i class="bi bi-shield-check me-2" style="color:#60a5fa;"></i>
-                    We use cookies to improve your experience and show relevant ads via Google AdSense.
-                    By clicking <strong>Accept</strong>, you agree to our
-                    <a href="{% url 'core:privacy' %}" style="color:#ffffff; text-decoration:underline; font-weight:600;">Privacy Policy</a>.
-                </p>
-                <div class="d-flex gap-2 flex-shrink-0">
-                    <button onclick="setCookieConsent('declined')"
-                        class="btn btn-sm rounded-pill px-3" style="font-size:0.8rem; background:rgba(255,255,255,0.1); color:#e6edf3; border:1px solid rgba(255,255,255,0.3);">Decline</button>
-                    <button onclick="setCookieConsent('accepted')"
-                        class="btn btn-sm rounded-pill px-3" style="font-size:0.8rem; background:#0559b7; color:#ffffff; border-color:#0559b7; font-weight:600;">Accept All</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        (function() {
-            var consent = localStorage.getItem('cookieConsent');
-            if (!consent) {
-                document.getElementById('cookieConsentBanner').style.display = 'block';
-            }
-        })();
-        function setCookieConsent(choice) {
-            localStorage.setItem('cookieConsent', choice);
-            document.getElementById('cookieConsentBanner').style.display = 'none';
-        }
-    </script>
 
 </body>
 </html>
