@@ -293,7 +293,7 @@
                     <hr>
                     <div class="form-group">
                         {% if action == 'Create' %}
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-plus mr-1"></i> Create {{ model_name }}
                         </button>
                         {% else %}
@@ -331,7 +331,7 @@
                     <dt class="col-sm-4">Status</dt>
                     <dd class="col-sm-8">
                         {% if object.is_published %}
-                        <span class="badge badge-success">Published</span>
+                        <span class="badge badge-soft-primary">Published</span>
                         {% else %}
                         <span class="badge badge-secondary">Draft</span>
                         {% endif %}
@@ -348,10 +348,10 @@
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0">
-                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Slug is auto-generated from the title.</li>
-                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Leave slug blank for auto-generation.</li>
-                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Use rich text editor for content fields.</li>
-                    <li><i class="fas fa-check text-success mr-1"></i> Upload images in JPG/PNG format.</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Slug is auto-generated from the title.</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Leave slug blank for auto-generation.</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Use rich text editor for content fields.</li>
+                    <li><i class="fas fa-check text-primary mr-1"></i> Upload images in JPG/PNG format.</li>
                 </ul>
             </div>
         </div>

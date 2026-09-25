@@ -31,7 +31,7 @@
                         </span>
                     </div>
                     <small class="text-muted">
-                        Sending to <strong class="text-success">{{ active_count }} active subscriber{{ active_count|pluralize }}</strong>.
+                        Sending to <strong class="text-primary">{{ active_count }} active subscriber{{ active_count|pluralize }}</strong>.
                         Subscribers receive individual blind carbon copy (BCC) delivery.
                     </small>
                 </div>
@@ -206,12 +206,12 @@
                 <!-- Study Notes -->
                 <div class="p-3 border-bottom">
                     <div class="font-weight-bold small text-uppercase text-muted mb-2">
-                        <i class="bi bi-journal-text text-success mr-1"></i> Study Notes
+                        <i class="bi bi-journal-text text-primary mr-1"></i> Study Notes
                     </div>
                     {% for n in recent_notes %}
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="small text-truncate mr-2 font-weight-500" style="max-width: 190px;" title="{{ n.title }}">{{ n.title }}</span>
-                        <a href="?prefill_type=note&prefill_id={{ n.id }}" class="btn btn-xs btn-outline-success py-0 px-2 font-weight-bold" style="font-size: 0.72rem;">
+                        <a href="?prefill_type=note&prefill_id={{ n.id }}" class="btn btn-xs btn-outline-primary py-0 px-2 font-weight-bold" style="font-size: 0.72rem;">
                             Load &raquo;
                         </a>
                     </div>

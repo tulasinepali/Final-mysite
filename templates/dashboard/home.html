@@ -63,7 +63,7 @@
 
                 <div class="fx-hero-footer">
                     <div class="fx-chip-list">
-                        <span class="fx-chip"><i class="bi bi-patch-check-fill text-success"></i> Learning Engine Live</span>
+                        <span class="fx-chip"><i class="bi bi-patch-check-fill text-primary"></i> Learning Engine Live</span>
                         <span class="fx-chip"><i class="bi bi-shield-check text-info"></i> AdSense High-RPM Safe</span>
                         <span class="fx-chip"><i class="bi bi-person-check-fill text-warning"></i> Tulasi Nepali Verified</span>
                     </div>
@@ -108,7 +108,7 @@
                         <a href="{% url 'dashboard:subscribers' %}" class="btn btn-sm btn-outline-primary flex-grow-1 text-center">
                             <i class="bi bi-people mr-1"></i> Subscribers
                         </a>
-                        <a href="{% url 'dashboard:broadcast_email' %}" class="btn btn-sm btn-outline-success flex-grow-1 text-center">
+                        <a href="{% url 'dashboard:broadcast_email' %}" class="btn btn-sm btn-outline-primary flex-grow-1 text-center">
                             <i class="bi bi-broadcast mr-1"></i> Broadcast
                         </a>
                         <a href="{% url 'dashboard:settings' %}" class="btn btn-sm btn-outline-secondary flex-grow-1 text-center">
@@ -139,7 +139,7 @@
     <div class="col-sm-6 col-xl-3 mb-3 mb-xl-0">
         <div class="card fx-mini-stat h-100 mb-0">
             <div class="card-body">
-                <span class="fx-mini-icon green"><i class="bi bi-check2-circle"></i></span>
+                <span class="fx-mini-icon primary"><i class="bi bi-check2-circle"></i></span>
                 <span class="fx-mini-label">Practice Submissions</span>
                 <span class="fx-mini-value mono-num">{{ total_quiz_attempts }}</span>
                 <span class="fx-mini-meta positive"><i class="bi bi-arrow-up"></i> Candidate Exams Taken</span>
@@ -242,7 +242,7 @@
                                 <td class="text-center mono-num font-weight-bold">{{ note.views }}</td>
                                 <td class="text-center">
                                     {% if note.is_published %}
-                                    <span class="badge badge-soft-success">Published</span>
+                                    <span class="badge badge-soft-primary">Published</span>
                                     {% else %}
                                     <span class="badge badge-soft-warning">Draft</span>
                                     {% endif %}
@@ -295,7 +295,7 @@
                                 <td class="text-center mono-num font-weight-bold">{{ post.views }}</td>
                                 <td class="text-center">
                                     {% if post.is_published %}
-                                    <span class="badge badge-soft-success">Published</span>
+                                    <span class="badge badge-soft-primary">Published</span>
                                     {% else %}
                                     <span class="badge badge-soft-warning">Draft</span>
                                     {% endif %}
@@ -334,7 +334,7 @@
                             <span class="font-weight-semibold text-dark" style="font-size: 0.86rem;">{{ dl.title|truncatechars:36 }}</span>
                             <small class="d-block text-muted">{{ dl.category.name }}</small>
                         </div>
-                        <span class="badge badge-soft-success mono-num font-weight-bold">
+                        <span class="badge badge-soft-primary mono-num font-weight-bold">
                             {{ dl.download_count }} downloads
                         </span>
                     </div>
@@ -387,7 +387,7 @@
                                 </td>
                                 <td class="text-center">
                                     {% if attempt.percentage >= 80 %}
-                                    <span class="badge badge-soft-success">{{ attempt.percentage }}%</span>
+                                    <span class="badge badge-soft-primary">{{ attempt.percentage }}%</span>
                                     {% elif attempt.percentage >= 50 %}
                                     <span class="badge badge-soft-warning">{{ attempt.percentage }}%</span>
                                     {% else %}
@@ -569,7 +569,7 @@
             var diffData = {{ quiz_difficulty|safe }};
             var labels = [];
             var counts = [];
-            var colors = { 'easy': '#10b981', 'medium': '#f59e0b', 'hard': '#ef4444' };
+            var colors = { 'easy': '#0559b7', 'medium': '#f59e0b', 'hard': '#ef4444' };
             var bgColors = [];
 
             for (var i = 0; i < diffData.length; i++) {

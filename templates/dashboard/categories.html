@@ -67,7 +67,7 @@
                             {% elif cat.module == 'blog' %}
                             <span class="badge badge-info"><i class="fas fa-blog mr-1"></i>Blog</span>
                             {% elif cat.module == 'downloads' %}
-                            <span class="badge badge-success"><i class="fas fa-download mr-1"></i>Downloads</span>
+                            <span class="badge badge-primary"><i class="fas fa-download mr-1"></i>Downloads</span>
                             {% elif cat.module == 'quiz' %}
                             <span class="badge badge-purple" style="background-color: #6f42c1;"><i class="fas fa-brain mr-1"></i>Quiz</span>
                             {% else %}
@@ -89,7 +89,7 @@
                         <td>{{ cat.order }}</td>
                         <td>
                             {% if cat.is_active %}
-                            <span class="badge badge-success">Active</span>
+                            <span class="badge badge-soft-primary">Active</span>
                             {% else %}
                             <span class="badge badge-secondary">Inactive</span>
                             {% endif %}

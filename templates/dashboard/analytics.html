@@ -21,7 +21,7 @@
     </div>
     <div class="col-lg-3 col-6">
         <div class="info-box">
-            <span class="info-box-icon bg-success"><i class="fas fa-percentage"></i></span>
+            <span class="info-box-icon bg-primary"><i class="fas fa-percentage"></i></span>
             <div class="info-box-content">
                 <span class="info-box-text">Avg Score (30d)</span>
                 <span class="info-box-number">{{ avg_score_30d|floatformat:1 }}</span>
@@ -144,7 +144,7 @@
                             <tr>
                                 <td>
                                     {% if ds.difficulty == 'easy' %}
-                                    <span class="badge badge-success">Easy</span>
+                                    <span class="badge badge-primary">Easy</span>
                                     {% elif ds.difficulty == 'medium' %}
                                     <span class="badge badge-warning">Medium</span>
                                     {% elif ds.difficulty == 'hard' %}
@@ -211,7 +211,7 @@
                                 <td><span class="badge badge-purple" style="background-color: #6f42c1;">{{ quiz.category.name }}</span></td>
                                 <td>
                                     {% if quiz.difficulty == 'easy' %}
-                                    <span class="badge badge-success">Easy</span>
+                                    <span class="badge badge-primary">Easy</span>
                                     {% elif quiz.difficulty == 'medium' %}
                                     <span class="badge badge-warning">Medium</span>
                                     {% elif quiz.difficulty == 'hard' %}
@@ -231,7 +231,7 @@
                                     {% if quiz.avg_score and quiz.questions.count > 0 %}
                                         {% widthratio quiz.avg_score quiz.questions.count 100 as perf_pct %}
                                         <div class="progress" style="height: 10px; min-width: 80px;">
-                                            <div class="progress-bar {% if perf_pct >= 80 %}bg-success{% elif perf_pct >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {% if perf_pct > 100 %}100{% else %}{{ perf_pct }}{% endif %}%"></div>
+                                            <div class="progress-bar {% if perf_pct >= 80 %}bg-primary{% elif perf_pct >= 50 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {% if perf_pct > 100 %}100{% else %}{{ perf_pct }}{% endif %}%"></div>
                                         </div>
                                     {% else %}
                                         <div class="progress" style="height: 10px; min-width: 80px;">
@@ -260,7 +260,7 @@
 {% block extra_scripts %}
 <script>
     // Color palette
-    var palette = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#fd7e14', '#e83e8c', '#20c997', '#6610f2'];
+    var palette = ['#0559b7', '#04448c', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#fd7e14', '#e83e8c', '#20c997', '#6610f2'];
 
     // 30-Day Attempts & Avg Score Chart
     (function() {
@@ -278,8 +278,8 @@
                         {
                             label: 'Attempts',
                             data: counts,
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            borderColor: '#0559b7',
+                            backgroundColor: 'rgba(5, 89, 183, 0.1)',
                             fill: true,
                             tension: 0.4,
                             yAxisID: 'y',
@@ -287,8 +287,8 @@
                         {
                             label: 'Avg Score %',
                             data: avgPct,
-                            borderColor: '#28a745',
-                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderColor: '#04448c',
+                            backgroundColor: 'rgba(5, 89, 183, 0.08)',
                             fill: false,
                             tension: 0.4,
                             yAxisID: 'y1',

@@ -24,7 +24,7 @@
                             <span class="mr-3">
                                 <i class="fas fa-signal mr-1"></i>
                                 {% if quiz.difficulty == 'easy' %}
-                                <span class="badge badge-success">Easy</span>
+                                <span class="badge badge-primary">Easy</span>
                                 {% elif quiz.difficulty == 'medium' %}
                                 <span class="badge badge-warning">Medium</span>
                                 {% elif quiz.difficulty == 'hard' %}
@@ -68,7 +68,7 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="small-box bg-success">
+        <div class="small-box bg-primary">
             <div class="inner">
                 <h3>{{ quiz.attempts|default:"0" }}</h3>
                 <p>Total Attempts</p>
@@ -99,7 +99,7 @@
                     <a href="{% url 'dashboard:question_import' quiz.pk %}" class="btn btn-sm btn-primary mr-1">
                         <i class="fas fa-file-excel mr-1"></i> Import from Excel
                     </a>
-                    <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-sm btn-success">
+                    <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus mr-1"></i> Add New Question
                     </a>
                 </div>
@@ -136,7 +136,7 @@
                                 <td class="text-center">
                                     <span class="badge
                                         {% if question.correct_answer == 'A' %}badge-primary
-                                        {% elif question.correct_answer == 'B' %}badge-success
+                                        {% elif question.correct_answer == 'B' %}badge-secondary
                                         {% elif question.correct_answer == 'C' %}badge-info
                                         {% elif question.correct_answer == 'D' %}badge-warning
                                         {% else %}badge-secondary{% endif %} font-size-lg">
@@ -153,7 +153,7 @@
                                 </td>
                                 <td class="text-center">
                                     {% if question.explanation %}
-                                    <i class="fas fa-check-circle text-success" title="Has explanation"></i>
+                                    <i class="fas fa-check-circle text-primary" title="Has explanation"></i>
                                     {% else %}
                                     <i class="fas fa-times-circle text-muted" title="No explanation"></i>
                                     {% endif %}
@@ -183,7 +183,7 @@
                     <a href="{% url 'dashboard:question_import' quiz.pk %}" class="btn btn-primary mr-2">
                         <i class="fas fa-file-excel mr-1"></i> Import from Excel
                     </a>
-                    <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-success">
+                    <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-primary">
                         <i class="fas fa-plus mr-1"></i> Add First Question
                     </a>
                 </div>
@@ -199,7 +199,7 @@
                         <a href="{% url 'dashboard:question_import' quiz.pk %}" class="btn btn-primary mr-1">
                             <i class="fas fa-file-excel mr-1"></i> Import from Excel
                         </a>
-                        <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-success">
+                        <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-primary">
                             <i class="fas fa-plus mr-1"></i> Add Another Question
                         </a>
                     </div>

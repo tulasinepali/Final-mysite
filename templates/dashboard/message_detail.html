@@ -22,7 +22,7 @@
                     {% if not message.is_read %}
                     <span class="badge badge-danger mr-2"><i class="fas fa-circle mr-1"></i> Unread</span>
                     {% else %}
-                    <span class="badge badge-success mr-2"><i class="fas fa-check-circle mr-1"></i> Read</span>
+                    <span class="badge badge-primary mr-2"><i class="fas fa-check-circle mr-1"></i> Read</span>
                     {% endif %}
                 </div>
             </div>
@@ -113,7 +113,7 @@
                         <th class="pl-3">Status</th>
                         <td>
                             {% if message.is_read %}
-                            <span class="badge badge-success">Read</span>
+                            <span class="badge badge-primary">Read</span>
                             {% else %}
                             <span class="badge badge-danger">Unread</span>
                             {% endif %}

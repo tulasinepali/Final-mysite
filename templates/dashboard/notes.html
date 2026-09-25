@@ -82,7 +82,7 @@
                         <td>
                             <a href="{% url 'dashboard:note_toggle_publish' note.pk %}" class="text-decoration-none" title="Click to toggle">
                                 {% if note.is_published %}
-                                <span class="badge badge-success">Published</span>
+                                <span class="badge badge-soft-primary">Published</span>
                                 {% else %}
                                 <span class="badge badge-danger">Draft</span>
                                 {% endif %}

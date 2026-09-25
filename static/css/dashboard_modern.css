@@ -38,8 +38,8 @@
     --border-color-dark: #c4d2e6;
 
     /* Status & Accent Colors */
-    --success-color: #16a34a;
-    --success-color-light: #dcfce7;
+    --success-color: #0559b7;
+    --success-color-light: rgba(5, 89, 183, 0.08);
     --warning-color: #d97706;
     --warning-color-light: #ffedd5;
     --danger-color: #dc2626;
@@ -645,8 +645,9 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
     gap: 4px;
     align-items: center;
     padding: 0.35rem 0.75rem;
-    background: var(--success-color-light);
-    color: var(--success-color);
+    background: rgba(5, 89, 183, 0.1) !important;
+    color: #0559b7 !important;
+    border: 1px solid rgba(5, 89, 183, 0.2) !important;
 }
 
 /* FlexAdmin 4-Column KPI Grid */
@@ -707,7 +708,7 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 }
 
 .fx-kpi-trend.positive {
-    color: var(--success-color);
+    color: #0559b7 !important;
 }
 
 .fx-hero-footer {
@@ -800,8 +801,8 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 }
 
 .fx-mini-icon.green {
-    background: var(--success-color-light);
-    color: var(--success-color);
+    background: rgba(5, 89, 183, 0.08) !important;
+    color: #0559b7 !important;
 }
 
 .fx-mini-icon.amber {
@@ -848,7 +849,7 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 }
 
 .fx-mini-meta.positive {
-    color: var(--success-color);
+    color: #0559b7 !important;
 }
 
 /* ------------------------------------------------------------
@@ -955,8 +956,9 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 }
 
 .badge-soft-success, .badge-success {
-    background: var(--success-color-light) !important;
-    color: var(--success-color) !important;
+    background: rgba(5, 89, 183, 0.08) !important;
+    color: #0559b7 !important;
+    border: 1px solid rgba(5, 89, 183, 0.2) !important;
 }
 
 .badge-soft-warning, .badge-warning {
@@ -1150,4 +1152,65 @@ svg.svg-inline--fa {
     color: var(--muted-color) !important;
     font-size: 0.82rem !important;
     padding: 1rem 1.75rem !important;
+}
+
+/* ============================================================
+   Royal Cobalt Blue Overrides for Green Styles
+   (Ensures 100% theme consistency with frontend)
+   ============================================================ */
+.btn-success {
+    background-color: #0559b7 !important;
+    border-color: #0559b7 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(5, 89, 183, 0.28) !important;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active,
+.btn-success.active {
+    background-color: #04448c !important;
+    border-color: #04448c !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 16px rgba(5, 89, 183, 0.38) !important;
+}
+
+.btn-outline-success {
+    color: #0559b7 !important;
+    border-color: #0559b7 !important;
+    background: transparent !important;
+}
+
+.btn-outline-success:hover,
+.btn-outline-success:focus,
+.btn-outline-success:active,
+.btn-outline-success.active {
+    background-color: rgba(5, 89, 183, 0.08) !important;
+    color: #0559b7 !important;
+    border-color: #0559b7 !important;
+}
+
+.text-success {
+    color: #0559b7 !important;
+}
+
+.bg-success {
+    background-color: #0559b7 !important;
+    color: #ffffff !important;
+}
+
+.small-box.bg-success,
+.info-box-icon.bg-success {
+    background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%) !important;
+    color: #ffffff !important;
+}
+
+.alert-success {
+    background-color: rgba(5, 89, 183, 0.08) !important;
+    border-color: rgba(5, 89, 183, 0.22) !important;
+    color: #032b5f !important;
+}
+
+.progress-bar.bg-success {
+    background-color: #0559b7 !important;
 }

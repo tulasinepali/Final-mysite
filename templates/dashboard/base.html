@@ -28,17 +28,173 @@
     <!-- Bootstrap 4 & AdminLTE base layout -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <!-- FlexAdmin Custom Theme -->
-    <link rel="stylesheet" href="{% static 'css/dashboard_modern.css' %}">
+    <!-- FlexAdmin Custom Theme with Cache Buster -->
+    <link rel="stylesheet" href="{% static 'css/dashboard_modern.css' %}?v={% now 'U' %}">
 
     {% block extra_head %}{% endblock %}
 
-    <!-- CKEditor 5 Compatibility -->
+    <!-- Royal Cobalt Blue Signature Theme (Exact Match with Frontend) -->
     <style>
+        :root {
+            --accent-color: #0559b7 !important;
+            --accent-hover: #04448c !important;
+            --accent-light: rgba(5, 89, 183, 0.08) !important;
+            --color-primary: #0559b7 !important;
+            --color-primary-dark: #04448c !important;
+            --color-primary-light: #2563eb !important;
+            --color-primary-bg: rgba(5, 89, 183, 0.08) !important;
+            --primary: #0559b7 !important;
+        }
+
+        /* Sidebar Branding & Active Highlight */
+        .main-sidebar .brand-link .brand-subtitle {
+            color: #0559b7 !important;
+        }
+        .sidebar .nav-sidebar .nav-link.active {
+            background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%) !important;
+            box-shadow: 0 8px 18px -4px rgba(5, 89, 183, 0.45) !important;
+            color: #ffffff !important;
+        }
+        .sidebar .nav-sidebar .nav-link.active .nav-icon {
+            background: rgba(255, 255, 255, 0.22) !important;
+            color: #ffffff !important;
+        }
+        .sidebar .nav-sidebar .nav-link:hover {
+            background: rgba(5, 89, 183, 0.08) !important;
+            color: #0f1728 !important;
+        }
+        .sidebar .nav-sidebar .nav-link .nav-icon {
+            background: rgba(5, 89, 183, 0.08) !important;
+            color: #0559b7 !important;
+        }
+        .sidebar .nav-link .badge-primary,
+        .sidebar .nav-link .badge-soft-primary,
+        .badge-soft-primary {
+            background: rgba(5, 89, 183, 0.1) !important;
+            color: #0559b7 !important;
+        }
+
+        /* Complete Overrides for AdminLTE / Bootstrap Greens with Signature Royal Blue */
+        .btn-success,
+        .btn-primary {
+            background-color: #0559b7 !important;
+            border-color: #0559b7 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(5, 89, 183, 0.28) !important;
+        }
+        .btn-success:hover,
+        .btn-success:focus,
+        .btn-success:active,
+        .btn-success.active,
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary.active {
+            background-color: #04448c !important;
+            border-color: #04448c !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 16px rgba(5, 89, 183, 0.38) !important;
+        }
+        .btn-outline-success,
+        .btn-outline-primary {
+            color: #0559b7 !important;
+            border-color: #0559b7 !important;
+            background: transparent !important;
+        }
+        .btn-outline-success:hover,
+        .btn-outline-success:focus,
+        .btn-outline-success:active,
+        .btn-outline-primary:hover,
+        .btn-outline-primary:focus,
+        .btn-outline-primary:active {
+            background: rgba(5, 89, 183, 0.08) !important;
+            color: #0559b7 !important;
+            border-color: #0559b7 !important;
+        }
+        .badge-success,
+        .badge-soft-success {
+            background-color: rgba(5, 89, 183, 0.08) !important;
+            color: #0559b7 !important;
+            border: 1px solid rgba(5, 89, 183, 0.2) !important;
+        }
+        .text-success {
+            color: #0559b7 !important;
+        }
+        .bg-success {
+            background-color: #0559b7 !important;
+            color: #ffffff !important;
+        }
+        .small-box.bg-success,
+        .info-box-icon.bg-success {
+            background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%) !important;
+            color: #ffffff !important;
+        }
+        .alert-success {
+            background-color: rgba(5, 89, 183, 0.08) !important;
+            border-color: rgba(5, 89, 183, 0.22) !important;
+            color: #032b5f !important;
+        }
+        .progress-bar.bg-success {
+            background-color: #0559b7 !important;
+        }
+
+        /* Top Bar Badges & Icons */
+        .header-brand .brand-badge {
+            background: rgba(5, 89, 183, 0.1) !important;
+            color: #0559b7 !important;
+        }
+        .sidebar-toggle:hover {
+            border-color: #0559b7 !important;
+            color: #0559b7 !important;
+            background: rgba(5, 89, 183, 0.08) !important;
+        }
+        .sidebar-toggle:hover i {
+            color: #0559b7 !important;
+        }
+        .header-search input:focus {
+            border-color: #0559b7 !important;
+            box-shadow: 0 0 0 3px rgba(5, 89, 183, 0.18) !important;
+        }
+        .user-trigger:hover {
+            border-color: #0559b7 !important;
+            background: rgba(5, 89, 183, 0.06) !important;
+        }
+
+        /* Hero Card, Mini Icons & Pulse */
+        .fx-hero-card {
+            background: linear-gradient(145deg, rgba(5, 89, 183, 0.06), #ffffff 60%) !important;
+            border: 1px solid rgba(5, 89, 183, 0.2) !important;
+        }
+        .fx-overline {
+            color: #0559b7 !important;
+        }
+        .fx-hero-badge {
+            background: rgba(5, 89, 183, 0.1) !important;
+            color: #0559b7 !important;
+            border: 1px solid rgba(5, 89, 183, 0.2) !important;
+        }
+        .fx-kpi-trend.positive,
+        .fx-mini-meta.positive {
+            color: #0559b7 !important;
+        }
+        .fx-mini-icon.teal,
+        .fx-mini-icon.green,
+        .fx-mini-icon.primary {
+            background: rgba(5, 89, 183, 0.08) !important;
+            color: #0559b7 !important;
+        }
+        .fx-kpi-item:hover {
+            border-color: #0559b7 !important;
+        }
+        .fx-chip i {
+            color: #0559b7 !important;
+        }
+
+        /* CKEditor 5 Compatibility */
         .ck.ck-editor { width: 100% !important; }
         .ck.ck-editor__main > .ck-editor__editable { min-height: 300px; background: #fff !important; }
         .ck.ck-toolbar { background: #f8fafc !important; border: 1px solid #dde5f1 !important; border-radius: 8px 8px 0 0; }
-        .ck.ck-editor__editable:focus { border-color: var(--accent-color) !important; box-shadow: 0 0 0 3px rgba(5, 89, 183, 0.18) !important; }
+        .ck.ck-editor__editable:focus { border-color: #0559b7 !important; box-shadow: 0 0 0 3px rgba(5, 89, 183, 0.18) !important; }
         .card-body .ck.ck-editor { margin-bottom: 0.5rem; }
         .ck.ck-toolbar .ck.ck-dropdown__panel { z-index: 1050 !important; }
     </style>
@@ -108,7 +264,7 @@
                             <i class="bi bi-graph-up mr-2 text-info"></i> Performance Analytics
                         </a>
                         <a href="{% url 'dashboard:ads' %}" class="dropdown-item py-2 d-flex align-items-center">
-                            <i class="bi bi-badge-ad mr-2 text-success"></i> Ad Placements Status
+                            <i class="bi bi-badge-ad mr-2 text-primary"></i> Ad Placements Status
                         </a>
                     </div>
                 </div>
@@ -259,7 +415,7 @@
                         <a href="{% url 'dashboard:broadcast_email' %}" class="nav-link {% if active_page == 'broadcast' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-broadcast"></i></span>
                             <p>Broadcast Email</p>
-                            <span class="badge badge-success">Send</span>
+                            <span class="badge badge-soft-primary">Send</span>
                         </a>
                     </li>
 
@@ -321,7 +477,7 @@
         <div class="mb-3">
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center" role="alert" style="border-left: 4px solid var(--accent-color) !important;">
-                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill text-success mr-2 font-weight-bold"></i>
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill text-primary mr-2 font-weight-bold"></i>
                 {% elif message.tags == 'error' or message.tags == 'danger' %}<i class="bi bi-exclamation-octagon-fill text-danger mr-2"></i>
                 {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill text-warning mr-2"></i>
                 {% else %}<i class="bi bi-info-circle-fill text-info mr-2"></i>

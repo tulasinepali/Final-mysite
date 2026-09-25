@@ -15,7 +15,7 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-ad mr-1"></i> Ad Placements</h3>
                 <div class="card-tools">
-                    <a href="{% url 'dashboard:ad_create' %}" class="btn btn-sm btn-success">
+                    <a href="{% url 'dashboard:ad_create' %}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus mr-1"></i> Create Ad Placement
                     </a>
                 </div>
@@ -46,11 +46,11 @@
                                     {% elif ad.placement == 'home_sidebar' %}
                                     <span class="badge badge-info"><i class="fas fa-columns mr-1"></i> Home Sidebar</span>
                                     {% elif ad.placement == 'notes_top' %}
-                                    <span class="badge badge-success"><i class="fas fa-book mr-1"></i> Notes Top</span>
+                                    <span class="badge badge-primary"><i class="fas fa-book mr-1"></i> Notes Top</span>
                                     {% elif ad.placement == 'notes_middle' %}
-                                    <span class="badge badge-success"><i class="fas fa-book mr-1"></i> Notes Middle</span>
+                                    <span class="badge badge-primary"><i class="fas fa-book mr-1"></i> Notes Middle</span>
                                     {% elif ad.placement == 'notes_bottom' %}
-                                    <span class="badge badge-success"><i class="fas fa-book mr-1"></i> Notes Bottom</span>
+                                    <span class="badge badge-primary"><i class="fas fa-book mr-1"></i> Notes Bottom</span>
                                     {% elif ad.placement == 'blog_top' %}
                                     <span class="badge badge-warning"><i class="fas fa-blog mr-1"></i> Blog Top</span>
                                     {% elif ad.placement == 'blog_middle' %}
@@ -82,7 +82,7 @@
                                 </td>
                                 <td class="text-center">
                                     {% if ad.is_active %}
-                                    <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> Active</span>
+                                    <span class="badge badge-soft-primary"><i class="bi bi-check-circle-fill mr-1"></i> Active</span>
                                     {% else %}
                                     <span class="badge badge-secondary"><i class="fas fa-times-circle mr-1"></i> Inactive</span>
                                     {% endif %}
@@ -102,7 +102,7 @@
                                     <!-- Toggle Active -->
                                     <form method="post" action="{% url 'dashboard:ad_toggle' ad.pk %}" style="display:inline;">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-{% if ad.is_active %}warning{% else %}success{% endif %}" title="{% if ad.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                        <button type="submit" class="btn btn-sm btn-outline-{% if ad.is_active %}warning{% else %}primary{% endif %}" title="{% if ad.is_active %}Deactivate{% else %}Activate{% endif %}">
                                             <i class="fas fa-{% if ad.is_active %}pause{% else %}play{% endif %}"></i>
                                         </button>
                                     </form>
@@ -126,7 +126,7 @@
                     <i class="fas fa-ad fa-2x mb-3 d-block text-muted"></i>
                     <h5>No ad placements yet</h5>
                     <p class="text-muted">Create ad placements to manage advertisements on your site. You can use HTML ad code, upload images, or create popup ads.</p>
-                    <a href="{% url 'dashboard:ad_create' %}" class="btn btn-sm btn-success">
+                    <a href="{% url 'dashboard:ad_create' %}" class="btn btn-sm btn-primary">
                         <i class="fas fa-plus mr-1"></i> Create First Ad Placement
                     </a>
                 </div>

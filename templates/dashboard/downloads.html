@@ -78,7 +78,7 @@
                             {{ dl.title|truncatechars:45 }}
                             {% endif %}
                         </td>
-                        <td><span class="badge badge-success">{{ dl.category.name }}</span></td>
+                        <td><span class="badge badge-soft-primary">{{ dl.category.name }}</span></td>
                         <td>
                             {% if dl.file_type == 'pdf' %}
                             <span class="badge badge-danger"><i class="fas fa-file-pdf mr-1"></i>PDF</span>
@@ -87,7 +87,7 @@
                             {% elif dl.file_type == 'ppt' %}
                             <span class="badge badge-warning"><i class="fas fa-file-powerpoint mr-1"></i>PPT</span>
                             {% elif dl.file_type == 'zip' %}
-                            <span class="badge badge-success"><i class="fas fa-file-archive mr-1"></i>ZIP</span>
+                            <span class="badge badge-primary"><i class="fas fa-file-archive mr-1"></i>ZIP</span>
                             {% else %}
                             <span class="badge badge-secondary"><i class="fas fa-file mr-1"></i>{{ dl.file_type|upper }}</span>
                             {% endif %}
@@ -96,7 +96,7 @@
                         <td>
                             <a href="{% url 'dashboard:download_toggle_publish' dl.pk %}" class="text-decoration-none" title="Click to toggle">
                                 {% if dl.is_published %}
-                                <span class="badge badge-success">Published</span>
+                                <span class="badge badge-soft-primary">Published</span>
                                 {% else %}
                                 <span class="badge badge-danger">Draft</span>
                                 {% endif %}

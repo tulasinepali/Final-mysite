@@ -180,10 +180,10 @@
                     <hr>
                     <div class="form-group">
                         {% if action == 'Create' %}
-                        <button type="submit" class="btn btn-success" name="_save">
+                        <button type="submit" class="btn btn-primary" name="_save">
                             <i class="fas fa-plus mr-1"></i> Create Question
                         </button>
-                        <button type="submit" class="btn btn-outline-success" name="_addanother">
+                        <button type="submit" class="btn btn-outline-primary" name="_addanother">
                             <i class="fas fa-plus-circle mr-1"></i> Save & Add Another
                         </button>
                         {% else %}
@@ -218,7 +218,7 @@
                     <dt class="col-sm-4">Difficulty</dt>
                     <dd class="col-sm-8">
                         {% if quiz.difficulty == 'easy' %}
-                        <span class="badge badge-success">Easy</span>
+                        <span class="badge badge-primary">Easy</span>
                         {% elif quiz.difficulty == 'medium' %}
                         <span class="badge badge-warning">Medium</span>
                         {% elif quiz.difficulty == 'hard' %}
@@ -240,10 +240,10 @@
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0">
-                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Make all four options plausible.</li>
-                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Add an explanation to help learners.</li>
-                    <li class="mb-2"><i class="fas fa-check text-success mr-1"></i> Use the order field to sequence questions.</li>
-                    <li><i class="fas fa-check text-success mr-1"></i> Keep question text clear and concise.</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Make all four options plausible.</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Add an explanation to help learners.</li>
+                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Use the order field to sequence questions.</li>
+                    <li><i class="fas fa-check text-primary mr-1"></i> Keep question text clear and concise.</li>
                 </ul>
             </div>
         </div>
