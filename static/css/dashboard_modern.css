@@ -9,21 +9,24 @@
    FlexAdmin CSS Custom Properties & Design Tokens
    ------------------------------------------------------------ */
 :root {
-    /* Typography */
-    --default-font: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --heading-font: "Sora", sans-serif;
-    --nav-font: "Manrope", sans-serif;
+    /* Typography (Matching Home Page) */
+    --default-font: "Roboto", "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --heading-font: "Montserrat", "Sora", sans-serif;
+    --nav-font: "Poppins", "Manrope", sans-serif;
     --mono-font: "JetBrains Mono", monospace;
 
-    /* Core Palette - FlexAdmin Signature Teal & Light Surfaces */
+    /* Core Palette - Royal Cobalt Blue (Matching Home) */
     --background-color: #f4f7fb;
     --default-color: #1c2635;
     --heading-color: #0f1728;
-    --accent-color: #0ea5a4;
-    --accent-hover: #0b8988;
-    --accent-light: rgba(14, 165, 164, 0.12);
+    --accent-color: #0559b7;
+    --accent-hover: #04448c;
+    --accent-light: rgba(5, 89, 183, 0.08);
     --surface-color: #ffffff;
     --contrast-color: #ffffff;
+    --accent-dark: #032b5f;
+    --accent-gradient: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);
+    --accent-shadow: rgba(5, 89, 183, 0.35);
 
     /* Text & Muted Tones */
     --muted-color: #5f6e83;
@@ -209,7 +212,7 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
     outline: none;
     border-color: var(--accent-color);
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.18);
+    box-shadow: 0 0 0 3px rgba(5, 89, 183, 0.18);
 }
 
 .header-search .search-shortcut {
@@ -266,7 +269,7 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 .header-action:hover {
     color: var(--accent-color);
     background: var(--accent-light);
-    border-color: rgba(14, 165, 164, 0.2);
+    border-color: rgba(5, 89, 183, 0.2);
     text-decoration: none;
 }
 
@@ -464,7 +467,7 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
     width: 30px !important;
     height: 30px !important;
     border-radius: 9px !important;
-    background: rgba(14, 165, 164, 0.08) !important;
+    background: rgba(5, 89, 183, 0.08) !important;
     color: var(--accent-color) !important;
     font-size: 1rem !important;
     flex-shrink: 0 !important;
@@ -483,8 +486,8 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 /* Active Nav Item */
 .sidebar .nav-sidebar .nav-link.active {
     color: #ffffff !important;
-    background: linear-gradient(135deg, #0ea5a4 0%, #0b8988 100%) !important;
-    box-shadow: 0 8px 16px -6px rgba(14, 165, 164, 0.45) !important;
+    background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%) !important;
+    box-shadow: 0 8px 16px -6px rgba(5, 89, 183, 0.4) !important;
 }
 
 .sidebar .nav-sidebar .nav-link.active .nav-icon {
@@ -542,7 +545,7 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(14, 165, 164, 0.12);
+    background: rgba(5, 89, 183, 0.08);
     color: var(--accent-color);
     font-size: 0.9rem;
     flex-shrink: 0;
@@ -591,8 +594,8 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
    FlexAdmin Hero Briefing Card (.fx-hero-card)
    ------------------------------------------------------------ */
 .fx-hero-card {
-    background: linear-gradient(145deg, rgba(14, 165, 164, 0.07), #ffffff 60%) !important;
-    border: 1px solid rgba(14, 165, 164, 0.22) !important;
+    background: linear-gradient(145deg, rgba(5, 89, 183, 0.06), #ffffff 60%) !important;
+    border: 1px solid rgba(5, 89, 183, 0.18) !important;
     border-radius: var(--radius-xl) !important;
     box-shadow: var(--shadow-sm) !important;
     overflow: hidden;
@@ -785,9 +788,10 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
     font-size: 1.15rem;
 }
 
-.fx-mini-icon.teal {
-    background: rgba(14, 165, 164, 0.12);
-    color: #0ea5a4;
+.fx-mini-icon.teal,
+.fx-mini-icon.primary {
+    background: rgba(5, 89, 183, 0.08);
+    color: #0559b7;
 }
 
 .fx-mini-icon.purple {
@@ -946,8 +950,8 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 }
 
 .badge-soft-primary, .badge-primary {
-    background: rgba(14, 165, 164, 0.12) !important;
-    color: #0ea5a4 !important;
+    background: rgba(5, 89, 183, 0.08) !important;
+    color: #0559b7 !important;
 }
 
 .badge-soft-success, .badge-success {
@@ -990,13 +994,13 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
     background: var(--accent-color) !important;
     border-color: var(--accent-color) !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(14, 165, 164, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(5, 89, 183, 0.28) !important;
 }
 
 .btn-primary:hover, .btn-primary:focus {
     background: var(--accent-hover) !important;
     border-color: var(--accent-hover) !important;
-    box-shadow: 0 6px 16px rgba(14, 165, 164, 0.4) !important;
+    box-shadow: 0 6px 16px rgba(5, 89, 183, 0.38) !important;
     color: #ffffff !important;
 }
 
@@ -1033,7 +1037,7 @@ h1, h2, h3, h4, h5, h6, .brand-text, .page-title, .fx-hero-title {
 
 .form-control:focus {
     border-color: var(--accent-color) !important;
-    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.18) !important;
+    box-shadow: 0 0 0 3px rgba(5, 89, 183, 0.18) !important;
 }
 
 /* ------------------------------------------------------------

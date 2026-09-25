@@ -1,6 +1,10 @@
 from django.contrib import admin
 from .models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber
 
+admin.site.site_header = "Tulasi Nepali - Admin Console"
+admin.site.site_title = "Tulasi Nepali Admin"
+admin.site.index_title = "Platform Management & Operations"
+
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):

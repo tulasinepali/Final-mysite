@@ -461,7 +461,7 @@
 
 {% block javascript %}
 <script>
-    // Quiz Attempts Line Chart (Styled with FlexAdmin Teal & Modern Gradient)
+    // Quiz Attempts Line Chart (Styled with Royal Cobalt Blue & Modern Gradient)
     (function() {
         var ctx = document.getElementById('quizAttemptsChart');
         if (ctx) {
@@ -477,8 +477,8 @@
             }
 
             var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
-            gradient.addColorStop(0, 'rgba(14, 165, 164, 0.28)');
-            gradient.addColorStop(1, 'rgba(14, 165, 164, 0.01)');
+            gradient.addColorStop(0, 'rgba(5, 89, 183, 0.28)');
+            gradient.addColorStop(1, 'rgba(5, 89, 183, 0.01)');
 
             new Chart(ctx, {
                 type: 'line',
@@ -488,12 +488,12 @@
                         {
                             label: 'Attempts',
                             data: data,
-                            borderColor: '#0ea5a4',
+                            borderColor: '#0559b7',
                             backgroundColor: gradient,
                             fill: true,
                             tension: 0.35,
                             borderWidth: 2.5,
-                            pointBackgroundColor: '#0ea5a4',
+                            pointBackgroundColor: '#0559b7',
                             pointBorderColor: '#ffffff',
                             pointBorderWidth: 2,
                             pointRadius: 4,
@@ -576,13 +576,13 @@
                 var d = diffData[i];
                 labels.push(d.difficulty.charAt(0).toUpperCase() + d.difficulty.slice(1));
                 counts.push(d.count);
-                bgColors.push(colors[d.difficulty] || '#0ea5a4');
+                bgColors.push(colors[d.difficulty] || '#0559b7');
             }
 
             if (labels.length === 0) {
                 labels = ['Ready'];
                 counts = [1];
-                bgColors = ['#0ea5a4'];
+                bgColors = ['#0559b7'];
             }
 
             new Chart(ctx, {
