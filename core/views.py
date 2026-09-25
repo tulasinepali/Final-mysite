@@ -92,6 +92,14 @@ def terms_conditions(request):
     }
     return render(request, 'core/terms.html', context)
 
+def disclaimer(request):
+    context = {
+        'meta_title': 'Disclaimer - Tulasi Nepali',
+        'meta_description': 'Read the disclaimer for tulasinepali.com.np. Educational content provided for informational purposes only, not affiliated with any government body.',
+    }
+    return render(request, 'core/disclaimer.html', context)
+
+
 def sitemap_view(request):
     """Generate a basic HTML sitemap"""
     notes = Note.objects.filter(is_published=True)

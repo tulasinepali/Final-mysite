@@ -341,6 +341,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div class="legal-links small">
                                 <a href="{% url 'core:privacy' %}" class="text-muted text-decoration-none me-2">Privacy</a>
                                 <a href="{% url 'core:terms' %}" class="text-muted text-decoration-none me-2">Terms</a>
+                                <a href="{% url 'core:disclaimer' %}" class="text-muted text-decoration-none me-2">Disclaimer</a>
                                 <a href="{% url 'core:sitemap' %}" class="text-muted text-decoration-none">Sitemap</a>
                             </div>
                         </div>
@@ -472,5 +473,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
     </script>
     {% endif %}
+
+    <!-- Cookie Consent Banner (GDPR Compliance) -->
+    <div id="cookieConsentBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999;
+         background:#1a1a2e; color:#fff; padding:14px 20px; box-shadow:0 -2px 12px rgba(0,0,0,0.3);">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <p class="mb-0 small" style="max-width:720px;">
+                    <i class="bi bi-shield-check me-2 text-primary"></i>
+                    We use cookies to improve your experience and show relevant ads via Google AdSense.
+                    By clicking <strong>Accept</strong>, you agree to our
+                    <a href="{% url 'core:privacy' %}" class="text-primary text-decoration-none">Privacy Policy</a>.
+                </p>
+                <div class="d-flex gap-2 flex-shrink-0">
+                    <button onclick="setCookieConsent('declined')"
+                        class="btn btn-sm btn-outline-light rounded-pill px-3" style="font-size:0.8rem;">Decline</button>
+                    <button onclick="setCookieConsent('accepted')"
+                        class="btn btn-sm btn-primary rounded-pill px-3" style="font-size:0.8rem; background:#0559b7; border-color:#0559b7;">Accept All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            var consent = localStorage.getItem('cookieConsent');
+            if (!consent) {
+                document.getElementById('cookieConsentBanner').style.display = 'block';
+            }
+        })();
+        function setCookieConsent(choice) {
+            localStorage.setItem('cookieConsent', choice);
+            document.getElementById('cookieConsentBanner').style.display = 'none';
+        }
+    </script>
+
 </body>
 </html>

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Disclaimer - Tulasi Nepali{% endblock %}
+{% block meta_description %}Read the disclaimer for tulasinepali.com.np. This site provides educational content for exam preparation purposes only and is not affiliated with any government body.{% endblock %}
+
+{% block og_title %}Disclaimer - Tulasi Nepali{% endblock %}
+{% block og_description %}Disclaimer for tulasinepali.com.np - educational content provided for informational purposes only.{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 small" style="font-family: 'Poppins', sans-serif;">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #0559b7;"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">Disclaimer</li>
+            </ol>
+        </nav>
+        <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Disclaimer</h1>
+        <p class="text-muted small mb-0">Last updated: September 2026</p>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+
+                    <h2 class="h5 fw-bold text-dark mb-3" style="color: #0559b7;">1. Educational Purpose Only</h2>
+                    <p class="text-muted">All content published on <strong>tulasinepali.com.np</strong> — including study notes, MCQ practice questions, quiz materials, blog articles, and downloadable PDF files — is provided strictly for <strong>educational and informational purposes only</strong>.</p>
+                    <p class="text-muted">This website is an independent educational platform curated by Tulasi Nepali to help students and job seekers prepare for Loksewa (Public Service Commission), school-level exams, and general knowledge improvement. It is <strong>not affiliated with, endorsed by, or connected to</strong> the Nepal Public Service Commission (Lok Sewa Aayog), any government ministry, or any official examination body.</p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 fw-bold text-dark mb-3">2. No Guarantee of Accuracy</h2>
+                    <p class="text-muted">While we make every effort to ensure that the information on this website is accurate and up-to-date, we make <strong>no warranties or representations</strong> of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability of the content.</p>
+                    <p class="text-muted">Question banks, model papers, and syllabus documents are compiled from publicly available sources for practice purposes. Always verify with official sources before relying on them for actual examinations.</p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 fw-bold text-dark mb-3">3. No Professional Advice</h2>
+                    <p class="text-muted">The content on this site does not constitute professional, legal, financial, or career advice. Any decisions you make based on the information provided are entirely at your own risk.</p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 fw-bold text-dark mb-3">4. Third-Party Links</h2>
+                    <p class="text-muted">This website may contain links to third-party websites for additional resources. These links are provided for your convenience only. We have no control over the content of those sites and accept no responsibility for them or for any loss or damage that may arise from your use of them.</p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 fw-bold text-dark mb-3">5. Advertising</h2>
+                    <p class="text-muted">This site uses Google AdSense to display advertisements. Google, as a third-party vendor, uses cookies to serve ads based on a user's prior visits to this website or other websites. You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" style="color: #0559b7;">Google Ads Settings</a>.</p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 fw-bold text-dark mb-3">6. Copyright</h2>
+                    <p class="text-muted">All original content on this website is the intellectual property of Tulasi Nepali unless otherwise stated. Unauthorized reproduction, distribution, or use of this content without written permission is prohibited. Publicly available exam questions and syllabuses are reproduced for educational practice and remain the property of their respective issuing bodies.</p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 fw-bold text-dark mb-3">7. Changes to This Disclaimer</h2>
+                    <p class="text-muted">We reserve the right to update or change this Disclaimer at any time. Any changes will be posted on this page with an updated revision date. Continued use of the website after any changes constitutes your acceptance of the new Disclaimer.</p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 fw-bold text-dark mb-3">8. Contact</h2>
+                    <p class="text-muted">If you have any questions about this Disclaimer, please <a href="{% url 'core:contact' %}" style="color: #0559b7;">contact us</a>.</p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
