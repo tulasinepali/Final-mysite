@@ -99,4 +99,13 @@ urlpatterns = [
     path('widgets/<int:pk>/delete/', views.widget_delete, name='widget_delete'),
     path('widgets/<int:pk>/toggle-active/', views.widget_toggle_active, name='widget_toggle_active'),
     path('widgets/settings/', views.dashboard_widget_settings, name='widget_settings'),
+
+    # Patro Holidays & Events
+    path('patro/events/', views.dashboard_patro_events, name='patro_events'),
+    path('patro/events/create/', views.patro_event_create, name='patro_event_create'),
+    path('patro/events/<int:pk>/edit/', views.patro_event_edit, name='patro_event_edit'),
+    path('patro/events/<int:pk>/delete/', views.patro_event_delete, name='patro_event_delete'),
+    path('patro/events/<int:pk>/toggle-holiday/', views.patro_event_toggle_holiday, name='patro_event_toggle_holiday'),
+    path('patro/events/import/', views.patro_event_import, name='patro_event_import'),
+    path('patro/events/sample-csv/', views.patro_event_sample_csv, name='patro_event_sample_csv'),
 ]

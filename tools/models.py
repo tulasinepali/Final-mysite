@@ -79,3 +79,53 @@ class WidgetSetting(models.Model):
     def get_settings(cls):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+
+class PatroEvent(models.Model):
+    EVENT_TYPES = (
+        ('holiday', 'सार्वजनिक बिदा (Public Holiday)'),
+        ('festival', 'चाडपर्व / उत्सव (Festival)'),
+        ('national', 'राष्ट्रिय दिवस (National Day)'),
+        ('international', 'अन्तर्राष्ट्रिय दिवस (International Day)'),
+        ('exam', 'परीक्षा / शैक्षिक सूचना (Educational)'),
+    )
+
+    MONTH_CHOICES = (
+        (1, '१. बैशाख (Baisakh)'),
+        (2, '२. जेठ (Jestha)'),
+        (3, '३. असार (Ashadh)'),
+        (4, '४. साउन (Shrawan)'),
+        (5, '५. भदौ (Bhadra)'),
+        (6, '६. असोज (Ashwin)'),
+        (7, '७. कात्तिक (Kartik)'),
+        (8, '८. मंसिर (Mangsir)'),
+        (9, '९. पुस (Poush)'),
+        (10, '१०. माघ (Magh)'),
+        (11, '११. फागुन (Falgun)'),
+        (12, '१२. चैत (Chaitra)'),
+    )
+
+    year_bs = models.PositiveSmallIntegerField(default=2083, help_text="Bikram Sambat Year (e.g. 2083, 2084)")
+    month_bs = models.PositiveSmallIntegerField(choices=MONTH_CHOICES, default=1, help_text="B.S. Month (1 to 12)")
+    day_bs = models.PositiveSmallIntegerField(help_text="B.S. Day (1 to 32)")
+    title = models.CharField(max_length=200, help_text="Event or holiday name in Nepali (e.g. नयाँ वर्ष, विजया दशमी)")
+    title_en = models.CharField(max_length=200, blank=True, help_text="Optional English title")
+    is_public_holiday = models.BooleanField(default=True, help_text="Check to highlight as official public holiday in red")
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPES, default='holiday')
+    description = models.TextField(blank=True, help_text="Optional additional notes or gazette notice reference")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['year_bs', 'month_bs', 'day_bs']
+        unique_together = ('year_bs', 'month_bs', 'day_bs', 'title')
+        verbose_name = 'Patro Event / Holiday'
+        verbose_name_plural = 'Patro Events / Holidays'
+
+    def __str__(self):
+        return f"{self.year_bs}-{self.month_bs:02d}-{self.day_bs:02d}: {self.title}"
+
+    @property
+    def date_key(self):
+        return f"{self.year_bs}-{self.month_bs:02d}-{self.day_bs:02d}"
+

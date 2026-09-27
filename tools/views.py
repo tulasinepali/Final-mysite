@@ -3,7 +3,8 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db.models import F
-from .models import Tool, Widget, WidgetSetting
+import json
+from .models import Tool, Widget, WidgetSetting, PatroEvent
 
 def tools_index(request):
     tools = Tool.objects.filter(is_active=True).order_by('order', 'name')
@@ -47,8 +48,21 @@ def nepali_patro(request):
     tool = Tool.objects.filter(slug='nepali-patro', is_active=True).first()
     if tool:
         Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
+    
+    events_qs = PatroEvent.objects.all()
+    events_dict = {
+        e.date_key: {
+            'title': e.title,
+            'is_holiday': e.is_public_holiday,
+            'event_type': e.event_type,
+            'description': e.description,
+        }
+        for e in events_qs
+    }
+
     return render(request, 'tools/nepali_patro.html', {
         'tool': tool,
+        'events_json': json.dumps(events_dict),
         'meta_title': tool.meta_title if tool and tool.meta_title else 'नेपाली पात्रो २०८३ | Nepali Patro (Calendar) with Tithi, Holidays & Festivals',
         'meta_description': tool.meta_description if tool and tool.meta_description else 'Interactive Nepali Patro (Calendar) 2083 Bikram Sambat with Tithi, official public holidays, Dashain & Tihar dates, and English calendar sync.',
     })
@@ -91,9 +105,49 @@ def widget_embed(request, slug):
         'widget_settings': settings,
         'theme': theme,
     }
+
+    if slug == 'nepali-patro':
+        events_qs = PatroEvent.objects.all()
+        events_dict = {
+            e.date_key: {
+                'title': e.title,
+                'is_holiday': e.is_public_holiday,
+                'event_type': e.event_type,
+                'description': e.description,
+            }
+            for e in events_qs
+        }
+        context['events_json'] = json.dumps(events_dict)
+
     return render(request, template_name, context)
 
 @require_POST
 def api_track_embed(request, slug):
     Widget.objects.filter(slug=slug).update(embed_count=F('embed_count') + 1)
     return JsonResponse({'status': 'ok'})
+
+def api_patro_events(request):
+    year = request.GET.get('year')
+    month = request.GET.get('month')
+    qs = PatroEvent.objects.all()
+    if year:
+        try:
+            qs = qs.filter(year_bs=int(year))
+        except ValueError:
+            pass
+    if month:
+        try:
+            qs = qs.filter(month_bs=int(month))
+        except ValueError:
+            pass
+    data = {
+        e.date_key: {
+            'title': e.title,
+            'is_holiday': e.is_public_holiday,
+            'event_type': e.event_type,
+            'description': e.description,
+        }
+        for e in qs
+    }
+    return JsonResponse(data)
+

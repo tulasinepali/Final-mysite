@@ -73,3 +73,12 @@ class ToolsViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.headers.get('X-Frame-Options'), 'DENY')
 
+    def test_api_patro_events(self):
+        response = self.client.get(reverse('tools:api_patro_events') + '?year=2083')
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIsInstance(data, dict)
+        self.assertIn('2083-01-01', data)
+        self.assertTrue(data['2083-01-01']['is_holiday'])
+
+

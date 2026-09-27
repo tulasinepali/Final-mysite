@@ -1,0 +1,75 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Bulk Import Patro Holidays - Dashboard{% endblock %}
+{% block page_header %}Bulk Import Holidays &amp; Events{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:patro_events' %}">Patro Holidays</a></li>
+<li class="breadcrumb-item active">Bulk Import</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border rounded-4">
+            <div class="card-header bg-white border-bottom">
+                <h3 class="card-title font-weight-bold text-primary mb-0">
+                    <i class="fas fa-file-upload mr-1"></i> Upload Year Holidays (CSV / JSON)
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted">
+                    When the Nepal Government (Ministry of Home Affairs / गृह मन्त्रालय) publishes the official Gazette (राजपत्र) for an upcoming year (e.g. <strong>2084 B.S.</strong>), you can easily upload all holidays at once.
+                </p>
+
+                <div class="alert alert-info">
+                    <h6 class="font-weight-bold mb-2"><i class="fas fa-info-circle mr-1"></i> Quick Instructions:</h6>
+                    <ul class="mb-2 pl-3 small">
+                        <li>You can upload either a <strong>.CSV</strong> (Excel compatible) or a <strong>.JSON</strong> file.</li>
+                        <li><strong>CSV Columns:</strong> <code>Month (1-12), Day (1-32), Title, Is Public Holiday (1/0), Event Type, Description</code></li>
+                        <li>Download our pre-formatted sample CSV below to get started immediately.</li>
+                    </ul>
+                    <a href="{% url 'dashboard:patro_event_sample_csv' %}" class="btn btn-sm btn-outline-primary bg-white">
+                        <i class="fas fa-download mr-1"></i> Download Pre-Formatted Sample CSV
+                    </a>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="mt-4">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">Target B.S. Year <span class="text-danger">*</span></label>
+                        {{ form.target_year }}
+                        <small class="form-text text-muted">{{ form.target_year.help_text }}</small>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">Select File (.CSV or .JSON) <span class="text-danger">*</span></label>
+                        {{ form.file }}
+                        <small class="form-text text-muted">{{ form.file.help_text }}</small>
+                    </div>
+
+                    <div class="form-group form-check mb-4 p-3 bg-light rounded border">
+                        {{ form.replace_existing }}
+                        <label class="form-check-label font-weight-bold text-danger ml-2" for="{{ form.replace_existing.id_for_label }}">
+                            Replace existing events for this year
+                        </label>
+                        <small class="form-text text-muted d-block mt-1">
+                            If checked, all previous events registered for this target year will be cleared before importing the new file.
+                        </small>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{% url 'dashboard:patro_events' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Holidays List
+                        </a>
+                        <button type="submit" class="btn btn-success px-4 font-weight-bold">
+                            <i class="fas fa-upload mr-1"></i> Import Holidays Now
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

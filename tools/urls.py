@@ -16,6 +16,7 @@ urlpatterns = [
     path('widgets/', views.widgets_index, name='widgets_index'),
     path('widgets/embed/<slug:slug>/', views.widget_embed, name='widget_embed'),
     path('widgets/api/track/<slug:slug>/', views.api_track_embed, name='api_track_embed'),
+    path('api/patro/events/', views.api_patro_events, name='api_patro_events'),
 
     # Generic Tool Detail (keep at end to prevent slug conflicts)
     path('<slug:slug>/', views.tool_detail, name='tool_detail'),

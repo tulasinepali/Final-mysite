@@ -17,11 +17,16 @@ from notes.models import Note
 from blog.models import BlogPost
 from downloads.models import Download
 from quiz.models import Quiz, Question, QuizAttempt
-from tools.models import Tool, Widget, WidgetSetting
+import csv
+import io
+import json
+from django.http import HttpResponse
+from tools.models import Tool, Widget, WidgetSetting, PatroEvent
 from .forms import (
     SiteSettingsForm, CategoryForm, TagForm, NoteForm, BlogPostForm,
     DownloadForm, QuizForm, QuestionForm, AdPlacementForm, QuestionImportForm,
     BroadcastEmailForm, ToolForm, WidgetForm, WidgetSettingForm,
+    PatroEventForm, PatroEventImportForm,
 )
 
 
@@ -1248,4 +1253,224 @@ def dashboard_widget_settings(request):
         'active_page': 'widget_settings',
         'widget_setting': obj,
     }
-    return render(request, 'dashboard/widget_settings.html', context)
+    return render(request, 'dashboard/widget_settings.html', context)
+
+
+# ========== PATRO EVENTS & HOLIDAYS CRUD ==========
+
+@staff_member_required
+def dashboard_patro_events(request):
+    events = PatroEvent.objects.all()
+    available_years = list(PatroEvent.objects.values_list('year_bs', flat=True).distinct().order_by('year_bs'))
+    if not available_years:
+        available_years = [2083]
+
+    selected_year = request.GET.get('year')
+    if selected_year and selected_year != 'all':
+        try:
+            events = events.filter(year_bs=int(selected_year))
+        except ValueError:
+            pass
+    elif not selected_year:
+        # Default to 2083 or latest
+        selected_year = '2083' if 2083 in available_years else str(available_years[-1])
+        events = events.filter(year_bs=int(selected_year))
+
+    selected_month = request.GET.get('month')
+    if selected_month:
+        try:
+            events = events.filter(month_bs=int(selected_month))
+        except ValueError:
+            pass
+
+    holiday_filter = request.GET.get('holiday')
+    if holiday_filter == 'yes':
+        events = events.filter(is_public_holiday=True)
+    elif holiday_filter == 'no':
+        events = events.filter(is_public_holiday=False)
+
+    search = request.GET.get('q')
+    if search:
+        events = events.filter(title__icontains=search)
+
+    paginator = Paginator(events.order_by('year_bs', 'month_bs', 'day_bs'), 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj,
+        'active_page': 'patro_events',
+        'total': events.count(),
+        'available_years': available_years,
+        'selected_year': selected_year,
+        'selected_month': selected_month,
+        'holiday_filter': holiday_filter,
+        'month_choices': PatroEvent.MONTH_CHOICES,
+    }
+    return render(request, 'dashboard/patro_events.html', context)
+
+@staff_member_required
+def patro_event_create(request):
+    if request.method == 'POST':
+        form = PatroEventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Holiday / Event added successfully!')
+            return redirect('dashboard:patro_events')
+    else:
+        initial_year = request.GET.get('year', 2083)
+        form = PatroEventForm(initial={'year_bs': initial_year})
+    context = {'form': form, 'active_page': 'patro_events', 'action': 'Add', 'model_name': 'Patro Holiday / Event'}
+    return render(request, 'dashboard/form.html', context)
+
+@staff_member_required
+def patro_event_edit(request, pk):
+    event = get_object_or_404(PatroEvent, pk=pk)
+    if request.method == 'POST':
+        form = PatroEventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Holiday / Event updated successfully!')
+            return redirect('dashboard:patro_events')
+    else:
+        form = PatroEventForm(instance=event)
+    context = {'form': form, 'active_page': 'patro_events', 'action': 'Edit', 'model_name': 'Patro Holiday / Event', 'object': event}
+    return render(request, 'dashboard/form.html', context)
+
+@staff_member_required
+def patro_event_delete(request, pk):
+    event = get_object_or_404(PatroEvent, pk=pk)
+    if request.method == 'POST':
+        event.delete()
+        messages.success(request, 'Holiday / Event deleted successfully!')
+    return redirect('dashboard:patro_events')
+
+@staff_member_required
+def patro_event_toggle_holiday(request, pk):
+    event = get_object_or_404(PatroEvent, pk=pk)
+    event.is_public_holiday = not event.is_public_holiday
+    event.save(update_fields=['is_public_holiday'])
+    status = 'marked as Public Holiday' if event.is_public_holiday else 'marked as Normal Event (Not a Holiday)'
+    messages.success(request, f'"{event.title}" {status}!')
+    return redirect('dashboard:patro_events')
+
+@staff_member_required
+def patro_event_import(request):
+    if request.method == 'POST':
+        form = PatroEventImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            target_year = form.cleaned_data['target_year']
+            replace_existing = form.cleaned_data['replace_existing']
+            uploaded_file = request.FILES['file']
+            file_name = uploaded_file.name.lower()
+
+            if replace_existing:
+                deleted_count, _ = PatroEvent.objects.filter(year_bs=target_year).delete()
+                messages.info(request, f'Removed {deleted_count} existing events for year {target_year}.')
+
+            imported_count = 0
+            errors = []
+
+            try:
+                if file_name.endswith('.json'):
+                    content = uploaded_file.read().decode('utf-8')
+                    items = json.loads(content)
+                    if isinstance(items, dict):
+                        # Format {"2084-01-01": {"title": "...", "is_holiday": true}}
+                        for key, val in items.items():
+                            parts = key.split('-')
+                            if len(parts) >= 3:
+                                y = int(parts[0])
+                                m = int(parts[1])
+                                d = int(parts[2])
+                                title = val.get('title', '').strip()
+                                is_h = bool(val.get('is_holiday', True))
+                                e_type = val.get('event_type', 'holiday')
+                                if title:
+                                    PatroEvent.objects.update_or_create(
+                                        year_bs=y, month_bs=m, day_bs=d, title=title,
+                                        defaults={'is_public_holiday': is_h, 'event_type': e_type}
+                                    )
+                                    imported_count += 1
+                    elif isinstance(items, list):
+                        # Format [{"month": 1, "day": 1, "title": "...", "is_holiday": true}]
+                        for item in items:
+                            m = int(item.get('month', 1))
+                            d = int(item.get('day', 1))
+                            title = item.get('title', '').strip()
+                            is_h = bool(item.get('is_holiday', True))
+                            e_type = item.get('event_type', 'holiday')
+                            if title:
+                                PatroEvent.objects.update_or_create(
+                                    year_bs=target_year, month_bs=m, day_bs=d, title=title,
+                                    defaults={'is_public_holiday': is_h, 'event_type': e_type}
+                                )
+                                imported_count += 1
+                else:
+                    # CSV processing
+                    csv_text = uploaded_file.read().decode('utf-8-sig')
+                    reader = csv.reader(io.StringIO(csv_text))
+                    for row_num, row in enumerate(reader, start=1):
+                        if not row or len(row) < 3:
+                            continue
+                        # Skip header row if found
+                        first_col = row[0].strip().lower()
+                        if 'month' in first_col or 'महिना' in first_col:
+                            continue
+                        try:
+                            m = int(row[0].strip())
+                            d = int(row[1].strip())
+                            title = row[2].strip()
+                            is_h = True
+                            if len(row) > 3:
+                                is_h_str = row[3].strip().lower()
+                                is_h = is_h_str in ['1', 'true', 'yes', 'y', 'हो', 'बिदा']
+                            e_type = row[4].strip() if len(row) > 4 and row[4].strip() else 'holiday'
+                            desc = row[5].strip() if len(row) > 5 else ''
+
+                            if title:
+                                PatroEvent.objects.update_or_create(
+                                    year_bs=target_year, month_bs=m, day_bs=d, title=title,
+                                    defaults={
+                                        'is_public_holiday': is_h,
+                                        'event_type': e_type,
+                                        'description': desc,
+                                    }
+                                )
+                                imported_count += 1
+                        except Exception as row_err:
+                            errors.append(f"Row {row_num}: {str(row_err)}")
+
+                messages.success(request, f'Successfully imported {imported_count} holidays/events for year {target_year}!')
+                if errors:
+                    messages.warning(request, f'{len(errors)} rows had issues and were skipped.')
+                return redirect(f"/dashboard/patro/events/?year={target_year}")
+
+            except Exception as e:
+                messages.error(request, f'Error parsing import file: {str(e)}')
+
+    else:
+        form = PatroEventImportForm()
+
+    context = {
+        'form': form,
+        'active_page': 'patro_events',
+    }
+    return render(request, 'dashboard/patro_event_import.html', context)
+
+@staff_member_required
+def patro_event_sample_csv(request):
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="nepali_patro_holidays_sample.csv"'
+    response.write('\ufeff')  # UTF-8 BOM for Excel compatibility
+
+    writer = csv.writer(response)
+    writer.writerow(['Month (1-12)', 'Day (1-32)', 'Title (Nepali)', 'Is Public Holiday (1/0)', 'Event Type', 'Description'])
+    writer.writerow([1, 1, 'नयाँ वर्ष / मेष संक्रान्ति', 1, 'holiday', 'Official Gazette Holiday'])
+    writer.writerow([1, 18, 'अन्तर्राष्ट्रिय श्रमिक दिवस', 1, 'international', 'May Day'])
+    writer.writerow([2, 15, 'गणतन्त्र दिवस', 1, 'national', 'Republic Day'])
+    writer.writerow([6, 3, 'संविधान दिवस', 1, 'national', 'National Day'])
+    writer.writerow([6, 25, 'घटस्थापना', 1, 'holiday', 'Dashain Festival Start'])
+    writer.writerow([7, 3, 'विजया दशमी', 1, 'holiday', 'Main Tika'])
+    writer.writerow([7, 27, 'भाइटीका', 1, 'holiday', 'Tihar Festival'])
+    return response
+

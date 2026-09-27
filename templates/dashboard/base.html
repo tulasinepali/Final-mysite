@@ -439,6 +439,12 @@
                             <p>Widget Settings</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:patro_events' %}" class="nav-link {% if active_page == 'patro_events' %}active{% endif %}">
+                            <span class="nav-icon"><i class="bi bi-calendar-event"></i></span>
+                            <p>Patro Holidays</p>
+                        </a>
+                    </li>
 
                     <!-- SYSTEM SECTION -->
                     <li class="nav-header">SYSTEM &amp; CONTROLS</li>

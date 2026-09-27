@@ -5,7 +5,7 @@ from notes.models import Note
 from blog.models import BlogPost
 from downloads.models import Download
 from quiz.models import Quiz, Question
-from tools.models import Tool, Widget, WidgetSetting
+from tools.models import Tool, Widget, WidgetSetting, PatroEvent
 
 
 class SiteSettingsForm(forms.ModelForm):
@@ -315,5 +315,39 @@ class WidgetSettingForm(forms.ModelForm):
             'branding_text': forms.TextInput(attrs={'class': 'form-control'}),
             'branding_url': forms.URLInput(attrs={'class': 'form-control'}),
         }
+
+
+class PatroEventForm(forms.ModelForm):
+    class Meta:
+        model = PatroEvent
+        fields = ['year_bs', 'month_bs', 'day_bs', 'title', 'title_en', 'is_public_holiday', 'event_type', 'description']
+        widgets = {
+            'year_bs': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 2083 or 2084'}),
+            'month_bs': forms.Select(attrs={'class': 'form-control'}),
+            'day_bs': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 32}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. नयाँ वर्ष, विजया दशमी'}),
+            'title_en': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. New Year, Vijaya Dashami'}),
+            'event_type': forms.Select(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 2, 'class': 'form-control', 'placeholder': 'Optional notes or gazette notice reference'}),
+        }
+
+
+class PatroEventImportForm(forms.Form):
+    target_year = forms.IntegerField(
+        initial=2084,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 2084'}),
+        help_text="Target Bikram Sambat year for the imported events"
+    )
+    file = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.csv,.json'}),
+        help_text="Upload a .CSV or .JSON file containing holidays and events"
+    )
+    replace_existing = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        help_text="Overwrite/replace any existing events for this year"
+    )
+
 
 

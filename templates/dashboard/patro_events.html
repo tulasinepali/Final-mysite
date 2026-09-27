@@ -1,0 +1,241 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Manage Patro Holidays & Events - Dashboard{% endblock %}
+{% block page_header %}Nepali Patro Holidays &amp; Events{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:tools' %}">Tools</a></li>
+<li class="breadcrumb-item active">Patro Holidays</li>
+{% endblock %}
+
+{% block content %}
+<!-- Action buttons row -->
+<div class="row mb-3">
+    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="{% url 'dashboard:patro_event_create' %}?year={{ selected_year }}" class="btn btn-primary">
+                <i class="fas fa-plus mr-1"></i> Add Holiday / Event
+            </a>
+            <a href="{% url 'dashboard:patro_event_import' %}" class="btn btn-success ml-2">
+                <i class="fas fa-file-upload mr-1"></i> Bulk Import (CSV / JSON)
+            </a>
+            <a href="{% url 'dashboard:patro_event_sample_csv' %}" class="btn btn-outline-info ml-2" title="Download Excel-compatible template">
+                <i class="fas fa-download mr-1"></i> Download Sample CSV
+            </a>
+            <a href="{% url 'tools:nepali_patro' %}" target="_blank" class="btn btn-outline-secondary ml-2">
+                <i class="fas fa-external-link-alt mr-1"></i> View Live Patro
+            </a>
+        </div>
+        <div>
+            <span class="badge badge-soft-primary px-3 py-2" style="font-size: 0.9rem;">
+                Total Events: {{ total }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Card with table -->
+<div class="card">
+    <div class="card-header bg-white border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-calendar-alt text-primary mr-1"></i> Nepali Calendar Holidays &amp; Events
+            </h3>
+            <span class="text-muted small">Manage upcoming years (e.g. 2084, 2085) with 1 click</span>
+        </div>
+    </div>
+    <div class="card-body">
+        
+        <!-- Filter Bar -->
+        <form method="get" class="form-inline mb-4 p-3 bg-light rounded border">
+            <div class="form-group mr-3 mb-2">
+                <label class="mr-2 font-weight-bold">B.S. Year:</label>
+                <select name="year" class="form-control form-control-sm font-weight-bold text-primary" onchange="this.form.submit()">
+                    <option value="all" {% if selected_year == 'all' %}selected{% endif %}>All Years</option>
+                    {% for y in available_years %}
+                    <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>{{ y }} B.S.</option>
+                    {% endfor %}
+                    {% if 2084 not in available_years %}
+                    <option value="2084" {% if selected_year == '2084' %}selected{% endif %}>2084 B.S. (Upcoming)</option>
+                    {% endif %}
+                    {% if 2085 not in available_years %}
+                    <option value="2085" {% if selected_year == '2085' %}selected{% endif %}>2085 B.S. (Upcoming)</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="form-group mr-3 mb-2">
+                <label class="mr-2 font-weight-bold">Month:</label>
+                <select name="month" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="">All Months (१-१२)</option>
+                    {% for m_num, m_name in month_choices %}
+                    <option value="{{ m_num }}" {% if request.GET.month == m_num|stringformat:"s" %}selected{% endif %}>{{ m_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group mr-3 mb-2">
+                <label class="mr-2 font-weight-bold">Holiday Status:</label>
+                <select name="holiday" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="">All Types</option>
+                    <option value="yes" {% if holiday_filter == 'yes' %}selected{% endif %}>Public Holidays Only (सार्वजनिक बिदा)</option>
+                    <option value="no" {% if holiday_filter == 'no' %}selected{% endif %}>Festivals / Non-Holidays</option>
+                </select>
+            </div>
+
+            <div class="form-group mr-2 mb-2 flex-grow-1">
+                <div class="input-group input-group-sm w-100">
+                    <input type="text" name="q" class="form-control" placeholder="Search event or festival..." value="{{ request.GET.q|default:'' }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% if request.GET.year or request.GET.month or request.GET.holiday or request.GET.q %}
+            <a href="{% url 'dashboard:patro_events' %}" class="btn btn-sm btn-link text-danger mb-2">Reset</a>
+            {% endif %}
+        </form>
+
+        <!-- Events Table -->
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle">
+                <thead class="thead-light">
+                    <tr>
+                        <th style="width: 140px;">B.S. Date</th>
+                        <th>Holiday / Event Name</th>
+                        <th style="width: 150px;">Category</th>
+                        <th style="width: 180px;" class="text-center">Public Holiday Status</th>
+                        <th style="width: 140px;" class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in page_obj %}
+                    <tr>
+                        <td>
+                            <strong class="text-dark">{{ event.year_bs }}-{{ event.month_bs|stringformat:"02d" }}-{{ event.day_bs|stringformat:"02d" }}</strong>
+                            <div class="text-muted small">
+                                {% for m_num, m_name in month_choices %}
+                                    {% if m_num == event.month_bs %}{{ m_name|slice:":7" }} {{ event.day_bs }} गते{% endif %}
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="font-weight-bold {% if event.is_public_holiday %}text-danger{% else %}text-dark{% endif %}" style="font-size: 1.05rem;">
+                                {{ event.title }}
+                            </span>
+                            {% if event.title_en %}
+                            <div class="text-muted small">{{ event.title_en }}</div>
+                            {% endif %}
+                            {% if event.description %}
+                            <div class="text-muted small font-italic mt-1"><i class="fas fa-info-circle mr-1"></i>{{ event.description }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-light border text-uppercase" style="font-size: 0.75rem;">
+                                {{ event.get_event_type_display }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <form method="post" action="{% url 'dashboard:patro_event_toggle_holiday' event.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                {% if event.is_public_holiday %}
+                                <button type="submit" class="btn btn-sm btn-danger px-3 rounded-pill" title="Click to change to normal event">
+                                    <i class="fas fa-check-circle mr-1"></i> Public Holiday
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary px-3 rounded-pill" title="Click to make public holiday">
+                                    <i class="far fa-circle mr-1"></i> Normal Event
+                                </button>
+                                {% endif %}
+                            </form>
+                        </td>
+                        <td class="text-right">
+                            <a href="{% url 'dashboard:patro_event_edit' event.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger ml-1" data-toggle="modal" data-target="#deleteModal{{ event.pk }}" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade text-left" id="deleteModal{{ event.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title font-weight-bold text-danger">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i> Delete Event
+                                            </h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete <strong>{{ event.title }}</strong> ({{ event.year_bs }}-{{ event.month_bs }}-{{ event.day_bs }})?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <form method="post" action="{% url 'dashboard:patro_event_delete' event.pk %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="fas fa-calendar-times fs-2 mb-2 d-block text-secondary" style="font-size: 2rem;"></i>
+                            No holidays or events found for the selected year/filters.
+                            <div class="mt-2">
+                                <a href="{% url 'dashboard:patro_event_create' %}?year={{ selected_year }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus mr-1"></i> Add Event for {{ selected_year }}
+                                </a>
+                                <a href="{% url 'dashboard:patro_event_import' %}" class="btn btn-sm btn-success ml-2">
+                                    <i class="fas fa-file-upload mr-1"></i> Bulk Upload {{ selected_year }} Holidays
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.year %}&year={{ request.GET.year }}{% endif %}{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}{% if request.GET.holiday %}&holiday={{ request.GET.holiday }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Previous</a>
+                </li>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}{% if request.GET.year %}&year={{ request.GET.year }}{% endif %}{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}{% if request.GET.holiday %}&holiday={{ request.GET.holiday }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.year %}&year={{ request.GET.year }}{% endif %}{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}{% if request.GET.holiday %}&holiday={{ request.GET.holiday }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
