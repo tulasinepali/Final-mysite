@@ -17,10 +17,11 @@ from notes.models import Note
 from blog.models import BlogPost
 from downloads.models import Download
 from quiz.models import Quiz, Question, QuizAttempt
+from tools.models import Tool, Widget, WidgetSetting
 from .forms import (
     SiteSettingsForm, CategoryForm, TagForm, NoteForm, BlogPostForm,
     DownloadForm, QuizForm, QuestionForm, AdPlacementForm, QuestionImportForm,
-    BroadcastEmailForm,
+    BroadcastEmailForm, ToolForm, WidgetForm, WidgetSettingForm,
 )
 
 
@@ -1090,3 +1091,161 @@ def dashboard_analytics(request):
         'avg_score_30d': QuizAttempt.objects.filter(completed_at__gte=thirty_days_ago).aggregate(avg=Avg('final_score'))['avg'] or 0,
     }
     return render(request, 'dashboard/analytics.html', context)
+
+
+# ========== TOOLS CRUD ==========
+
+@staff_member_required
+def dashboard_tools(request):
+    tools = Tool.objects.all()
+    category_filter = request.GET.get('category')
+    if category_filter:
+        tools = tools.filter(category=category_filter)
+    active_filter = request.GET.get('active')
+    if active_filter == 'yes':
+        tools = tools.filter(is_active=True)
+    elif active_filter == 'no':
+        tools = tools.filter(is_active=False)
+    search = request.GET.get('q')
+    if search:
+        tools = tools.filter(name__icontains=search)
+    paginator = Paginator(tools.order_by('order', 'name'), 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    context = {
+        'page_obj': page_obj,
+        'active_page': 'tools',
+        'total': tools.count(),
+        'category_choices': Tool.CATEGORY_CHOICES,
+    }
+    return render(request, 'dashboard/tools.html', context)
+
+@staff_member_required
+def tool_create(request):
+    if request.method == 'POST':
+        form = ToolForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tool created successfully!')
+            return redirect('dashboard:tools')
+    else:
+        form = ToolForm()
+    context = {'form': form, 'active_page': 'tools', 'action': 'Create', 'model_name': 'Tool'}
+    return render(request, 'dashboard/form.html', context)
+
+@staff_member_required
+def tool_edit(request, pk):
+    tool = get_object_or_404(Tool, pk=pk)
+    if request.method == 'POST':
+        form = ToolForm(request.POST, instance=tool)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tool updated successfully!')
+            return redirect('dashboard:tools')
+    else:
+        form = ToolForm(instance=tool)
+    context = {'form': form, 'active_page': 'tools', 'action': 'Edit', 'model_name': 'Tool', 'object': tool}
+    return render(request, 'dashboard/form.html', context)
+
+@staff_member_required
+def tool_delete(request, pk):
+    tool = get_object_or_404(Tool, pk=pk)
+    if request.method == 'POST':
+        tool.delete()
+        messages.success(request, 'Tool deleted successfully!')
+    return redirect('dashboard:tools')
+
+@staff_member_required
+def tool_toggle_active(request, pk):
+    tool = get_object_or_404(Tool, pk=pk)
+    tool.is_active = not tool.is_active
+    tool.save(update_fields=['is_active'])
+    status = 'activated' if tool.is_active else 'deactivated'
+    messages.success(request, f'Tool {status} successfully!')
+    return redirect('dashboard:tools')
+
+
+# ========== WIDGETS CRUD ==========
+
+@staff_member_required
+def dashboard_widgets(request):
+    widgets = Widget.objects.select_related('tool').all()
+    active_filter = request.GET.get('active')
+    if active_filter == 'yes':
+        widgets = widgets.filter(is_active=True)
+    elif active_filter == 'no':
+        widgets = widgets.filter(is_active=False)
+    search = request.GET.get('q')
+    if search:
+        widgets = widgets.filter(title__icontains=search)
+    paginator = Paginator(widgets.order_by('order', 'title'), 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    settings = WidgetSetting.get_settings()
+    context = {
+        'page_obj': page_obj,
+        'active_page': 'widgets',
+        'total': widgets.count(),
+        'widget_settings': settings,
+    }
+    return render(request, 'dashboard/widgets.html', context)
+
+@staff_member_required
+def widget_create(request):
+    if request.method == 'POST':
+        form = WidgetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Widget created successfully!')
+            return redirect('dashboard:widgets')
+    else:
+        form = WidgetForm()
+    context = {'form': form, 'active_page': 'widgets', 'action': 'Create', 'model_name': 'Widget'}
+    return render(request, 'dashboard/form.html', context)
+
+@staff_member_required
+def widget_edit(request, pk):
+    widget = get_object_or_404(Widget, pk=pk)
+    if request.method == 'POST':
+        form = WidgetForm(request.POST, instance=widget)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Widget updated successfully!')
+            return redirect('dashboard:widgets')
+    else:
+        form = WidgetForm(instance=widget)
+    context = {'form': form, 'active_page': 'widgets', 'action': 'Edit', 'model_name': 'Widget', 'object': widget}
+    return render(request, 'dashboard/form.html', context)
+
+@staff_member_required
+def widget_delete(request, pk):
+    widget = get_object_or_404(Widget, pk=pk)
+    if request.method == 'POST':
+        widget.delete()
+        messages.success(request, 'Widget deleted successfully!')
+    return redirect('dashboard:widgets')
+
+@staff_member_required
+def widget_toggle_active(request, pk):
+    widget = get_object_or_404(Widget, pk=pk)
+    widget.is_active = not widget.is_active
+    widget.save(update_fields=['is_active'])
+    status = 'activated' if widget.is_active else 'deactivated'
+    messages.success(request, f'Widget {status} successfully!')
+    return redirect('dashboard:widgets')
+
+@staff_member_required
+def dashboard_widget_settings(request):
+    obj = WidgetSetting.get_settings()
+    if request.method == 'POST':
+        form = WidgetSettingForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Widget settings updated successfully!')
+            return redirect('dashboard:widget_settings')
+    else:
+        form = WidgetSettingForm(instance=obj)
+    context = {
+        'form': form,
+        'active_page': 'widget_settings',
+        'widget_setting': obj,
+    }
+    return render(request, 'dashboard/widget_settings.html', context)

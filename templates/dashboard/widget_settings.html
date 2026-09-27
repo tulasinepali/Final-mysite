@@ -1,0 +1,123 @@
+{% extends 'dashboard/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Widget Settings - Dashboard{% endblock %}
+{% block page_header %}Widget Global Settings{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard:widgets' %}">Widgets</a></li>
+<li class="breadcrumb-item active">Settings</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-sliders-h mr-1"></i> Global Embedding &amp; Branding Configuration
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Allow Embedding Toggle -->
+                    <div class="form-group mb-4 p-3 rounded border bg-light">
+                        <div class="custom-control custom-switch">
+                            {{ form.allow_embedding|add_class:'custom-control-input'|attr:'id:allowEmbeddingSwitch' }}
+                            <label class="custom-control-label font-weight-bold" for="allowEmbeddingSwitch">
+                                Enable Public Widget Embedding
+                            </label>
+                        </div>
+                        <small class="form-text text-muted mt-1">
+                            When enabled, bloggers and webmasters can embed your widgets into their external websites via iframe. If disabled, all external embeds will show a polite notice.
+                        </small>
+                    </div>
+
+                    <!-- Branding Text -->
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold" for="{{ form.branding_text.id_for_label }}">
+                            Widget Footer Branding Text <span class="text-danger">*</span>
+                        </label>
+                        {{ form.branding_text|add_class:'form-control' }}
+                        <small class="form-text text-muted">
+                            Text shown in the bottom bar of every embedded widget (e.g., "Powered by Tulasi Nepali").
+                        </small>
+                        {% for error in form.branding_text.errors %}
+                        <span class="invalid-feedback d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Branding URL -->
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold" for="{{ form.branding_url.id_for_label }}">
+                            Branding Target URL <span class="text-danger">*</span>
+                        </label>
+                        {{ form.branding_url|add_class:'form-control' }}
+                        <small class="form-text text-muted">
+                            Where visitors are sent when they click the branding credit link inside the embedded widget.
+                        </small>
+                        {% for error in form.branding_url.errors %}
+                        <span class="invalid-feedback d-block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Show Ads in Widgets -->
+                    <div class="form-group mb-4 p-3 rounded border bg-light">
+                        <div class="custom-control custom-switch">
+                            {{ form.show_ads_in_widgets|add_class:'custom-control-input'|attr:'id:showAdsSwitch' }}
+                            <label class="custom-control-label font-weight-bold" for="showAdsSwitch">
+                                Display AdSense Ads Inside Widgets
+                            </label>
+                        </div>
+                        <small class="form-text text-muted mt-1">
+                            Monetize your widgets by showing a compact banner ad inside iframe embeds on third-party sites.
+                        </small>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> Save Widget Settings
+                        </button>
+                        <a href="{% url 'dashboard:widgets' %}" class="btn btn-default ml-2">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Widgets
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side Info -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> About Widget Embeds</h3>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-2">
+                    Widgets allow other educators, news portals, and schools to embed your interactive tools:
+                </p>
+                <ul class="small text-muted pl-3 mb-3">
+                    <li>📅 Nepali Date Converter (B.S. &harr; A.D.)</li>
+                    <li>🧮 Universal Age Calculator</li>
+                    <li>⌨️ Preeti &harr; Unicode Converter</li>
+                    <li>⏱️ Live Nepal Time Clock</li>
+                </ul>
+                <div class="alert alert-info py-2 px-3 small mb-0">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    Embedded iframes automatically inherit your branding credits and click-tracking analytics.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

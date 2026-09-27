@@ -5,6 +5,7 @@ from notes.models import Note
 from blog.models import BlogPost
 from downloads.models import Download
 from quiz.models import Quiz, Question
+from tools.models import Tool, Widget, WidgetSetting
 
 
 class SiteSettingsForm(forms.ModelForm):
@@ -256,4 +257,63 @@ class BroadcastEmailForm(forms.Form):
         if send_test and not test_email:
             self.add_error('test_email', 'Please provide a test recipient email address when test mode is selected.')
         return cleaned_data
+
+
+class ToolForm(forms.ModelForm):
+    class Meta:
+        model = Tool
+        fields = ['name', 'slug', 'category', 'icon', 'order', 'is_active', 'short_description', 'meta_title', 'meta_description']
+        widgets = {
+            'short_description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'meta_description': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control'}),
+            'icon': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. bi-calculator, bi-calendar3'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control'}),
+            'meta_title': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['slug'].widget.attrs.update({'data-slug-from': 'name'})
+        self.fields['slug'].required = False
+        self.fields['meta_title'].required = False
+        self.fields['meta_description'].required = False
+
+
+class WidgetForm(forms.ModelForm):
+    class Meta:
+        model = Widget
+        fields = ['title', 'slug', 'tool', 'icon', 'badge_text', 'default_width', 'default_height', 'order', 'is_active', 'short_description', 'custom_html']
+        widgets = {
+            'short_description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'custom_html': forms.Textarea(attrs={'rows': 4, 'class': 'form-control', 'placeholder': '<iframe ...></iframe>'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control'}),
+            'tool': forms.Select(attrs={'class': 'form-control'}),
+            'icon': forms.TextInput(attrs={'class': 'form-control'}),
+            'badge_text': forms.TextInput(attrs={'class': 'form-control'}),
+            'default_width': forms.TextInput(attrs={'class': 'form-control'}),
+            'default_height': forms.TextInput(attrs={'class': 'form-control'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['slug'].widget.attrs.update({'data-slug-from': 'title'})
+        self.fields['slug'].required = False
+        self.fields['tool'].required = False
+        self.fields['custom_html'].required = False
+
+
+class WidgetSettingForm(forms.ModelForm):
+    class Meta:
+        model = WidgetSetting
+        fields = ['allow_embedding', 'branding_text', 'branding_url', 'show_ads_in_widgets']
+        widgets = {
+            'branding_text': forms.TextInput(attrs={'class': 'form-control'}),
+            'branding_url': forms.URLInput(attrs={'class': 'form-control'}),
+        }
+
 

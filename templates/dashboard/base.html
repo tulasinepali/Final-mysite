@@ -422,24 +422,21 @@
                     <!-- TOOLS & WIDGETS SECTION -->
                     <li class="nav-header">TOOLS &amp; WIDGETS</li>
                     <li class="nav-item">
-                        <a href="/admin/tools/tool/" class="nav-link" target="_blank" rel="noopener">
+                        <a href="{% url 'dashboard:tools' %}" class="nav-link {% if active_page == 'tools' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-tools"></i></span>
                             <p>Manage Tools</p>
-                            <i class="bi bi-box-arrow-up-right ml-auto text-muted" style="font-size: 0.65rem;"></i>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/admin/tools/widget/" class="nav-link" target="_blank" rel="noopener">
+                        <a href="{% url 'dashboard:widgets' %}" class="nav-link {% if active_page == 'widgets' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-puzzle-fill"></i></span>
                             <p>Manage Widgets</p>
-                            <i class="bi bi-box-arrow-up-right ml-auto text-muted" style="font-size: 0.65rem;"></i>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/admin/tools/widgetsetting/" class="nav-link" target="_blank" rel="noopener">
+                        <a href="{% url 'dashboard:widget_settings' %}" class="nav-link {% if active_page == 'widget_settings' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-gear-wide-connected"></i></span>
                             <p>Widget Settings</p>
-                            <i class="bi bi-box-arrow-up-right ml-auto text-muted" style="font-size: 0.65rem;"></i>
                         </a>
                     </li>
 

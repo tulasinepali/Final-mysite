@@ -84,4 +84,19 @@ urlpatterns = [
 
     # Analytics
     path('analytics/', views.dashboard_analytics, name='analytics'),
+
+    # Tools
+    path('tools/', views.dashboard_tools, name='tools'),
+    path('tools/create/', views.tool_create, name='tool_create'),
+    path('tools/<int:pk>/edit/', views.tool_edit, name='tool_edit'),
+    path('tools/<int:pk>/delete/', views.tool_delete, name='tool_delete'),
+    path('tools/<int:pk>/toggle-active/', views.tool_toggle_active, name='tool_toggle_active'),
+
+    # Widgets
+    path('widgets/', views.dashboard_widgets, name='widgets'),
+    path('widgets/create/', views.widget_create, name='widget_create'),
+    path('widgets/<int:pk>/edit/', views.widget_edit, name='widget_edit'),
+    path('widgets/<int:pk>/delete/', views.widget_delete, name='widget_delete'),
+    path('widgets/<int:pk>/toggle-active/', views.widget_toggle_active, name='widget_toggle_active'),
+    path('widgets/settings/', views.dashboard_widget_settings, name='widget_settings'),
 ]

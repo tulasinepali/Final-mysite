@@ -1,0 +1,182 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Manage Widgets - Dashboard{% endblock %}
+{% block page_header %}Embeddable Widgets{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Widgets</li>
+{% endblock %}
+
+{% block content %}
+<!-- Action buttons row -->
+<div class="row mb-3">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <a href="{% url 'dashboard:widget_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus mr-1"></i> Create Widget
+            </a>
+            <a href="{% url 'dashboard:widget_settings' %}" class="btn btn-outline-info ml-2">
+                <i class="fas fa-sliders-h mr-1"></i> Widget Settings
+            </a>
+            <a href="{% url 'tools:widgets_index' %}" target="_blank" class="btn btn-outline-secondary ml-2">
+                <i class="fas fa-external-link-alt mr-1"></i> View Public Widgets Showcase
+            </a>
+        </div>
+        <span class="badge badge-soft-info px-3 py-2" style="font-size: 0.9rem;">
+            Total Widgets: {{ total }}
+        </span>
+    </div>
+</div>
+
+<!-- Card with table -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-puzzle-piece mr-1"></i> Embeddable Widgets List</h3>
+    </div>
+    <div class="card-body">
+        <!-- Filter Bar -->
+        <form method="get" class="form-inline mb-3">
+            <div class="form-group mr-2">
+                <label class="mr-1">Status:</label>
+                <select name="active" class="form-control form-control-sm">
+                    <option value="">All Statuses</option>
+                    <option value="yes" {% if request.GET.active == 'yes' %}selected{% endif %}>Active</option>
+                    <option value="no" {% if request.GET.active == 'no' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="form-group mr-2">
+                <input type="text" name="q" value="{{ request.GET.q|default:'' }}" class="form-control form-control-sm" placeholder="Search widget title...">
+            </div>
+            <button type="submit" class="btn btn-sm btn-outline-primary mr-1"><i class="fas fa-filter mr-1"></i> Filter</button>
+            <a href="{% url 'dashboard:widgets' %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-times"></i> Clear</a>
+        </form>
+
+        <!-- Table -->
+        <div class="table-responsive p-0">
+            <table class="table table-hover text-nowrap align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Widget Title</th>
+                        <th>Linked Tool</th>
+                        <th>Icon</th>
+                        <th>Default Size</th>
+                        <th style="width: 80px;" class="text-center">Order</th>
+                        <th style="width: 100px;" class="text-center">Status</th>
+                        <th style="width: 100px;" class="text-center">Embeds</th>
+                        <th style="width: 180px;" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for widget in page_obj %}
+                    <tr>
+                        <td class="text-muted">{{ forloop.counter }}</td>
+                        <td>
+                            <strong class="text-dark">{{ widget.title }}</strong>
+                            {% if widget.badge_text %}
+                            <span class="badge badge-success ml-1">{{ widget.badge_text }}</span>
+                            {% endif %}
+                            <div class="small text-muted">{{ widget.short_description|truncatechars:60 }}</div>
+                        </td>
+                        <td>
+                            {% if widget.tool %}
+                            <span class="badge badge-light border"><i class="fas fa-link mr-1 text-primary"></i>{{ widget.tool.name }}</span>
+                            {% else %}
+                            <span class="text-muted small">Standalone Widget</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <i class="bi {{ widget.icon|default:'bi-puzzle' }} fs-5 text-info"></i>
+                            <code class="small text-muted ml-1">{{ widget.icon }}</code>
+                        </td>
+                        <td>
+                            <code>{{ widget.default_width }} &times; {{ widget.default_height }}px</code>
+                        </td>
+                        <td class="text-center">{{ widget.order }}</td>
+                        <td class="text-center">
+                            <form method="post" action="{% url 'dashboard:widget_toggle_active' widget.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                {% if widget.is_active %}
+                                <button type="submit" class="btn btn-xs btn-success" title="Click to deactivate">
+                                    <i class="fas fa-check mr-1"></i> Active
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn btn-xs btn-secondary" title="Click to activate">
+                                    <i class="fas fa-times mr-1"></i> Inactive
+                                </button>
+                                {% endif %}
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge badge-light border">{{ widget.embed_count }}</span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ widget.get_embed_url }}" target="_blank" class="btn btn-xs btn-outline-info" title="Preview iframe embed">
+                                <i class="fas fa-code"></i> Preview
+                            </a>
+                            <a href="{% url 'dashboard:widget_edit' widget.pk %}" class="btn btn-xs btn-primary ml-1" title="Edit widget">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-xs btn-danger ml-1" data-toggle="modal" data-target="#deleteWidgetModal{{ widget.pk }}" title="Delete widget">
+                                <i class="fas fa-trash"></i>
+                            </button>
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteWidgetModal{{ widget.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-danger mr-2"></i> Confirm Delete</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body text-left text-wrap">
+                                            Are you sure you want to delete the widget <strong>"{{ widget.title }}"</strong>? Any third-party websites embedding this widget will no longer be able to load it.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                                            <form method="post" action="{% url 'dashboard:widget_delete' widget.pk %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Yes, Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            <i class="fas fa-puzzle-piece fa-2x mb-2 d-block"></i>
+                            No widgets found. <a href="{% url 'dashboard:widget_create' %}">Create your first embeddable widget</a>.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="text-muted small">Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} widgets</span>
+            <ul class="pagination pagination-sm m-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.active %}&active={{ request.GET.active }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo;</a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.active %}&active={{ request.GET.active }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.active %}&active={{ request.GET.active }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
