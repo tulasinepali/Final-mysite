@@ -98,6 +98,12 @@
         {% if site_settings.address %},"address": "{{ site_settings.address }}"{% endif %}
     }
     </script>
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
 </head>
 <body class="index-page">
     <!-- Google Tag Manager (noscript) -->
@@ -161,6 +167,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <i class="bi bi-speedometer2 me-1"></i> Admin
                         </a>
                         {% endif %}
+
+                        <!-- Language Selector -->
+                        <div class="dropdown ms-2 d-none d-md-block">
+                            <button class="action-icon lang-btn border-0 bg-transparent dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Select Language" title="Language">
+                                <i class="bi bi-translate fs-5"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:130px;">
+                                <li><a class="dropdown-item lang-option py-2" href="#" data-lang="en"><span class="me-2">🇬🇧</span> English</a></li>
+                                <li><a class="dropdown-item lang-option py-2" href="#" data-lang="ne"><span class="me-2">🇳🇵</span> नेपाली</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Dark Mode Toggle -->
+                        <button id="darkModeToggle" class="action-icon border-0 bg-transparent ms-2" type="button" aria-label="Toggle dark mode" title="Toggle Dark Mode">
+                            <i class="bi bi-moon-stars fs-5" id="darkModeIcon"></i>
+                        </button>
 
                         <!-- Mobile Search Toggle -->
                         <button class="action-icon mobile-search-toggle d-lg-none border-0 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch" aria-expanded="false" aria-controls="mobileSearch" aria-label="Search">
@@ -250,7 +272,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <p class="footer-desc">{{ site_settings.site_description|striptags|default:"Nepal's open learning hub curated by Tulasi Nepali. Free study notes, interactive MCQs, downloadable resources, and guides in Technology, Computing, General Knowledge (GK), and Exam Preparation." }}</p>
 
                         <div class="social-links mt-4">
-                            <h5 class="fs-6 fw-bold">Connect With Us</h5>
+                            <h5 class="fs-6 fw-bold text-white mb-2">Connect With Us</h5>
                             <div class="social-icons d-flex gap-2 mt-2">
                                 {% if site_settings.facebook_url %}
                                 <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
@@ -478,5 +500,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </script>
     {% endif %}
 
+    <!-- Dark Mode Controller -->
+    <script>
+        (function() {
+            var toggleBtn = document.getElementById('darkModeToggle');
+            var icon = document.getElementById('darkModeIcon');
+            var currentTheme = localStorage.getItem('theme') || 'light';
+            if (icon) {
+                icon.className = currentTheme === 'dark' ? 'bi bi-sun fs-5 text-warning' : 'bi bi-moon-stars fs-5';
+            }
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    var cur = document.documentElement.getAttribute('data-bs-theme') || 'light';
+                    var next = cur === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-bs-theme', next);
+                    localStorage.setItem('theme', next);
+                    if (icon) {
+                        icon.className = next === 'dark' ? 'bi bi-sun fs-5 text-warning' : 'bi bi-moon-stars fs-5';
+                    }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

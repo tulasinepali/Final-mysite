@@ -53,6 +53,62 @@
 }
 
 /* ----------------------------------------------------------
+   Dark Mode Theme Overrides
+   ---------------------------------------------------------- */
+[data-bs-theme="dark"] {
+    --background-color: #0d1117;
+    --default-color: #c9d1d9;
+    --heading-color: #f0f6fc;
+    --surface-color: #161b22;
+    --light-background: #0d1117;
+    --border-color: #30363d;
+    --border-color-light: #21262d;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
+}
+
+[data-bs-theme="dark"] .header,
+[data-bs-theme="dark"] .header-bar {
+    background-color: #161b22;
+    border-color: #30363d;
+}
+
+[data-bs-theme="dark"] .header-search .search-input {
+    background-color: #0d1117;
+    color: #f0f6fc;
+    border-color: #30363d;
+}
+
+[data-bs-theme="dark"] .header-actions .action-icon {
+    color: #c9d1d9;
+}
+
+[data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .collection-tile,
+[data-bs-theme="dark"] .list-group-item {
+    background-color: #161b22;
+    color: #c9d1d9;
+    border-color: #30363d;
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: #161b22 !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #0d1117 !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: #f0f6fc !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #8b949e !important;
+}
+
+/* ----------------------------------------------------------
    Base & Typography
    ---------------------------------------------------------- */
 *, *::before, *::after {
@@ -790,17 +846,30 @@ a:hover {
     margin-top: 10px;
 }
 
+.footer h1, .footer h2, .footer h3, .footer h4, .footer h5, .footer h6 {
+    color: #ffffff !important;
+}
+
 .footer-widget h4 {
     font-family: var(--heading-font);
     font-size: 16px;
     font-weight: 700;
-    color: #ffffff;
+    color: #ffffff !important;
     margin-bottom: 20px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 2px solid #0559b7;
     padding-bottom: 8px;
     display: inline-block;
+}
+
+.social-links h5 {
+    color: #ffffff !important;
+    font-family: var(--heading-font);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
 }
 
 .footer-links li {
