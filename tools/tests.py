@@ -62,3 +62,14 @@ class ToolsViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.widget_age.refresh_from_db()
         self.assertEqual(self.widget_age.embed_count, initial_count + 1)
+
+    def test_nepali_patro_view(self):
+        response = self.client.get(reverse('tools:nepali_patro'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "नेपाली पात्रो २०८३")
+
+    def test_nepali_patro_widget_embed(self):
+        response = self.client.get(reverse('tools:widget_embed', kwargs={'slug': 'nepali-patro'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.headers.get('X-Frame-Options'), 'DENY')
+

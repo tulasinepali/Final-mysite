@@ -121,6 +121,10 @@
                             <a href="{% url 'tools:unicode_converter' %}" class="btn btn-outline-secondary rounded-pill px-3">
                                 View Full Tool <i class="bi bi-arrow-right ms-1"></i>
                             </a>
+                            {% elif widget.slug == 'nepali-patro' %}
+                            <a href="{% url 'tools:nepali_patro' %}" class="btn btn-outline-secondary rounded-pill px-3">
+                                View Full Tool <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
                             {% endif %}
                         </div>
                     </div>

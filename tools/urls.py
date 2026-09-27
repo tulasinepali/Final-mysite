@@ -10,6 +10,7 @@ urlpatterns = [
     path('date-converter/', views.date_converter, name='date_converter'),
     path('age-calculator/', views.age_calculator, name='age_calculator'),
     path('unicode-converter/', views.unicode_converter, name='unicode_converter'),
+    path('nepali-patro/', views.nepali_patro, name='nepali_patro'),
 
     # Widgets URLs
     path('widgets/', views.widgets_index, name='widgets_index'),

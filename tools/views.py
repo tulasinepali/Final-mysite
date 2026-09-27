@@ -43,6 +43,16 @@ def unicode_converter(request):
         'meta_description': tool.meta_description if tool and tool.meta_description else 'Fast, accurate Preeti to Unicode Converter and Unicode to Preeti font converter with 1-click copy.',
     })
 
+def nepali_patro(request):
+    tool = Tool.objects.filter(slug='nepali-patro', is_active=True).first()
+    if tool:
+        Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
+    return render(request, 'tools/nepali_patro.html', {
+        'tool': tool,
+        'meta_title': tool.meta_title if tool and tool.meta_title else 'नेपाली पात्रो २०८३ | Nepali Patro (Calendar) with Tithi, Holidays & Festivals',
+        'meta_description': tool.meta_description if tool and tool.meta_description else 'Interactive Nepali Patro (Calendar) 2083 Bikram Sambat with Tithi, official public holidays, Dashain & Tihar dates, and English calendar sync.',
+    })
+
 def tool_detail(request, slug):
     if slug == 'date-converter':
         return date_converter(request)
@@ -50,6 +60,8 @@ def tool_detail(request, slug):
         return age_calculator(request)
     elif slug == 'unicode-converter':
         return unicode_converter(request)
+    elif slug == 'nepali-patro':
+        return nepali_patro(request)
     tool = get_object_or_404(Tool, slug=slug, is_active=True)
     Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
     return render(request, 'tools/tool_detail.html', {'tool': tool})
