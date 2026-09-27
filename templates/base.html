@@ -102,10 +102,14 @@
         (function() {
             var theme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-bs-theme', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
         })();
     </script>
 </head>
 <body class="index-page">
+    <script>(function(){if(localStorage.getItem('theme')==='dark'){document.body.classList.add('dark-mode');}})();</script>
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KCFVW48R"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -506,12 +510,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         function setDarkMode(isDark) {
             var theme = isDark ? 'dark' : 'light';
             document.documentElement.setAttribute('data-bs-theme', theme);
+            document.documentElement.classList.toggle('dark-mode', isDark);
             if (document.body) {
-                if (isDark) {
-                    document.body.classList.add('dark-mode');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                }
+                document.body.classList.toggle('dark-mode', isDark);
             }
             localStorage.setItem('theme', theme);
             var icon = document.getElementById('darkModeIcon');
@@ -534,54 +535,144 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         })();
     </script>
 
-    <!-- Google Translate Container (Hidden) -->
-    <div id="google_translate_element" style="display:none;"></div>
+    <!-- Google Translate Hidden Container -->
+    <div id="google_translate_element" style="position:fixed; bottom:-200px; left:0; width:1px; height:1px; opacity:0.01; pointer-events:none; z-index:-999;"></div>
+
+    <!-- Translation Engine: Instant Dictionary + Google Translate Full Page -->
     <script>
+        var nepaliDictionary = {
+            "Home": "गृहपृष्ठ",
+            "Study Notes": "अध्ययन नोटहरू",
+            "MCQ Practice": "MCQ अभ्यास",
+            "Downloads": "डाउनलोडहरू",
+            "Blog & Guides": "ब्लग तथा जानकारी",
+            "About": "हाम्रो बारेमा",
+            "Contact": "सम्पर्क",
+            "Search": "खोज्नुहोस्",
+            "Search notes, MCQs, syllabus PDFs...": "नोटहरू, MCQs, पाठ्यक्रम खोज्नुहोस्...",
+            "Help": "सहयोग",
+            "Admin": "प्रशासक",
+            "Hot": "नयाँ",
+            "PDFs": "पीडीएफ",
+            "Live Question": "प्रत्यक्ष प्रश्न",
+            "Interactive": "अन्तरक्रियात्मक",
+            "Explore": "हेर्नुहोस्",
+            "Start MCQ Practice": "MCQ अभ्यास सुरु गर्नुहोस्",
+            "Browse Study Notes": "अध्ययन नोटहरू हेर्नुहोस्",
+            "Free Downloads": "निःशुल्क डाउनलोडहरू",
+            "Study Hub": "अध्ययन केन्द्र",
+            "Categories": "विषयगत वर्गहरू",
+            "Contact & Support": "सम्पर्क तथा सहयोग",
+            "Connect With Us": "हामीसँग जोडिनुहोस्",
+            "Send a Direct Message": "सिधा सन्देश पठाउनुहोस्",
+            "Privacy": "गोपनीयता नीति",
+            "Terms": "नियम तथा सर्तहरू",
+            "Disclaimer": "अस्वीकरण",
+            "Sitemap": "साइटम्याप",
+            "Copyright": "प्रतिलिपि अधिकार",
+            "All Rights Reserved": "सबै अधिकार सुरक्षित",
+            "Technology & IT": "प्रविधि तथा सूचना प्रविधि",
+            "General Knowledge (GK)": "सामान्य ज्ञान (GK)",
+            "General Knowledge": "सामान्य ज्ञान",
+            "Computer Applications": "कम्प्युटर एप्लिकेसन्स",
+            "Competitive Exams": "प्रतिस्पर्धात्मक परीक्षा",
+            "Response Guarantee: Prompt replies within 24 hours.": "प्रतिक्रिया ग्यारेन्टी: २४ घण्टा भित्र तुरुन्त जवाफ दिइनेछ।"
+        };
+
+        function applyNepaliDictionary() {
+            var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            var node;
+            while (node = walker.nextNode()) {
+                var text = node.nodeValue.trim();
+                if (nepaliDictionary[text]) {
+                    node.nodeValue = node.nodeValue.replace(text, nepaliDictionary[text]);
+                }
+            }
+            var searchInput = document.getElementById('globalSearchInput');
+            if (searchInput) {
+                searchInput.placeholder = "नोटहरू, MCQs, पाठ्यक्रम खोज्नुहोस्...";
+            }
+        }
+
+        function setGoogleTransCookies(lang) {
+            var hostname = window.location.hostname;
+            var parts = hostname.split('.');
+            var rootDomain = parts.length > 2 ? parts.slice(-2).join('.') : hostname;
+            var val = (lang === 'ne') ? '/en/ne' : '/en/en';
+            var expire = (lang === 'en') ? '; expires=Thu, 01 Jan 1970 00:00:00 UTC;' : ';';
+
+            var cookies = [
+                'googtrans=' + val + '; path=/;' + expire,
+                'googtrans=' + val + '; path=/; domain=' + hostname + ';' + expire,
+                'googtrans=' + val + '; path=/; domain=.' + hostname + ';' + expire,
+                'googtrans=' + val + '; path=/; domain=' + rootDomain + ';' + expire,
+                'googtrans=' + val + '; path=/; domain=.' + rootDomain + ';' + expire
+            ];
+            if (lang === 'ne') {
+                cookies.push(
+                    'googtrans=/auto/ne; path=/;',
+                    'googtrans=/auto/ne; path=/; domain=' + hostname + ';',
+                    'googtrans=/auto/ne; path=/; domain=.' + hostname + ';'
+                );
+            }
+            cookies.forEach(function(c) {
+                document.cookie = c;
+            });
+        }
+
+        function setSiteLanguage(lang) {
+            localStorage.setItem('site_lang', lang);
+            setGoogleTransCookies(lang);
+
+            var badge = document.getElementById('currentLangBadge');
+            if (badge) {
+                badge.textContent = (lang === 'ne') ? 'नेपाली' : 'EN';
+            }
+
+            if (lang === 'ne') {
+                applyNepaliDictionary();
+                var combo = document.querySelector('.goog-te-combo');
+                if (combo) {
+                    combo.value = 'ne';
+                    combo.dispatchEvent(new Event('change'));
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                window.location.reload();
+            }
+        }
+
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
                 includedLanguages: 'en,ne',
                 autoDisplay: false
             }, 'google_translate_element');
+
+            if (localStorage.getItem('site_lang') === 'ne') {
+                setTimeout(function() {
+                    var combo = document.querySelector('.goog-te-combo');
+                    if (combo && combo.value !== 'ne') {
+                        combo.value = 'ne';
+                        combo.dispatchEvent(new Event('change'));
+                    }
+                }, 400);
+            }
         }
 
-        function setSiteLanguage(lang) {
-            var hostname = window.location.hostname;
-            if (lang === 'ne') {
-                document.cookie = "googtrans=/en/ne; path=/;";
-                document.cookie = "googtrans=/en/ne; path=/; domain=" + hostname;
-                document.cookie = "googtrans=/en/ne; path=/; domain=." + hostname;
-                localStorage.setItem('site_lang', 'ne');
-            } else {
-                document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-                document.cookie = "googtrans=; path=/; domain=" + hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-                document.cookie = "googtrans=; path=/; domain=." + hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-                document.cookie = "googtrans=/en/en; path=/;";
-                document.cookie = "googtrans=/en/en; path=/; domain=" + hostname;
-                localStorage.setItem('site_lang', 'en');
-            }
-
-            var combo = document.querySelector('.goog-te-combo');
-            if (combo) {
-                combo.value = lang;
-                combo.dispatchEvent(new Event('change'));
-            }
-            setTimeout(function() {
-                window.location.reload();
-            }, 100);
-        }
-
+        // Run on load
         (function() {
-            var lang = localStorage.getItem('site_lang') || 'en';
+            var currentLang = localStorage.getItem('site_lang') || 'en';
             var badge = document.getElementById('currentLangBadge');
             if (badge) {
-                badge.textContent = lang === 'ne' ? 'NE' : 'EN';
+                badge.textContent = (currentLang === 'ne') ? 'नेपाली' : 'EN';
             }
-            if (lang === 'ne') {
-                if (!document.cookie.includes('googtrans=/en/ne')) {
-                    document.cookie = "googtrans=/en/ne; path=/;";
-                    document.cookie = "googtrans=/en/ne; path=/; domain=" + window.location.hostname;
-                }
+            if (currentLang === 'ne') {
+                setGoogleTransCookies('ne');
+                document.addEventListener('DOMContentLoaded', function() {
+                    applyNepaliDictionary();
+                });
             }
         })();
     </script>
