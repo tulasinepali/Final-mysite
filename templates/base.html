@@ -266,6 +266,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Main Content -->
     <main id="main-content">
         {% block content %}{% endblock %}
+        {% if ads.footer %}
+        <div class="container my-3">
+            <div class="ad-container text-center py-2">
+                {{ ads.footer|safe }}
+            </div>
+        </div>
+        {% endif %}
     </main>
 
     <!-- SmartStore Footer -->
@@ -390,14 +397,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </footer>
-
-
-    <!-- Footer Ad -->
-    {% if ads.footer %}
-    <div class="ad-container text-center py-2 bg-light">
-        {{ ads.footer|safe }}
-    </div>
-    {% endif %}
 
     <!-- Popup Ad Modal -->
     {% if popup_ad %}
