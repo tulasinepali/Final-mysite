@@ -219,7 +219,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li><a href="{% url 'core:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="bi bi-house me-1"></i> Home</a></li>
                         <li><a href="{% url 'notes:list' %}" class="{% if 'notes' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-journal-text me-1"></i> Study Notes</a></li>
                         <li><a href="{% url 'quiz:list' %}" class="{% if 'quiz' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-check2-circle me-1"></i> MCQ Practice</a></li>
-                        <li><a href="{% url 'tools:tools_index' %}" class="{% if 'tools' in request.resolver_match.app_names and request.resolver_match.url_name != 'widgets_index' and 'widget' not in request.path %}active{% endif %}"><i class="bi bi-tools me-1"></i> Tools</a></li>
                         <li><a href="{% url 'downloads:list' %}" class="{% if 'downloads' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-download me-1"></i> Downloads</a></li>
                         <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blog &amp; Guides</a></li>
                         <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About {{ site_settings.owner_title|default:"Mentor" }}</a></li>
@@ -268,6 +267,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <main id="main-content">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Footer Ad (Above Footer) -->
+    {% if ads.footer %}
+    <div class="container my-3">
+        <div class="ad-container text-center py-2">
+            {{ ads.footer|safe }}
+        </div>
+    </div>
+    {% endif %}
 
     <!-- SmartStore Footer -->
     <footer id="footer" class="footer">
@@ -391,14 +399,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </footer>
-
-
-    <!-- Footer Ad -->
-    {% if ads.footer %}
-    <div class="ad-container text-center py-2 bg-light">
-        {{ ads.footer|safe }}
-    </div>
-    {% endif %}
 
     <!-- Popup Ad Modal -->
     {% if popup_ad %}
