@@ -324,28 +324,39 @@ body.dark-mode .header-actions .action-icon,
     color: #ffffff !important;
 }
 
-/* Google Translate clean styling */
+/* Google Translate clean styling — suppress injected frames, tooltips, and 96px loading spinner */
+[class*="VIpgJd"],
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO,
+.VIpgJd-ZVi9od-aZ2wEe,
 .goog-te-banner-frame,
 iframe.goog-te-banner-frame,
-.goog-te-banner-frame.skiptranslate {
+.goog-te-banner-frame.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.skiptranslate iframe {
     display: none !important;
     visibility: hidden !important;
     height: 0 !important;
+    width: 0 !important;
+    max-height: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
 }
 body {
     top: 0px !important;
     position: static !important;
 }
-#goog-gt-tt,
-.goog-te-balloon-frame {
-    display: none !important;
-}
 .goog-text-highlight {
     background: none !important;
     box-shadow: none !important;
-}
-.skiptranslate iframe {
-    display: none !important;
 }
 
 /* ----------------------------------------------------------
