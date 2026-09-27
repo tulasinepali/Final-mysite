@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Free Embeddable Web Widgets | Tulasi Nepali" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Free embeddable widgets for blogs, news portals, and school websites. Embed Nepali Date Converter, Universal Age Calculator, Preeti to Unicode, and Live Nepali Clock easily." }}{% endblock %}
+
+{% block content %}
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container text-center">
+        <div class="d-inline-flex align-items-center gap-2 mb-2">
+            <span class="badge rounded-pill px-3 py-1 bg-primary text-white">
+                <i class="bi bi-puzzle me-1"></i> Webmaster &amp; Blogger Hub
+            </span>
+            <span class="badge rounded-pill px-3 py-1 bg-success bg-opacity-10 text-success border border-success">
+                100% Free Forever
+            </span>
+        </div>
+        <h1 class="fw-bold mb-2">Free Embeddable Widgets for Your Website</h1>
+        <p class="text-muted mb-0 mx-auto" style="max-width: 680px;">
+            Enhance your school portal, personal blog, or news website. Copy and paste 1 line of responsive iframe code to add live interactive tools for your visitors.
+        </p>
+    </div>
+</div>
+
+<section class="py-5" style="background: #ffffff;">
+    <div class="container">
+        
+        <!-- Feature Highlights Bar -->
+        <div class="row g-3 mb-5 text-center">
+            <div class="col-md-4">
+                <div class="p-3 rounded-4 border bg-light h-100">
+                    <i class="bi bi-lightning-charge text-primary fs-3 mb-2 d-inline-block"></i>
+                    <h6 class="fw-bold mb-1">Instant Integration</h6>
+                    <p class="text-muted small mb-0">Works on WordPress, Blogger, Joomla, PHP, Wix, Webflow &amp; pure HTML.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-4 border bg-light h-100">
+                    <i class="bi bi-moon-stars text-primary fs-3 mb-2 d-inline-block"></i>
+                    <h6 class="fw-bold mb-1">Dark &amp; Light Themes</h6>
+                    <p class="text-muted small mb-0">Seamlessly customize widget themes to match your website's exact color scheme.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded-4 border bg-light h-100">
+                    <i class="bi bi-phone text-primary fs-3 mb-2 d-inline-block"></i>
+                    <h6 class="fw-bold mb-1">Mobile &amp; Fast Responsive</h6>
+                    <p class="text-muted small mb-0">Zero dependencies on your server. Fast client-side loading with SSL HTTPS security.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widgets Showcase List -->
+        <div class="d-flex flex-column gap-5">
+            {% for widget in widgets %}
+            <div class="card border rounded-4 shadow-sm overflow-hidden p-4 p-lg-5 bg-white" id="widget-{{ widget.slug }}">
+                <div class="row g-4 align-items-center">
+                    
+                    <!-- Left Column: Info & Embed Code Generator -->
+                    <div class="col-lg-6">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge rounded-pill px-3 py-1 bg-primary bg-opacity-10 text-primary fw-semibold">
+                                <i class="bi {{ widget.icon|default:'bi-puzzle' }} me-1"></i> Widget #{{ forloop.counter }}
+                            </span>
+                            {% if widget.embed_count > 0 %}
+                            <span class="badge bg-light text-muted border small">
+                                <i class="bi bi-graph-up me-1"></i> {{ widget.embed_count }} Embeds
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="fw-bold mb-2">{{ widget.title }}</h3>
+                        <p class="text-muted mb-4">{{ widget.description }}</p>
+
+                        <!-- Customization Controls -->
+                        <div class="p-3 rounded-3 bg-light border mb-3">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-sm-6">
+                                    <label class="small text-muted fw-semibold mb-1 d-block">Select Theme</label>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="button" class="btn btn-outline-primary active" id="theme-btn-light-{{ widget.slug }}" onclick="updateWidgetTheme('{{ widget.slug }}', 'light')">
+                                            <i class="bi bi-sun me-1"></i> Light
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary" id="theme-btn-dark-{{ widget.slug }}" onclick="updateWidgetTheme('{{ widget.slug }}', 'dark')">
+                                            <i class="bi bi-moon me-1"></i> Dark
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="small text-muted fw-semibold mb-1 d-block">Recommended Size</label>
+                                    <span class="small fw-semibold text-dark">{{ widget.default_width|default:"100%" }} &times; {{ widget.default_height|default:"380px" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Embed Code Textarea -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="small text-muted fw-bold">HTML Embed Code (Copy &amp; Paste)</label>
+                                <span class="badge bg-success bg-opacity-10 text-success small" id="copiedBadge-{{ widget.slug }}" style="display: none;">
+                                    <i class="bi bi-check-circle me-1"></i> Copied to Clipboard!
+                                </span>
+                            </div>
+                            <textarea id="embedCode-{{ widget.slug }}" class="form-control font-monospace small bg-light" rows="3" readonly onclick="this.select()">&lt;iframe src="{{ request.scheme }}://{{ request.get_host }}{% url 'tools:widget_embed' widget.slug %}?theme=light" width="{{ widget.default_width|default:'100%' }}" height="{{ widget.default_height|default:'380' }}" frameborder="0" style="border:1px solid #e2e8f0; border-radius:12px; max-width:100%;" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
+                        </div>
+
+                        <!-- Copy Button -->
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-primary rounded-pill px-4 fw-semibold" onclick="copyWidgetCode('{{ widget.slug }}')">
+                                <i class="bi bi-clipboard me-1" id="copyIcon-{{ widget.slug }}"></i> <span id="copyBtnText-{{ widget.slug }}">Copy Embed Code</span>
+                            </button>
+                            {% if widget.slug == 'date-converter' %}
+                            <a href="{% url 'tools:date_converter' %}" class="btn btn-outline-secondary rounded-pill px-3">
+                                View Full Tool <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                            {% elif widget.slug == 'age-calculator' %}
+                            <a href="{% url 'tools:age_calculator' %}" class="btn btn-outline-secondary rounded-pill px-3">
+                                View Full Tool <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                            {% elif widget.slug == 'unicode-converter' %}
+                            <a href="{% url 'tools:unicode_converter' %}" class="btn btn-outline-secondary rounded-pill px-3">
+                                View Full Tool <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Live Interactive Iframe Preview -->
+                    <div class="col-lg-6">
+                        <div class="border rounded-4 p-3 bg-light text-center">
+                            <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary small">
+                                    <i class="bi bi-eye me-1"></i> Live Interactive Preview
+                                </span>
+                                <small class="text-muted" id="previewThemeLabel-{{ widget.slug }}">Theme: Light</small>
+                            </div>
+                            <div class="rounded-3 overflow-hidden shadow-sm border bg-white" style="max-width: 440px; margin: 0 auto;">
+                                <iframe id="previewIframe-{{ widget.slug }}" 
+                                        src="{% url 'tools:widget_embed' widget.slug %}?theme=light" 
+                                        width="100%" 
+                                        height="{{ widget.default_height|default:'380' }}" 
+                                        frameborder="0" 
+                                        style="display: block; width: 100%; border: none;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Widgets directory is currently being updated. Please check back shortly!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- How to Embed Guide -->
+        <div class="content-box p-4 p-md-5 rounded-4 border bg-white mt-5">
+            <h3 class="fw-bold mb-3">How to Embed on Your Website</h3>
+            <div class="row g-4 mt-1">
+                <div class="col-md-4">
+                    <div class="d-flex gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5 flex-shrink-0" style="width: 40px; height: 40px;">1</div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Choose &amp; Customize</h6>
+                            <p class="text-muted small">Select your preferred tool above and toggle between Light or Dark theme to match your website design.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5 flex-shrink-0" style="width: 40px; height: 40px;">2</div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Copy Embed Code</h6>
+                            <p class="text-muted small">Click the "Copy Embed Code" button to copy the pre-configured responsive HTML iframe tag.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5 flex-shrink-0" style="width: 40px; height: 40px;">3</div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Paste into HTML / CMS</h6>
+                            <p class="text-muted small">Paste into a "Custom HTML" widget in WordPress, Blogger, or anywhere in your website code. It works instantly!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var widgetBaseUrl = "{{ request.scheme }}://{{ request.get_host }}";
+
+function updateWidgetTheme(slug, theme) {
+    var btnLight = document.getElementById("theme-btn-light-" + slug);
+    var btnDark = document.getElementById("theme-btn-dark-" + slug);
+    var iframe = document.getElementById("previewIframe-" + slug);
+    var codeArea = document.getElementById("embedCode-" + slug);
+    var themeLabel = document.getElementById("previewThemeLabel-" + slug);
+
+    if (theme === 'dark') {
+        btnLight.classList.remove("active");
+        btnDark.classList.add("active");
+        themeLabel.textContent = "Theme: Dark";
+    } else {
+        btnDark.classList.remove("active");
+        btnLight.classList.add("active");
+        themeLabel.textContent = "Theme: Light";
+    }
+
+    // Update iframe preview src
+    var embedPath = "/widgets/embed/" + slug + "/?theme=" + theme;
+    iframe.src = embedPath;
+
+    // Update embed textarea code
+    var currentHeight = iframe.getAttribute("height") || "380";
+    var currentWidth = iframe.getAttribute("width") || "100%";
+    var fullUrl = widgetBaseUrl + embedPath;
+    var newCode = '<iframe src="' + fullUrl + '" width="' + currentWidth + '" height="' + currentHeight + '" frameborder="0" style="border:1px solid #e2e8f0; border-radius:12px; max-width:100%;" loading="lazy"></iframe>';
+    codeArea.value = newCode;
+}
+
+function copyWidgetCode(slug) {
+    var codeArea = document.getElementById("embedCode-" + slug);
+    codeArea.select();
+
+    navigator.clipboard.writeText(codeArea.value).then(function () {
+        var copyBtnText = document.getElementById("copyBtnText-" + slug);
+        var copyIcon = document.getElementById("copyIcon-" + slug);
+        var badge = document.getElementById("copiedBadge-" + slug);
+
+        copyBtnText.textContent = "Copied!";
+        copyIcon.className = "bi bi-check2 text-white";
+        badge.style.display = "inline-block";
+
+        setTimeout(function () {
+            copyBtnText.textContent = "Copy Embed Code";
+            copyIcon.className = "bi bi-clipboard";
+            badge.style.display = "none";
+        }, 2500);
+    });
+}
+</script>
+{% endblock %}

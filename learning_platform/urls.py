@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 from core.views import custom_404, custom_500
 from django.views.generic import TemplateView
+from tools import views as tools_views
 
 
 urlpatterns = [
@@ -23,6 +24,10 @@ urlpatterns = [
     path('quiz/', include('quiz.urls')),
     path('search/', include('search.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('tools/', include('tools.urls')),
+    path('widgets/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
+    path('widget/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
+    path('widgets/embed/<slug:slug>/', tools_views.widget_embed),
     path(
         "ads.txt",
         TemplateView.as_view(

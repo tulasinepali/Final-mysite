@@ -151,6 +151,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div class="d-flex align-items-center header-actions">
                         <!-- Quick Links -->
                         <div class="quick-links d-none d-md-flex align-items-center">
+                            <a href="{% url 'tools:tools_index' %}" class="quick-link">
+                                <i class="bi bi-tools text-primary"></i>
+                                <span>Tools</span>
+                            </a>
+                            <a href="{% url 'tools:widgets_index' %}" class="quick-link">
+                                <i class="bi bi-puzzle text-info"></i>
+                                <span>Widgets</span>
+                            </a>
                             <a href="{% url 'quiz:list' %}" class="quick-link">
                                 <i class="bi bi-patch-question text-primary"></i>
                                 <span>MCQs</span>
@@ -211,6 +219,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li><a href="{% url 'core:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="bi bi-house me-1"></i> Home</a></li>
                         <li><a href="{% url 'notes:list' %}" class="{% if 'notes' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-journal-text me-1"></i> Study Notes</a></li>
                         <li><a href="{% url 'quiz:list' %}" class="{% if 'quiz' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-check2-circle me-1"></i> MCQ Practice</a></li>
+                        <li><a href="{% url 'tools:tools_index' %}" class="{% if 'tools' in request.resolver_match.app_names and request.resolver_match.url_name != 'widgets_index' and 'widget' not in request.path %}active{% endif %}"><i class="bi bi-tools me-1"></i> Tools</a></li>
+                        <li><a href="{% url 'tools:widgets_index' %}" class="{% if 'widgets' in request.path %}active{% endif %}"><i class="bi bi-puzzle me-1"></i> Widgets</a></li>
                         <li><a href="{% url 'downloads:list' %}" class="{% if 'downloads' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-download me-1"></i> Downloads</a></li>
                         <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blog &amp; Guides</a></li>
                         <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About {{ site_settings.owner_title|default:"Mentor" }}</a></li>
@@ -303,6 +313,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <ul class="footer-links list-unstyled">
                             <li><a href="{% url 'notes:list' %}"><i class="bi bi-chevron-right me-1"></i>Study Notes</a></li>
                             <li><a href="{% url 'quiz:list' %}"><i class="bi bi-chevron-right me-1"></i>MCQ Practice</a></li>
+                            <li><a href="{% url 'tools:tools_index' %}"><i class="bi bi-chevron-right me-1"></i>Student Tools</a></li>
+                            <li><a href="{% url 'tools:widgets_index' %}"><i class="bi bi-chevron-right me-1"></i>Web Widgets</a></li>
                             <li><a href="{% url 'downloads:list' %}"><i class="bi bi-chevron-right me-1"></i>Downloads</a></li>
                             <li><a href="{% url 'blog:list' %}"><i class="bi bi-chevron-right me-1"></i>Exam Blog</a></li>
                             <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right me-1"></i>About {{ site_settings.owner_title|default:"Mentor" }}</a></li>
@@ -588,6 +600,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             "Home": "गृहपृष्ठ",
             "Study Notes": "अध्ययन नोटहरू",
             "MCQ Practice": "MCQ अभ्यास",
+            "Tools": "उपकरणहरू",
+            "Widgets": "विजेटहरू",
+            "Student Tools": "विद्यार्थी उपकरणहरू",
+            "Web Widgets": "वेब विजेटहरू",
             "Downloads": "डाउनलोडहरू",
             "Blog & Guides": "ब्लग तथा जानकारी",
             "About": "हाम्रो बारेमा",

@@ -9,8 +9,9 @@ PassengerPython /home/tulasine/virtualenv/learning-platformfinal/3.10/bin/python
     # HSTS — force HTTPS for 1 year (fixes "No HSTS header" flag)
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 
-    # X-Frame-Options — prevent clickjacking
-    Header always set X-Frame-Options "SAMEORIGIN"
+    # X-Frame-Options — prevent clickjacking (except for embeddable widgets)
+    SetEnvIf Request_URI "^/widgets/embed/" IS_WIDGET
+    Header always set X-Frame-Options "SAMEORIGIN" env=!IS_WIDGET
 
     # X-Content-Type-Options — prevent MIME sniffing
     Header always set X-Content-Type-Options "nosniff"

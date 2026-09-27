@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ widget.title }}</title>
+    <style>
+        :root {
+            --bg-color: {% if theme == 'dark' %}#121824{% else %}#ffffff{% endif %};
+            --card-bg: {% if theme == 'dark' %}#1a2234{% else %}#f8fafc{% endif %};
+            --text-color: {% if theme == 'dark' %}#e2e8f0{% else %}#1e293b{% endif %};
+            --muted-color: {% if theme == 'dark' %}#94a3b8{% else %}#64748b{% endif %};
+            --border-color: {% if theme == 'dark' %}#2d3748{% else %}#e2e8f0{% endif %};
+            --primary-color: #0559b7;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Mukta", sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 16px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .clock-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: #dc2626;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .time-display {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-color);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .date-bs {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 2px;
+        }
+        .date-ad {
+            font-size: 11px;
+            color: var(--muted-color);
+        }
+        .widget-footer {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted-color);
+        }
+        .widget-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="live-badge">
+            <span class="pulse-dot"></span> LIVE NEPAL TIME
+        </div>
+        <div class="time-display" id="nepalTime">--:--:-- --</div>
+        <div class="date-bs" id="nepalDateBs">लोड हुँदैछ...</div>
+        <div class="date-ad" id="nepalDateAd">Loading Gregorian date...</div>
+    </div>
+
+    <div class="widget-footer">
+        Powered by <a href="{{ widget_settings.branding_url|default:'https://tulasinepali.com.np' }}" target="_blank" rel="noopener">{{ widget_settings.branding_text|default:'Tulasi Nepali' }}</a>
+    </div>
+
+    <script src="{% static 'js/nepali-calendar.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            try {
+                fetch("{% url 'tools:api_track_embed' widget.slug %}", { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            } catch(e) {}
+        });
+
+        function updateClock() {
+            // Nepal is UTC + 5:45
+            var now = new Date();
+            var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            var npt = new Date(utc + (3600000 * 5.75));
+
+            var hours = npt.getHours();
+            var minutes = npt.getMinutes();
+            var seconds = npt.getSeconds();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 becomes 12
+
+            var strHours = hours < 10 ? '0' + hours : hours;
+            var strMin = minutes < 10 ? '0' + minutes : minutes;
+            var strSec = seconds < 10 ? '0' + seconds : seconds;
+
+            document.getElementById("nepalTime").textContent = strHours + ":" + strMin + ":" + strSec + " " + ampm;
+
+            try {
+                var bs = NepaliCalendar.adToBs(npt.getFullYear(), npt.getMonth() + 1, npt.getDate());
+                document.getElementById("nepalDateBs").textContent = bs.formattedBsNe;
+
+                var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                var adDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                var adStr = adDays[npt.getDay()] + ", " + adMonths[npt.getMonth()] + " " + npt.getDate() + ", " + npt.getFullYear();
+                document.getElementById("nepalDateAd").textContent = adStr;
+            } catch(e) {}
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Preeti to Unicode Converter | Unicode to Preeti Nepali Font Tool" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Fast, accurate Preeti to Unicode and Unicode to Preeti converter. Easily convert traditional Preeti text into modern Nepali Unicode with 1-click copy." }}{% endblock %}
+
+{% block content %}
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container text-center">
+        <span class="badge rounded-pill px-3 py-1 bg-primary text-white mb-2">
+            <i class="bi bi-fonts me-1"></i> Two-Way Font Converter
+        </span>
+        <h1 class="fw-bold mb-2">Preeti &harr; Unicode Converter</h1>
+        <p class="text-muted mb-0 mx-auto" style="max-width: 650px;">
+            Instantly convert traditional Nepali fonts (Preeti, Kantipur) to universal Nepali Unicode and vice-versa with live real-time typing.
+        </p>
+    </div>
+</div>
+
+<section class="py-5" style="background: #ffffff;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <!-- Main Converter Workspace -->
+                <div class="card border rounded-4 shadow-sm p-4 p-md-5 mb-5 bg-white">
+                    
+                    <!-- Direction Toolbar -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom">
+                        <div class="btn-group p-1 bg-light rounded-pill border" role="group">
+                            <button type="button" class="btn btn-sm rounded-pill px-3 fw-semibold active" id="btnPreetiToUni" onclick="setConversionDirection('preeti-to-uni')">
+                                Preeti &rarr; Unicode (प्रिती बाट युनिकोड)
+                            </button>
+                            <button type="button" class="btn btn-sm rounded-pill px-3 fw-semibold" id="btnUniToPreeti" onclick="setConversionDirection('uni-to-preeti')">
+                                Unicode &rarr; Preeti (युनिकोड बाट प्रिती)
+                            </button>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="swapTextAreas()">
+                                <i class="bi bi-arrow-left-right me-1"></i> Swap
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="clearAllText()">
+                                <i class="bi bi-trash3 me-1"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dual Panes -->
+                    <div class="row g-4">
+                        <!-- Left Pane: Preeti -->
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label for="preetiInput" class="form-label fw-bold mb-0">
+                                    <i class="bi bi-keyboard text-primary me-1"></i> Preeti Font (प्रिती)
+                                </label>
+                                <span class="badge bg-light text-muted border small" id="preetiCharCount">0 chars</span>
+                            </div>
+                            <textarea id="preetiInput" class="form-control rounded-3 p-3 font-monospace" rows="10" 
+                                      placeholder="Type or paste Preeti text here (e.g. g]kfn)..." 
+                                      oninput="onPreetiInput()"></textarea>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted">Type in traditional layout</small>
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="copyText('preetiInput', 'copyPreetiBtn')">
+                                    <i class="bi bi-clipboard me-1" id="copyPreetiBtnIcon"></i> <span id="copyPreetiBtn">Copy Preeti</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right Pane: Unicode -->
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label for="unicodeInput" class="form-label fw-bold mb-0">
+                                    <i class="bi bi-translate text-success me-1"></i> Unicode (नेपाली युनिकोड)
+                                </label>
+                                <span class="badge bg-light text-muted border small" id="unicodeCharCount">0 chars</span>
+                            </div>
+                            <textarea id="unicodeInput" class="form-control rounded-3 p-3" rows="10" 
+                                      placeholder="Unicode text will appear here (e.g. नेपाल)..." 
+                                      oninput="onUnicodeInput()"></textarea>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted">Universal web-ready text</small>
+                                <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="copyText('unicodeInput', 'copyUnicodeBtn')">
+                                    <i class="bi bi-clipboard me-1" id="copyUnicodeBtnIcon"></i> <span id="copyUnicodeBtn">Copy Unicode</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Embed Widget Button -->
+                    <div class="text-center pt-4 mt-5 border-top">
+                        <a href="{% url 'tools:widgets_index' %}#widget-unicode-converter" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                            <i class="bi bi-code-square me-1"></i> Embed This Font Converter on Your Website
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Character Mapping Guide & Reference -->
+                <div class="content-box p-4 p-md-5 rounded-4 border bg-white mb-4">
+                    <h3 class="fw-bold mb-3">Understanding Preeti &amp; Nepali Unicode</h3>
+                    <p class="text-muted leading-relaxed">
+                        For decades, Nepali government offices, publishers, and newspapers have used legacy fonts like <strong>Preeti</strong>, <strong>Kantipur</strong>, and <strong>Fontasy Himali</strong>. However, legacy fonts require the recipient to have the specific font installed on their computer, otherwise the text renders as gibberish (e.g., <code>g]kfn</code> instead of <code>नेपाल</code>).
+                    </p>
+                    <p class="text-muted leading-relaxed">
+                        <strong>Unicode</strong> is the international computing standard that assigns a unique, universal code point to every Nepali character. Text in Unicode displays properly across all smartphones, social media platforms (Facebook, Twitter, WhatsApp), web browsers, and search engines without installing any extra software.
+                    </p>
+
+                    <h4 class="fw-bold mt-4 mb-3">Common Preeti Key Mappings</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Key Pressed</th>
+                                    <th>Preeti Character</th>
+                                    <th>Unicode Output</th>
+                                    <th>Word Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>s</code></td>
+                                    <td>क</td>
+                                    <td>क</td>
+                                    <td><code>sfd</code> &rarr; काम</td>
+                                </tr>
+                                <tr>
+                                    <td><code>k</code></td>
+                                    <td>प</td>
+                                    <td>प</td>
+                                    <td><code>kfgL</code> &rarr; पानी</td>
+                                </tr>
+                                <tr>
+                                    <td><code>g</code></td>
+                                    <td>न</td>
+                                    <td>न</td>
+                                    <td><code>gfd</code> &rarr; नाम</td>
+                                </tr>
+                                <tr>
+                                    <td><code>r</code></td>
+                                    <td>च</td>
+                                    <td>च</td>
+                                    <td><code>rfdn</code> &rarr; चामल</td>
+                                </tr>
+                                <tr>
+                                    <td><code>{</code> or <code>~</code></td>
+                                    <td>रेफ (र्)</td>
+                                    <td>र् (e.g. कार्य)</td>
+                                    <td><code>sfo{</code> &rarr; कार्य</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="fw-bold mt-4 mb-3">Frequently Asked Questions (FAQs)</h4>
+                    <div class="accordion accordion-flush" id="unicodeFaqAccordion">
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="ufaq1Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#ufaq1">
+                                    Can I convert Unicode back into Preeti font?
+                                </button>
+                            </h2>
+                            <div id="ufaq1" class="accordion-collapse collapse" data-bs-parent="#unicodeFaqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Yes! Our converter is fully bidirectional. Simply paste your Unicode text into the right box or click <strong>Unicode &rarr; Preeti</strong> to generate Preeti text ready for desktop publishing software like Adobe PageMaker or InDesign.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="ufaq2Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#ufaq2">
+                                    Does this converter work offline?
+                                </button>
+                            </h2>
+                            <div id="ufaq2" class="accordion-collapse collapse" data-bs-parent="#unicodeFaqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Yes, all conversions run entirely client-side in your web browser using JavaScript. No text is sent to any server, keeping your confidential documents 100% private and instantaneous.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/preeti-unicode.js' %}"></script>
+<script>
+var activeDirection = 'preeti-to-uni';
+
+function setConversionDirection(dir) {
+    activeDirection = dir;
+    var btnP2U = document.getElementById("btnPreetiToUni");
+    var btnU2P = document.getElementById("btnUniToPreeti");
+
+    if (dir === 'preeti-to-uni') {
+        btnP2U.classList.add("active");
+        btnU2P.classList.remove("active");
+        document.getElementById("preetiInput").focus();
+    } else {
+        btnU2P.classList.add("active");
+        btnP2U.classList.remove("active");
+        document.getElementById("unicodeInput").focus();
+    }
+}
+
+function onPreetiInput() {
+    var preeti = document.getElementById("preetiInput").value;
+    document.getElementById("preetiCharCount").textContent = preeti.length + " chars";
+
+    var unicode = PreetiConverter.preetiToUnicode(preeti);
+    document.getElementById("unicodeInput").value = unicode;
+    document.getElementById("unicodeCharCount").textContent = unicode.length + " chars";
+}
+
+function onUnicodeInput() {
+    var unicode = document.getElementById("unicodeInput").value;
+    document.getElementById("unicodeCharCount").textContent = unicode.length + " chars";
+
+    var preeti = PreetiConverter.unicodeToPreeti(unicode);
+    document.getElementById("preetiInput").value = preeti;
+    document.getElementById("preetiCharCount").textContent = preeti.length + " chars";
+}
+
+function swapTextAreas() {
+    var preetiEl = document.getElementById("preetiInput");
+    var unicodeEl = document.getElementById("unicodeInput");
+
+    var temp = preetiEl.value;
+    preetiEl.value = unicodeEl.value;
+    unicodeEl.value = temp;
+
+    onPreetiInput();
+}
+
+function clearAllText() {
+    document.getElementById("preetiInput").value = "";
+    document.getElementById("unicodeInput").value = "";
+    document.getElementById("preetiCharCount").textContent = "0 chars";
+    document.getElementById("unicodeCharCount").textContent = "0 chars";
+}
+
+function copyText(elementId, btnTextId) {
+    var text = document.getElementById(elementId).value;
+    if (!text) return;
+
+    navigator.clipboard.writeText(text).then(function () {
+        var label = document.getElementById(btnTextId);
+        var origText = label.textContent;
+        label.textContent = "Copied!";
+        setTimeout(function () {
+            label.textContent = origText;
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

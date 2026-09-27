@@ -1,0 +1,323 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ widget.title }}</title>
+    <style>
+        :root {
+            --bg-color: {% if theme == 'dark' %}#121824{% else %}#ffffff{% endif %};
+            --card-bg: {% if theme == 'dark' %}#1a2234{% else %}#f8fafc{% endif %};
+            --text-color: {% if theme == 'dark' %}#e2e8f0{% else %}#1e293b{% endif %};
+            --muted-color: {% if theme == 'dark' %}#94a3b8{% else %}#64748b{% endif %};
+            --border-color: {% if theme == 'dark' %}#2d3748{% else %}#e2e8f0{% endif %};
+            --primary-color: #0559b7;
+            --primary-hover: #044289;
+            --input-bg: {% if theme == 'dark' %}#0f172a{% else %}#ffffff{% endif %};
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Mukta", sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .widget-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .today-badge {
+            font-size: 11px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 3px 8px;
+            border-radius: 20px;
+            color: var(--muted-color);
+        }
+        .mode-toggle {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2px;
+            margin-bottom: 12px;
+        }
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--muted-color);
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            background: var(--primary-color);
+            color: #ffffff;
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted-color);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        select {
+            width: 100%;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        select:focus {
+            border-color: var(--primary-color);
+        }
+        .convert-btn {
+            width: 100%;
+            background: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .convert-btn:hover {
+            background: var(--primary-hover);
+        }
+        .result-box {
+            margin-top: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .result-primary {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+        }
+        .result-secondary {
+            font-size: 11px;
+            color: var(--muted-color);
+        }
+        .widget-footer {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted-color);
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        .widget-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .widget-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-header">
+        <span class="widget-title">📅 Nepali Date Converter</span>
+        <span class="today-badge" id="widgetTodayBadge">Loading...</span>
+    </div>
+
+    <div class="mode-toggle">
+        <button type="button" class="mode-btn active" id="btnBsToAd" onclick="setMode('bs-to-ad')">B.S. &rarr; A.D.</button>
+        <button type="button" class="mode-btn" id="btnAdToBs" onclick="setMode('ad-to-bs')">A.D. &rarr; B.S.</button>
+    </div>
+
+    <form onsubmit="event.preventDefault(); doConvert();">
+        <div class="input-row" id="inputsContainer"></div>
+        <button type="submit" class="convert-btn">Convert Date</button>
+    </form>
+
+    <div class="result-box" id="resultContainer" style="display: none;">
+        <div class="result-primary" id="resPrimary"></div>
+        <div class="result-secondary" id="resSecondary"></div>
+    </div>
+
+    <div class="widget-footer">
+        Powered by <a href="{{ widget_settings.branding_url|default:'https://tulasinepali.com.np' }}" target="_blank" rel="noopener">{{ widget_settings.branding_text|default:'Tulasi Nepali' }}</a>
+    </div>
+
+    <script src="{% static 'js/nepali-calendar.js' %}"></script>
+    <script>
+        var currentMode = 'bs-to-ad';
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var today = NepaliCalendar.getTodayBs();
+            document.getElementById("widgetTodayBadge").textContent = today.bsYear + "-" + (today.bsMonth < 10 ? '0' : '') + today.bsMonth + "-" + (today.bsDay < 10 ? '0' : '') + today.bsDay + " B.S.";
+            renderInputs();
+            doConvert();
+
+            // Track impression
+            try {
+                fetch("{% url 'tools:api_track_embed' widget.slug %}", { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            } catch(e) {}
+        });
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById("btnBsToAd").classList.toggle("active", mode === 'bs-to-ad');
+            document.getElementById("btnAdToBs").classList.toggle("active", mode === 'ad-to-bs');
+            renderInputs();
+            doConvert();
+        }
+
+        function renderInputs() {
+            var container = document.getElementById("inputsContainer");
+            var todayBs = NepaliCalendar.getTodayBs();
+            var nowAd = new Date();
+
+            if (currentMode === 'bs-to-ad') {
+                container.innerHTML = `
+                    <div class="input-group">
+                        <label>Year (वर्ष)</label>
+                        <select id="wYear" onchange="updateDays()"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>Month (महिना)</label>
+                        <select id="wMonth" onchange="updateDays()"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>Day (गते)</label>
+                        <select id="wDay"></select>
+                    </div>
+                `;
+                var yEl = document.getElementById("wYear");
+                for (var y = 2100; y >= 1970; y--) {
+                    var opt = document.createElement("option");
+                    opt.value = y;
+                    opt.textContent = y;
+                    if (y === todayBs.bsYear) opt.selected = true;
+                    yEl.appendChild(opt);
+                }
+                var mEl = document.getElementById("wMonth");
+                NepaliCalendar.BS_MONTHS_EN.forEach(function (name, idx) {
+                    var opt = document.createElement("option");
+                    opt.value = idx + 1;
+                    opt.textContent = (idx + 1) + ". " + name;
+                    if (idx + 1 === todayBs.bsMonth) opt.selected = true;
+                    mEl.appendChild(opt);
+                });
+                updateDays(todayBs.bsDay);
+            } else {
+                container.innerHTML = `
+                    <div class="input-group">
+                        <label>Year (A.D.)</label>
+                        <select id="wYear" onchange="updateDays()"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>Month</label>
+                        <select id="wMonth" onchange="updateDays()"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>Day</label>
+                        <select id="wDay"></select>
+                    </div>
+                `;
+                var yElAd = document.getElementById("wYear");
+                for (var ya = 2043; ya >= 1913; ya--) {
+                    var optA = document.createElement("option");
+                    optA.value = ya;
+                    optA.textContent = ya;
+                    if (ya === nowAd.getFullYear()) optA.selected = true;
+                    yElAd.appendChild(optA);
+                }
+                var mElAd = document.getElementById("wMonth");
+                var adMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                adMonths.forEach(function (name, idx) {
+                    var opt = document.createElement("option");
+                    opt.value = idx + 1;
+                    opt.textContent = (idx + 1) + ". " + name;
+                    if (idx === nowAd.getMonth()) opt.selected = true;
+                    mElAd.appendChild(opt);
+                });
+                updateDays(nowAd.getDate());
+            }
+        }
+
+        function updateDays(pref) {
+            var y = parseInt(document.getElementById("wYear").value);
+            var m = parseInt(document.getElementById("wMonth").value);
+            var dEl = document.getElementById("wDay");
+            var prev = pref || parseInt(dEl.value) || 1;
+
+            var max = 30;
+            if (currentMode === 'bs-to-ad') {
+                max = (NepaliCalendar.bsCalendarData[y] && NepaliCalendar.bsCalendarData[y][m - 1]) || 30;
+            } else {
+                max = new Date(y, m, 0).getDate();
+            }
+
+            dEl.innerHTML = "";
+            for (var d = 1; d <= max; d++) {
+                var opt = document.createElement("option");
+                opt.value = d;
+                opt.textContent = d;
+                if (d === prev || (prev > max && d === max)) opt.selected = true;
+                dEl.appendChild(opt);
+            }
+        }
+
+        function doConvert() {
+            var y = document.getElementById("wYear").value;
+            var m = document.getElementById("wMonth").value;
+            var d = document.getElementById("wDay").value;
+            var resBox = document.getElementById("resultContainer");
+
+            try {
+                if (currentMode === 'bs-to-ad') {
+                    var r = NepaliCalendar.bsToAd(y, m, d);
+                    document.getElementById("resPrimary").textContent = r.formattedAd;
+                    document.getElementById("resSecondary").textContent = r.dayNameEn + " | " + r.formattedBsNe;
+                } else {
+                    var rBs = NepaliCalendar.adToBs(y, m, d);
+                    document.getElementById("resPrimary").textContent = rBs.formattedBs + " B.S.";
+                    document.getElementById("resSecondary").textContent = rBs.formattedBsNe;
+                }
+                resBox.style.display = "block";
+            } catch(e) {
+                document.getElementById("resPrimary").textContent = "Invalid Date";
+                document.getElementById("resSecondary").textContent = e.message;
+                resBox.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

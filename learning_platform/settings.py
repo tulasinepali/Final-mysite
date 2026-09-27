@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'quiz',
     'search',
     'dashboard',
+    'tools',
     'csp',
 ]
 
@@ -261,69 +262,74 @@ SECURE_HSTS_PRELOAD = True
 SECURE_SSL_REDIRECT = not DEBUG  # Only redirect in production
 
 # CSP Settings (django-csp middleware)
-# Allow AdSense, GTM, Google Analytics, Fonts, Bootstrap CDN
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = (
-    "'self'", "'unsafe-inline'", "'unsafe-eval'",
-    "https://cdn.jsdelivr.net",
-    "https://cdnjs.cloudflare.com",
-    "https://pagead2.googlesyndication.com",
-    "https://adservice.google.com",
-    "https://www.googletagmanager.com",
-    "https://www.googletagservices.com",
-    "https://www.google-analytics.com",
-    "https://googleads.g.doubleclick.net",
-    "https://tpc.googlesyndication.com",
-    "https://ep1.adtrafficquality.google",
-    "https://ep2.adtrafficquality.google",
-    "https://cdn.ampproject.org",
-    "https://cdn.onesignal.com",
-    "https://www.google.com",
-    "https://translate.google.com",
-    "https://translate.googleapis.com",
-)
-CSP_STYLE_SRC = (
-    "'self'", "'unsafe-inline'",
-    "https://cdn.jsdelivr.net",
-    "https://cdnjs.cloudflare.com",
-    "https://fonts.googleapis.com",
-    "https://translate.googleapis.com",
-)
-CSP_FONT_SRC = (
-    "'self'",
-    "https://cdn.jsdelivr.net",
-    "https://cdnjs.cloudflare.com",
-    "https://fonts.gstatic.com",
-    "data:",
-)
-CSP_IMG_SRC = (
-    "'self'", "data:", "blob:",
-    "https://www.google.com",
-    "https://www.gstatic.com",
-    "https://pagead2.googlesyndication.com",
-    "https://googleads.g.doubleclick.net",
-    "https://www.google-analytics.com",
-    "https://translate.google.com",
-    "https://translate.googleapis.com",
-)
-CSP_FRAME_SRC = (
-    "https://googleads.g.doubleclick.net",
-    "https://tpc.googlesyndication.com",
-    "https://www.google.com",
-    "https://ep2.adtrafficquality.google",
-    "https://translate.google.com",
-)
-CSP_CONNECT_SRC = (
-    "'self'",
-    "https://www.google-analytics.com",
-    "https://www.googletagmanager.com",
-    "https://pagead2.googlesyndication.com",
-    "https://ep1.adtrafficquality.google",
-    "https://ep2.adtrafficquality.google",
-    "https://translate.googleapis.com",
-)
-CSP_OBJECT_SRC = ("'none'",)
-CSP_BASE_URI = ("'self'",)
+# Allow AdSense, GTM, Google Analytics, Fonts, Bootstrap CDN, Google Translate
+CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'script-src': (
+            "'self'", "'unsafe-inline'", "'unsafe-eval'",
+            'https://cdn.jsdelivr.net',
+            'https://cdnjs.cloudflare.com',
+            'https://pagead2.googlesyndication.com',
+            'https://adservice.google.com',
+            'https://www.googletagmanager.com',
+            'https://www.googletagservices.com',
+            'https://www.google-analytics.com',
+            'https://googleads.g.doubleclick.net',
+            'https://tpc.googlesyndication.com',
+            'https://ep1.adtrafficquality.google',
+            'https://ep2.adtrafficquality.google',
+            'https://cdn.ampproject.org',
+            'https://cdn.onesignal.com',
+            'https://www.google.com',
+            'https://translate.google.com',
+            'https://translate.googleapis.com',
+        ),
+        'style-src': (
+            "'self'", "'unsafe-inline'",
+            'https://cdn.jsdelivr.net',
+            'https://cdnjs.cloudflare.com',
+            'https://fonts.googleapis.com',
+            'https://translate.googleapis.com',
+        ),
+        'font-src': (
+            "'self'",
+            'https://cdn.jsdelivr.net',
+            'https://cdnjs.cloudflare.com',
+            'https://fonts.gstatic.com',
+            'data:',
+        ),
+        'img-src': (
+            "'self'", 'data:', 'blob:',
+            'https://www.google.com',
+            'https://www.gstatic.com',
+            'https://pagead2.googlesyndication.com',
+            'https://googleads.g.doubleclick.net',
+            'https://www.google-analytics.com',
+            'https://translate.google.com',
+            'https://translate.googleapis.com',
+        ),
+        'frame-src': (
+            "'self'",
+            'https://googleads.g.doubleclick.net',
+            'https://tpc.googlesyndication.com',
+            'https://www.google.com',
+            'https://ep2.adtrafficquality.google',
+            'https://translate.google.com',
+        ),
+        'connect-src': (
+            "'self'",
+            'https://www.google-analytics.com',
+            'https://www.googletagmanager.com',
+            'https://pagead2.googlesyndication.com',
+            'https://ep1.adtrafficquality.google',
+            'https://ep2.adtrafficquality.google',
+            'https://translate.googleapis.com',
+        ),
+        'object-src': ("'none'",),
+        'base-uri': ("'self'",),
+    }
+}
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend'

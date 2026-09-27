@@ -1,0 +1,529 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Universal Age Calculator | Calculate Exact Age in Years, Months & Days" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Calculate your exact age in years, months, and days using either Bikram Sambat (B.S.) or English (A.D.) birth dates. Fast, accurate, and completely free." }}{% endblock %}
+
+{% block content %}
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container text-center">
+        <span class="badge rounded-pill px-3 py-1 bg-primary text-white mb-2">
+            <i class="bi bi-calculator me-1"></i> Universal Calculator
+        </span>
+        <h1 class="fw-bold mb-2">Universal Age Calculator</h1>
+        <p class="text-muted mb-0 mx-auto" style="max-width: 650px;">
+            Calculate your exact chronological age in years, months, and days. Supports both Bikram Sambat (B.S.) and Gregorian (A.D.) dates.
+        </p>
+    </div>
+</div>
+
+<section class="py-5" style="background: #ffffff;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Main Calculator Card -->
+                <div class="card border rounded-4 shadow-sm p-4 p-md-5 mb-5 bg-white">
+                    <form id="ageCalculatorForm" onsubmit="event.preventDefault(); calculateAgeResult();">
+                        
+                        <!-- Section 1: Date of Birth -->
+                        <div class="mb-4">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-bold mb-0">
+                                    <i class="bi bi-cake2 text-primary me-1"></i> Date of Birth (जन्म मिति)
+                                </label>
+                                <div class="btn-group btn-group-sm p-1 bg-light rounded-pill border" role="group">
+                                    <input type="radio" class="btn-check" name="dobCalendar" id="dobCalendarBs" value="BS" checked onchange="toggleDobCalendarType('BS')">
+                                    <label class="btn btn-sm rounded-pill px-3" for="dobCalendarBs">B.S. (नेपाली)</label>
+
+                                    <input type="radio" class="btn-check" name="dobCalendar" id="dobCalendarAd" value="AD" onchange="toggleDobCalendarType('AD')">
+                                    <label class="btn btn-sm rounded-pill px-3" for="dobCalendarAd">A.D. (English)</label>
+                                </div>
+                            </div>
+
+                            <!-- DOB BS inputs -->
+                            <div id="dobBsFields" class="row g-2">
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Year (वर्ष)</label>
+                                    <select class="form-select rounded-3" id="dobBsYear" onchange="updateDobBsDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Month (महिना)</label>
+                                    <select class="form-select rounded-3" id="dobBsMonth" onchange="updateDobBsDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Day (गते)</label>
+                                    <select class="form-select rounded-3" id="dobBsDay"></select>
+                                </div>
+                            </div>
+
+                            <!-- DOB AD inputs -->
+                            <div id="dobAdFields" class="row g-2" style="display: none;">
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Year</label>
+                                    <select class="form-select rounded-3" id="dobAdYear" onchange="updateDobAdDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Month</label>
+                                    <select class="form-select rounded-3" id="dobAdMonth" onchange="updateDobAdDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Day</label>
+                                    <select class="form-select rounded-3" id="dobAdDay"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Calculate Age As Of Date -->
+                        <div class="mb-4 pt-3 border-top">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-bold mb-0">
+                                    <i class="bi bi-calendar-event text-primary me-1"></i> Age As Of Date (कुन मितिमा उमेर निकाल्ने?)
+                                </label>
+                                <div class="btn-group btn-group-sm p-1 bg-light rounded-pill border" role="group">
+                                    <input type="radio" class="btn-check" name="targetCalendar" id="targetCalendarBs" value="BS" checked onchange="toggleTargetCalendarType('BS')">
+                                    <label class="btn btn-sm rounded-pill px-3" for="targetCalendarBs">B.S. (नेपाली)</label>
+
+                                    <input type="radio" class="btn-check" name="targetCalendar" id="targetCalendarAd" value="AD" onchange="toggleTargetCalendarType('AD')">
+                                    <label class="btn btn-sm rounded-pill px-3" for="targetCalendarAd">A.D. (English)</label>
+                                </div>
+                            </div>
+
+                            <!-- Target BS inputs -->
+                            <div id="targetBsFields" class="row g-2">
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Year (वर्ष)</label>
+                                    <select class="form-select rounded-3" id="targetBsYear" onchange="updateTargetBsDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Month (महिना)</label>
+                                    <select class="form-select rounded-3" id="targetBsMonth" onchange="updateTargetBsDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Day (गते)</label>
+                                    <select class="form-select rounded-3" id="targetBsDay"></select>
+                                </div>
+                            </div>
+
+                            <!-- Target AD inputs -->
+                            <div id="targetAdFields" class="row g-2" style="display: none;">
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Year</label>
+                                    <select class="form-select rounded-3" id="targetAdYear" onchange="updateTargetAdDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Month</label>
+                                    <select class="form-select rounded-3" id="targetAdMonth" onchange="updateTargetAdDays()"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="small text-muted mb-1">Day</label>
+                                    <select class="form-select rounded-3" id="targetAdDay"></select>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 text-end">
+                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-muted" onclick="resetTargetToToday()">
+                                    <i class="bi bi-clock-history me-1"></i> Reset to Today's Date
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="text-center pt-2">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold shadow-sm">
+                                <i class="bi bi-calculator me-1"></i> Calculate Age
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Error Alert -->
+                    <div id="ageErrorAlert" class="alert alert-danger rounded-3 mt-4" style="display: none;"></div>
+
+                    <!-- Result Section -->
+                    <div id="ageResultSection" class="mt-4 pt-4 border-top" style="display: none;">
+                        <div class="text-center mb-4">
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1 mb-2 fw-semibold">
+                                <i class="bi bi-check-circle me-1"></i> Calculated Age
+                            </span>
+                            <h2 class="display-6 fw-bold text-primary mb-1" id="primaryAgeDisplay">0 Years, 0 Months, 0 Days</h2>
+                            <p class="text-muted fs-6 mb-0" id="secondaryAgeDisplay"></p>
+                        </div>
+
+                        <!-- Grid Statistics -->
+                        <div class="row g-3 text-center mb-4">
+                            <div class="col-sm-6 col-md-3">
+                                <div class="p-3 rounded-3 bg-light border">
+                                    <div class="text-muted small text-uppercase fw-semibold mb-1">Total Months</div>
+                                    <div class="fs-4 fw-bold text-dark" id="statTotalMonths">0</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="p-3 rounded-3 bg-light border">
+                                    <div class="text-muted small text-uppercase fw-semibold mb-1">Total Weeks</div>
+                                    <div class="fs-4 fw-bold text-dark" id="statTotalWeeks">0</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="p-3 rounded-3 bg-light border">
+                                    <div class="text-muted small text-uppercase fw-semibold mb-1">Total Days</div>
+                                    <div class="fs-4 fw-bold text-dark" id="statTotalDays">0</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="p-3 rounded-3 bg-light border">
+                                    <div class="text-muted small text-uppercase fw-semibold mb-1">Next Birthday</div>
+                                    <div class="fs-4 fw-bold text-success" id="statNextBirthday">0 days</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Copy and Actions -->
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="copyAgeResult()">
+                                <i class="bi bi-clipboard me-1" id="copyAgeIcon"></i> <span id="copyAgeText">Copy Result</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Embed Widget Promotion -->
+                    <div class="text-center pt-4 mt-4 border-top">
+                        <a href="{% url 'tools:widgets_index' %}#widget-age-calculator" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                            <i class="bi bi-code-square me-1"></i> Embed This Age Calculator on Your Website
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Informational Content & FAQs for SEO / AdSense -->
+                <div class="content-box p-4 p-md-5 rounded-4 border bg-white mb-4">
+                    <h3 class="fw-bold mb-3">Why Use a Chronological Age Calculator?</h3>
+                    <p class="text-muted leading-relaxed">
+                        Calculating an exact age down to the day can be challenging due to varying month lengths and leap years. This tool solves that difficulty with mathematical accuracy, supporting both the standard international Gregorian calendar (A.D.) and Nepal's official Bikram Sambat (B.S.) calendar.
+                    </p>
+                    <p class="text-muted leading-relaxed">
+                        Whether you are filling out official admission forms, verifying eligibility for programs, calculating insurance terms, or simply checking how many days you have lived, this universal calculator produces instant and reliable results.
+                    </p>
+
+                    <h4 class="fw-bold mt-4 mb-3">Frequently Asked Questions (FAQs)</h4>
+                    <div class="accordion accordion-flush" id="ageFaqAccordion">
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="faq1Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Can I enter my birth date in Bikram Sambat (B.S.)?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#ageFaqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Yes! You can toggle between <strong>B.S. (नेपाली)</strong> and <strong>A.D. (English)</strong> for both your date of birth and the target calculation date. Our built-in astronomical calendar handles all conversions seamlessly.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="faq2Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    How does the calculator determine exact months and days?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#ageFaqAccordion">
+                                <div class="accordion-body text-muted">
+                                    The calculator subtracts the birth date from the reference date by properly handling day and month borrow operations according to the exact number of days in the preceding months, including leap years in February.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="faq3Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Can I calculate my age on a specific future or past date?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#ageFaqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Absolutely. By default, the tool calculates your age as of today's date, but you can select any custom target date to determine your age at a milestone in the past or in the future.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/nepali-calendar.js' %}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    initAgeCalculator();
+});
+
+var currentDobMode = 'BS';
+var currentTargetMode = 'BS';
+
+function initAgeCalculator() {
+    var todayBs = NepaliCalendar.getTodayBs();
+    var nowAd = new Date();
+
+    // Populate DOB BS Year (2000 to 2090)
+    var dobBsYearSelect = document.getElementById("dobBsYear");
+    dobBsYearSelect.innerHTML = "";
+    for (var y = todayBs.bsYear; y >= 1975; y--) {
+        var opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y + " (" + NepaliCalendar.toNepaliDigits(y) + ")";
+        if (y === 2055) opt.selected = true; // sensible default
+        dobBsYearSelect.appendChild(opt);
+    }
+
+    // Populate DOB BS Month
+    var dobBsMonthSelect = document.getElementById("dobBsMonth");
+    dobBsMonthSelect.innerHTML = "";
+    NepaliCalendar.BS_MONTHS_EN.forEach(function (name, idx) {
+        var opt = document.createElement("option");
+        opt.value = idx + 1;
+        opt.textContent = (idx + 1) + ". " + name + " (" + NepaliCalendar.BS_MONTHS_NE[idx] + ")";
+        dobBsMonthSelect.appendChild(opt);
+    });
+
+    // Populate DOB AD
+    var dobAdYearSelect = document.getElementById("dobAdYear");
+    dobAdYearSelect.innerHTML = "";
+    for (var ya = nowAd.getFullYear(); ya >= 1920; ya--) {
+        var optA = document.createElement("option");
+        optA.value = ya;
+        optA.textContent = ya;
+        if (ya === 1998) optA.selected = true;
+        dobAdYearSelect.appendChild(optA);
+    }
+
+    var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var dobAdMonthSelect = document.getElementById("dobAdMonth");
+    dobAdMonthSelect.innerHTML = "";
+    adMonths.forEach(function (m, idx) {
+        var opt = document.createElement("option");
+        opt.value = idx + 1;
+        opt.textContent = (idx + 1) + ". " + m;
+        dobAdMonthSelect.appendChild(opt);
+    });
+
+    // Populate Target BS
+    var targetBsYearSelect = document.getElementById("targetBsYear");
+    targetBsYearSelect.innerHTML = "";
+    for (var yt = todayBs.bsYear + 10; yt >= 1975; yt--) {
+        var optT = document.createElement("option");
+        optT.value = yt;
+        optT.textContent = yt + " (" + NepaliCalendar.toNepaliDigits(yt) + ")";
+        if (yt === todayBs.bsYear) optT.selected = true;
+        targetBsYearSelect.appendChild(optT);
+    }
+
+    var targetBsMonthSelect = document.getElementById("targetBsMonth");
+    targetBsMonthSelect.innerHTML = "";
+    NepaliCalendar.BS_MONTHS_EN.forEach(function (name, idx) {
+        var opt = document.createElement("option");
+        opt.value = idx + 1;
+        opt.textContent = (idx + 1) + ". " + name + " (" + NepaliCalendar.BS_MONTHS_NE[idx] + ")";
+        if (idx + 1 === todayBs.bsMonth) opt.selected = true;
+        targetBsMonthSelect.appendChild(opt);
+    });
+
+    // Populate Target AD
+    var targetAdYearSelect = document.getElementById("targetAdYear");
+    targetAdYearSelect.innerHTML = "";
+    for (var yta = nowAd.getFullYear() + 10; yta >= 1920; yta--) {
+        var optTa = document.createElement("option");
+        optTa.value = yta;
+        optTa.textContent = yta;
+        if (yta === nowAd.getFullYear()) optTa.selected = true;
+        targetAdYearSelect.appendChild(optTa);
+    }
+
+    var targetAdMonthSelect = document.getElementById("targetAdMonth");
+    targetAdMonthSelect.innerHTML = "";
+    adMonths.forEach(function (m, idx) {
+        var opt = document.createElement("option");
+        opt.value = idx + 1;
+        opt.textContent = (idx + 1) + ". " + m;
+        if (idx === nowAd.getMonth()) opt.selected = true;
+        targetAdMonthSelect.appendChild(opt);
+    });
+
+    updateDobBsDays();
+    updateDobAdDays();
+    updateTargetBsDays(todayBs.bsDay);
+    updateTargetAdDays(nowAd.getDate());
+
+    // Auto calculate initial default
+    calculateAgeResult();
+}
+
+function updateDobBsDays() {
+    var year = parseInt(document.getElementById("dobBsYear").value);
+    var month = parseInt(document.getElementById("dobBsMonth").value);
+    var daySelect = document.getElementById("dobBsDay");
+    var prevVal = parseInt(daySelect.value) || 1;
+
+    var maxDays = (NepaliCalendar.bsCalendarData[year] && NepaliCalendar.bsCalendarData[year][month - 1]) || 30;
+    daySelect.innerHTML = "";
+    for (var d = 1; d <= maxDays; d++) {
+        var opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d + " (" + NepaliCalendar.toNepaliDigits(d) + ")";
+        if (d === prevVal || (prevVal > maxDays && d === maxDays)) opt.selected = true;
+        daySelect.appendChild(opt);
+    }
+}
+
+function updateDobAdDays() {
+    var year = parseInt(document.getElementById("dobAdYear").value);
+    var month = parseInt(document.getElementById("dobAdMonth").value);
+    var daySelect = document.getElementById("dobAdDay");
+    var prevVal = parseInt(daySelect.value) || 1;
+
+    var daysInMonth = new Date(year, month, 0).getDate();
+    daySelect.innerHTML = "";
+    for (var d = 1; d <= daysInMonth; d++) {
+        var opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        if (d === prevVal || (prevVal > daysInMonth && d === daysInMonth)) opt.selected = true;
+        daySelect.appendChild(opt);
+    }
+}
+
+function updateTargetBsDays(preferredDay) {
+    var year = parseInt(document.getElementById("targetBsYear").value);
+    var month = parseInt(document.getElementById("targetBsMonth").value);
+    var daySelect = document.getElementById("targetBsDay");
+    var prevVal = preferredDay || parseInt(daySelect.value) || 1;
+
+    var maxDays = (NepaliCalendar.bsCalendarData[year] && NepaliCalendar.bsCalendarData[year][month - 1]) || 30;
+    daySelect.innerHTML = "";
+    for (var d = 1; d <= maxDays; d++) {
+        var opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d + " (" + NepaliCalendar.toNepaliDigits(d) + ")";
+        if (d === prevVal || (prevVal > maxDays && d === maxDays)) opt.selected = true;
+        daySelect.appendChild(opt);
+    }
+}
+
+function updateTargetAdDays(preferredDay) {
+    var year = parseInt(document.getElementById("targetAdYear").value);
+    var month = parseInt(document.getElementById("targetAdMonth").value);
+    var daySelect = document.getElementById("targetAdDay");
+    var prevVal = preferredDay || parseInt(daySelect.value) || 1;
+
+    var daysInMonth = new Date(year, month, 0).getDate();
+    daySelect.innerHTML = "";
+    for (var d = 1; d <= daysInMonth; d++) {
+        var opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        if (d === prevVal || (prevVal > daysInMonth && d === daysInMonth)) opt.selected = true;
+        daySelect.appendChild(opt);
+    }
+}
+
+function toggleDobCalendarType(type) {
+    currentDobMode = type;
+    document.getElementById("dobBsFields").style.display = (type === 'BS') ? 'flex' : 'none';
+    document.getElementById("dobAdFields").style.display = (type === 'AD') ? 'flex' : 'none';
+}
+
+function toggleTargetCalendarType(type) {
+    currentTargetMode = type;
+    document.getElementById("targetBsFields").style.display = (type === 'BS') ? 'flex' : 'none';
+    document.getElementById("targetAdFields").style.display = (type === 'AD') ? 'flex' : 'none';
+}
+
+function resetTargetToToday() {
+    var todayBs = NepaliCalendar.getTodayBs();
+    var nowAd = new Date();
+
+    document.getElementById("targetBsYear").value = todayBs.bsYear;
+    document.getElementById("targetBsMonth").value = todayBs.bsMonth;
+    updateTargetBsDays(todayBs.bsDay);
+
+    document.getElementById("targetAdYear").value = nowAd.getFullYear();
+    document.getElementById("targetAdMonth").value = nowAd.getMonth() + 1;
+    updateTargetAdDays(nowAd.getDate());
+
+    calculateAgeResult();
+}
+
+var lastCalculatedAge = null;
+
+function calculateAgeResult() {
+    var errBox = document.getElementById("ageErrorAlert");
+    var resBox = document.getElementById("ageResultSection");
+    errBox.style.display = "none";
+
+    try {
+        var dobYear, dobMonth, dobDay, isDobBs;
+        if (currentDobMode === 'BS') {
+            dobYear = document.getElementById("dobBsYear").value;
+            dobMonth = document.getElementById("dobBsMonth").value;
+            dobDay = document.getElementById("dobBsDay").value;
+            isDobBs = true;
+        } else {
+            dobYear = document.getElementById("dobAdYear").value;
+            dobMonth = document.getElementById("dobAdMonth").value;
+            dobDay = document.getElementById("dobAdDay").value;
+            isDobBs = false;
+        }
+
+        var targetYear, targetMonth, targetDay, isTargetBs;
+        if (currentTargetMode === 'BS') {
+            targetYear = document.getElementById("targetBsYear").value;
+            targetMonth = document.getElementById("targetBsMonth").value;
+            targetDay = document.getElementById("targetBsDay").value;
+            isTargetBs = true;
+        } else {
+            targetYear = document.getElementById("targetAdYear").value;
+            targetMonth = document.getElementById("targetAdMonth").value;
+            targetDay = document.getElementById("targetAdDay").value;
+            isTargetBs = false;
+        }
+
+        var res = NepaliCalendar.calculateAge(dobYear, dobMonth, dobDay, isDobBs, targetYear, targetMonth, targetDay, isTargetBs);
+        lastCalculatedAge = res;
+
+        document.getElementById("primaryAgeDisplay").textContent = res.summaryEn;
+        document.getElementById("secondaryAgeDisplay").textContent = res.summaryNe;
+
+        document.getElementById("statTotalMonths").textContent = res.totalMonths.toLocaleString();
+        document.getElementById("statTotalWeeks").textContent = res.totalWeeks.toLocaleString();
+        document.getElementById("statTotalDays").textContent = res.totalDays.toLocaleString();
+        document.getElementById("statNextBirthday").textContent = res.daysToNextBirthday + (res.daysToNextBirthday === 1 ? " day" : " days");
+
+        resBox.style.display = "block";
+    } catch (err) {
+        errBox.textContent = err.message || "An error occurred during calculation.";
+        errBox.style.display = "block";
+        resBox.style.display = "none";
+    }
+}
+
+function copyAgeResult() {
+    if (!lastCalculatedAge) return;
+    var copyText = "Age: " + lastCalculatedAge.summaryEn + " (" + lastCalculatedAge.summaryNe + ")\n" +
+                   "Total Days Lived: " + lastCalculatedAge.totalDays.toLocaleString() + "\n" +
+                   "Days to Next Birthday: " + lastCalculatedAge.daysToNextBirthday + " days\n" +
+                   "Calculated via Tulasi Nepali Age Calculator (https://tulasinepali.com.np/tools/age-calculator/)";
+
+    navigator.clipboard.writeText(copyText).then(function () {
+        var copyBtnText = document.getElementById("copyAgeText");
+        var copyBtnIcon = document.getElementById("copyAgeIcon");
+        copyBtnText.textContent = "Copied!";
+        copyBtnIcon.className = "bi bi-check2 text-success";
+        setTimeout(function () {
+            copyBtnText.textContent = "Copy Result";
+            copyBtnIcon.className = "bi bi-clipboard";
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

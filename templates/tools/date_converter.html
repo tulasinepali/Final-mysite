@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Nepali Date Converter (B.S. ↔ A.D.) | Tulasi Nepali" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Accurately convert Bikram Sambat (B.S.) dates to English (A.D.) dates and vice versa. Free online tool by Tulasi Nepali." }}{% endblock %}
+
+{% block content %}
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container text-center">
+        <span class="badge rounded-pill px-3 py-1 bg-primary text-white mb-2"><i class="bi bi-calendar3 me-1"></i> Two-Way Calendar Tool</span>
+        <h1 class="fw-bold mb-2">Nepali Date Converter (B.S. &harr; A.D.)</h1>
+        <p class="text-muted mb-0 mx-auto" style="max-width: 650px;">
+            Convert Bikram Sambat (विक्रम संवत्) to Gregorian (English) dates and vice versa with 100% astronomical accuracy.
+        </p>
+    </div>
+</div>
+
+<section class="py-5" style="background: #ffffff;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Today's Date Banner -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between p-3 mb-4 rounded-3 border bg-light">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-calendar-check text-primary fs-4"></i>
+                        <div>
+                            <span class="small text-muted text-uppercase fw-semibold d-block">Today's Nepali Date (आजको मिति)</span>
+                            <strong id="todayBsBadge" class="fs-6 text-dark">Loading...</strong>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill mt-2 mt-sm-0" onclick="setConverterToToday()">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Fill Today
+                    </button>
+                </div>
+
+                <!-- Main Converter Card -->
+                <div class="card border rounded-4 shadow-sm p-4 p-md-5 mb-5 bg-white">
+                    <!-- Direction Selector Tabs -->
+                    <div class="d-flex justify-content-center mb-4">
+                        <div class="btn-group p-1 bg-light rounded-pill border" role="group">
+                            <button type="button" class="btn btn-sm rounded-pill px-4 fw-semibold active" id="btnModeBsToAd" onclick="switchConverterMode('bs-to-ad')">
+                                B.S. &rarr; A.D. (नेपाली बाट अंग्रेजी)
+                            </button>
+                            <button type="button" class="btn btn-sm rounded-pill px-4 fw-semibold" id="btnModeAdToBs" onclick="switchConverterMode('ad-to-bs')">
+                                A.D. &rarr; B.S. (अंग्रेजी बाट नेपाली)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Input Form -->
+                    <form id="dateConverterForm" onsubmit="event.preventDefault(); convertDate();">
+                        <div class="row g-3 justify-content-center" id="dateInputRow">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold shadow-sm">
+                                <i class="bi bi-calculator me-1"></i> Convert Date
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Result Box -->
+                    <div id="conversionResultBox" class="mt-4 p-4 rounded-4 border bg-light text-center" style="display: none;">
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1 mb-2">Conversion Result</span>
+                        <h3 id="resultPrimaryDate" class="fw-bold mb-1 text-primary"></h3>
+                        <p id="resultSecondaryDate" class="text-muted mb-3 fs-6"></p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="copyConverterResult()">
+                                <i class="bi bi-clipboard me-1" id="copyResultIcon"></i> <span id="copyResultText">Copy Result</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Embed Widget Button -->
+                    <div class="text-center pt-4 mt-4 border-top">
+                        <a href="{% url 'tools:widgets_index' %}#widget-date-converter" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                            <i class="bi bi-code-square me-1"></i> Embed This Date Converter on Your Website
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Helpful Content & FAQ for AdSense & SEO -->
+                <div class="content-box p-4 p-md-5 rounded-4 border bg-white mb-4">
+                    <h3 class="fw-bold mb-3">About Bikram Sambat (B.S.) Calendar</h3>
+                    <p class="text-muted leading-relaxed">
+                        The Bikram Sambat (विक्रम संवत्) is the official civil calendar of Nepal. It is approximately <strong>56 years and 8 months</strong> ahead of the standard international Gregorian calendar (A.D.). The Nepali New Year commences on the 1st of Baishakh (normally mid-April).
+                    </p>
+                    <p class="text-muted leading-relaxed">
+                        Unlike the Gregorian calendar, where month lengths are fixed except for leap years, Bikram Sambat months vary each year between <strong>29 and 32 days</strong> based on solar astronomical movements through zodiac signs (Sankranti). Our converter uses verified calendar records from 1970 to 2100 B.S., ensuring pinpoint day-level accuracy.
+                    </p>
+
+                    <h4 class="fw-bold mt-4 mb-3">Frequently Asked Questions (FAQs)</h4>
+                    <div class="accordion accordion-flush" id="faqAccordion">
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="faq1Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    How many days are in each Nepali month?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Nepali months can range from 29 to 32 days. The exact number of days is determined by the astronomical time the sun takes to traverse each zodiac constellation (Rashi).
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="faq2Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Why do I need to convert B.S. to A.D. for official documents?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    In Nepal, citizenship cards, birth certificates, and academic transcripts record dates in B.S. However, international passports, foreign university applications, visas, and digital banking forms require Gregorian (A.D.) dates.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0">
+                            <h2 class="accordion-header" id="faq3Heading">
+                                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Can I embed this Nepali Date Converter on my website?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">
+                                    Yes! You can embed this date converter widget on your WordPress site, school portal, or blog for free. Visit our <a href="{% url 'tools:widgets_index' %}">Free Web Widgets page</a> to copy the embed code.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Scripts -->
+<script src="{% static 'js/nepali-calendar.js' %}"></script>
+<script>
+    var currentMode = 'bs-to-ad';
+    var latestResultString = '';
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Display today's date badge
+        var todayBs = NepaliCalendar.getTodayBs();
+        var badge = document.getElementById('todayBsBadge');
+        if (badge) {
+            badge.textContent = todayBs.formattedBsNe;
+        }
+
+        renderInputFields();
+        setConverterToToday();
+    });
+
+    function switchConverterMode(mode) {
+        currentMode = mode;
+        document.getElementById('btnModeBsToAd').classList.toggle('active', mode === 'bs-to-ad');
+        document.getElementById('btnModeAdToBs').classList.toggle('active', mode === 'ad-to-bs');
+        renderInputFields();
+        document.getElementById('conversionResultBox').style.display = 'none';
+    }
+
+    function renderInputFields() {
+        var container = document.getElementById('dateInputRow');
+        if (currentMode === 'bs-to-ad') {
+            container.innerHTML = `
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">B.S. Year (वर्ष)</label>
+                    <select id="inputYear" class="form-select" onchange="updateBsDays()"></select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">B.S. Month (महिना)</label>
+                    <select id="inputMonth" class="form-select" onchange="updateBsDays()"></select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">B.S. Day (गते)</label>
+                    <select id="inputDay" class="form-select"></select>
+                </div>
+            `;
+            populateBsDropdowns();
+        } else {
+            container.innerHTML = `
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">A.D. Year</label>
+                    <select id="inputYear" class="form-select" onchange="updateAdDays()"></select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">A.D. Month</label>
+                    <select id="inputMonth" class="form-select" onchange="updateAdDays()"></select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">A.D. Day</label>
+                    <select id="inputDay" class="form-select"></select>
+                </div>
+            `;
+            populateAdDropdowns();
+        }
+    }
+
+    function populateBsDropdowns() {
+        var yearSelect = document.getElementById('inputYear');
+        var monthSelect = document.getElementById('inputMonth');
+        yearSelect.innerHTML = '';
+        for (var y = 2100; y >= 1970; y--) {
+            var opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y + " (" + NepaliCalendar.toNepaliDigits(y) + ")";
+            yearSelect.appendChild(opt);
+        }
+        monthSelect.innerHTML = '';
+        for (var m = 1; m <= 12; m++) {
+            var optM = document.createElement('option');
+            optM.value = m;
+            optM.textContent = (m < 10 ? '0' + m : m) + " - " + NepaliCalendar.BS_MONTHS_NE[m - 1] + " (" + NepaliCalendar.BS_MONTHS_EN[m - 1] + ")";
+            monthSelect.appendChild(optM);
+        }
+        updateBsDays();
+    }
+
+    function updateBsDays() {
+        var y = parseInt(document.getElementById('inputYear').value) || 2081;
+        var m = parseInt(document.getElementById('inputMonth').value) || 1;
+        var daySelect = document.getElementById('inputDay');
+        var maxDays = (NepaliCalendar.bsCalendarData[y] && NepaliCalendar.bsCalendarData[y][m - 1]) ? NepaliCalendar.bsCalendarData[y][m - 1] : 30;
+        var curVal = parseInt(daySelect.value) || 1;
+        daySelect.innerHTML = '';
+        for (var d = 1; d <= maxDays; d++) {
+            var optD = document.createElement('option');
+            optD.value = d;
+            optD.textContent = d + " (" + NepaliCalendar.toNepaliDigits(d) + ")";
+            daySelect.appendChild(optD);
+        }
+        daySelect.value = Math.min(curVal, maxDays);
+    }
+
+    function populateAdDropdowns() {
+        var yearSelect = document.getElementById('inputYear');
+        var monthSelect = document.getElementById('inputMonth');
+        yearSelect.innerHTML = '';
+        var curYear = new Date().getFullYear();
+        for (var y = curYear + 10; y >= 1913; y--) {
+            var opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            yearSelect.appendChild(opt);
+        }
+        monthSelect.innerHTML = '';
+        var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        for (var m = 1; m <= 12; m++) {
+            var optM = document.createElement('option');
+            optM.value = m;
+            optM.textContent = (m < 10 ? '0' + m : m) + " - " + adMonths[m - 1];
+            monthSelect.appendChild(optM);
+        }
+        updateAdDays();
+    }
+
+    function updateAdDays() {
+        var y = parseInt(document.getElementById('inputYear').value) || 2024;
+        var m = parseInt(document.getElementById('inputMonth').value) || 1;
+        var isLeap = (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+        var daysInM = [31, (isLeap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        var max = daysInM[m - 1];
+        var daySelect = document.getElementById('inputDay');
+        var curVal = parseInt(daySelect.value) || 1;
+        daySelect.innerHTML = '';
+        for (var d = 1; d <= max; d++) {
+            var optD = document.createElement('option');
+            optD.value = d;
+            optD.textContent = d;
+            daySelect.appendChild(optD);
+        }
+        daySelect.value = Math.min(curVal, max);
+    }
+
+    function setConverterToToday() {
+        var today = NepaliCalendar.getTodayBs();
+        var now = new Date();
+        if (currentMode === 'bs-to-ad') {
+            document.getElementById('inputYear').value = today.bsYear;
+            document.getElementById('inputMonth').value = today.bsMonth;
+            updateBsDays();
+            document.getElementById('inputDay').value = today.bsDay;
+        } else {
+            document.getElementById('inputYear').value = now.getFullYear();
+            document.getElementById('inputMonth').value = now.getMonth() + 1;
+            updateAdDays();
+            document.getElementById('inputDay').value = now.getDate();
+        }
+        convertDate();
+    }
+
+    function convertDate() {
+        var y = parseInt(document.getElementById('inputYear').value);
+        var m = parseInt(document.getElementById('inputMonth').value);
+        var d = parseInt(document.getElementById('inputDay').value);
+
+        try {
+            var box = document.getElementById('conversionResultBox');
+            var primary = document.getElementById('resultPrimaryDate');
+            var secondary = document.getElementById('resultSecondaryDate');
+
+            if (currentMode === 'bs-to-ad') {
+                var resAd = NepaliCalendar.bsToAd(y, m, d);
+                primary.textContent = resAd.formattedAd + " (" + resAd.dayNameEn + ")";
+                secondary.textContent = "Bikram Sambat: " + resAd.formattedBsNe;
+                latestResultString = y + "-" + m + "-" + d + " B.S. = " + resAd.formattedAd + " A.D. (" + resAd.dayNameEn + ")";
+            } else {
+                var resBs = NepaliCalendar.adToBs(y, m, d);
+                primary.textContent = resBs.formattedBsNe;
+                secondary.textContent = "Gregorian: " + y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d) + " (" + resBs.dayNameEn + ")";
+                latestResultString = y + "-" + m + "-" + d + " A.D. = " + resBs.formattedBs + " B.S. (" + resBs.formattedBsNe + ")";
+            }
+            box.style.display = 'block';
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    function copyConverterResult() {
+        if (!latestResultString) return;
+        navigator.clipboard.writeText(latestResultString).then(function () {
+            var btnText = document.getElementById('copyResultText');
+            var icon = document.getElementById('copyResultIcon');
+            btnText.textContent = 'Copied!';
+            icon.className = 'bi bi-check2 text-success me-1';
+            setTimeout(function () {
+                btnText.textContent = 'Copy Result';
+                icon.className = 'bi bi-clipboard me-1';
+            }, 2000);
+        });
+    }
+</script>
+{% endblock %}

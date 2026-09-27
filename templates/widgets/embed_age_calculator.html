@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ widget.title }}</title>
+    <style>
+        :root {
+            --bg-color: {% if theme == 'dark' %}#121824{% else %}#ffffff{% endif %};
+            --card-bg: {% if theme == 'dark' %}#1a2234{% else %}#f8fafc{% endif %};
+            --text-color: {% if theme == 'dark' %}#e2e8f0{% else %}#1e293b{% endif %};
+            --muted-color: {% if theme == 'dark' %}#94a3b8{% else %}#64748b{% endif %};
+            --border-color: {% if theme == 'dark' %}#2d3748{% else %}#e2e8f0{% endif %};
+            --primary-color: #0559b7;
+            --primary-hover: #044289;
+            --input-bg: {% if theme == 'dark' %}#0f172a{% else %}#ffffff{% endif %};
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .widget-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted-color);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-toggle-grp {
+            display: inline-flex;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .btn-toggle-grp button {
+            background: transparent;
+            border: none;
+            padding: 2px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            color: var(--muted-color);
+        }
+        .btn-toggle-grp button.active {
+            background: var(--primary-color);
+            color: #fff;
+            font-weight: 600;
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        select {
+            width: 100%;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        select:focus {
+            border-color: var(--primary-color);
+        }
+        .calc-btn {
+            width: 100%;
+            background: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .calc-btn:hover {
+            background: var(--primary-hover);
+        }
+        .result-box {
+            margin-top: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .result-age {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        .result-details {
+            font-size: 11px;
+            color: var(--muted-color);
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .widget-footer {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted-color);
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        .widget-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-header">
+        <span class="widget-title">🧮 Age Calculator</span>
+    </div>
+
+    <form onsubmit="event.preventDefault(); doCalculateAge();">
+        <div class="section-label">
+            <span>Date of Birth (जन्म मिति)</span>
+            <div class="btn-toggle-grp">
+                <button type="button" class="active" id="btnDobBs" onclick="setDobMode('BS')">B.S.</button>
+                <button type="button" id="btnDobAd" onclick="setDobMode('AD')">A.D.</button>
+            </div>
+        </div>
+        <div class="input-row" id="dobContainer"></div>
+
+        <button type="submit" class="calc-btn">Calculate Age</button>
+    </form>
+
+    <div class="result-box" id="resBox" style="display: none;">
+        <div class="result-age" id="ageSummary">0 Years, 0 Months, 0 Days</div>
+        <div class="result-details">
+            <div><strong id="resDays">0</strong> Days</div>
+            <div><strong id="resWeeks">0</strong> Weeks</div>
+            <div>Next B'day in <strong id="resNext">0</strong> d</div>
+        </div>
+    </div>
+
+    <div class="widget-footer">
+        Powered by <a href="{{ widget_settings.branding_url|default:'https://tulasinepali.com.np' }}" target="_blank" rel="noopener">{{ widget_settings.branding_text|default:'Tulasi Nepali' }}</a>
+    </div>
+
+    <script src="{% static 'js/nepali-calendar.js' %}"></script>
+    <script>
+        var dobMode = 'BS';
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderDobFields();
+            doCalculateAge();
+
+            try {
+                fetch("{% url 'tools:api_track_embed' widget.slug %}", { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            } catch(e) {}
+        });
+
+        function setDobMode(m) {
+            dobMode = m;
+            document.getElementById("btnDobBs").classList.toggle("active", m === 'BS');
+            document.getElementById("btnDobAd").classList.toggle("active", m === 'AD');
+            renderDobFields();
+            doCalculateAge();
+        }
+
+        function renderDobFields() {
+            var container = document.getElementById("dobContainer");
+            var todayBs = NepaliCalendar.getTodayBs();
+            var nowAd = new Date();
+
+            if (dobMode === 'BS') {
+                container.innerHTML = `
+                    <div><select id="dobY" onchange="updateDobDays()"></select></div>
+                    <div><select id="dobM" onchange="updateDobDays()"></select></div>
+                    <div><select id="dobD"></select></div>
+                `;
+                var yEl = document.getElementById("dobY");
+                for (var y = todayBs.bsYear; y >= 1975; y--) {
+                    var opt = document.createElement("option");
+                    opt.value = y;
+                    opt.textContent = y;
+                    if (y === 2055) opt.selected = true;
+                    yEl.appendChild(opt);
+                }
+                var mEl = document.getElementById("dobM");
+                NepaliCalendar.BS_MONTHS_EN.forEach(function (name, idx) {
+                    var optM = document.createElement("option");
+                    optM.value = idx + 1;
+                    optM.textContent = (idx + 1) + ". " + name;
+                    mEl.appendChild(optM);
+                });
+                updateDobDays();
+            } else {
+                container.innerHTML = `
+                    <div><select id="dobY" onchange="updateDobDays()"></select></div>
+                    <div><select id="dobM" onchange="updateDobDays()"></select></div>
+                    <div><select id="dobD"></select></div>
+                `;
+                var yElAd = document.getElementById("dobY");
+                for (var ya = nowAd.getFullYear(); ya >= 1920; ya--) {
+                    var optA = document.createElement("option");
+                    optA.value = ya;
+                    optA.textContent = ya;
+                    if (ya === 1998) optA.selected = true;
+                    yElAd.appendChild(optA);
+                }
+                var mElAd = document.getElementById("dobM");
+                var adMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                adMonths.forEach(function (name, idx) {
+                    var optMA = document.createElement("option");
+                    optMA.value = idx + 1;
+                    optMA.textContent = (idx + 1) + ". " + name;
+                    mElAd.appendChild(optMA);
+                });
+                updateDobDays();
+            }
+        }
+
+        function updateDobDays() {
+            var y = parseInt(document.getElementById("dobY").value);
+            var m = parseInt(document.getElementById("dobM").value);
+            var dEl = document.getElementById("dobD");
+            var prev = parseInt(dEl.value) || 1;
+
+            var max = 30;
+            if (dobMode === 'BS') {
+                max = (NepaliCalendar.bsCalendarData[y] && NepaliCalendar.bsCalendarData[y][m - 1]) || 30;
+            } else {
+                max = new Date(y, m, 0).getDate();
+            }
+
+            dEl.innerHTML = "";
+            for (var d = 1; d <= max; d++) {
+                var opt = document.createElement("option");
+                opt.value = d;
+                opt.textContent = d;
+                if (d === prev || (prev > max && d === max)) opt.selected = true;
+                dEl.appendChild(opt);
+            }
+        }
+
+        function doCalculateAge() {
+            var y = document.getElementById("dobY").value;
+            var m = document.getElementById("dobM").value;
+            var d = document.getElementById("dobD").value;
+
+            var now = new Date();
+            var targetY = now.getFullYear();
+            var targetM = now.getMonth() + 1;
+            var targetD = now.getDate();
+
+            try {
+                var res = NepaliCalendar.calculateAge(y, m, d, (dobMode === 'BS'), targetY, targetM, targetD, false);
+                document.getElementById("ageSummary").textContent = res.summaryEn;
+                document.getElementById("resDays").textContent = res.totalDays.toLocaleString();
+                document.getElementById("resWeeks").textContent = res.totalWeeks.toLocaleString();
+                document.getElementById("resNext").textContent = res.daysToNextBirthday;
+                document.getElementById("resBox").style.display = "block";
+            } catch(e) {
+                document.getElementById("ageSummary").textContent = e.message;
+                document.getElementById("resBox").style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

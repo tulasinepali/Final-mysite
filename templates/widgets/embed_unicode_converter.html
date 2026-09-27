@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ widget.title }}</title>
+    <style>
+        :root {
+            --bg-color: {% if theme == 'dark' %}#121824{% else %}#ffffff{% endif %};
+            --card-bg: {% if theme == 'dark' %}#1a2234{% else %}#f8fafc{% endif %};
+            --text-color: {% if theme == 'dark' %}#e2e8f0{% else %}#1e293b{% endif %};
+            --muted-color: {% if theme == 'dark' %}#94a3b8{% else %}#64748b{% endif %};
+            --border-color: {% if theme == 'dark' %}#2d3748{% else %}#e2e8f0{% endif %};
+            --primary-color: #0559b7;
+            --input-bg: {% if theme == 'dark' %}#0f172a{% else %}#ffffff{% endif %};
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 14px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .widget-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .actions-bar {
+            display: flex;
+            gap: 6px;
+        }
+        .btn-sm {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .panes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 480px) {
+            .panes-grid { grid-template-columns: 1fr; }
+        }
+        .pane {
+            display: flex;
+            flex-direction: column;
+        }
+        .pane-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted-color);
+        }
+        textarea {
+            width: 100%;
+            height: 140px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 12px;
+            outline: none;
+            resize: none;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            border-color: var(--primary-color);
+        }
+        .copy-btn {
+            margin-top: 4px;
+            align-self: flex-end;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .widget-footer {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted-color);
+            padding-top: 6px;
+            border-top: 1px solid var(--border-color);
+        }
+        .widget-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-header">
+        <span class="widget-title">⌨️ Preeti &harr; Unicode</span>
+        <div class="actions-bar">
+            <button type="button" class="btn-sm" onclick="clearText()">Clear</button>
+        </div>
+    </div>
+
+    <div class="panes-grid">
+        <div class="pane">
+            <div class="pane-header">
+                <span>Preeti Font</span>
+            </div>
+            <textarea id="wPreeti" placeholder="Type Preeti text..." oninput="convertPreetiToUni()"></textarea>
+            <button type="button" class="copy-btn" id="copyPBtn" onclick="copyField('wPreeti', 'copyPBtn')">Copy</button>
+        </div>
+        <div class="pane">
+            <div class="pane-header">
+                <span>Nepali Unicode</span>
+            </div>
+            <textarea id="wUnicode" placeholder="Unicode appears here..." oninput="convertUniToPreeti()"></textarea>
+            <button type="button" class="copy-btn" id="copyUBtn" onclick="copyField('wUnicode', 'copyUBtn')">Copy</button>
+        </div>
+    </div>
+
+    <div class="widget-footer">
+        Powered by <a href="{{ widget_settings.branding_url|default:'https://tulasinepali.com.np' }}" target="_blank" rel="noopener">{{ widget_settings.branding_text|default:'Tulasi Nepali' }}</a>
+    </div>
+
+    <script src="{% static 'js/preeti-unicode.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            try {
+                fetch("{% url 'tools:api_track_embed' widget.slug %}", { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            } catch(e) {}
+        });
+
+        function convertPreetiToUni() {
+            var val = document.getElementById("wPreeti").value;
+            document.getElementById("wUnicode").value = PreetiConverter.preetiToUnicode(val);
+        }
+
+        function convertUniToPreeti() {
+            var val = document.getElementById("wUnicode").value;
+            document.getElementById("wPreeti").value = PreetiConverter.unicodeToPreeti(val);
+        }
+
+        function clearText() {
+            document.getElementById("wPreeti").value = "";
+            document.getElementById("wUnicode").value = "";
+        }
+
+        function copyField(fieldId, btnId) {
+            var text = document.getElementById(fieldId).value;
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(function () {
+                var btn = document.getElementById(btnId);
+                btn.textContent = "Copied!";
+                setTimeout(function () { btn.textContent = "Copy"; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Student Tools & Utilities | Tulasi Nepali" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Free online tools: Nepali Date Converter (B.S. ↔ A.D.), Age Calculator, and Preeti to Unicode font converter." }}{% endblock %}
+
+{% block content %}
+<!-- Page Title Header -->
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container text-center">
+        <div class="d-inline-flex align-items-center gap-2 mb-2">
+            <span class="badge rounded-pill px-3 py-1 bg-primary text-white"><i class="bi bi-tools me-1"></i> Student Utilities</span>
+            <span class="badge rounded-pill px-3 py-1 bg-white text-dark border">100% Free</span>
+        </div>
+        <h1 class="fw-bold mb-2">Essential Student Tools &amp; Calculators</h1>
+        <p class="text-muted mb-0 mx-auto" style="max-width: 650px;">
+            Free, fast, and accurate online utilities curated by Tulasi Nepali to assist learners, job candidates, and professionals across Nepal.
+        </p>
+    </div>
+</div>
+
+<section class="py-5" style="background: #ffffff;">
+    <div class="container">
+        <!-- Tools Grid -->
+        <div class="row g-4 justify-content-center">
+            {% for tool in tools %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border rounded-4 overflow-hidden position-relative" style="transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-3 bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                                <i class="bi {{ tool.icon|default:'bi-tools' }} fs-3"></i>
+                            </div>
+                            <span class="badge bg-light text-muted border px-2 py-1 small text-uppercase">{{ tool.get_category_display }}</span>
+                        </div>
+                        <h4 class="fw-bold mb-2">{{ tool.name }}</h4>
+                        <p class="text-muted small mb-4 flex-grow-1">{{ tool.short_description }}</p>
+                        <div class="pt-2 border-top d-flex align-items-center justify-content-between">
+                            <a href="{% url 'tools:tool_detail' tool.slug %}" class="btn btn-primary btn-sm rounded-pill px-3">
+                                Open Tool <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                            <a href="{% url 'tools:widgets_index' %}#widget-{{ tool.slug }}" class="text-muted small text-decoration-none" title="Get embed code for your website">
+                                <i class="bi bi-code-slash me-1"></i> Embed Widget
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Tools are currently being updated. Please check back shortly!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Banner to Widgets Hub -->
+        <div class="card border-0 rounded-4 p-4 p-lg-5 mt-5 text-center text-white" style="background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);">
+            <div class="mx-auto" style="max-width: 680px;">
+                <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 mb-3">
+                    <i class="bi bi-puzzle me-1"></i> For Bloggers, Schools &amp; Webmasters
+                </span>
+                <h3 class="fw-bold mb-2">Want to Embed These Tools on Your Website?</h3>
+                <p class="text-white-50 mb-4">
+                    Easily add our interactive Nepali Date Converter, Age Calculator, or Preeti ↔ Unicode font tool to your school portal, personal blog, or news website for free with 1 line of HTML.
+                </p>
+                <a href="{% url 'tools:widgets_index' %}" class="btn btn-light rounded-pill px-4 py-2 fw-semibold text-primary shadow-sm">
+                    <i class="bi bi-code-square me-1"></i> Browse Free Web Widgets &amp; Embed Codes
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
