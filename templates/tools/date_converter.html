@@ -205,7 +205,7 @@
         var yearSelect = document.getElementById('inputYear');
         var monthSelect = document.getElementById('inputMonth');
         yearSelect.innerHTML = '';
-        for (var y = 2100; y >= 1970; y--) {
+        for (var y = 2099; y >= 1978; y--) {
             var opt = document.createElement('option');
             opt.value = y;
             opt.textContent = y + " (" + NepaliCalendar.toNepaliDigits(y) + ")";

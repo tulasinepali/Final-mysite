@@ -269,7 +269,7 @@ function initAgeCalculator() {
     // Populate DOB BS Year (2000 to 2090)
     var dobBsYearSelect = document.getElementById("dobBsYear");
     dobBsYearSelect.innerHTML = "";
-    for (var y = todayBs.bsYear; y >= 1975; y--) {
+    for (var y = todayBs.bsYear; y >= 1978; y--) {
         var opt = document.createElement("option");
         opt.value = y;
         opt.textContent = y + " (" + NepaliCalendar.toNepaliDigits(y) + ")";
@@ -311,7 +311,7 @@ function initAgeCalculator() {
     // Populate Target BS
     var targetBsYearSelect = document.getElementById("targetBsYear");
     targetBsYearSelect.innerHTML = "";
-    for (var yt = todayBs.bsYear + 10; yt >= 1975; yt--) {
+    for (var yt = Math.min(todayBs.bsYear + 10, 2099); yt >= 1978; yt--) {
         var optT = document.createElement("option");
         optT.value = yt;
         optT.textContent = yt + " (" + NepaliCalendar.toNepaliDigits(yt) + ")";
