@@ -168,19 +168,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </a>
                         {% endif %}
 
-                        <!-- Language Selector -->
-                        <div class="dropdown ms-2 d-none d-md-block">
-                            <button class="action-icon lang-btn border-0 bg-transparent dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Select Language" title="Language">
+                        <!-- Language Selector (Mobile & Desktop) -->
+                        <div class="dropdown ms-1 ms-sm-2">
+                            <button class="action-icon lang-btn border-0 bg-transparent dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-label="Select Language" title="Language">
                                 <i class="bi bi-translate fs-5"></i>
+                                <span id="currentLangBadge" class="badge rounded-pill bg-primary bg-opacity-10 text-primary" style="font-size:0.7rem; padding: 2px 6px;">EN</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:130px;">
-                                <li><a class="dropdown-item lang-option py-2" href="#" data-lang="en"><span class="me-2">🇬🇧</span> English</a></li>
-                                <li><a class="dropdown-item lang-option py-2" href="#" data-lang="ne"><span class="me-2">🇳🇵</span> नेपाली</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width:140px;">
+                                <li><a class="dropdown-item lang-option py-2" href="javascript:void(0)" onclick="setSiteLanguage('en')"><span class="me-2">🇬🇧</span> English</a></li>
+                                <li><a class="dropdown-item lang-option py-2" href="javascript:void(0)" onclick="setSiteLanguage('ne')"><span class="me-2">🇳🇵</span> नेपाली</a></li>
                             </ul>
                         </div>
 
                         <!-- Dark Mode Toggle -->
-                        <button id="darkModeToggle" class="action-icon border-0 bg-transparent ms-2" type="button" aria-label="Toggle dark mode" title="Toggle Dark Mode">
+                        <button id="darkModeToggle" class="action-icon border-0 bg-transparent ms-1 ms-sm-2" type="button" aria-label="Toggle dark mode" title="Toggle Dark Mode">
                             <i class="bi bi-moon-stars fs-5" id="darkModeIcon"></i>
                         </button>
 
@@ -502,25 +503,88 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Dark Mode Controller -->
     <script>
-        (function() {
-            var toggleBtn = document.getElementById('darkModeToggle');
-            var icon = document.getElementById('darkModeIcon');
-            var currentTheme = localStorage.getItem('theme') || 'light';
-            if (icon) {
-                icon.className = currentTheme === 'dark' ? 'bi bi-sun fs-5 text-warning' : 'bi bi-moon-stars fs-5';
+        function setDarkMode(isDark) {
+            var theme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            if (document.body) {
+                if (isDark) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
             }
+            localStorage.setItem('theme', theme);
+            var icon = document.getElementById('darkModeIcon');
+            if (icon) {
+                icon.className = isDark ? 'bi bi-sun fs-5 text-warning' : 'bi bi-moon-stars fs-5';
+            }
+        }
+
+        (function() {
+            var currentTheme = localStorage.getItem('theme') || 'light';
+            setDarkMode(currentTheme === 'dark');
+            var toggleBtn = document.getElementById('darkModeToggle');
             if (toggleBtn) {
-                toggleBtn.addEventListener('click', function() {
-                    var cur = document.documentElement.getAttribute('data-bs-theme') || 'light';
-                    var next = cur === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-bs-theme', next);
-                    localStorage.setItem('theme', next);
-                    if (icon) {
-                        icon.className = next === 'dark' ? 'bi bi-sun fs-5 text-warning' : 'bi bi-moon-stars fs-5';
-                    }
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var cur = localStorage.getItem('theme') || 'light';
+                    setDarkMode(cur !== 'dark');
                 });
             }
         })();
     </script>
+
+    <!-- Google Translate Container (Hidden) -->
+    <div id="google_translate_element" style="display:none;"></div>
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,ne',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        function setSiteLanguage(lang) {
+            var hostname = window.location.hostname;
+            if (lang === 'ne') {
+                document.cookie = "googtrans=/en/ne; path=/;";
+                document.cookie = "googtrans=/en/ne; path=/; domain=" + hostname;
+                document.cookie = "googtrans=/en/ne; path=/; domain=." + hostname;
+                localStorage.setItem('site_lang', 'ne');
+            } else {
+                document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                document.cookie = "googtrans=; path=/; domain=" + hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                document.cookie = "googtrans=; path=/; domain=." + hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                document.cookie = "googtrans=/en/en; path=/;";
+                document.cookie = "googtrans=/en/en; path=/; domain=" + hostname;
+                localStorage.setItem('site_lang', 'en');
+            }
+
+            var combo = document.querySelector('.goog-te-combo');
+            if (combo) {
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
+            }
+            setTimeout(function() {
+                window.location.reload();
+            }, 100);
+        }
+
+        (function() {
+            var lang = localStorage.getItem('site_lang') || 'en';
+            var badge = document.getElementById('currentLangBadge');
+            if (badge) {
+                badge.textContent = lang === 'ne' ? 'NE' : 'EN';
+            }
+            if (lang === 'ne') {
+                if (!document.cookie.includes('googtrans=/en/ne')) {
+                    document.cookie = "googtrans=/en/ne; path=/;";
+                    document.cookie = "googtrans=/en/ne; path=/; domain=" + window.location.hostname;
+                }
+            }
+        })();
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer></script>
 </body>
 </html>

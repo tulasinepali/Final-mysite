@@ -279,12 +279,15 @@ CSP_SCRIPT_SRC = (
     "https://cdn.ampproject.org",
     "https://cdn.onesignal.com",
     "https://www.google.com",
+    "https://translate.google.com",
+    "https://translate.googleapis.com",
 )
 CSP_STYLE_SRC = (
     "'self'", "'unsafe-inline'",
     "https://cdn.jsdelivr.net",
     "https://cdnjs.cloudflare.com",
     "https://fonts.googleapis.com",
+    "https://translate.googleapis.com",
 )
 CSP_FONT_SRC = (
     "'self'",
@@ -300,12 +303,15 @@ CSP_IMG_SRC = (
     "https://pagead2.googlesyndication.com",
     "https://googleads.g.doubleclick.net",
     "https://www.google-analytics.com",
+    "https://translate.google.com",
+    "https://translate.googleapis.com",
 )
 CSP_FRAME_SRC = (
     "https://googleads.g.doubleclick.net",
     "https://tpc.googlesyndication.com",
     "https://www.google.com",
     "https://ep2.adtrafficquality.google",
+    "https://translate.google.com",
 )
 CSP_CONNECT_SRC = (
     "'self'",
@@ -314,6 +320,7 @@ CSP_CONNECT_SRC = (
     "https://pagead2.googlesyndication.com",
     "https://ep1.adtrafficquality.google",
     "https://ep2.adtrafficquality.google",
+    "https://translate.googleapis.com",
 )
 CSP_OBJECT_SRC = ("'none'",)
 CSP_BASE_URI = ("'self'",)
