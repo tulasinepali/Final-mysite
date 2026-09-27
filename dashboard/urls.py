@@ -99,6 +99,7 @@ urlpatterns = [
     path('widgets/<int:pk>/delete/', views.widget_delete, name='widget_delete'),
     path('widgets/<int:pk>/toggle-active/', views.widget_toggle_active, name='widget_toggle_active'),
     path('widgets/settings/', views.dashboard_widget_settings, name='widget_settings'),
+    path('widgets/analytics/', views.dashboard_widget_analytics, name='widget_analytics'),
 
     # Patro Holidays & Events
     path('patro/events/', views.dashboard_patro_events, name='patro_events'),

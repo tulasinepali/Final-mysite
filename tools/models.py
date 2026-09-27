@@ -129,3 +129,23 @@ class PatroEvent(models.Model):
     def date_key(self):
         return f"{self.year_bs}-{self.month_bs:02d}-{self.day_bs:02d}"
 
+
+class WidgetUsage(models.Model):
+    widget = models.ForeignKey(Widget, on_delete=models.CASCADE, related_name='usages')
+    domain = models.CharField(max_length=255, db_index=True, help_text="Hostname or domain embedding this widget")
+    full_url = models.URLField(max_length=500, blank=True, help_text="Full referrer URL if provided")
+    total_views = models.PositiveIntegerField(default=1, help_text="Total embed views from this domain")
+    is_internal = models.BooleanField(default=False, help_text="Internal preview on our own domain / localhost")
+    first_seen = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-total_views', '-last_seen']
+        unique_together = ('widget', 'domain')
+        verbose_name = 'Widget Usage / Domain'
+        verbose_name_plural = 'Widget Usages / Domains'
+
+    def __str__(self):
+        return f"{self.widget.title} on {self.domain} ({self.total_views} views)"
+
+

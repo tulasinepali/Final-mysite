@@ -4,7 +4,9 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db.models import F
 import json
-from .models import Tool, Widget, WidgetSetting, PatroEvent
+from urllib.parse import urlparse
+from django.utils import timezone
+from .models import Tool, Widget, WidgetSetting, PatroEvent, WidgetUsage
 
 def tools_index(request):
     tools = Tool.objects.filter(is_active=True).order_by('order', 'name')
@@ -123,7 +125,56 @@ def widget_embed(request, slug):
 
 @require_POST
 def api_track_embed(request, slug):
-    Widget.objects.filter(slug=slug).update(embed_count=F('embed_count') + 1)
+    widget = get_object_or_404(Widget, slug=slug, is_active=True)
+    Widget.objects.filter(pk=widget.pk).update(embed_count=F('embed_count') + 1)
+
+    referrer = ""
+    try:
+        if request.content_type == 'application/json' and request.body:
+            body_data = json.loads(request.body)
+            referrer = body_data.get('referrer', '').strip()
+    except Exception:
+        pass
+
+    if not referrer:
+        referrer = request.POST.get('referrer', '').strip()
+    if not referrer:
+        referrer = request.META.get('HTTP_REFERER', '').strip()
+
+    if referrer:
+        try:
+            parsed = urlparse(referrer)
+            domain = parsed.netloc.lower()
+            if domain:
+                if ':' in domain:
+                    host, port = domain.split(':', 1)
+                    if port in ['80', '443']:
+                        domain = host
+
+                current_host = request.get_host().lower().split(':')[0]
+                is_internal = (
+                    domain in [current_host, 'localhost', '127.0.0.1', 'tulasinepali.com.np', 'www.tulasinepali.com.np']
+                    or 'tulasinepali.com' in domain
+                )
+
+                usage, created = WidgetUsage.objects.get_or_create(
+                    widget=widget,
+                    domain=domain,
+                    defaults={
+                        'full_url': referrer[:500],
+                        'is_internal': is_internal,
+                        'total_views': 1,
+                    }
+                )
+                if not created:
+                    WidgetUsage.objects.filter(pk=usage.pk).update(
+                        total_views=F('total_views') + 1,
+                        last_seen=timezone.now(),
+                        full_url=referrer[:500]
+                    )
+        except Exception:
+            pass
+
     return JsonResponse({'status': 'ok'})
 
 def api_patro_events(request):

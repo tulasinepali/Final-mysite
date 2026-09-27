@@ -107,7 +107,12 @@
             setInterval(updateClock, 1000);
 
             try {
-                fetch("{% url 'tools:api_track_embed' widget.slug %}", { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                var refUrl = document.referrer || (window.location.ancestorOrigins && window.location.ancestorOrigins[0]) || "";
+                fetch("{% url 'tools:api_track_embed' widget.slug %}", { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify({ referrer: refUrl })
+                });
             } catch(e) {}
         });
 

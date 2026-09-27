@@ -473,11 +473,16 @@
                 renderCalendar(currentViewYear, currentViewMonth);
             });
 
-            // Track widget embed impression
+            // Track widget embed impression with parent referrer
             try {
+                var refUrl = document.referrer || (window.location.ancestorOrigins && window.location.ancestorOrigins[0]) || "";
                 fetch("{% url 'tools:api_track_embed' widget.slug %}", { 
                     method: 'POST', 
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' 
+                    },
+                    body: JSON.stringify({ referrer: refUrl })
                 });
             } catch(e) {}
         });

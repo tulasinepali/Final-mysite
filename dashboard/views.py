@@ -21,7 +21,7 @@ import csv
 import io
 import json
 from django.http import HttpResponse
-from tools.models import Tool, Widget, WidgetSetting, PatroEvent
+from tools.models import Tool, Widget, WidgetSetting, PatroEvent, WidgetUsage
 from .forms import (
     SiteSettingsForm, CategoryForm, TagForm, NoteForm, BlogPostForm,
     DownloadForm, QuizForm, QuestionForm, AdPlacementForm, QuestionImportForm,
@@ -1473,4 +1473,63 @@ def patro_event_sample_csv(request):
     writer.writerow([7, 3, 'विजया दशमी', 1, 'holiday', 'Main Tika'])
     writer.writerow([7, 27, 'भाइटीका', 1, 'holiday', 'Tihar Festival'])
     return response
+
+
+# ========== WIDGET ANALYTICS & DOMAIN TRACKER ==========
+
+@staff_member_required
+def dashboard_widget_analytics(request):
+    usages = WidgetUsage.objects.select_related('widget').all()
+
+    # Filter by widget
+    widget_slug = request.GET.get('widget')
+    if widget_slug:
+        usages = usages.filter(widget__slug=widget_slug)
+
+    # Filter by type (external vs all vs internal)
+    type_filter = request.GET.get('type', 'external')
+    if type_filter == 'external':
+        usages = usages.filter(is_internal=False)
+    elif type_filter == 'internal':
+        usages = usages.filter(is_internal=True)
+
+    # Search query (domain)
+    q = request.GET.get('q')
+    if q:
+        usages = usages.filter(domain__icontains=q)
+
+    # KPIs
+    total_external_domains = WidgetUsage.objects.filter(is_internal=False).values('domain').distinct().count()
+    total_external_views = WidgetUsage.objects.filter(is_internal=False).aggregate(total=Sum('total_views'))['total'] or 0
+    total_all_views = WidgetUsage.objects.aggregate(total=Sum('total_views'))['total'] or 0
+    total_widgets = Widget.objects.filter(is_active=True).count()
+
+    # Top 5 external domains
+    top_domains = (
+        WidgetUsage.objects.filter(is_internal=False)
+        .values('domain')
+        .annotate(domain_views=Sum('total_views'))
+        .order_by('-domain_views')[:5]
+    )
+
+    # Widgets list
+    widgets_list = Widget.objects.filter(is_active=True).annotate(usage_views=Sum('usages__total_views')).order_by('-usage_views')
+
+    paginator = Paginator(usages.order_by('-total_views', '-last_seen'), 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj,
+        'active_page': 'widget_analytics',
+        'total_external_domains': total_external_domains,
+        'total_external_views': total_external_views,
+        'total_all_views': total_all_views,
+        'total_widgets': total_widgets,
+        'top_domains': top_domains,
+        'widgets_list': widgets_list,
+        'selected_widget': widget_slug,
+        'selected_type': type_filter,
+    }
+    return render(request, 'dashboard/widget_analytics.html', context)
+
 

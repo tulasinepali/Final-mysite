@@ -1,3 +1,4 @@
+import json
 from django.test import TestCase, Client
 from django.urls import reverse
 from tools.models import Tool, Widget, WidgetSetting
@@ -58,10 +59,21 @@ class ToolsViewsTestCase(TestCase):
 
     def test_api_track_embed(self):
         initial_count = self.widget_age.embed_count
-        response = self.client.post(reverse('tools:api_track_embed', kwargs={'slug': 'age-calculator'}))
+        response = self.client.post(
+            reverse('tools:api_track_embed', kwargs={'slug': 'age-calculator'}),
+            data=json.dumps({'referrer': 'https://schoolportal.edu.np/calendar/'}),
+            content_type='application/json'
+        )
         self.assertEqual(response.status_code, 200)
         self.widget_age.refresh_from_db()
         self.assertEqual(self.widget_age.embed_count, initial_count + 1)
+
+        from tools.models import WidgetUsage
+        usage = WidgetUsage.objects.filter(widget=self.widget_age, domain='schoolportal.edu.np').first()
+        self.assertIsNotNone(usage)
+        self.assertFalse(usage.is_internal)
+        self.assertEqual(usage.total_views, 1)
+
 
     def test_nepali_patro_view(self):
         response = self.client.get(reverse('tools:nepali_patro'))
