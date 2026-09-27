@@ -78,29 +78,68 @@ body.dark-mode,
     color: #ffffff !important;
 }
 
-/* Whole screen backgrounds */
+/* Whole screen backgrounds & inline background neutralizers */
 body.dark-mode main,
 body.dark-mode section,
 body.dark-mode .section,
 body.dark-mode .hero.section,
 body.dark-mode .stats-section,
+body.dark-mode .page-title,
 body.dark-mode .header-bar,
 body.dark-mode .header,
+body.dark-mode [style*="background: #ffffff"],
+body.dark-mode [style*="background:#ffffff"],
+body.dark-mode [style*="background: #fff"],
+body.dark-mode [style*="background:#fff"],
+body.dark-mode [style*="background: white"],
+body.dark-mode [style*="background:white"],
+body.dark-mode [style*="background-color: #ffffff"],
+body.dark-mode [style*="background-color:#ffffff"],
+body.dark-mode [style*="background-color: white"],
+body.dark-mode [style*="background-color:white"],
+body.dark-mode [style*="background: #edf2f8"],
+body.dark-mode [style*="background:#edf2f8"],
+body.dark-mode [style*="background-color: #edf2f8"],
+body.dark-mode [style*="background-color:#edf2f8"],
+body.dark-mode [style*="background-color: var(--light-background)"],
+body.dark-mode [style*="background-color:var(--light-background)"],
 [data-bs-theme="dark"] main,
 [data-bs-theme="dark"] section,
 [data-bs-theme="dark"] .section,
 [data-bs-theme="dark"] .hero.section,
 [data-bs-theme="dark"] .stats-section,
+[data-bs-theme="dark"] .page-title,
 [data-bs-theme="dark"] .header-bar,
-[data-bs-theme="dark"] .header {
+[data-bs-theme="dark"] .header,
+[data-bs-theme="dark"] [style*="background: #ffffff"],
+[data-bs-theme="dark"] [style*="background:#ffffff"],
+[data-bs-theme="dark"] [style*="background: #fff"],
+[data-bs-theme="dark"] [style*="background:#fff"],
+[data-bs-theme="dark"] [style*="background: white"],
+[data-bs-theme="dark"] [style*="background:white"],
+[data-bs-theme="dark"] [style*="background-color: #ffffff"],
+[data-bs-theme="dark"] [style*="background-color:#ffffff"],
+[data-bs-theme="dark"] [style*="background-color: white"],
+[data-bs-theme="dark"] [style*="background-color:white"],
+[data-bs-theme="dark"] [style*="background: #edf2f8"],
+[data-bs-theme="dark"] [style*="background:#edf2f8"],
+[data-bs-theme="dark"] [style*="background-color: #edf2f8"],
+[data-bs-theme="dark"] [style*="background-color:#edf2f8"],
+[data-bs-theme="dark"] [style*="background-color: var(--light-background)"],
+[data-bs-theme="dark"] [style*="background-color:var(--light-background)"] {
     background: #0b0f19 !important;
     background-color: #0b0f19 !important;
     background-image: none !important;
     border-color: #1f2937 !important;
+    color: #ffffff !important;
 }
 
-/* All cards, boxes, tiles, lists to dark surface */
+/* All cards, articles, boxes, tiles, lists, alerts to dark surface */
+body.dark-mode article,
 body.dark-mode .card,
+body.dark-mode .card-header,
+body.dark-mode .card-body,
+body.dark-mode .card-footer,
 body.dark-mode .showcase-card,
 body.dark-mode .showcase-card .card-visual,
 body.dark-mode .showcase-card .card-details,
@@ -117,8 +156,16 @@ body.dark-mode .modal-content,
 body.dark-mode .dropdown-menu,
 body.dark-mode .bg-white,
 body.dark-mode .bg-light,
+body.dark-mode .alert,
 body.dark-mode .mcq-option-btn,
+body.dark-mode .rounded-4.border,
+body.dark-mode .rounded-3.border,
+body.dark-mode .rounded-2.border,
+[data-bs-theme="dark"] article,
 [data-bs-theme="dark"] .card,
+[data-bs-theme="dark"] .card-header,
+[data-bs-theme="dark"] .card-body,
+[data-bs-theme="dark"] .card-footer,
 [data-bs-theme="dark"] .showcase-card,
 [data-bs-theme="dark"] .showcase-card .card-visual,
 [data-bs-theme="dark"] .showcase-card .card-details,
@@ -135,10 +182,29 @@ body.dark-mode .mcq-option-btn,
 [data-bs-theme="dark"] .dropdown-menu,
 [data-bs-theme="dark"] .bg-white,
 [data-bs-theme="dark"] .bg-light,
-[data-bs-theme="dark"] .mcq-option-btn {
+[data-bs-theme="dark"] .alert,
+[data-bs-theme="dark"] .mcq-option-btn,
+[data-bs-theme="dark"] .rounded-4.border,
+[data-bs-theme="dark"] .rounded-3.border,
+[data-bs-theme="dark"] .rounded-2.border {
     background-color: #111827 !important;
     background: #111827 !important;
     border-color: #1f2937 !important;
+    color: #ffffff !important;
+}
+
+/* Badges & buttons */
+body.dark-mode .badge.bg-white,
+body.dark-mode .badge.bg-light,
+body.dark-mode .btn.bg-white,
+body.dark-mode .btn.bg-light,
+[data-bs-theme="dark"] .badge.bg-white,
+[data-bs-theme="dark"] .badge.bg-light,
+[data-bs-theme="dark"] .btn.bg-white,
+[data-bs-theme="dark"] .btn.bg-light {
+    background-color: #1f2937 !important;
+    background: #1f2937 !important;
+    border-color: #374151 !important;
     color: #ffffff !important;
 }
 
@@ -163,6 +229,20 @@ body.dark-mode .lead-text,
 body.dark-mode .site-sub,
 body.dark-mode .navmenu a,
 body.dark-mode .dropdown-item,
+body.dark-mode article,
+body.dark-mode article p,
+body.dark-mode article span,
+body.dark-mode article div,
+body.dark-mode .page-title h1,
+body.dark-mode .page-title h2,
+body.dark-mode .page-title p,
+body.dark-mode [style*="color: #000"],
+body.dark-mode [style*="color:#000"],
+body.dark-mode [style*="color: black"],
+body.dark-mode [style*="color: #1"],
+body.dark-mode [style*="color: #2"],
+body.dark-mode [style*="color: #3"],
+body.dark-mode [style*="color: #4"],
 [data-bs-theme="dark"] h1,
 [data-bs-theme="dark"] h2,
 [data-bs-theme="dark"] h3,
@@ -182,7 +262,21 @@ body.dark-mode .dropdown-item,
 [data-bs-theme="dark"] .lead-text,
 [data-bs-theme="dark"] .site-sub,
 [data-bs-theme="dark"] .navmenu a,
-[data-bs-theme="dark"] .dropdown-item {
+[data-bs-theme="dark"] .dropdown-item,
+[data-bs-theme="dark"] article,
+[data-bs-theme="dark"] article p,
+[data-bs-theme="dark"] article span,
+[data-bs-theme="dark"] article div,
+[data-bs-theme="dark"] .page-title h1,
+[data-bs-theme="dark"] .page-title h2,
+[data-bs-theme="dark"] .page-title p,
+[data-bs-theme="dark"] [style*="color: #000"],
+[data-bs-theme="dark"] [style*="color:#000"],
+[data-bs-theme="dark"] [style*="color: black"],
+[data-bs-theme="dark"] [style*="color: #1"],
+[data-bs-theme="dark"] [style*="color: #2"],
+[data-bs-theme="dark"] [style*="color: #3"],
+[data-bs-theme="dark"] [style*="color: #4"] {
     color: #ffffff !important;
 }
 
