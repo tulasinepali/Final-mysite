@@ -136,9 +136,28 @@ def robots_txt(request):
     from django.http import HttpResponse
     content = """User-agent: *
 Allow: /
-Disallow: /dashboard/
-Disallow: /admin/
+Allow: /notes/
+Allow: /quiz/
+Allow: /blog/
+Allow: /downloads/
+Allow: /tools/
+Allow: /about/
+Allow: /contact/
+Allow: /search/
+Allow: /privacy-policy/
+Allow: /terms-conditions/
+Allow: /disclaimer/
+Allow: /sitemap.html
 
+# Block admin, login, and internal pages from crawlers
+Disallow: /admin/
+Disallow: /login/
+Disallow: /logout/
+Disallow: /dashboard/
+Disallow: /ckeditor5/
+Disallow: /media/site/
+
+# Sitemaps
 Sitemap: https://tulasinepali.com.np/sitemap.xml
 """
     return HttpResponse(content, content_type='text/plain')
