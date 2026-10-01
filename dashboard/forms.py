@@ -1,4 +1,7 @@
+import os
+import uuid
 from django import forms
+from django.utils.text import slugify
 from django_ckeditor_5.widgets import CKEditor5Widget
 from core.models import SiteSettings, Category, Tag, AdPlacement
 from notes.models import Note
@@ -6,6 +9,20 @@ from blog.models import BlogPost
 from downloads.models import Download
 from quiz.models import Quiz, Question
 from tools.models import Tool, Widget, WidgetSetting, PatroEvent
+
+
+def auto_generate_slug(model_class, title, slug_val, instance_pk=None, prefix='item'):
+    slug_val = (slug_val or '').strip()
+    if not slug_val and title:
+        base_slug = slugify(title)
+        if not base_slug:
+            base_slug = f"{prefix}-{uuid.uuid4().hex[:8]}"
+        slug_val = base_slug
+        counter = 1
+        while model_class.objects.filter(slug=slug_val).exclude(pk=instance_pk).exists():
+            slug_val = f"{base_slug}-{counter}"
+            counter += 1
+    return slug_val
 
 
 class SiteSettingsForm(forms.ModelForm):
@@ -54,12 +71,19 @@ class NoteForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(module='notes')
         self.fields['slug'].widget.attrs.update({'data-slug-from': 'title'})
+        self.fields['slug'].required = False
         # Make auto-managed fields not required
         self.fields['views'].required = False
         self.fields['meta_title'].required = False
         self.fields['meta_description'].required = False
         self.fields['featured_image'].required = False
         self.fields['tags'].required = False
+
+    def clean_slug(self):
+        slug = self.cleaned_data.get('slug')
+        title = self.cleaned_data.get('title')
+        instance_pk = self.instance.pk if self.instance else None
+        return auto_generate_slug(Note, title, slug, instance_pk=instance_pk, prefix='note')
 
 
 class BlogPostForm(forms.ModelForm):
@@ -75,11 +99,18 @@ class BlogPostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(module='blog')
         self.fields['slug'].widget.attrs.update({'data-slug-from': 'title'})
+        self.fields['slug'].required = False
         self.fields['views'].required = False
         self.fields['meta_title'].required = False
         self.fields['meta_description'].required = False
         self.fields['featured_image'].required = False
         self.fields['tags'].required = False
+
+    def clean_slug(self):
+        slug = self.cleaned_data.get('slug')
+        title = self.cleaned_data.get('title')
+        instance_pk = self.instance.pk if self.instance else None
+        return auto_generate_slug(BlogPost, title, slug, instance_pk=instance_pk, prefix='blog')
 
 
 class DownloadForm(forms.ModelForm):
@@ -95,12 +126,39 @@ class DownloadForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(module='downloads')
         self.fields['slug'].widget.attrs.update({'data-slug-from': 'title'})
+        self.fields['slug'].required = False
+        self.fields['file_type'].required = False
         self.fields['download_count'].required = False
         self.fields['file_size'].required = False
         self.fields['thumbnail'].required = False
         self.fields['meta_title'].required = False
         self.fields['meta_description'].required = False
         self.fields['tags'].required = False
+
+    def clean_slug(self):
+        slug = self.cleaned_data.get('slug')
+        title = self.cleaned_data.get('title')
+        instance_pk = self.instance.pk if self.instance else None
+        return auto_generate_slug(Download, title, slug, instance_pk=instance_pk, prefix='download')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        file = cleaned_data.get('file')
+        file_type = cleaned_data.get('file_type')
+        if file and not file_type:
+            fname = getattr(file, 'name', '') or ''
+            ext = os.path.splitext(fname)[1].lower().lstrip('.')
+            if ext == 'pdf':
+                cleaned_data['file_type'] = 'pdf'
+            elif ext in ['doc', 'docx']:
+                cleaned_data['file_type'] = 'docx'
+            elif ext in ['ppt', 'pptx']:
+                cleaned_data['file_type'] = 'ppt'
+            elif ext in ['zip', 'rar', '7z', 'tar', 'gz']:
+                cleaned_data['file_type'] = 'zip'
+            else:
+                cleaned_data['file_type'] = 'other'
+        return cleaned_data
 
 
 class QuizForm(forms.ModelForm):
@@ -115,6 +173,7 @@ class QuizForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(module='quiz')
         self.fields['slug'].widget.attrs.update({'data-slug-from': 'title'})
+        self.fields['slug'].required = False
         self.fields['attempts'].required = False
         self.fields['meta_title'].required = False
         self.fields['meta_description'].required = False
@@ -126,6 +185,12 @@ class QuizForm(forms.ModelForm):
             # Set initial value to 20 if creating a new quiz (no instance)
             if not self.instance or not self.instance.pk:
                 self.fields['negative_marking_value'].initial = 20
+
+    def clean_slug(self):
+        slug = self.cleaned_data.get('slug')
+        title = self.cleaned_data.get('title')
+        instance_pk = self.instance.pk if self.instance else None
+        return auto_generate_slug(Quiz, title, slug, instance_pk=instance_pk, prefix='quiz')
 
     def clean_negative_marking_value(self):
         """Ensure negative_marking_value is never None or 0 when negative marking is enabled."""

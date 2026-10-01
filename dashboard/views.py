@@ -277,9 +277,14 @@ def download_create(request):
     if request.method == 'POST':
         form = DownloadForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Download created successfully!')
-            return redirect('dashboard:downloads')
+            try:
+                form.save()
+                messages.success(request, 'Download created successfully!')
+                return redirect('dashboard:downloads')
+            except Exception as e:
+                messages.error(request, f'Failed to create download: {e}')
+        else:
+            messages.error(request, 'Please check the form for errors below.')
     else:
         form = DownloadForm()
     context = {'form': form, 'active_page': 'downloads', 'action': 'Create', 'model_name': 'Download'}
@@ -291,9 +296,14 @@ def download_edit(request, pk):
     if request.method == 'POST':
         form = DownloadForm(request.POST, request.FILES, instance=dl)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Download updated successfully!')
-            return redirect('dashboard:downloads')
+            try:
+                form.save()
+                messages.success(request, 'Download updated successfully!')
+                return redirect('dashboard:downloads')
+            except Exception as e:
+                messages.error(request, f'Failed to update download: {e}')
+        else:
+            messages.error(request, 'Please check the form for errors below.')
     else:
         form = DownloadForm(instance=dl)
     context = {'form': form, 'active_page': 'downloads', 'action': 'Edit', 'model_name': 'Download', 'object': dl}

@@ -1,4 +1,5 @@
 import logging
+import threading
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.backends.smtp import EmailBackend
@@ -29,7 +30,7 @@ def get_mail_connection():
     except Exception as e:
         logger.warning(f"Error initializing custom SMTP backend, falling back to default: {e}")
     
-    return get_connection()
+    return get_connection(timeout=10)
 
 
 def get_sender_address():
@@ -172,10 +173,12 @@ def trigger_auto_email_notification(content_type, title, description, url, site_
     </div>
     """
 
-    return send_broadcast_to_subscribers(
-        subject=subject,
-        headline=headline,
-        body_html=body_html,
-        cta_text=cta_label,
-        cta_url=full_url,
+    # Dispatch sending in a background thread to never block web requests
+    thread = threading.Thread(
+        target=send_broadcast_to_subscribers,
+        args=(subject, headline, body_html, cta_label, full_url),
+        daemon=True
     )
+    thread.start()
+
+    return True, 0, "Notification queued in background thread."

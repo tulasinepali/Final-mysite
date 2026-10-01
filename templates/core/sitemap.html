@@ -41,6 +41,7 @@
                         <a href="{% url 'core:contact' %}" class="list-group-item list-group-item-action small py-2 px-4">Contact Us</a>
                         <a href="{% url 'core:privacy' %}" class="list-group-item list-group-item-action small py-2 px-4">Privacy Policy</a>
                         <a href="{% url 'core:terms' %}" class="list-group-item list-group-item-action small py-2 px-4">Terms &amp; Conditions</a>
+                        <a href="{% url 'core:disclaimer' %}" class="list-group-item list-group-item-action small py-2 px-4">Disclaimer</a>
                     </div>
                 </div>
             </div>
@@ -87,12 +88,12 @@
                 </div>
             </div>
 
-            <!-- Quizzes & Downloads -->
+            <!-- Quizzes, Downloads & Tools -->
             <div class="col-lg-3 col-md-6">
                 <div class="card border-0 shadow-sm rounded-4 h-100 catalog-card">
                     <div class="card-header bg-white border-bottom pt-4 px-4 pb-2" style="border-color: #e1e7f0 !important;">
                         <h2 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            <i class="bi bi-patch-question-fill me-2 text-success"></i>Tests &amp; Files
+                            <i class="bi bi-tools me-2 text-primary"></i>Tools &amp; Hubs
                         </h2>
                     </div>
                     <div class="list-group list-group-flush">
@@ -101,6 +102,21 @@
                         </a>
                         <a href="{% url 'downloads:list' %}" class="list-group-item list-group-item-action fw-semibold small py-2 px-4 text-warning">
                             <i class="bi bi-cloud-arrow-down me-2"></i>Download Center
+                        </a>
+                        <a href="{% url 'tools:nepali_patro' %}" class="list-group-item list-group-item-action small py-2 px-4">
+                            <i class="bi bi-calendar3 me-2 text-primary"></i>Nepali Patro Calendar
+                        </a>
+                        <a href="{% url 'tools:date_converter' %}" class="list-group-item list-group-item-action small py-2 px-4">
+                            <i class="bi bi-arrow-repeat me-2 text-info"></i>BS to AD Date Converter
+                        </a>
+                        <a href="{% url 'tools:age_calculator' %}" class="list-group-item list-group-item-action small py-2 px-4">
+                            <i class="bi bi-calculator me-2 text-secondary"></i>Age Calculator
+                        </a>
+                        <a href="{% url 'tools:unicode_converter' %}" class="list-group-item list-group-item-action small py-2 px-4">
+                            <i class="bi bi-translate me-2 text-success"></i>Preeti to Unicode
+                        </a>
+                        <a href="{% url 'tools:widgets_index' %}" class="list-group-item list-group-item-action small py-2 px-4">
+                            <i class="bi bi-puzzle me-2 text-warning"></i>Embeddable Widgets
                         </a>
                     </div>
                 </div>
