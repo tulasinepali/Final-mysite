@@ -143,11 +143,54 @@ Sitemap: https://tulasinepali.com.np/sitemap.xml
 """
     return HttpResponse(content, content_type='text/plain')
 
-def custom_404(request, exception):
-    return render(request, 'core/404.html', {'meta_title': 'Page Not Found'}, status=404)
+
+def favicon_view(request):
+    """Serve favicon or redirect to site icon so /favicon.ico always returns 200/302"""
+    from django.shortcuts import redirect
+    from django.http import HttpResponse
+    try:
+        s = SiteSettings.objects.first()
+        if s and s.site_favicon:
+            return redirect(s.site_favicon.url, permanent=False)
+    except Exception:
+        pass
+    # Minimal 1x1 ICO byte sequence so crawlers receive 200 OK
+    ico_bytes = b'\x00\x00\x01\x00\x01\x00\x01\x01\x00\x00\x01\x00\x18\x000\x00\x00\x00\x16\x00\x00\x00(\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x18\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    return HttpResponse(ico_bytes, content_type='image/x-icon', status=200)
+
+
+def health_check(request):
+    """Lightweight 200 OK endpoint for uptime monitors and load balancers"""
+    from django.http import JsonResponse
+    from django.db import connection
+    db_ok = True
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+    except Exception:
+        db_ok = False
+
+    status_code = 200 if db_ok else 503
+    return JsonResponse({
+        "status": "healthy" if db_ok else "unhealthy",
+        "database": "connected" if db_ok else "unavailable",
+    }, status=status_code)
+
+
+def custom_404(request, exception=None):
+    from django.http import HttpResponse
+    try:
+        return render(request, 'core/404.html', {'meta_title': 'Page Not Found'}, status=404)
+    except Exception:
+        return HttpResponse("<!DOCTYPE html><html><head><title>Page Not Found</title></head><body><h1>404 - Page Not Found</h1><p>The requested page could not be found.</p><a href='/'>Go Home</a></body></html>", content_type="text/html", status=404)
+
 
 def custom_500(request):
-    return render(request, 'core/500.html', {'meta_title': 'Server Error'}, status=500)
+    from django.http import HttpResponse
+    try:
+        return render(request, 'core/500.html', {'meta_title': 'Server Error'}, status=500)
+    except Exception:
+        return HttpResponse("<!DOCTYPE html><html><head><title>Server Error</title></head><body><h1>500 - Server Error</h1><p>Something went wrong on our end. We are working to fix it.</p><a href='/'>Go Home</a></body></html>", content_type="text/html", status=500)
 
 
 def subscribe_newsletter(request):

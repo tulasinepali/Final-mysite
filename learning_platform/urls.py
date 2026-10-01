@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
+from core import views as core_views
 from core.views import custom_404, custom_500
 from django.views.generic import TemplateView
 from tools import views as tools_views
@@ -28,6 +29,10 @@ urlpatterns = [
     path('widgets/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
     path('widget/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
     path('widgets/embed/<slug:slug>/', tools_views.widget_embed),
+    path('robots.txt', core_views.robots_txt, name='robots_txt'),
+    path('favicon.ico', core_views.favicon_view, name='favicon'),
+    path('health/', core_views.health_check, name='health_check'),
+    path('up/', core_views.health_check, name='up'),
     path(
         "ads.txt",
         TemplateView.as_view(

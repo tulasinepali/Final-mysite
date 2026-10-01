@@ -91,8 +91,23 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 20,
+        },
     }
 }
+
+# Ensure SQLite performance and concurrency on cPanel
+from django.db.backends.signals import connection_created
+
+def configure_sqlite_performance(sender, connection, **kwargs):
+    if connection.vendor == 'sqlite':
+        with connection.cursor() as cursor:
+            cursor.execute('PRAGMA journal_mode=WAL;')
+            cursor.execute('PRAGMA busy_timeout=20000;')
+            cursor.execute('PRAGMA synchronous=NORMAL;')
+
+connection_created.connect(configure_sqlite_performance)
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
