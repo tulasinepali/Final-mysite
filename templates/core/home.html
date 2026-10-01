@@ -43,42 +43,77 @@
         <div class="row g-4 justify-content-center mt-2">
             <!-- Showcase Card 1: Interactive Live MCQ Widget -->
             <div class="col-lg-5 col-md-6">
-                <div class="showcase-card elevated h-100">
-                    <div class="card-visual flex-column align-items-start py-3 px-4 position-relative">
-                        <span class="label hot"><i class="bi bi-lightning-charge-fill me-1"></i>Live Question</span>
-                        <div class="d-flex align-items-center justify-content-between w-100 mt-4 mb-2">
-                            <span class="small fw-semibold text-primary"><i class="bi bi-laptop me-1"></i>Technology &amp; Computer Quiz</span>
-                            <span class="badge bg-success bg-opacity-10 text-success small">Interactive</span>
+                <div class="showcase-card elevated hero-mcq-card h-100">
+                    <div class="card-visual hero-mcq-visual flex-column align-items-start p-3 p-sm-4 position-relative">
+                        <div class="d-flex align-items-center justify-content-between w-100 mb-2">
+                            <span class="live-pulse-badge">
+                                <span class="pulse-ring"></span>
+                                <span class="pulse-dot"></span>
+                                LIVE QUESTION
+                            </span>
+                            <button type="button" class="btn btn-sm hero-refresh-btn" id="nextHeroMcqBtn" onclick="rotateHeroQuestion()" title="Try another question">
+                                <i class="bi bi-arrow-repeat me-1"></i><span>Next Q</span>
+                            </button>
                         </div>
-                        <p class="fw-bold text-dark mb-0 fs-6">Q: Which shortcut key is used to duplicate the selected slide in PowerPoint?</p>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge hero-category-badge" id="heroCategoryBadge">
+                                <i class="bi bi-laptop me-1"></i>Computer Operator
+                            </span>
+                            <span class="badge hero-level-badge" id="heroLevelBadge">
+                                High-Yield
+                            </span>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-0 fs-6 hero-question-title" id="heroQuestionTitle">
+                            Q: Which shortcut key is used to duplicate the selected slide in PowerPoint?
+                        </h6>
                     </div>
 
-                    <div class="card-details pt-3">
+                    <div class="card-details p-3 p-sm-4 pt-3 d-flex flex-column justify-content-between">
                         <div id="heroLiveMcq">
-                            <button type="button" class="mcq-option-btn" onclick="checkHeroMcq(this, false, 'Ctrl + M creates a NEW blank slide, not a duplicate.')">
-                                <span><strong>A.</strong> Ctrl + M</span>
-                                <i class="bi bi-circle text-muted"></i>
-                            </button>
-                            <button type="button" class="mcq-option-btn" onclick="checkHeroMcq(this, true, 'Correct! Ctrl + D immediately duplicates the active slide.')">
-                                <span><strong>B.</strong> Ctrl + D</span>
-                                <i class="bi bi-circle text-muted"></i>
-                            </button>
-                            <button type="button" class="mcq-option-btn" onclick="checkHeroMcq(this, false, 'Ctrl + Shift + N creates a new folder in Windows Explorer.')">
-                                <span><strong>C.</strong> Ctrl + Shift + N</span>
-                                <i class="bi bi-circle text-muted"></i>
-                            </button>
-                            <button type="button" class="mcq-option-btn" onclick="checkHeroMcq(this, false, 'Ctrl + K opens the Insert Hyperlink dialog.')">
-                                <span><strong>D.</strong> Ctrl + K</span>
-                                <i class="bi bi-circle text-muted"></i>
-                            </button>
+                            <!-- 2x2 Option Grid -->
+                            <div class="hero-mcq-grid mb-2" id="heroOptionGrid">
+                                <button type="button" class="hero-mcq-tile" onclick="handleHeroChoice(0)">
+                                    <span class="tile-letter">A</span>
+                                    <span class="tile-text">Ctrl + M</span>
+                                    <i class="bi bi-circle tile-status-icon"></i>
+                                </button>
+                                <button type="button" class="hero-mcq-tile" onclick="handleHeroChoice(1)">
+                                    <span class="tile-letter">B</span>
+                                    <span class="tile-text">Ctrl + D</span>
+                                    <i class="bi bi-circle tile-status-icon"></i>
+                                </button>
+                                <button type="button" class="hero-mcq-tile" onclick="handleHeroChoice(2)">
+                                    <span class="tile-letter">C</span>
+                                    <span class="tile-text">Ctrl + Shift + N</span>
+                                    <i class="bi bi-circle tile-status-icon"></i>
+                                </button>
+                                <button type="button" class="hero-mcq-tile" onclick="handleHeroChoice(3)">
+                                    <span class="tile-letter">D</span>
+                                    <span class="tile-text">Ctrl + K</span>
+                                    <i class="bi bi-circle tile-status-icon"></i>
+                                </button>
+                            </div>
 
                             <!-- Dynamic Feedback Box -->
-                            <div id="mcqFeedback" class="alert alert-light border py-2 px-3 small mt-2 d-none" role="alert"></div>
+                            <div id="mcqFeedback" class="hero-feedback-alert d-none" role="alert"></div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center pt-3 mt-2 border-top">
-                            <span class="small text-muted"><i class="bi bi-people me-1"></i>10,000+ questions practiced</span>
-                            <a href="{% url 'quiz:list' %}" class="btn btn-sm btn-primary rounded-pill px-3">Full Practice <i class="bi bi-arrow-right ms-1"></i></a>
+                        <!-- Gamified Social Proof & Practice Link -->
+                        <div class="d-flex flex-wrap align-items-center justify-content-between pt-3 mt-2 border-top hero-card-footer gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-stack">
+                                    <span class="avatar-pill bg-primary text-white">TN</span>
+                                    <span class="avatar-pill bg-success text-white">RK</span>
+                                    <span class="avatar-pill bg-warning text-dark">SP</span>
+                                </div>
+                                <div class="lh-sm">
+                                    <span class="fw-bold d-block text-dark small">12,400+</span>
+                                    <span class="text-muted" style="font-size: 0.72rem;">Practiced Today</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'quiz:list' %}" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold hero-cta-btn">
+                                Full Practice <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -604,30 +639,145 @@
 
 {% block extra_js %}
 <script>
-    // Interactive Live MCQ feedback handler on Home
-    function checkHeroMcq(btn, isCorrect, explanation) {
-        const parent = btn.closest('#heroLiveMcq');
-        const allBtns = parent.querySelectorAll('.mcq-option-btn');
-        const feedbackBox = document.getElementById('mcqFeedback');
+    // Interactive Live MCQ Pool & State Handler on Home
+    const heroMcqPool = [
+        {
+            category: 'Computer Operator',
+            categoryIcon: 'bi-laptop',
+            level: 'MS PowerPoint',
+            question: 'Q: Which shortcut key is used to duplicate the selected slide in PowerPoint?',
+            options: ['Ctrl + M', 'Ctrl + D', 'Ctrl + Shift + N', 'Ctrl + K'],
+            correctIndex: 1,
+            explanation: 'Ctrl + D immediately duplicates the active slide. (Ctrl + M inserts a blank new slide).'
+        },
+        {
+            category: 'Operating System',
+            categoryIcon: 'bi-windows',
+            level: 'Windows Utility',
+            question: 'Q: Which key combination directly opens the Task Manager in Windows?',
+            options: ['Ctrl + Alt + Del', 'Ctrl + Shift + Esc', 'Win + X', 'Alt + F4'],
+            correctIndex: 1,
+            explanation: 'Ctrl + Shift + Esc instantly opens Task Manager without routing to the lock screen.'
+        },
+        {
+            category: 'Spreadsheet',
+            categoryIcon: 'bi-file-earmark-spreadsheet',
+            level: 'MS Excel',
+            question: 'Q: In Microsoft Excel, which function tallies cells containing numbers only?',
+            options: ['COUNTA', 'COUNT', 'COUNTBLANK', 'COUNTIF'],
+            correctIndex: 1,
+            explanation: 'COUNT counts only numeric entries, while COUNTA counts all non-empty cells.'
+        },
+        {
+            category: 'Cyber & Web',
+            categoryIcon: 'bi-shield-check',
+            level: 'Networking',
+            question: 'Q: Which secure protocol encrypts web traffic using SSL/TLS over port 443?',
+            options: ['HTTP', 'FTP', 'HTTPS', 'SMTP'],
+            correctIndex: 2,
+            explanation: 'HTTPS encrypts HTTP requests and responses using SSL/TLS cryptography.'
+        },
+        {
+            category: 'Word Processing',
+            categoryIcon: 'bi-file-earmark-word',
+            level: 'MS Word',
+            question: 'Q: Which shortcut key is used to insert a hard Page Break in Microsoft Word?',
+            options: ['Ctrl + Enter', 'Shift + Enter', 'Alt + Enter', 'Ctrl + Space'],
+            correctIndex: 0,
+            explanation: 'Ctrl + Enter immediately breaks to the next page in MS Word.'
+        }
+    ];
 
-        allBtns.forEach(b => {
-            b.classList.remove('correct-choice', 'wrong-choice');
-            const icon = b.querySelector('i');
-            if (icon) icon.className = 'bi bi-circle text-muted';
+    let currentHeroIndex = 0;
+    let hasAnsweredCurrent = false;
+
+    function renderHeroQuestion(idx) {
+        const q = heroMcqPool[idx];
+        const categoryBadge = document.getElementById('heroCategoryBadge');
+        const levelBadge = document.getElementById('heroLevelBadge');
+        const questionTitle = document.getElementById('heroQuestionTitle');
+        const grid = document.getElementById('heroOptionGrid');
+        const feedback = document.getElementById('mcqFeedback');
+
+        if (!q || !grid) return;
+
+        hasAnsweredCurrent = false;
+        feedback.className = 'hero-feedback-alert d-none';
+        feedback.innerHTML = '';
+
+        if (categoryBadge) {
+            categoryBadge.innerHTML = `<i class="bi ${q.categoryIcon} me-1"></i>${q.category}`;
+        }
+        if (levelBadge) {
+            levelBadge.textContent = q.level;
+        }
+        if (questionTitle) {
+            questionTitle.textContent = q.question;
+        }
+
+        const letters = ['A', 'B', 'C', 'D'];
+        grid.innerHTML = q.options.map((opt, i) => `
+            <button type="button" class="hero-mcq-tile" onclick="handleHeroChoice(${i})" id="heroTile${i}">
+                <span class="tile-letter">${letters[i]}</span>
+                <span class="tile-text">${opt}</span>
+                <i class="bi bi-circle tile-status-icon"></i>
+            </button>
+        `).join('');
+    }
+
+    function handleHeroChoice(chosenIdx) {
+        if (hasAnsweredCurrent) return;
+        hasAnsweredCurrent = true;
+
+        const q = heroMcqPool[currentHeroIndex];
+        const isCorrect = (chosenIdx === q.correctIndex);
+        const feedback = document.getElementById('mcqFeedback');
+        const tiles = document.querySelectorAll('.hero-mcq-tile');
+
+        tiles.forEach((tile, idx) => {
+            tile.disabled = true;
+            const icon = tile.querySelector('.tile-status-icon');
+
+            if (idx === q.correctIndex) {
+                tile.classList.add('is-correct');
+                if (icon) icon.className = 'bi bi-check-circle-fill tile-status-icon text-success';
+            } else if (idx === chosenIdx && !isCorrect) {
+                tile.classList.add('is-wrong');
+                if (icon) icon.className = 'bi bi-x-circle-fill tile-status-icon text-danger';
+            } else {
+                tile.classList.add('is-dimmed');
+            }
         });
 
-        const icon = btn.querySelector('i');
         if (isCorrect) {
-            btn.classList.add('correct-choice');
-            if (icon) icon.className = 'bi bi-check-circle-fill text-success';
-            feedbackBox.className = 'alert alert-success border-0 py-2 px-3 small mt-2 d-block';
-            feedbackBox.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> <strong>Spot On!</strong> ' + explanation;
+            feedback.className = 'hero-feedback-alert alert-success d-flex align-items-start gap-2 mt-2';
+            feedback.innerHTML = `
+                <i class="bi bi-patch-check-fill text-success fs-5 flex-shrink-0"></i>
+                <div class="flex-grow-1">
+                    <strong class="d-block text-success">Spot On! Correct answer.</strong>
+                    <span class="small text-muted">${q.explanation}</span>
+                </div>
+            `;
         } else {
-            btn.classList.add('wrong-choice');
-            if (icon) icon.className = 'bi bi-x-circle-fill text-danger';
-            feedbackBox.className = 'alert alert-danger border-0 py-2 px-3 small mt-2 d-block';
-            feedbackBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> <strong>Not quite:</strong> ' + explanation;
+            feedback.className = 'hero-feedback-alert alert-danger d-flex align-items-start gap-2 mt-2';
+            feedback.innerHTML = `
+                <i class="bi bi-exclamation-octagon-fill text-danger fs-5 flex-shrink-0"></i>
+                <div class="flex-grow-1">
+                    <strong class="d-block text-danger">Not quite!</strong>
+                    <span class="small text-muted">${q.explanation}</span>
+                </div>
+            `;
         }
+    }
+
+    function rotateHeroQuestion() {
+        const btn = document.getElementById('nextHeroMcqBtn');
+        if (btn) {
+            btn.classList.add('spinning');
+            setTimeout(() => btn.classList.remove('spinning'), 500);
+        }
+        currentHeroIndex = (currentHeroIndex + 1) % heroMcqPool.length;
+        renderHeroQuestion(currentHeroIndex);
     }
 
     // Animated Counter for Stats
