@@ -11,10 +11,10 @@ from django.utils.safestring import mark_safe
 import openpyxl
 from openpyxl import Workbook
 
-from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber
+from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber, VisitorLog
 from core.emails import send_broadcast_to_subscribers
 from notes.models import Note
-from blog.models import BlogPost
+from blog.models import BlogPost, Comment
 from downloads.models import Download
 from quiz.models import Quiz, Question, QuizAttempt
 import csv
@@ -1541,5 +1541,222 @@ def dashboard_widget_analytics(request):
         'selected_type': type_filter,
     }
     return render(request, 'dashboard/widget_analytics.html', context)
+
+
+# ========== BLOG COMMENTS ==========
+
+@staff_member_required
+def dashboard_comments(request):
+    status_filter = request.GET.get('status', 'all')
+    q = request.GET.get('q', '').strip()
+
+    comments = Comment.objects.select_related('post', 'parent').order_by('-created_at')
+
+    if status_filter == 'pending':
+        comments = comments.filter(is_approved=False)
+    elif status_filter == 'approved':
+        comments = comments.filter(is_approved=True)
+
+    if q:
+        from django.db.models import Q
+        comments = comments.filter(
+            Q(name__icontains=q) |
+            Q(email__icontains=q) |
+            Q(content__icontains=q) |
+            Q(post__title__icontains=q)
+        )
+
+    # KPIs
+    from django.utils import timezone
+    today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    total_count = Comment.objects.count()
+    pending_count = Comment.objects.filter(is_approved=False).count()
+    approved_count = Comment.objects.filter(is_approved=True).count()
+    today_count = Comment.objects.filter(created_at__gte=today_start).count()
+
+    paginator = Paginator(comments, 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj,
+        'status_filter': status_filter,
+        'q': q,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'today_count': today_count,
+        'active_page': 'comments',
+    }
+    return render(request, 'dashboard/comments/list.html', context)
+
+
+@staff_member_required
+def comment_toggle_approve(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    comment.is_approved = not comment.is_approved
+    comment.save(update_fields=['is_approved', 'updated_at'])
+    if comment.is_approved:
+        messages.success(request, f'Comment by "{comment.name}" approved!')
+    else:
+        messages.info(request, f'Comment by "{comment.name}" set to pending.')
+    return redirect(request.META.get('HTTP_REFERER') or 'dashboard:comments')
+
+
+@staff_member_required
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.method == 'POST':
+        comment.delete()
+        messages.success(request, 'Comment deleted successfully!')
+    return redirect('dashboard:comments')
+
+
+@staff_member_required
+def comment_reply(request, pk):
+    parent = get_object_or_404(Comment, pk=pk)
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        if content:
+            admin_name = request.user.get_full_name() or request.user.username or "Admin"
+            admin_email = request.user.email or "admin@example.com"
+            Comment.objects.create(
+                post=parent.post,
+                parent=parent,
+                name=admin_name,
+                email=admin_email,
+                content=content,
+                is_approved=True,
+                is_author_reply=True,
+                ip_address=request.META.get('REMOTE_ADDR', '127.0.0.1')
+            )
+            messages.success(request, f'Reply to "{parent.name}" published successfully!')
+        else:
+            messages.error(request, 'Reply content cannot be empty.')
+    return redirect(request.META.get('HTTP_REFERER') or 'dashboard:comments')
+
+
+# ========== VISITOR LOGS ==========
+
+@staff_member_required
+def dashboard_visitor_logs(request):
+    from django.utils import timezone
+    from datetime import timedelta
+    from django.db.models import Q
+
+    range_filter = request.GET.get('range', '7d')
+    device_filter = request.GET.get('device', 'all')
+    bot_filter = request.GET.get('bot', 'real')
+    q = request.GET.get('q', '').strip()
+
+    now = timezone.now()
+    if range_filter == 'today':
+        start_time = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif range_filter == '24h':
+        start_time = now - timedelta(hours=24)
+    elif range_filter == '7d':
+        start_time = now - timedelta(days=7)
+    elif range_filter == '30d':
+        start_time = now - timedelta(days=30)
+    else:
+        start_time = None
+
+    logs = VisitorLog.objects.all()
+
+    if start_time:
+        logs = logs.filter(timestamp__gte=start_time)
+
+    if device_filter in ['Mobile', 'Desktop', 'Tablet']:
+        logs = logs.filter(device_type=device_filter)
+
+    if bot_filter == 'real':
+        logs = logs.filter(is_bot=False)
+    elif bot_filter == 'bot':
+        logs = logs.filter(is_bot=True)
+
+    if q:
+        logs = logs.filter(
+            Q(ip_address__icontains=q) |
+            Q(path__icontains=q) |
+            Q(browser__icontains=q) |
+            Q(os__icontains=q) |
+            Q(country__icontains=q) |
+            Q(referrer__icontains=q)
+        )
+
+    # KPIs in this selection / today
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    total_views = logs.count()
+    unique_visitors = logs.values('ip_address').distinct().count()
+    today_views = VisitorLog.objects.filter(timestamp__gte=today_start, is_bot=False).count()
+    today_uniques = VisitorLog.objects.filter(timestamp__gte=today_start, is_bot=False).values('ip_address').distinct().count()
+
+    # Device breakdown
+    mobile_count = logs.filter(device_type='Mobile').count()
+    desktop_count = logs.filter(device_type='Desktop').count()
+    tablet_count = logs.filter(device_type='Tablet').count()
+    mobile_pct = round((mobile_count / total_views * 100), 1) if total_views > 0 else 0
+
+    # Top 5 visited paths
+    top_paths = (
+        logs.values('path')
+        .annotate(view_count=Count('id'))
+        .order_by('-view_count')[:5]
+    )
+
+    # Top 5 referrers
+    top_referrers = (
+        logs.exclude(referrer__isnull=True).exclude(referrer='')
+        .values('referrer')
+        .annotate(ref_count=Count('id'))
+        .order_by('-ref_count')[:5]
+    )
+
+    # Top browsers
+    top_browsers = (
+        logs.values('browser')
+        .annotate(b_count=Count('id'))
+        .order_by('-b_count')[:5]
+    )
+
+    # Pagination
+    paginator = Paginator(logs.order_by('-timestamp'), 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj,
+        'range_filter': range_filter,
+        'device_filter': device_filter,
+        'bot_filter': bot_filter,
+        'q': q,
+        'total_views': total_views,
+        'unique_visitors': unique_visitors,
+        'today_views': today_views,
+        'today_uniques': today_uniques,
+        'mobile_pct': mobile_pct,
+        'mobile_count': mobile_count,
+        'desktop_count': desktop_count,
+        'tablet_count': tablet_count,
+        'top_paths': top_paths,
+        'top_referrers': top_referrers,
+        'top_browsers': top_browsers,
+        'active_page': 'visitor_logs',
+    }
+    return render(request, 'dashboard/visitor_logs/list.html', context)
+
+
+@staff_member_required
+def visitor_logs_clear_old(request):
+    from django.utils import timezone
+    from datetime import timedelta
+    if request.method == 'POST':
+        try:
+            days = int(request.POST.get('days', 30))
+        except (ValueError, TypeError):
+            days = 30
+        cutoff = timezone.now() - timedelta(days=days)
+        deleted_count, _ = VisitorLog.objects.filter(timestamp__lt=cutoff).delete()
+        messages.success(request, f'Cleaned {deleted_count} visitor logs older than {days} days.')
+    return redirect('dashboard:visitor_logs')
+
 
 

@@ -1,0 +1,360 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Visitor Logs & Analytics - Dashboard{% endblock %}
+{% block page_header %}Visitor Logs{% endblock %}
+{% block page_subtitle %}Live real-time visitor traffic, device breakdowns, page views, and location metrics{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Visitor Logs</li>
+{% endblock %}
+
+{% block content %}
+<!-- Top KPI Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid #0559b7 !important;">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: rgba(5, 89, 183, 0.1); color: #0559b7;">
+                    <i class="bi bi-eye-fill fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Page Views (Range)</h6>
+                    <h3 class="mb-0 font-weight-bold">{{ total_views }}</h3>
+                    <small class="text-muted">Total hits recorded</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid #28a745 !important;">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: rgba(40, 167, 69, 0.12); color: #28a745;">
+                    <i class="bi bi-people-fill fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Unique Visitors</h6>
+                    <h3 class="mb-0 font-weight-bold text-success">{{ unique_visitors }}</h3>
+                    <small class="text-muted">Distinct client IPs</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid #17a2b8 !important;">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: rgba(23, 162, 184, 0.12); color: #17a2b8;">
+                    <i class="bi bi-calendar-event-fill fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Today's Live Traffic</h6>
+                    <h3 class="mb-0 font-weight-bold text-info">{{ today_views }} <span style="font-size: 0.85rem; font-weight: normal; color: #6c757d;">({{ today_uniques }} unique)</span></h3>
+                    <small class="text-muted">Active since midnight</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid #6f42c1 !important;">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: rgba(111, 66, 193, 0.12); color: #6f42c1;">
+                    <i class="bi bi-phone-fill fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Mobile Visitors</h6>
+                    <h3 class="mb-0 font-weight-bold" style="color: #6f42c1;">{{ mobile_pct }}%</h3>
+                    <small class="text-muted">{{ mobile_count }} mobile / {{ desktop_count }} desktop</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary Insights (Top Pages & Referrers) -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-3 mb-lg-0">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-bottom py-2 d-flex align-items-center justify-content-between">
+                <h6 class="mb-0 font-weight-bold"><i class="bi bi-fire text-danger mr-1"></i> Top Visited Pages (This Period)</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Page URL Path</th>
+                                <th class="text-right" style="width: 100px;">Views</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tp in top_paths %}
+                            <tr>
+                                <td class="text-truncate" style="max-width: 320px;">
+                                    <a href="{{ tp.path }}" target="_blank" class="text-decoration-none text-dark">
+                                        {{ tp.path }}
+                                        <i class="bi bi-box-arrow-up-right text-muted small ml-1"></i>
+                                    </a>
+                                </td>
+                                <td class="text-right">
+                                    <span class="badge badge-light border font-weight-bold px-2">{{ tp.view_count }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-muted text-center py-3 small">No page views recorded yet in this range.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-bottom py-2 d-flex align-items-center justify-content-between">
+                <h6 class="mb-0 font-weight-bold"><i class="bi bi-signpost-split-fill text-primary mr-1"></i> Traffic Sources & Referrers</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Referrer Source</th>
+                                <th class="text-right" style="width: 100px;">Visitors</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tr in top_referrers %}
+                            <tr>
+                                <td class="text-truncate" style="max-width: 320px;">
+                                    <span class="small text-muted">{{ tr.referrer|truncatechars:50 }}</span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="badge badge-light border font-weight-bold px-2">{{ tr.ref_count }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-muted text-center py-3 small">Most visitors came directly or via search engines.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Table Card -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap align-items-center justify-content-between">
+        <div class="d-flex align-items-center mb-2 mb-md-0">
+            <span class="mr-2 text-primary"><i class="bi bi-person-lines-fill"></i></span>
+            <h5 class="mb-0 font-weight-bold">Live Visitor Logs Stream</h5>
+        </div>
+        
+        <div class="d-flex align-items-center">
+            <!-- Clear Logs Modal Trigger -->
+            <button type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#clearOldModal">
+                <i class="bi bi-trash mr-1"></i> Clean Old Logs
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-3">
+        <!-- Filter Bar -->
+        <form method="get" class="row g-2 mb-3 align-items-center">
+            <!-- Range Filter -->
+            <div class="col-md-3 col-sm-6 mb-2">
+                <select name="range" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="today" {% if range_filter == 'today' %}selected{% endif %}>Range: Today</option>
+                    <option value="24h" {% if range_filter == '24h' %}selected{% endif %}>Range: Last 24 Hours</option>
+                    <option value="7d" {% if range_filter == '7d' %}selected{% endif %}>Range: Last 7 Days</option>
+                    <option value="30d" {% if range_filter == '30d' %}selected{% endif %}>Range: Last 30 Days</option>
+                    <option value="all" {% if range_filter == 'all' %}selected{% endif %}>Range: All Time</option>
+                </select>
+            </div>
+
+            <!-- Device Filter -->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <select name="device" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="all" {% if device_filter == 'all' %}selected{% endif %}>Device: All</option>
+                    <option value="Mobile" {% if device_filter == 'Mobile' %}selected{% endif %}>Device: Mobile</option>
+                    <option value="Desktop" {% if device_filter == 'Desktop' %}selected{% endif %}>Device: Desktop</option>
+                    <option value="Tablet" {% if device_filter == 'Tablet' %}selected{% endif %}>Device: Tablet</option>
+                </select>
+            </div>
+
+            <!-- Bot Filter -->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <select name="bot" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="real" {% if bot_filter == 'real' %}selected{% endif %}>Real Users Only</option>
+                    <option value="bot" {% if bot_filter == 'bot' %}selected{% endif %}>Bots / Crawlers</option>
+                    <option value="all" {% if bot_filter == 'all' %}selected{% endif %}>All Traffic</option>
+                </select>
+            </div>
+
+            <!-- Search query -->
+            <div class="col-md-4 col-sm-6 mb-2">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="q" class="form-control" placeholder="Search IP, Path, Browser, OS, Country..." value="{{ q }}">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                        {% if q or device_filter != 'all' or bot_filter != 'real' or range_filter != '7d' %}
+                        <a href="{% url 'dashboard:visitor_logs' %}" class="btn btn-outline-secondary" title="Reset Filters"><i class="bi bi-x-lg"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Logs Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size: 0.88rem;">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width: 150px;">Time</th>
+                        <th style="width: 170px;">Visitor IP</th>
+                        <th>Visited Page</th>
+                        <th style="width: 160px;">Device &amp; OS</th>
+                        <th style="width: 140px;">Browser</th>
+                        <th style="width: 120px;">Location</th>
+                        <th style="width: 180px;">Referrer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in page_obj %}
+                    <tr>
+                        <td class="text-muted small">
+                            <div class="font-weight-600 text-dark">{{ log.timestamp|date:"M d, Y" }}</div>
+                            <div style="font-size: 0.75rem;">{{ log.timestamp|date:"g:i:s A" }}</div>
+                        </td>
+                        <td>
+                            <div class="font-weight-bold text-dark">
+                                <i class="bi bi-hdd-network text-primary mr-1"></i>{{ log.ip_address }}
+                            </div>
+                            {% if log.is_bot %}
+                            <span class="badge badge-secondary px-1" style="font-size: 0.65rem;">Crawler / Bot</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ log.path }}" target="_blank" class="text-decoration-none font-weight-500 text-primary text-break" title="{{ log.path }}">
+                                {{ log.path|truncatechars:55 }}
+                                <i class="bi bi-box-arrow-up-right ml-1" style="font-size: 0.65rem;"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <div>
+                                {% if log.device_type == 'Mobile' %}
+                                <i class="bi bi-phone text-info mr-1"></i>
+                                {% elif log.device_type == 'Tablet' %}
+                                <i class="bi bi-tablet text-warning mr-1"></i>
+                                {% else %}
+                                <i class="bi bi-laptop text-secondary mr-1"></i>
+                                {% endif %}
+                                <span class="font-weight-600">{{ log.device_type }}</span>
+                            </div>
+                            <small class="text-muted">{{ log.os|default:"Unknown OS" }}</small>
+                        </td>
+                        <td>
+                            <span class="badge badge-light border font-weight-500">
+                                <i class="bi bi-globe2 mr-1 text-muted"></i>{{ log.browser|default:"Other" }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="small font-weight-600">
+                                <i class="bi bi-geo-alt-fill text-danger mr-1" style="font-size: 0.75rem;"></i>
+                                {{ log.country|default:"Nepal" }}
+                            </div>
+                            {% if log.city %}
+                            <div class="small text-muted" style="font-size: 0.75rem;">{{ log.city }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted text-break">
+                            {% if log.referrer %}
+                            <span title="{{ log.referrer }}">
+                                <i class="bi bi-link-45deg mr-1"></i>{{ log.referrer|truncatechars:28 }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted font-italic">Direct visit</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-person-lines-fill fa-3x mb-3 d-block text-muted opacity-50"></i>
+                            <h6 class="font-weight-bold mb-1">No Visitor Logs Found</h6>
+                            <p class="small mb-0">Public visits will be recorded automatically when users browse study notes, blog posts, quizzes, tools, and downloads.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+            <span class="small text-muted">
+                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} logs
+            </span>
+            <ul class="pagination pagination-sm mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&range={{ range_filter }}&device={{ device_filter }}&bot={{ bot_filter }}&q={{ q }}">Previous</a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}&range={{ range_filter }}&device={{ device_filter }}&bot={{ bot_filter }}&q={{ q }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&range={{ range_filter }}&device={{ device_filter }}&bot={{ bot_filter }}&q={{ q }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Clean Old Logs -->
+<div class="modal fade" id="clearOldModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <form method="post" action="{% url 'dashboard:visitor_logs_clear_old' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header bg-danger text-white">
+                <h6 class="modal-title font-weight-bold">
+                    <i class="bi bi-trash-fill mr-1"></i> Clean Old Logs
+                </h6>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted mb-3">Maintain database performance by deleting historical visitor records older than:</p>
+                <div class="form-group mb-0">
+                    <select name="days" class="form-control form-control-sm">
+                        <option value="30">Older than 30 days (Recommended)</option>
+                        <option value="60">Older than 60 days</option>
+                        <option value="90">Older than 90 days</option>
+                        <option value="7">Older than 7 days</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-sm btn-danger">Confirm Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

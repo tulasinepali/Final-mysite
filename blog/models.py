@@ -75,3 +75,25 @@ class BlogPost(models.Model):
             except Exception:
                 pass
 
+
+class Comment(models.Model):
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='comments')
+    name = models.CharField(max_length=120)
+    email = models.EmailField()
+    content = models.TextField(max_length=1200)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    is_approved = models.BooleanField(default=True, help_text="Approved comments are visible on the blog post.")
+    is_author_reply = models.BooleanField(default=False, help_text="Mark if this comment is from the author.")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Blog Comment'
+        verbose_name_plural = 'Blog Comments'
+
+    def __str__(self):
+        return f"Comment by {self.name} on {self.post.title}"
+
+

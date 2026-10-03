@@ -355,6 +355,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{% url 'dashboard:comments' %}" class="nav-link {% if active_page == 'comments' %}active{% endif %}">
+                            <span class="nav-icon"><i class="bi bi-chat-square-text-fill"></i></span>
+                            <p>Blog Comments</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{% url 'dashboard:downloads' %}" class="nav-link {% if active_page == 'downloads' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-download"></i></span>
                             <p>Resource Downloads</p>
@@ -471,6 +477,13 @@
                             <span class="nav-icon"><i class="bi bi-shield-lock-fill"></i></span>
                             <p>Django Admin</p>
                             <i class="bi bi-box-arrow-up-right ml-auto text-muted" style="font-size: 0.65rem;"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:visitor_logs' %}" class="nav-link {% if active_page == 'visitor_logs' %}active{% endif %}">
+                            <span class="nav-icon"><i class="bi bi-person-lines-fill"></i></span>
+                            <p>Visitor Logs</p>
+                            <span class="badge badge-soft-primary">Live</span>
                         </a>
                     </li>
                 </ul>

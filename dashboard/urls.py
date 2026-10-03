@@ -109,4 +109,14 @@ urlpatterns = [
     path('patro/events/<int:pk>/toggle-holiday/', views.patro_event_toggle_holiday, name='patro_event_toggle_holiday'),
     path('patro/events/import/', views.patro_event_import, name='patro_event_import'),
     path('patro/events/sample-csv/', views.patro_event_sample_csv, name='patro_event_sample_csv'),
+
+    # Blog Comments
+    path('comments/', views.dashboard_comments, name='comments'),
+    path('comments/<int:pk>/toggle-approve/', views.comment_toggle_approve, name='comment_toggle_approve'),
+    path('comments/<int:pk>/delete/', views.comment_delete, name='comment_delete'),
+    path('comments/<int:pk>/reply/', views.comment_reply, name='comment_reply'),
+
+    # Visitor Logs
+    path('visitors/', views.dashboard_visitor_logs, name='visitor_logs'),
+    path('visitors/clear-old/', views.visitor_logs_clear_old, name='visitor_logs_clear_old'),
 ]

@@ -248,3 +248,30 @@ class VisitorCount(models.Model):
             return obj.count
         return cls.objects.get(pk=1).count
 
+
+class VisitorLog(models.Model):
+    """Detailed log of each visitor page view"""
+    ip_address = models.CharField(max_length=50, db_index=True)
+    path = models.CharField(max_length=500)
+    method = models.CharField(max_length=10, default='GET')
+    referrer = models.CharField(max_length=500, blank=True, null=True)
+    user_agent = models.TextField(blank=True, null=True)
+    device_type = models.CharField(max_length=30, default='Desktop')  # Mobile, Tablet, Desktop
+    browser = models.CharField(max_length=50, blank=True, null=True)
+    os = models.CharField(max_length=50, blank=True, null=True)
+    country = models.CharField(max_length=60, default='Nepal')
+    city = models.CharField(max_length=60, blank=True, null=True)
+    isp = models.CharField(max_length=100, blank=True, null=True)
+    session_key = models.CharField(max_length=60, blank=True, null=True, db_index=True)
+    is_bot = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = 'Visitor Log'
+        verbose_name_plural = 'Visitor Logs'
+
+    def __str__(self):
+        return f"{self.ip_address} visited {self.path} ({self.device_type}) at {self.timestamp}"
+
+

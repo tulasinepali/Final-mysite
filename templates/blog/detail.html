@@ -199,6 +199,165 @@
                     </div>
                 </article>
 
+                <!-- =======================================================
+                     Reader Comments & Discussion Section (Directly under blog)
+                     ======================================================= -->
+                <section class="mt-5 pt-3" id="comments">
+                    <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3" style="border-color: #e1e7f0 !important;">
+                        <div class="d-flex align-items-center gap-2">
+                            <h2 class="h5 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                                <i class="bi bi-chat-quote-fill me-2" style="color: #0559b7;"></i>Reader Discussion
+                            </h2>
+                            <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">
+                                {{ total_comments_count }} Comment{{ total_comments_count|pluralize }}
+                            </span>
+                        </div>
+                        <a href="#leave-comment" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                            <i class="bi bi-pencil-square me-1"></i>Write Comment
+                        </a>
+                    </div>
+
+                    <!-- List of Approved Comments -->
+                    {% if approved_comments %}
+                    <div class="comment-list mb-5 d-flex flex-column gap-3">
+                        {% for c in approved_comments %}
+                        <div class="card border rounded-4 shadow-sm p-3 p-sm-4 bg-white" id="comment-{{ c.id }}" style="border-color: #e2e8f0 !important;">
+                            <div class="d-flex align-items-start gap-3">
+                                <!-- Avatar -->
+                                <div class="rounded-circle text-white d-flex align-items-center justify-content-center flex-shrink-0 fw-bold shadow-sm" style="width: 44px; height: 44px; font-size: 1rem; background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%);">
+                                    {{ c.name|slice:":1"|upper }}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <h6 class="fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">{{ c.name }}</h6>
+                                            {% if c.is_author_reply %}
+                                            <span class="badge rounded-pill bg-primary text-white small px-2 py-0.5"><i class="bi bi-patch-check-fill me-1"></i>Author</span>
+                                            {% endif %}
+                                        </div>
+                                        <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">
+                                            <i class="bi bi-clock me-1"></i>{{ c.created_at|timesince }} ago
+                                        </small>
+                                    </div>
+                                    <p class="text-secondary mb-2" style="font-family: 'Roboto', sans-serif; line-height: 1.6; font-size: 0.95rem; white-space: pre-line;">{{ c.content }}</p>
+                                    
+                                    <!-- Reply button -->
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-sm btn-link text-decoration-none text-primary p-0 small fw-semibold" onclick="setReplyTo('{{ c.id }}', '{{ c.name|escapejs }}')">
+                                            <i class="bi bi-reply-fill me-1"></i>Reply
+                                        </button>
+                                    </div>
+
+                                    <!-- Nested Author / Reader Replies -->
+                                    {% if c.replies.all %}
+                                    <div class="nested-replies mt-3 pt-3 border-top d-flex flex-column gap-3" style="border-color: #f1f5f9 !important;">
+                                        {% for rep in c.replies.all %}
+                                        {% if rep.is_approved %}
+                                        <div class="p-3 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0 !important;" id="comment-{{ rep.id }}">
+                                            <div class="d-flex align-items-start gap-2">
+                                                <div class="rounded-circle text-white d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem; background: {% if rep.is_author_reply %}#0559b7{% else %}#64748b{% endif %};">
+                                                    {{ rep.name|slice:":1"|upper }}
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                                        <div class="d-flex align-items-center gap-1">
+                                                            <strong class="small text-dark">{{ rep.name }}</strong>
+                                                            {% if rep.is_author_reply %}
+                                                            <span class="badge rounded-pill bg-primary text-white" style="font-size: 0.65rem;"><i class="bi bi-patch-check-fill me-1"></i>Author</span>
+                                                            {% endif %}
+                                                        </div>
+                                                        <small class="text-muted" style="font-size: 0.72rem;">{{ rep.created_at|timesince }} ago</small>
+                                                    </div>
+                                                    <p class="small text-secondary mb-0" style="line-height: 1.5; white-space: pre-line;">{{ rep.content }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- No comments yet prompt -->
+                    <div class="text-center p-4 rounded-4 border bg-white mb-4" style="border-color: #e2e8f0 !important;">
+                        <i class="bi bi-chat-heart text-muted mb-2 d-block" style="font-size: 2.2rem;"></i>
+                        <h3 class="h6 fw-bold text-dark mb-1">Be the First to Share Your Thoughts!</h3>
+                        <p class="text-muted small mb-0">Have a question or insight about this article? Drop a comment below.</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Comment Submission Form Card -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 p-sm-5 bg-white border" id="leave-comment" style="border: 1.5px solid #e2e8f0 !important;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h3 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
+                                <i class="bi bi-pencil-fill me-2 text-primary"></i>Leave a Comment
+                            </h3>
+                            <span class="small text-muted" style="font-size: 0.8rem;">
+                                <i class="bi bi-shield-check me-1 text-success"></i>No login required
+                            </span>
+                        </div>
+                        <p class="text-muted small mb-4">
+                            Your email address will not be published. Required fields are marked *
+                        </p>
+
+                        <!-- Reply indicator (if replying to someone) -->
+                        <div id="replyIndicator" class="alert alert-info py-2 px-3 small d-none align-items-center justify-content-between mb-3">
+                            <span>Replying to <strong id="replyToName"></strong></span>
+                            <button type="button" class="btn-close small" onclick="cancelReply()"></button>
+                        </div>
+
+                        <form method="post" action="#comments">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent_id" id="parentIdInput" value="">
+                            
+                            <!-- Hidden Honeypot for spam bots -->
+                            <div style="display:none !important;" aria-hidden="true">
+                                {{ comment_form.hp_website }}
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold text-dark">Your Name *</label>
+                                    {{ comment_form.name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold text-dark">Your Email *</label>
+                                    {{ comment_form.email }}
+                                    <small class="text-muted" style="font-size: 0.72rem;">Kept private for verification</small>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-semibold text-dark">Your Comment *</label>
+                                {{ comment_form.content }}
+                            </div>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i>Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <script>
+                    function setReplyTo(commentId, authorName) {
+                        document.getElementById('parentIdInput').value = commentId;
+                        document.getElementById('replyToName').textContent = authorName;
+                        const indicator = document.getElementById('replyIndicator');
+                        indicator.classList.remove('d-none');
+                        indicator.classList.add('d-flex');
+                        document.getElementById('leave-comment').scrollIntoView({ behavior: 'smooth' });
+                    }
+                    function cancelReply() {
+                        document.getElementById('parentIdInput').value = '';
+                        const indicator = document.getElementById('replyIndicator');
+                        indicator.classList.add('d-none');
+                        indicator.classList.remove('d-flex');
+                    }
+                </script>
+
                 <!-- Related Articles Grid -->
                 {% if related_posts %}
                 <section class="mt-5">
