@@ -47,6 +47,7 @@ def dashboard_signals(request):
 
     try:
         from django.utils import timezone
+        from django.urls import reverse
         from core.models import ContactMessage, VisitorLog, Subscriber
         from blog.models import Comment
         from quiz.models import QuizFeedback, QuizAttempt
@@ -71,7 +72,7 @@ def dashboard_signals(request):
             recent_signals.append({
                 'title': f'Comment: {c.name}',
                 'desc': f'On "{c.post.title[:32]}..."',
-                'url': '/dashboard/comments/?status=pending',
+                'url': reverse('dashboard:comments') + '?status=pending',
                 'time': c.created_at,
                 'icon': 'bi-chat-left-text-fill',
                 'color': 'warning',
@@ -84,7 +85,7 @@ def dashboard_signals(request):
             recent_signals.append({
                 'title': 'Question Error Report' if is_issue else f'Quiz Review ({fb.rating}★)',
                 'desc': f'"{fb.quiz.title[:32]}..." by {fb.name}',
-                'url': '/dashboard/quizzes/feedbacks/?status=pending',
+                'url': reverse('dashboard:quiz_feedbacks') + '?status=pending',
                 'time': fb.created_at,
                 'icon': 'bi-flag-fill' if is_issue else 'bi-star-fill',
                 'color': 'danger' if is_issue else 'info',
@@ -96,7 +97,7 @@ def dashboard_signals(request):
             recent_signals.append({
                 'title': f'Inquiry: {msg.name}',
                 'desc': msg.subject[:36],
-                'url': f'/dashboard/messages/{msg.pk}/',
+                'url': reverse('dashboard:message_read', kwargs={'pk': msg.pk}),
                 'time': msg.created_at,
                 'icon': 'bi-envelope-fill',
                 'color': 'primary',
@@ -108,7 +109,7 @@ def dashboard_signals(request):
             recent_signals.append({
                 'title': 'Candidate Attempt',
                 'desc': f'{qa.quiz.title[:28]} — Score: {qa.final_score}/{qa.total_questions * 2}',
-                'url': '/dashboard/quizzes/',
+                'url': reverse('dashboard:quizzes'),
                 'time': qa.completed_at,
                 'icon': 'bi-patch-check-fill',
                 'color': 'success',

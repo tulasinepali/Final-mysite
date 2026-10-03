@@ -143,9 +143,9 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication URLs
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_URL = '/rishav/login/'
+LOGIN_REDIRECT_URL = '/rishav/'
+LOGOUT_REDIRECT_URL = '/rishav/login/'
 
 # Site ID
 SITE_ID = 1

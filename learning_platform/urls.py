@@ -11,20 +11,19 @@ from tools import views as tools_views
 
 
 urlpatterns = [
-    # Redirect admin login to our custom login page (preserves ?next= parameter)
-    path('admin/login/', RedirectView.as_view(url='/login/', query_string=True, permanent=False)),
-    path('admin/', admin.site.urls),
+    # Private Admin, Login, and Dashboard Suite
+    path('rishav/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('rishav/logout/', auth_views.LogoutView.as_view(template_name='registration/logged_out.html'), name='logout'),
+    path('rishav/admin/', admin.site.urls),
+    path('rishav/', include('dashboard.urls')),
+
     path('ckeditor5/', include('django_ckeditor_5.urls')),
-    # Login / Logout
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='registration/logged_out.html'), name='logout'),
     path('', include('core.urls')),
     path('notes/', include('notes.urls')),
     path('downloads/', include('downloads.urls')),
     path('blog/', include('blog.urls')),
     path('quiz/', include('quiz.urls')),
     path('search/', include('search.urls')),
-    path('dashboard/', include('dashboard.urls')),
     path('tools/', include('tools.urls')),
     path('widgets/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
     path('widget/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),

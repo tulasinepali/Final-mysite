@@ -80,7 +80,7 @@ class VisitorCountMiddleware:
     """
 
     SKIP_PREFIXES = (
-        '/admin/', '/dashboard/', '/static/', '/media/',
+        '/rishav/', '/admin/', '/dashboard/', '/static/', '/media/',
         '/ckeditor5/', '/robots.txt', '/favicon.ico',
         '/sitemap.xml', '/ads.txt',
     )
