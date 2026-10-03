@@ -375,6 +375,12 @@
                             <p>MCQ Quizzes</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:quiz_feedbacks' %}" class="nav-link {% if active_page == 'quiz_feedbacks' %}active{% endif %}">
+                            <span class="nav-icon"><i class="bi bi-star-half"></i></span>
+                            <p>Quiz Feedbacks</p>
+                        </a>
+                    </li>
 
                     <!-- TAXONOMY & ADS SECTION -->
                     <li class="nav-header">STRUCTURE &amp; MONETIZATION</li>

@@ -208,7 +208,12 @@
                         </span>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="badge rounded-pill bg-light text-muted border px-2 py-1 small" style="font-family: 'Poppins', sans-serif;">Question {{ forloop.counter }}</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge rounded-pill bg-light text-muted border px-2 py-1 small" style="font-family: 'Poppins', sans-serif;">Question {{ forloop.counter }}</span>
+                                    <button type="button" class="btn btn-sm btn-link text-muted p-0 text-decoration-none" style="font-size: 0.72rem;" onclick="openQuestionReportModal('{{ question.id }}', 'Question {{ forloop.counter }}: {{ question.question_text|truncatechars:35|escapejs }}')">
+                                        <i class="bi bi-flag text-danger me-1"></i>Report Issue
+                                    </button>
+                                </div>
                                 {% if user_answer == question.correct_answer %}
                                 <span class="badge rounded-pill px-2 py-1 small fw-semibold" style="background: rgba(25, 135, 84, 0.1); color: #198754; font-family: 'Poppins', sans-serif;">+2.0 Marks</span>
                                 {% elif user_answer %}
@@ -276,6 +281,70 @@
             </div>
         </div>
 
+        <!-- Student Quiz Quality Feedback & Rating Section -->
+        <div class="row justify-content-center my-5">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white" style="border: 1px solid #e1e7f0 !important;">
+                    <div class="text-center mb-4">
+                        <span class="badge rounded-pill px-3 py-1 mb-2" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif;">
+                            <i class="bi bi-chat-heart-fill me-1"></i> Student Experience
+                        </span>
+                        <h3 class="h4 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Rate This Practice Quiz</h3>
+                        <p class="text-muted small mb-0" style="font-family: 'Roboto', sans-serif;">
+                            Your feedback helps instructor Tulasi Nepali refine questions, adjust difficulty, and create better study materials.
+                        </p>
+                    </div>
+
+                    <!-- AJAX Feedback Form -->
+                    <form id="quiz-feedback-form" method="post" action="{% url 'quiz:feedback_submit' quiz.slug %}">
+                        {% csrf_token %}
+                        <!-- Honeypot -->
+                        <div style="display:none !important;" aria-hidden="true">
+                            <input type="text" name="hp_subject" tabindex="-1" autocomplete="off">
+                        </div>
+
+                        <!-- 5 Star Interactive Rating Selector -->
+                        <div class="text-center mb-4">
+                            <div class="d-inline-flex gap-2 p-2 rounded-pill px-4 align-items-center" style="background: #edf2f8;">
+                                <input type="hidden" name="rating" id="rating-val" value="5">
+                                <i class="bi bi-star-fill text-warning fs-3 rating-star" data-val="1" style="cursor: pointer;"></i>
+                                <i class="bi bi-star-fill text-warning fs-3 rating-star" data-val="2" style="cursor: pointer;"></i>
+                                <i class="bi bi-star-fill text-warning fs-3 rating-star" data-val="3" style="cursor: pointer;"></i>
+                                <i class="bi bi-star-fill text-warning fs-3 rating-star" data-val="4" style="cursor: pointer;"></i>
+                                <i class="bi bi-star-fill text-warning fs-3 rating-star" data-val="5" style="cursor: pointer;"></i>
+                            </div>
+                            <div id="rating-label" class="small text-muted mt-2 fw-semibold">Excellent Practice (5/5 Stars)</div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">Your Name (Optional)</label>
+                                <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Ramesh or Anonymous">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">Feedback Category</label>
+                                <select name="feedback_type" class="form-select rounded-3">
+                                    <option value="general">Overall Review &amp; Rating</option>
+                                    <option value="difficulty">Difficulty Level Feedback</option>
+                                    <option value="suggestion">Topic / Question Suggestion</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-dark">Your Feedback &amp; Suggestions <span class="text-danger">*</span></label>
+                                <textarea name="message" class="form-control rounded-3" rows="3" placeholder="Share your experience, what questions helped most, or any suggestions for the instructor..." required></textarea>
+                            </div>
+                            <div class="col-12 text-center mt-3">
+                                <button type="submit" id="feedback-submit-btn" class="btn btn-primary rounded-pill px-5 fw-semibold shadow-sm" style="background: #0559b7; border-color: #0559b7;">
+                                    <i class="bi bi-send-fill me-1"></i> Submit Feedback
+                                </button>
+                                <div id="feedback-alert" class="mt-3 small" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Action Strip -->
         <div class="d-flex flex-wrap gap-3 justify-content-center my-5">
             <a href="{{ quiz.get_absolute_url }}" class="btn btn-explore btn-lg rounded-pill px-5 shadow-sm" style="font-family: 'Poppins', sans-serif;">
@@ -287,11 +356,64 @@
         </div>
     </div>
 </section>
+
+<!-- Question Issue Report Modal -->
+<div class="modal fade" id="questionReportModal" tabindex="-1" aria-labelledby="questionReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="question-report-form" method="post" action="{% url 'quiz:feedback_submit' quiz.slug %}" class="modal-content rounded-4 border-0 shadow">
+            {% csrf_token %}
+            <input type="hidden" name="question_id" id="report-question-id" value="">
+            <input type="hidden" name="feedback_type" value="question_error">
+            <input type="hidden" name="rating" value="3">
+            <div style="display:none !important;" aria-hidden="true">
+                <input type="text" name="hp_subject" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="modal-header border-bottom py-3">
+                <h5 class="modal-title fs-6 fw-bold text-dark d-flex align-items-center" id="questionReportModalLabel">
+                    <i class="bi bi-flag-fill text-danger me-2"></i> Report Question Issue
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="p-3 mb-3 rounded-3 small text-muted" style="background: #edf2f8; border-left: 4px solid #0559b7;">
+                    <div class="fw-bold text-dark" id="report-question-label">Question</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-dark">Issue Type</label>
+                    <select name="issue_reason" id="issue-reason" class="form-select rounded-3 small">
+                        <option value="Wrong Answer Key">The marked correct answer seems wrong</option>
+                        <option value="Typo / Spelling Error">Typo or spelling error in question/options</option>
+                        <option value="Unclear Explanation">Explanation is missing or confusing</option>
+                        <option value="Outdated Information">Question or answer is outdated</option>
+                        <option value="Other">Other issue</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-dark">Details or Suggested Correction <span class="text-danger">*</span></label>
+                    <textarea name="message" id="report-message" class="form-control rounded-3 small" rows="3" placeholder="Explain the error or suggest the correct answer..." required></textarea>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label small fw-semibold text-dark">Your Name (Optional)</label>
+                    <input type="text" name="name" class="form-control rounded-3 small" placeholder="Anonymous Student">
+                </div>
+                <div id="report-alert" class="mt-3 small" style="display: none;"></div>
+            </div>
+            <div class="modal-footer border-top py-2 px-4 d-flex justify-content-between">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" id="report-submit-btn" class="btn btn-sm btn-danger rounded-pill px-4 fw-semibold">
+                    <i class="bi bi-send-fill me-1"></i> Submit Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Copy score summary
     var copyBtn = document.getElementById('copy-score-btn');
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
@@ -305,6 +427,145 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Star rating selection
+    var ratingVal = document.getElementById('rating-val');
+    var ratingLabel = document.getElementById('rating-label');
+    var stars = document.querySelectorAll('.rating-star');
+    var starLabels = {
+        1: "Needs Improvement (1/5 Stars)",
+        2: "Fair Practice (2/5 Stars)",
+        3: "Good Practice (3/5 Stars)",
+        4: "Very Helpful (4/5 Stars)",
+        5: "Excellent Practice (5/5 Stars)"
+    };
+
+    stars.forEach(function(star) {
+        star.addEventListener('click', function() {
+            var val = parseInt(this.getAttribute('data-val'));
+            ratingVal.value = val;
+            ratingLabel.textContent = starLabels[val] || (val + "/5 Stars");
+            stars.forEach(function(s) {
+                var sVal = parseInt(s.getAttribute('data-val'));
+                if (sVal <= val) {
+                    s.classList.remove('bi-star');
+                    s.classList.add('bi-star-fill', 'text-warning');
+                } else {
+                    s.classList.remove('bi-star-fill', 'text-warning');
+                    s.classList.add('bi-star');
+                }
+            });
+        });
+    });
+
+    // AJAX Feedback Form
+    var feedbackForm = document.getElementById('quiz-feedback-form');
+    var feedbackAlert = document.getElementById('feedback-alert');
+    var feedbackBtn = document.getElementById('feedback-submit-btn');
+
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            feedbackBtn.disabled = true;
+            feedbackBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Submitting...';
+
+            var formData = new FormData(feedbackForm);
+
+            fetch(feedbackForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                feedbackAlert.style.display = 'block';
+                if (data.status === 'ok') {
+                    feedbackAlert.className = 'mt-3 small alert alert-success py-2 rounded-3 text-center';
+                    feedbackAlert.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ' + data.message;
+                    feedbackForm.reset();
+                    feedbackBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Submitted!';
+                } else {
+                    feedbackAlert.className = 'mt-3 small alert alert-danger py-2 rounded-3 text-center';
+                    feedbackAlert.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> ' + (data.message || 'Error submitting feedback.');
+                    feedbackBtn.disabled = false;
+                    feedbackBtn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Submit Feedback';
+                }
+            })
+            .catch(function(err) {
+                feedbackAlert.style.display = 'block';
+                feedbackAlert.className = 'mt-3 small alert alert-danger py-2 rounded-3 text-center';
+                feedbackAlert.innerHTML = 'An unexpected error occurred. Please try again.';
+                feedbackBtn.disabled = false;
+                feedbackBtn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Submit Feedback';
+            });
+        });
+    }
+
+    // AJAX Question Issue Report Form
+    var reportForm = document.getElementById('question-report-form');
+    var reportAlert = document.getElementById('report-alert');
+    var reportBtn = document.getElementById('report-submit-btn');
+
+    if (reportForm) {
+        reportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            reportBtn.disabled = true;
+            reportBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Sending...';
+
+            var formData = new FormData(reportForm);
+            var reason = document.getElementById('issue-reason').value;
+            var currentMsg = formData.get('message') || '';
+            formData.set('message', '[' + reason + '] ' + currentMsg);
+
+            fetch(reportForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                reportAlert.style.display = 'block';
+                if (data.status === 'ok') {
+                    reportAlert.className = 'mt-3 small alert alert-success py-2 rounded-3 text-center';
+                    reportAlert.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ' + data.message;
+                    setTimeout(function() {
+                        var modalEl = document.getElementById('questionReportModal');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        reportForm.reset();
+                        reportAlert.style.display = 'none';
+                        reportBtn.disabled = false;
+                        reportBtn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Submit Report';
+                    }, 1800);
+                } else {
+                    reportAlert.className = 'mt-3 small alert alert-danger py-2 rounded-3 text-center';
+                    reportAlert.innerHTML = (data.message || 'Error submitting report.');
+                    reportBtn.disabled = false;
+                    reportBtn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Submit Report';
+                }
+            })
+            .catch(function(err) {
+                reportAlert.style.display = 'block';
+                reportAlert.className = 'mt-3 small alert alert-danger py-2 rounded-3 text-center';
+                reportAlert.innerHTML = 'An unexpected error occurred.';
+                reportBtn.disabled = false;
+                reportBtn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Submit Report';
+            });
+        });
+    }
 });
+
+function openQuestionReportModal(questionId, questionLabel) {
+    document.getElementById('report-question-id').value = questionId;
+    document.getElementById('report-question-label').textContent = questionLabel;
+    var modalEl = document.getElementById('questionReportModal');
+    var modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
 </script>
 {% endblock %}
+

@@ -1,9 +1,12 @@
 import json
 import random
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.http import JsonResponse
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
-from .models import Quiz, Question, QuizAttempt
+from .models import Quiz, Question, QuizAttempt, QuizFeedback
 from core.models import Category
 
 def quiz_list(request):
@@ -152,3 +155,63 @@ def quiz_leaderboard(request, slug):
         'meta_title': f'Leaderboard - {quiz.title}',
     }
     return render(request, 'quiz/leaderboard.html', context)
+
+
+def quiz_feedback_submit(request, slug):
+    quiz = get_object_or_404(Quiz, slug=slug, is_published=True)
+    if request.method == 'POST':
+        # Honeypot spam trap
+        honeypot = request.POST.get('hp_subject', '').strip()
+        if honeypot:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'ok', 'message': 'Thank you for your feedback!'})
+            return redirect('quiz:detail', slug=slug)
+
+        name = request.POST.get('name', '').strip() or 'Student / Visitor'
+        feedback_type = request.POST.get('feedback_type', 'general')
+        message = request.POST.get('message', '').strip()
+        question_id = request.POST.get('question_id')
+
+        try:
+            rating = int(request.POST.get('rating', 5))
+            if rating < 1 or rating > 5:
+                rating = 5
+        except (ValueError, TypeError):
+            rating = 5
+
+        question_obj = None
+        if question_id:
+            try:
+                question_obj = Question.objects.get(pk=int(question_id), quiz=quiz)
+            except (Question.DoesNotExist, ValueError):
+                pass
+
+        if message:
+            # Client IP
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                ip = x_forwarded_for.split(',')[0].strip()
+            else:
+                ip = request.META.get('REMOTE_ADDR', '')
+
+            QuizFeedback.objects.create(
+                quiz=quiz,
+                question=question_obj,
+                name=name[:120],
+                rating=rating,
+                feedback_type=feedback_type,
+                message=message,
+                ip_address=ip[:50] if ip else None
+            )
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.POST.get('ajax') == '1':
+                return JsonResponse({'status': 'ok', 'message': 'Thank you! Your feedback has been sent to the instructor.'})
+
+            messages.success(request, 'Thank you! Your feedback has been sent to the instructor.')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.POST.get('ajax') == '1':
+                return JsonResponse({'status': 'error', 'message': 'Please provide feedback text before submitting.'}, status=400)
+            messages.error(request, 'Please provide feedback text before submitting.')
+
+    return redirect(request.META.get('HTTP_REFERER') or reverse('quiz:detail', kwargs={'slug': slug}))
+

@@ -8,4 +8,5 @@ urlpatterns = [
     path('<slug:slug>/', views.quiz_detail, name='detail'),
     path('<slug:slug>/result/', views.quiz_result, name='result'),
     path('<slug:slug>/leaderboard/', views.quiz_leaderboard, name='leaderboard'),
+    path('<slug:slug>/feedback/', views.quiz_feedback_submit, name='feedback_submit'),
 ]

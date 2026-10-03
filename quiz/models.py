@@ -135,3 +135,38 @@ class QuizAttempt(models.Model):
         total_marks = self.total_questions * marks_per_question
         effective_score = float(self.final_score) if self.final_score is not None else float(self.score)
         return round((effective_score / total_marks) * 100, 1)
+
+
+class QuizFeedback(models.Model):
+    FEEDBACK_TYPE_CHOICES = [
+        ('general', 'General Review & Rating'),
+        ('question_error', 'Question Error / Typo Report'),
+        ('suggestion', 'Content Suggestion'),
+        ('difficulty', 'Difficulty Feedback'),
+    ]
+
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='feedbacks')
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='issue_reports',
+        help_text='Specific question reported, if applicable'
+    )
+    name = models.CharField(max_length=120, default='Student / Visitor', blank=True)
+    rating = models.PositiveSmallIntegerField(default=5, help_text='Rating 1 to 5 stars')
+    feedback_type = models.CharField(max_length=20, choices=FEEDBACK_TYPE_CHOICES, default='general')
+    message = models.TextField(help_text='Feedback thoughts, review, or issue description')
+    ip_address = models.CharField(max_length=50, blank=True, null=True)
+    is_reviewed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Quiz Feedback'
+        verbose_name_plural = 'Quiz Feedbacks'
+
+    def __str__(self):
+        return f"{self.get_feedback_type_display()} on {self.quiz.title} ({self.rating}★)"
+

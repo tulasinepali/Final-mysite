@@ -39,6 +39,9 @@ urlpatterns = [
     path('quizzes/<int:pk>/toggle-featured/', views.quiz_toggle_featured, name='quiz_toggle_featured'),
     path('quizzes/<int:pk>/toggle-negative-marking/', views.quiz_toggle_negative_marking, name='quiz_toggle_negative_marking'),
     path('quizzes/<int:pk>/questions/', views.quiz_questions, name='quiz_questions'),
+    path('quizzes/feedbacks/', views.dashboard_quiz_feedbacks, name='quiz_feedbacks'),
+    path('quizzes/feedbacks/<int:pk>/toggle-review/', views.quiz_feedback_toggle_review, name='quiz_feedback_toggle_review'),
+    path('quizzes/feedbacks/<int:pk>/delete/', views.quiz_feedback_delete, name='quiz_feedback_delete'),
 
     # Questions (within quiz context)
     path('quizzes/<int:quiz_pk>/questions/create/', views.question_create, name='question_create'),

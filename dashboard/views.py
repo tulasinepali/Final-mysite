@@ -16,7 +16,7 @@ from core.emails import send_broadcast_to_subscribers
 from notes.models import Note
 from blog.models import BlogPost, Comment
 from downloads.models import Download
-from quiz.models import Quiz, Question, QuizAttempt
+from quiz.models import Quiz, Question, QuizAttempt, QuizFeedback
 import csv
 import io
 import json
@@ -1757,6 +1757,87 @@ def visitor_logs_clear_old(request):
         deleted_count, _ = VisitorLog.objects.filter(timestamp__lt=cutoff).delete()
         messages.success(request, f'Cleaned {deleted_count} visitor logs older than {days} days.')
     return redirect('dashboard:visitor_logs')
+
+
+# ========== QUIZ FEEDBACKS & ISSUE REPORTS ==========
+
+@staff_member_required
+def dashboard_quiz_feedbacks(request):
+    type_filter = request.GET.get('type', 'all')
+    status_filter = request.GET.get('status', 'all')
+    quiz_id = request.GET.get('quiz')
+    q = request.GET.get('q', '').strip()
+
+    feedbacks = QuizFeedback.objects.select_related('quiz', 'question').order_by('-created_at')
+
+    if type_filter == 'issues':
+        feedbacks = feedbacks.filter(feedback_type='question_error')
+    elif type_filter == 'reviews':
+        feedbacks = feedbacks.exclude(feedback_type='question_error')
+
+    if status_filter == 'pending':
+        feedbacks = feedbacks.filter(is_reviewed=False)
+    elif status_filter == 'reviewed':
+        feedbacks = feedbacks.filter(is_reviewed=True)
+
+    if quiz_id:
+        feedbacks = feedbacks.filter(quiz_id=quiz_id)
+
+    if q:
+        from django.db.models import Q
+        feedbacks = feedbacks.filter(
+            Q(name__icontains=q) |
+            Q(message__icontains=q) |
+            Q(quiz__title__icontains=q) |
+            Q(question__question_text__icontains=q)
+        )
+
+    # KPIs
+    total_feedbacks = QuizFeedback.objects.count()
+    pending_count = QuizFeedback.objects.filter(is_reviewed=False).count()
+    issue_reports = QuizFeedback.objects.filter(feedback_type='question_error').count()
+    avg_rating = QuizFeedback.objects.exclude(feedback_type='question_error').aggregate(avg=Avg('rating'))['avg'] or 5.0
+    avg_rating = round(avg_rating, 1)
+
+    quizzes_list = Quiz.objects.filter(is_published=True).order_by('title')
+
+    paginator = Paginator(feedbacks, 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj,
+        'type_filter': type_filter,
+        'status_filter': status_filter,
+        'selected_quiz': quiz_id,
+        'q': q,
+        'total_feedbacks': total_feedbacks,
+        'pending_count': pending_count,
+        'issue_reports': issue_reports,
+        'avg_rating': avg_rating,
+        'quizzes_list': quizzes_list,
+        'active_page': 'quiz_feedbacks',
+    }
+    return render(request, 'dashboard/quiz_feedback.html', context)
+
+
+@staff_member_required
+def quiz_feedback_toggle_review(request, pk):
+    fb = get_object_or_404(QuizFeedback, pk=pk)
+    fb.is_reviewed = not fb.is_reviewed
+    fb.save(update_fields=['is_reviewed'])
+    status_str = "marked as Reviewed" if fb.is_reviewed else "marked as Pending"
+    messages.success(request, f'Feedback item {status_str}.')
+    return redirect(request.META.get('HTTP_REFERER') or 'dashboard:quiz_feedbacks')
+
+
+@staff_member_required
+def quiz_feedback_delete(request, pk):
+    fb = get_object_or_404(QuizFeedback, pk=pk)
+    if request.method == 'POST':
+        fb.delete()
+        messages.success(request, 'Feedback item deleted successfully!')
+    return redirect('dashboard:quiz_feedbacks')
+
 
 
 
