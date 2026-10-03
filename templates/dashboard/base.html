@@ -251,21 +251,103 @@
                     </div>
                 </div>
 
-                <!-- Notifications / Analytics -->
+                <!-- Notifications / Live Signals Dropdown -->
                 <div class="dropdown">
-                    <a class="header-action" data-toggle="dropdown" href="#" role="button" title="Analytics & Signals">
-                        <i class="bi bi-bell"></i>
+                    <a class="header-action position-relative" data-toggle="dropdown" href="#" role="button" title="Live Signals & Notifications">
+                        <i class="bi bi-bell{% if total_signals_count %}-fill text-primary{% endif %}"></i>
+                        {% if total_signals_count %}
+                        <span class="header-badge bg-danger text-white border-0">{{ total_signals_count }}</span>
+                        {% endif %}
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" style="min-width: 260px;">
-                        <div class="px-3 py-2 border-bottom">
-                            <span class="font-weight-bold" style="font-size: 0.85rem;">Live Signals</span>
+                    <div class="dropdown-menu dropdown-menu-right shadow-lg border-0 py-0" style="min-width: 320px; max-width: 360px; max-height: 520px; overflow-y: auto; border-radius: 12px;">
+                        <!-- Header -->
+                        <div class="px-3 py-2 bg-light border-bottom d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <span class="spinner-grow spinner-grow-sm text-success mr-2" style="width: 8px; height: 8px;" role="status"></span>
+                                <span class="font-weight-bold text-dark" style="font-size: 0.85rem;">Live Signals</span>
+                            </div>
+                            {% if total_signals_count %}
+                            <span class="badge badge-danger px-2 py-1" style="font-size: 0.7rem;">{{ total_signals_count }} Pending</span>
+                            {% else %}
+                            <span class="badge badge-success px-2 py-1" style="font-size: 0.7rem;">All Caught Up</span>
+                            {% endif %}
                         </div>
-                        <a href="{% url 'dashboard:analytics' %}" class="dropdown-item py-2 d-flex align-items-center">
-                            <i class="bi bi-graph-up mr-2 text-info"></i> Performance Analytics
-                        </a>
-                        <a href="{% url 'dashboard:ads' %}" class="dropdown-item py-2 d-flex align-items-center">
-                            <i class="bi bi-badge-ad mr-2 text-primary"></i> Ad Placements Status
-                        </a>
+
+                        <!-- Active Channel Counters (Click to Redirect) -->
+                        <div class="p-2 border-bottom bg-white">
+                            {% if pending_comments_count %}
+                            <a href="{% url 'dashboard:comments' %}?status=pending" class="dropdown-item py-1 px-2 rounded d-flex align-items-center justify-content-between mb-1" style="background: rgba(255, 193, 7, 0.1);">
+                                <span class="small font-weight-600 text-dark"><i class="bi bi-chat-square-text-fill text-warning mr-2"></i>Blog Comments</span>
+                                <span class="badge badge-warning text-dark font-weight-bold">{{ pending_comments_count }} Pending</span>
+                            </a>
+                            {% endif %}
+
+                            {% if pending_feedbacks_count %}
+                            <a href="{% url 'dashboard:quiz_feedbacks' %}?status=pending" class="dropdown-item py-1 px-2 rounded d-flex align-items-center justify-content-between mb-1" style="background: rgba(220, 53, 69, 0.08);">
+                                <span class="small font-weight-600 text-dark"><i class="bi bi-flag-fill text-danger mr-2"></i>Quiz Issues &amp; Feedbacks</span>
+                                <span class="badge badge-danger font-weight-bold">{{ pending_feedbacks_count }} Action</span>
+                            </a>
+                            {% endif %}
+
+                            {% if unread_messages %}
+                            <a href="{% url 'dashboard:messages' %}?status=unread" class="dropdown-item py-1 px-2 rounded d-flex align-items-center justify-content-between mb-1" style="background: rgba(5, 89, 183, 0.08);">
+                                <span class="small font-weight-600 text-dark"><i class="bi bi-envelope-fill text-primary mr-2"></i>Contact Inquiries</span>
+                                <span class="badge badge-primary font-weight-bold">{{ unread_messages }} Unread</span>
+                            </a>
+                            {% endif %}
+
+                            {% if today_visitors_count %}
+                            <a href="{% url 'dashboard:visitor_logs' %}?range=today" class="dropdown-item py-1 px-2 rounded d-flex align-items-center justify-content-between mb-1" style="background: rgba(23, 162, 184, 0.08);">
+                                <span class="small font-weight-600 text-dark"><i class="bi bi-person-lines-fill text-info mr-2"></i>Today's Live Visitors</span>
+                                <span class="badge badge-info text-white font-weight-bold">{{ today_visitors_count }} Unique</span>
+                            </a>
+                            {% endif %}
+
+                            {% if today_attempts_count %}
+                            <a href="{% url 'dashboard:quizzes' %}" class="dropdown-item py-1 px-2 rounded d-flex align-items-center justify-content-between mb-1" style="background: rgba(40, 167, 69, 0.08);">
+                                <span class="small font-weight-600 text-dark"><i class="bi bi-patch-question-fill text-success mr-2"></i>Candidate Attempts</span>
+                                <span class="badge badge-success font-weight-bold">{{ today_attempts_count }} Today</span>
+                            </a>
+                            {% endif %}
+                        </div>
+
+                        <!-- Recent Individual Live Notification Feed -->
+                        <div class="px-3 pt-2 pb-1 text-muted text-uppercase" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; background: #fdfdfd;">
+                            Recent Live Activity Feed
+                        </div>
+
+                        <div class="signals-list">
+                            {% for sig in recent_signals %}
+                            <a href="{{ sig.url }}" class="dropdown-item py-2 px-3 border-bottom d-flex align-items-start" style="white-space: normal;">
+                                <div class="rounded-circle p-1 mr-2 mt-1 text-{{ sig.color }}" style="background: rgba(0,0,0,0.04); font-size: 0.85rem; line-height: 1;">
+                                    <i class="bi {{ sig.icon }}"></i>
+                                </div>
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <strong style="font-size: 0.78rem;" class="text-dark">{{ sig.title }}</strong>
+                                        <span class="badge badge-light border text-muted" style="font-size: 0.62rem;">{{ sig.badge }}</span>
+                                    </div>
+                                    <div class="text-muted text-truncate" style="font-size: 0.72rem;">{{ sig.desc }}</div>
+                                    <small class="text-muted" style="font-size: 0.65rem;">{{ sig.time|timesince }} ago</small>
+                                </div>
+                            </a>
+                            {% empty %}
+                            <div class="px-3 py-3 text-center text-muted small">
+                                <i class="bi bi-check2-circle text-success mb-1 d-block fa-lg"></i>
+                                No pending items. Platform running smoothly!
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Footer Navigation -->
+                        <div class="p-2 bg-light border-top d-flex justify-content-between align-items-center" style="font-size: 0.75rem;">
+                            <a href="{% url 'dashboard:analytics' %}" class="text-decoration-none text-muted font-weight-bold">
+                                <i class="bi bi-graph-up mr-1 text-primary"></i> Analytics
+                            </a>
+                            <a href="{% url 'dashboard:visitor_logs' %}" class="text-decoration-none text-muted font-weight-bold">
+                                <i class="bi bi-person-lines-fill mr-1 text-info"></i> All Visitor Logs
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -358,6 +440,9 @@
                         <a href="{% url 'dashboard:comments' %}" class="nav-link {% if active_page == 'comments' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-chat-square-text-fill"></i></span>
                             <p>Blog Comments</p>
+                            {% if pending_comments_count %}
+                            <span class="badge badge-warning text-dark ml-auto" style="font-size: 0.72rem;">{{ pending_comments_count }}</span>
+                            {% endif %}
                         </a>
                     </li>
                     <li class="nav-item">
@@ -379,6 +464,9 @@
                         <a href="{% url 'dashboard:quiz_feedbacks' %}" class="nav-link {% if active_page == 'quiz_feedbacks' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-star-half"></i></span>
                             <p>Quiz Feedbacks</p>
+                            {% if pending_feedbacks_count %}
+                            <span class="badge badge-danger ml-auto" style="font-size: 0.72rem;">{{ pending_feedbacks_count }}</span>
+                            {% endif %}
                         </a>
                     </li>
 
@@ -489,7 +577,7 @@
                         <a href="{% url 'dashboard:visitor_logs' %}" class="nav-link {% if active_page == 'visitor_logs' %}active{% endif %}">
                             <span class="nav-icon"><i class="bi bi-person-lines-fill"></i></span>
                             <p>Visitor Logs</p>
-                            <span class="badge badge-soft-primary">Live</span>
+                            <span class="badge badge-soft-primary ml-auto">{% if today_visitors_count %}{{ today_visitors_count }} Today{% else %}Live{% endif %}</span>
                         </a>
                     </li>
                 </ul>

@@ -77,6 +77,7 @@ TEMPLATES = [
                 'core.context_processors.site_settings',
                 'core.context_processors.global_categories',
                 'core.context_processors.ad_placements',
+                'core.context_processors.dashboard_signals',
             ],
         },
     },
