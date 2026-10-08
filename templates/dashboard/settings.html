@@ -121,6 +121,20 @@
                                     {% else %}<span class="text-muted">Not set</span>{% endif %}
                                 </td>
                             </tr>
+                            <tr>
+                                <th>Verification</th>
+                                <td>
+                                    <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i> {{ settings.get_adsense_verification_method_display|default:"AdSense code snippet" }}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ads.txt</th>
+                                <td>
+                                    <a href="/ads.txt" target="_blank" class="text-primary font-weight-bold">
+                                        <i class="fas fa-external-link-alt fa-xs mr-1"></i> /ads.txt (Live)
+                                    </a>
+                                </td>
+                            </tr>
                         </table>
 
                         <h6 class="text-muted text-uppercase mt-3"><i class="fas fa-bullseye mr-1"></i> Mission & Vision</h6>

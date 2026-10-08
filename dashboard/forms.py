@@ -36,6 +36,8 @@ class SiteSettingsForm(forms.ModelForm):
             'vision': CKEditor5Widget(config_name='default'),
             'address': forms.Textarea(attrs={'rows': 2}),
             'email_host_password': forms.PasswordInput(render_value=True, attrs={'placeholder': '••••••••••••••••'}),
+            'ads_txt_content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0'}),
+            'adsense_verification_method': forms.RadioSelect(),
         }
 
 

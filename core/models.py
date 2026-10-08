@@ -40,7 +40,27 @@ class SiteSettings(models.Model):
     youtube_url = models.URLField(blank=True)
     instagram_url = models.URLField(blank=True)
     google_analytics_id = models.CharField(max_length=50, blank=True)
-    adsense_client_id = models.CharField(max_length=100, blank=True)
+    adsense_client_id = models.CharField(
+        max_length=100,
+        blank=True,
+        default='ca-pub-3956705237421931',
+        help_text='Google AdSense Publisher ID (e.g. ca-pub-3956705237421931)'
+    )
+    adsense_verification_method = models.CharField(
+        max_length=50,
+        default='code',
+        choices=[
+            ('code', 'AdSense code snippet'),
+            ('adstxt', 'Ads.txt snippet'),
+            ('meta', 'Meta tag'),
+        ],
+        help_text='AdSense verification method for your site'
+    )
+    ads_txt_content = models.TextField(
+        blank=True,
+        default='google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0',
+        help_text='Content for /ads.txt file (Google AdSense and authorized digital sellers)'
+    )
     
     # Web Push Notification Settings
     enable_web_push = models.BooleanField(

@@ -148,6 +148,7 @@ Allow: /privacy-policy/
 Allow: /terms-conditions/
 Allow: /disclaimer/
 Allow: /sitemap.html
+Allow: /ads.txt
 
 # Block admin, login, and internal pages from crawlers
 Disallow: /admin/
@@ -161,6 +162,20 @@ Disallow: /media/site/
 Sitemap: https://tulasinepali.com.np/sitemap.xml
 """
     return HttpResponse(content, content_type='text/plain')
+
+
+def ads_txt(request):
+    """Serve /ads.txt dynamically from SiteSettings or fallback to default publisher snippet."""
+    from django.http import HttpResponse
+    try:
+        s = SiteSettings.objects.first()
+        if s and s.ads_txt_content:
+            content = s.ads_txt_content.strip()
+        else:
+            content = "google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0"
+    except Exception:
+        content = "google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0"
+    return HttpResponse(content + "\n", content_type='text/plain; charset=utf-8')
 
 
 def favicon_view(request):

@@ -32,13 +32,7 @@ urlpatterns = [
     path('favicon.ico', core_views.favicon_view, name='favicon'),
     path('health/', core_views.health_check, name='health_check'),
     path('up/', core_views.health_check, name='up'),
-    path(
-        "ads.txt",
-        TemplateView.as_view(
-            template_name="ads.txt",
-            content_type="text/plain"
-        ),
-    ),
+    path('ads.txt', core_views.ads_txt, name='ads_txt'),
 ]
 
 if settings.DEBUG:

@@ -408,25 +408,186 @@
                                 <small class="form-text text-muted">Enter your Google Analytics tracking ID.</small>
                             </div>
 
-                            <div class="form-group {% if form.adsense_client_id.errors %}has-error{% endif %}">
-                                <label for="{{ form.adsense_client_id.id_for_label }}"><i class="fab fa-google mr-1"></i> AdSense Client ID</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-ad"></i></span>
+                            <!-- Google AdSense Verification & Integration Card -->
+                            <div class="card card-outline card-primary shadow-sm mt-4 mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0 font-weight-bold text-primary">
+                                        <i class="fab fa-google mr-1 text-warning"></i> Google AdSense Verification &amp; Integration
+                                    </h5>
+                                    <div class="card-tools">
+                                        <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> 3 Methods Supported</span>
                                     </div>
-                                    {{ form.adsense_client_id|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:ca-pub-XXXXXXXXXXXXXXXX' }}
                                 </div>
-                                {% if form.adsense_client_id.errors %}
-                                {% for error in form.adsense_client_id.errors %}
-                                <span class="error invalid-feedback d-block">{{ error }}</span>
-                                {% endfor %}
-                                {% endif %}
-                                <small class="form-text text-muted">Enter your Google AdSense publisher ID.</small>
+                                <div class="card-body">
+                                    <p class="text-muted mb-3">
+                                        Manage your AdSense Publisher ID and verify site ownership using any of the 3 official Google AdSense verification methods.
+                                    </p>
+
+                                    <!-- AdSense Publisher ID Input -->
+                                    <div class="form-group {% if form.adsense_client_id.errors %}has-error{% endif %}">
+                                        <label for="{{ form.adsense_client_id.id_for_label }}" class="font-weight-bold">
+                                            <i class="fas fa-id-badge text-secondary mr-1"></i> Your AdSense Publisher ID (Client ID)
+                                        </label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text font-monospace bg-light">client=</span>
+                                            </div>
+                                            {{ form.adsense_client_id|add_class:'form-control font-monospace font-weight-bold'|add_error_class:'is-invalid'|attr:'placeholder:ca-pub-3956705237421931' }}
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="copyRawText(document.getElementById('{{ form.adsense_client_id.id_for_label }}').value || 'ca-pub-3956705237421931', 'Publisher ID')">
+                                                    <i class="fas fa-copy mr-1"></i> Copy ID
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {% if form.adsense_client_id.errors %}
+                                        {% for error in form.adsense_client_id.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <small class="form-text text-muted">Example: <code>ca-pub-3956705237421931</code> (Account ID: <code>pub-3956705237421931</code>)</small>
+                                    </div>
+
+                                    <!-- Verification Method Selector Section -->
+                                    <div class="border rounded p-3 bg-light mt-4">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <h6 class="font-weight-bold text-dark mb-0">
+                                                <i class="fas fa-shield-alt text-primary mr-1"></i> Select verification method:
+                                            </h6>
+                                            <span class="badge badge-info"><i class="fas fa-layer-group mr-1"></i> Choose any method</span>
+                                        </div>
+                                        <p class="text-muted small mb-3">
+                                            Select which verification method you want to inspect or manage below:
+                                        </p>
+
+                                        <!-- Selector Buttons / Radio Cards -->
+                                        <div class="row mb-3">
+                                            <div class="col-md-4 mb-2">
+                                                <div class="custom-control custom-radio card-verification-option p-3 border rounded bg-white shadow-sm h-100" style="cursor: pointer;" onclick="selectVerificationMethod('code')">
+                                                    <input type="radio" id="method_code_radio" name="adsense_verification_method" value="code" class="custom-control-input" {% if form.instance.adsense_verification_method == 'code' or not form.instance.adsense_verification_method %}checked{% endif %}>
+                                                    <label class="custom-control-label font-weight-bold w-100 text-left" style="cursor: pointer;" for="method_code_radio">
+                                                        <i class="fas fa-code text-primary mr-1"></i> AdSense code snippet
+                                                        <small class="d-block text-muted font-weight-normal mt-1">&lt;script&gt; code between &lt;head&gt; tags</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <div class="custom-control custom-radio card-verification-option p-3 border rounded bg-white shadow-sm h-100" style="cursor: pointer;" onclick="selectVerificationMethod('adstxt')">
+                                                    <input type="radio" id="method_adstxt_radio" name="adsense_verification_method" value="adstxt" class="custom-control-input" {% if form.instance.adsense_verification_method == 'adstxt' %}checked{% endif %}>
+                                                    <label class="custom-control-label font-weight-bold w-100 text-left" style="cursor: pointer;" for="method_adstxt_radio">
+                                                        <i class="fas fa-file-alt text-success mr-1"></i> Ads.txt snippet
+                                                        <small class="d-block text-muted font-weight-normal mt-1">Authorized digital sellers file</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-2">
+                                                <div class="custom-control custom-radio card-verification-option p-3 border rounded bg-white shadow-sm h-100" style="cursor: pointer;" onclick="selectVerificationMethod('meta')">
+                                                    <input type="radio" id="method_meta_radio" name="adsense_verification_method" value="meta" class="custom-control-input" {% if form.instance.adsense_verification_method == 'meta' %}checked{% endif %}>
+                                                    <label class="custom-control-label font-weight-bold w-100 text-left" style="cursor: pointer;" for="method_meta_radio">
+                                                        <i class="fas fa-tags text-info mr-1"></i> Meta tag
+                                                        <small class="d-block text-muted font-weight-normal mt-1">&lt;meta&gt; tag in &lt;head&gt; section</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Panel 1: AdSense code snippet -->
+                                        <div id="panel_verification_code" class="verification-panel p-3 bg-white border rounded">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="font-weight-bold text-primary mb-0">
+                                                    <i class="fas fa-code mr-1"></i> AdSense code snippet
+                                                </h6>
+                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Active in &lt;head&gt;</span>
+                                            </div>
+                                            <p class="text-secondary small mb-2">
+                                                To get your site ready to show ads, copy and paste this code between the <code>&lt;head&gt;&lt;/head&gt;</code> tags on each page of your site.
+                                                <a href="https://support.google.com/adsense/answer/9274634?hl=en_US" target="_blank" rel="noopener noreferrer" class="font-weight-bold text-primary">
+                                                    Learn more about the AdSense code <i class="fas fa-external-link-alt fa-xs"></i>
+                                                </a>
+                                            </p>
+                                            <div class="font-weight-bold text-dark small mb-1">Your AdSense code:</div>
+                                            <div class="position-relative bg-dark text-light p-3 rounded font-monospace small mb-3" style="background-color: #1e1e2f !important;">
+                                                <button type="button" class="btn btn-sm btn-outline-light position-absolute" style="top: 8px; right: 8px;" onclick="copyElementText('adsense_code_display', 'AdSense Code Snippet')">
+                                                    <i class="fas fa-copy mr-1"></i> Copy Snippet
+                                                </button>
+                                                <pre class="m-0 text-success" id="adsense_code_display" style="white-space: pre-wrap; word-break: break-all;"><code>&lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ form.instance.adsense_client_id|default:'ca-pub-3956705237421931' }}"
+     crossorigin="anonymous"&gt;&lt;/script&gt;</code></pre>
+                                            </div>
+                                            <div class="alert alert-info py-2 px-3 small mb-0">
+                                                <i class="fas fa-check-circle mr-1 text-success"></i> <strong>Live on site:</strong> This script tag is automatically injected into <code>templates/base.html</code> on every page of your site.
+                                            </div>
+                                        </div>
+
+                                        <!-- Panel 2: Ads.txt snippet -->
+                                        <div id="panel_verification_adstxt" class="verification-panel p-3 bg-white border rounded" style="display: none;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="font-weight-bold text-success mb-0">
+                                                    <i class="fas fa-file-alt mr-1"></i> Ads.txt snippet
+                                                </h6>
+                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Live at /ads.txt</span>
+                                            </div>
+                                            <p class="text-secondary small mb-2">
+                                                Add this snippet to your <code>ads.txt</code> file in your root domain. Google uses this to verify domain ownership and confirm authorized ad sellers.
+                                            </p>
+                                            <div class="font-weight-bold text-dark small mb-1">Your Ads.txt snippet:</div>
+                                            <div class="position-relative bg-dark text-light p-3 rounded font-monospace small mb-3" style="background-color: #1e1e2f !important;">
+                                                <button type="button" class="btn btn-sm btn-outline-light position-absolute" style="top: 8px; right: 8px;" onclick="copyElementText('adstxt_code_display', 'Ads.txt Snippet')">
+                                                    <i class="fas fa-copy mr-1"></i> Copy Snippet
+                                                </button>
+                                                <pre class="m-0 text-warning" id="adstxt_code_display" style="white-space: pre-wrap;"><code>google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0</code></pre>
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label for="{{ form.ads_txt_content.id_for_label }}" class="font-weight-bold small text-dark">
+                                                    <i class="fas fa-edit mr-1"></i> Manage Live /ads.txt Content
+                                                </label>
+                                                {{ form.ads_txt_content|add_class:'form-control font-monospace small'|attr:'rows:3' }}
+                                                <small class="form-text text-muted">You can edit this or add partner seller records here. Changes are immediately saved and served dynamically at <code>/ads.txt</code>.</small>
+                                            </div>
+
+                                            <div class="d-flex align-items-center justify-content-between mt-3 pt-2 border-top">
+                                                <span class="small text-muted"><i class="fas fa-globe mr-1 text-primary"></i> Live URL: <code>https://tulasinepali.com.np/ads.txt</code></span>
+                                                <a href="/ads.txt" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-external-link-alt mr-1"></i> View Live ads.txt
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Panel 3: Meta tag -->
+                                        <div id="panel_verification_meta" class="verification-panel p-3 bg-white border rounded" style="display: none;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="font-weight-bold text-info mb-0">
+                                                    <i class="fas fa-tags mr-1"></i> Meta tag
+                                                </h6>
+                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Active in &lt;head&gt;</span>
+                                            </div>
+                                            <p class="text-secondary small mb-2">
+                                                Copy and paste this meta tag into your site's HTML head between <code>&lt;head&gt;&lt;/head&gt;</code> tags.
+                                            </p>
+                                            <div class="font-weight-bold text-dark small mb-1">Your Meta tag:</div>
+                                            <div class="position-relative bg-dark text-light p-3 rounded font-monospace small mb-3" style="background-color: #1e1e2f !important;">
+                                                <button type="button" class="btn btn-sm btn-outline-light position-absolute" style="top: 8px; right: 8px;" onclick="copyElementText('meta_tag_code_display', 'Meta Tag Snippet')">
+                                                    <i class="fas fa-copy mr-1"></i> Copy Snippet
+                                                </button>
+                                                <pre class="m-0 text-info" id="meta_tag_code_display" style="white-space: pre-wrap;"><code>&lt;meta name="google-adsense-account" content="{{ form.instance.adsense_client_id|default:'ca-pub-3956705237421931' }}"&gt;</code></pre>
+                                            </div>
+                                            <div class="alert alert-info py-2 px-3 small mb-0">
+                                                <i class="fas fa-check-circle mr-1 text-success"></i> <strong>Live on site:</strong> This meta tag is active in <code>templates/base.html</code> on every page of your site.
+                                            </div>
+                                        </div>
+
+                                        <!-- Crawler Help Note -->
+                                        <div class="alert alert-light border mt-3 mb-0 small">
+                                            <i class="fas fa-info-circle text-primary mr-1"></i>
+                                            <strong>Why did Google report "Getting ready — Not found"?</strong>
+                                            All 3 verification snippets above are active in your code. The temporary "Not found" status happens when Googlebot encounters an anti-bot JavaScript waiting challenge screen ("One moment, please..."). Ensure your cPanel / hosting firewall (OpenResty WebShield / cPGuard / Imunify360) whitelists Googlebot and Mediapartners-Google so Google can reach your site immediately.
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Any extra fields not in defined sections -->
                             {% for field in form %}
-                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_title,owner_tagline,owner_experience,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog,sender_email,email_host,email_port,email_host_user,email_host_password,email_use_tls,auto_email_on_quiz,auto_email_on_note,auto_email_on_blog,auto_email_on_download' %}
+                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_title,owner_tagline,owner_experience,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,adsense_verification_method,ads_txt_content,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog,sender_email,email_host,email_port,email_host_user,email_host_password,email_use_tls,auto_email_on_quiz,auto_email_on_note,auto_email_on_blog,auto_email_on_download' %}
                                 <div class="form-group">
                                     <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
                                     {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
@@ -756,6 +917,86 @@
             reader.readAsDataURL(this.files[0]);
         }
     });
+
+    // Initialize AdSense verification tab
+    var checkedMethod = $('input[name="adsense_verification_method"]:checked').val() || 'code';
+    if (window.selectVerificationMethod) {
+        window.selectVerificationMethod(checkedMethod);
+    }
 })();
+
+// Google AdSense Verification Method Switcher & Clipboard Helpers
+window.selectVerificationMethod = function(method) {
+    document.querySelectorAll('.verification-panel').forEach(function(el) {
+        el.style.display = 'none';
+    });
+    var target = document.getElementById('panel_verification_' + method);
+    if (target) {
+        target.style.display = 'block';
+    }
+    var radio = document.querySelector('input[name="adsense_verification_method"][value="' + method + '"]');
+    if (radio) {
+        radio.checked = true;
+    }
+    document.querySelectorAll('.card-verification-option').forEach(function(card) {
+        card.classList.remove('border-primary');
+    });
+    if (radio && radio.closest('.card-verification-option')) {
+        radio.closest('.card-verification-option').classList.add('border-primary');
+    }
+};
+
+window.copyElementText = function(elementId, label) {
+    var el = document.getElementById(elementId);
+    if (!el) return;
+    var text = el.innerText || el.textContent;
+    window.copyRawText(text.trim(), label);
+};
+
+window.copyRawText = function(text, label) {
+    if (!text) return;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopyNotification(label);
+        }).catch(function() {
+            fallbackCopyText(text, label);
+        });
+    } else {
+        fallbackCopyText(text, label);
+    }
+};
+
+function fallbackCopyText(text, label) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showCopyNotification(label);
+    } catch (e) {
+        alert('Could not copy text.');
+    }
+    document.body.removeChild(textarea);
+}
+
+function showCopyNotification(label) {
+    var msg = (label || 'Snippet') + ' copied to clipboard!';
+    if (typeof toastr !== 'undefined') {
+        toastr.success(msg);
+    } else if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Copied!',
+            text: msg,
+            timer: 1800,
+            showConfirmButton: false
+        });
+    } else {
+        alert(msg);
+    }
+}
 </script>
 {% endblock %}
