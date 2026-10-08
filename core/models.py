@@ -56,6 +56,28 @@ class SiteSettings(models.Model):
         ],
         help_text='AdSense verification method for your site'
     )
+    enable_adsense_code = models.BooleanField(
+        default=True,
+        help_text='Automatically add AdSense code snippet to <head> on all pages'
+    )
+    adsense_code_snippet = models.TextField(
+        blank=True,
+        default='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3956705237421931" crossorigin="anonymous"></script>',
+        help_text='AdSense code snippet inserted between <head> tags'
+    )
+    enable_adsense_meta = models.BooleanField(
+        default=True,
+        help_text='Automatically add AdSense meta tag to <head> on all pages'
+    )
+    adsense_meta_tag = models.TextField(
+        blank=True,
+        default='<meta name="google-adsense-account" content="ca-pub-3956705237421931">',
+        help_text='AdSense verification meta tag inserted between <head> tags'
+    )
+    enable_ads_txt = models.BooleanField(
+        default=True,
+        help_text='Enable serving ads.txt file'
+    )
     ads_txt_content = models.TextField(
         blank=True,
         default='google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0',

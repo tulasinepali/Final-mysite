@@ -26,7 +26,12 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             'fields': ('facebook_url', 'twitter_url', 'youtube_url')
         }),
         ('Analytics & Ads', {
-            'fields': ('google_analytics_id', 'adsense_client_id', 'adsense_verification_method', 'ads_txt_content')
+            'fields': (
+                'google_analytics_id', 'adsense_client_id', 'adsense_verification_method',
+                'enable_adsense_code', 'adsense_code_snippet',
+                'enable_adsense_meta', 'adsense_meta_tag',
+                'enable_ads_txt', 'ads_txt_content'
+            )
         }),
         ('Web Push Notifications', {
             'fields': ('enable_web_push', 'onesignal_app_id', 'onesignal_rest_api_key', 'auto_push_on_quiz', 'auto_push_on_blog'),

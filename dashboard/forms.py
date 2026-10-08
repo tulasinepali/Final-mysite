@@ -37,6 +37,8 @@ class SiteSettingsForm(forms.ModelForm):
             'address': forms.Textarea(attrs={'rows': 2}),
             'email_host_password': forms.PasswordInput(render_value=True, attrs={'placeholder': '••••••••••••••••'}),
             'ads_txt_content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0'}),
+            'adsense_code_snippet': forms.Textarea(attrs={'rows': 4, 'placeholder': '<script async src="https://pagead2.googlesyndication.com/..."></script>'}),
+            'adsense_meta_tag': forms.Textarea(attrs={'rows': 3, 'placeholder': '<meta name="google-adsense-account" content="ca-pub-3956705237421931">'}),
             'adsense_verification_method': forms.RadioSelect(),
         }
 

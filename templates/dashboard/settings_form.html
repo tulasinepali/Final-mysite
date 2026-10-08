@@ -494,9 +494,9 @@
                                         <div id="panel_verification_code" class="verification-panel p-3 bg-white border rounded">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <h6 class="font-weight-bold text-primary mb-0">
-                                                    <i class="fas fa-code mr-1"></i> AdSense code snippet
+                                                    <i class="fas fa-code mr-1"></i> Method 1: AdSense code snippet
                                                 </h6>
-                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Active in &lt;head&gt;</span>
+                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-magic mr-1"></i> Auto-injected in &lt;head&gt;</span>
                                             </div>
                                             <p class="text-secondary small mb-2">
                                                 To get your site ready to show ads, copy and paste this code between the <code>&lt;head&gt;&lt;/head&gt;</code> tags on each page of your site.
@@ -504,16 +504,34 @@
                                                     Learn more about the AdSense code <i class="fas fa-external-link-alt fa-xs"></i>
                                                 </a>
                                             </p>
-                                            <div class="font-weight-bold text-dark small mb-1">Your AdSense code:</div>
-                                            <div class="position-relative bg-dark text-light p-3 rounded font-monospace small mb-3" style="background-color: #1e1e2f !important;">
-                                                <button type="button" class="btn btn-sm btn-outline-light position-absolute" style="top: 8px; right: 8px;" onclick="copyElementText('adsense_code_display', 'AdSense Code Snippet')">
-                                                    <i class="fas fa-copy mr-1"></i> Copy Snippet
-                                                </button>
-                                                <pre class="m-0 text-success" id="adsense_code_display" style="white-space: pre-wrap; word-break: break-all;"><code>&lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ form.instance.adsense_client_id|default:'ca-pub-3956705237421931' }}"
-     crossorigin="anonymous"&gt;&lt;/script&gt;</code></pre>
+
+                                            <div class="custom-control custom-switch mb-3">
+                                                {{ form.enable_adsense_code|add_class:'custom-control-input'|attr:'id:enable_adsense_code_switch' }}
+                                                <label class="custom-control-label font-weight-bold small" style="cursor: pointer;" for="enable_adsense_code_switch">
+                                                    Automatically inject AdSense script into &lt;head&gt; on all front-end pages
+                                                </label>
                                             </div>
-                                            <div class="alert alert-info py-2 px-3 small mb-0">
-                                                <i class="fas fa-check-circle mr-1 text-success"></i> <strong>Live on site:</strong> This script tag is automatically injected into <code>templates/base.html</code> on every page of your site.
+
+                                            <div class="form-group mb-2">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="{{ form.adsense_code_snippet.id_for_label }}" class="font-weight-bold small text-dark mb-0">
+                                                        <i class="fas fa-edit mr-1"></i> Editable AdSense Code Snippet (&lt;script&gt;)
+                                                    </label>
+                                                    <button type="button" class="btn btn-xs btn-outline-primary" onclick="copyRawText(document.getElementById('{{ form.adsense_code_snippet.id_for_label }}').value, 'AdSense Code Snippet')">
+                                                        <i class="fas fa-copy mr-1"></i> Copy Snippet
+                                                    </button>
+                                                </div>
+                                                {{ form.adsense_code_snippet|add_class:'form-control font-monospace small'|attr:'rows:4' }}
+                                                {% if form.adsense_code_snippet.errors %}
+                                                {% for error in form.adsense_code_snippet.errors %}
+                                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                                {% endfor %}
+                                                {% endif %}
+                                                <small class="form-text text-muted">Paste your AdSense <code>&lt;script&gt;</code> tag here. Changes are saved and automatically added to all front-end pages.</small>
+                                            </div>
+
+                                            <div class="alert alert-info py-2 px-3 small mb-0 mt-3">
+                                                <i class="fas fa-check-circle mr-1 text-success"></i> <strong>Front-End Integration:</strong> The snippet above is automatically rendered in <code>templates/base.html</code> inside <code>&lt;head&gt;</code> across the entire site.
                                             </div>
                                         </div>
 
@@ -521,31 +539,41 @@
                                         <div id="panel_verification_adstxt" class="verification-panel p-3 bg-white border rounded" style="display: none;">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <h6 class="font-weight-bold text-success mb-0">
-                                                    <i class="fas fa-file-alt mr-1"></i> Ads.txt snippet
+                                                    <i class="fas fa-file-alt mr-1"></i> Method 2: Ads.txt snippet
                                                 </h6>
-                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Live at /ads.txt</span>
+                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-globe mr-1"></i> Live at /ads.txt</span>
                                             </div>
                                             <p class="text-secondary small mb-2">
-                                                Add this snippet to your <code>ads.txt</code> file in your root domain. Google uses this to verify domain ownership and confirm authorized ad sellers.
+                                                An <code>ads.txt</code> file identifies authorized sellers of your digital ad inventory. Google checks this to verify domain ownership.
                                             </p>
-                                            <div class="font-weight-bold text-dark small mb-1">Your Ads.txt snippet:</div>
-                                            <div class="position-relative bg-dark text-light p-3 rounded font-monospace small mb-3" style="background-color: #1e1e2f !important;">
-                                                <button type="button" class="btn btn-sm btn-outline-light position-absolute" style="top: 8px; right: 8px;" onclick="copyElementText('adstxt_code_display', 'Ads.txt Snippet')">
-                                                    <i class="fas fa-copy mr-1"></i> Copy Snippet
-                                                </button>
-                                                <pre class="m-0 text-warning" id="adstxt_code_display" style="white-space: pre-wrap;"><code>google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0</code></pre>
+
+                                            <div class="custom-control custom-switch mb-3">
+                                                {{ form.enable_ads_txt|add_class:'custom-control-input'|attr:'id:enable_ads_txt_switch' }}
+                                                <label class="custom-control-label font-weight-bold small" style="cursor: pointer;" for="enable_ads_txt_switch">
+                                                    Enable dynamic /ads.txt file serving
+                                                </label>
                                             </div>
 
                                             <div class="form-group mb-2">
-                                                <label for="{{ form.ads_txt_content.id_for_label }}" class="font-weight-bold small text-dark">
-                                                    <i class="fas fa-edit mr-1"></i> Manage Live /ads.txt Content
-                                                </label>
-                                                {{ form.ads_txt_content|add_class:'form-control font-monospace small'|attr:'rows:3' }}
-                                                <small class="form-text text-muted">You can edit this or add partner seller records here. Changes are immediately saved and served dynamically at <code>/ads.txt</code>.</small>
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="{{ form.ads_txt_content.id_for_label }}" class="font-weight-bold small text-dark mb-0">
+                                                        <i class="fas fa-edit mr-1"></i> Editable /ads.txt Content
+                                                    </label>
+                                                    <button type="button" class="btn btn-xs btn-outline-success" onclick="copyRawText(document.getElementById('{{ form.ads_txt_content.id_for_label }}').value, 'Ads.txt Snippet')">
+                                                        <i class="fas fa-copy mr-1"></i> Copy Snippet
+                                                    </button>
+                                                </div>
+                                                {{ form.ads_txt_content|add_class:'form-control font-monospace small'|attr:'rows:4' }}
+                                                {% if form.ads_txt_content.errors %}
+                                                {% for error in form.ads_txt_content.errors %}
+                                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                                {% endfor %}
+                                                {% endif %}
+                                                <small class="form-text text-muted">You can customize or add authorized seller lines here. Changes are immediately saved and served live at <code>/ads.txt</code>.</small>
                                             </div>
 
                                             <div class="d-flex align-items-center justify-content-between mt-3 pt-2 border-top">
-                                                <span class="small text-muted"><i class="fas fa-globe mr-1 text-primary"></i> Live URL: <code>https://tulasinepali.com.np/ads.txt</code></span>
+                                                <span class="small text-muted"><i class="fas fa-globe mr-1 text-primary"></i> Public URL: <code>https://tulasinepali.com.np/ads.txt</code></span>
                                                 <a href="/ads.txt" target="_blank" class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-external-link-alt mr-1"></i> View Live ads.txt
                                                 </a>
@@ -556,22 +584,41 @@
                                         <div id="panel_verification_meta" class="verification-panel p-3 bg-white border rounded" style="display: none;">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <h6 class="font-weight-bold text-info mb-0">
-                                                    <i class="fas fa-tags mr-1"></i> Meta tag
+                                                    <i class="fas fa-tags mr-1"></i> Method 3: Meta tag
                                                 </h6>
-                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Active in &lt;head&gt;</span>
+                                                <span class="badge badge-success px-2 py-1"><i class="fas fa-magic mr-1"></i> Auto-injected in &lt;head&gt;</span>
                                             </div>
                                             <p class="text-secondary small mb-2">
                                                 Copy and paste this meta tag into your site's HTML head between <code>&lt;head&gt;&lt;/head&gt;</code> tags.
                                             </p>
-                                            <div class="font-weight-bold text-dark small mb-1">Your Meta tag:</div>
-                                            <div class="position-relative bg-dark text-light p-3 rounded font-monospace small mb-3" style="background-color: #1e1e2f !important;">
-                                                <button type="button" class="btn btn-sm btn-outline-light position-absolute" style="top: 8px; right: 8px;" onclick="copyElementText('meta_tag_code_display', 'Meta Tag Snippet')">
-                                                    <i class="fas fa-copy mr-1"></i> Copy Snippet
-                                                </button>
-                                                <pre class="m-0 text-info" id="meta_tag_code_display" style="white-space: pre-wrap;"><code>&lt;meta name="google-adsense-account" content="{{ form.instance.adsense_client_id|default:'ca-pub-3956705237421931' }}"&gt;</code></pre>
+
+                                            <div class="custom-control custom-switch mb-3">
+                                                {{ form.enable_adsense_meta|add_class:'custom-control-input'|attr:'id:enable_adsense_meta_switch' }}
+                                                <label class="custom-control-label font-weight-bold small" style="cursor: pointer;" for="enable_adsense_meta_switch">
+                                                    Automatically inject AdSense meta tag into &lt;head&gt; on all front-end pages
+                                                </label>
                                             </div>
-                                            <div class="alert alert-info py-2 px-3 small mb-0">
-                                                <i class="fas fa-check-circle mr-1 text-success"></i> <strong>Live on site:</strong> This meta tag is active in <code>templates/base.html</code> on every page of your site.
+
+                                            <div class="form-group mb-2">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="{{ form.adsense_meta_tag.id_for_label }}" class="font-weight-bold small text-dark mb-0">
+                                                        <i class="fas fa-edit mr-1"></i> Editable &lt;meta&gt; Tag Code
+                                                    </label>
+                                                    <button type="button" class="btn btn-xs btn-outline-info" onclick="copyRawText(document.getElementById('{{ form.adsense_meta_tag.id_for_label }}').value, 'Meta Tag Snippet')">
+                                                        <i class="fas fa-copy mr-1"></i> Copy Snippet
+                                                    </button>
+                                                </div>
+                                                {{ form.adsense_meta_tag|add_class:'form-control font-monospace small'|attr:'rows:3' }}
+                                                {% if form.adsense_meta_tag.errors %}
+                                                {% for error in form.adsense_meta_tag.errors %}
+                                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                                {% endfor %}
+                                                {% endif %}
+                                                <small class="form-text text-muted">Paste your AdSense <code>&lt;meta&gt;</code> tag here. Changes are saved and automatically added to all front-end pages.</small>
+                                            </div>
+
+                                            <div class="alert alert-info py-2 px-3 small mb-0 mt-3">
+                                                <i class="fas fa-check-circle mr-1 text-success"></i> <strong>Front-End Integration:</strong> This meta tag is automatically rendered in <code>templates/base.html</code> inside <code>&lt;head&gt;</code> across the entire site.
                                             </div>
                                         </div>
 
@@ -587,7 +634,7 @@
 
                             <!-- Any extra fields not in defined sections -->
                             {% for field in form %}
-                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_title,owner_tagline,owner_experience,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,adsense_verification_method,ads_txt_content,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog,sender_email,email_host,email_port,email_host_user,email_host_password,email_use_tls,auto_email_on_quiz,auto_email_on_note,auto_email_on_blog,auto_email_on_download' %}
+                                {% if field.name not in 'site_name,site_tagline,site_description,owner_name,owner_title,owner_tagline,owner_experience,owner_bio,owner_image,mission,vision,contact_email,contact_phone,address,facebook_url,twitter_url,youtube_url,instagram_url,google_analytics_id,adsense_client_id,adsense_verification_method,enable_adsense_code,adsense_code_snippet,enable_adsense_meta,adsense_meta_tag,enable_ads_txt,ads_txt_content,enable_web_push,onesignal_app_id,onesignal_rest_api_key,auto_push_on_quiz,auto_push_on_blog,sender_email,email_host,email_port,email_host_user,email_host_password,email_use_tls,auto_email_on_quiz,auto_email_on_note,auto_email_on_blog,auto_email_on_download' %}
                                 <div class="form-group">
                                     <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
                                     {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}

@@ -3,8 +3,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google AdSense Verification Meta Tag -->
+    {% if site_settings.enable_adsense_meta and site_settings.adsense_meta_tag %}
+    {{ site_settings.adsense_meta_tag|safe }}
+    {% elif site_settings.adsense_meta_tag %}
+    {{ site_settings.adsense_meta_tag|safe }}
+    {% else %}
     <meta name="google-adsense-account" content="{{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}">
+    {% endif %}
     <!-- Google Tag Manager — async, does not block render -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -56,8 +62,14 @@
     </script>
     {% endif %}
 
-    <!-- Google AdSense Script -->
+    <!-- Google AdSense Code Snippet -->
+    {% if site_settings.enable_adsense_code and site_settings.adsense_code_snippet %}
+    {{ site_settings.adsense_code_snippet|safe }}
+    {% elif site_settings.adsense_code_snippet %}
+    {{ site_settings.adsense_code_snippet|safe }}
+    {% else %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}" crossorigin="anonymous"></script>
+    {% endif %}
 
     <!-- Preconnect to CDNs for faster connections -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>

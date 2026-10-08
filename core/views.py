@@ -169,6 +169,8 @@ def ads_txt(request):
     from django.http import HttpResponse
     try:
         s = SiteSettings.objects.first()
+        if s and hasattr(s, 'enable_ads_txt') and not s.enable_ads_txt:
+            return HttpResponse("", content_type='text/plain; charset=utf-8')
         if s and s.ads_txt_content:
             content = s.ads_txt_content.strip()
         else:
