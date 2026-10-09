@@ -5,7 +5,27 @@
 {% block meta_description %}{{ meta_description|default:"Interactive Nepali Patro (Calendar) 2083 Bikram Sambat with Tithi, official public holidays, Dashain & Tihar dates, and English calendar sync. Free utility by Tulasi Nepali." }}{% endblock %}
 
 {% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+    .patro-main-card,
+    .cal-grid-header,
+    .cal-grid-days,
+    .cal-day-cell,
+    .cal-bs-day,
+    .cal-weekday-th,
+    .cal-event-text,
+    #selectYear,
+    #selectMonth,
+    #liveDateBs,
+    #liveClock,
+    #mainMonthTitle,
+    #selectedDateNe,
+    #sideEventsList,
+    .patro-nav-btn {
+        font-family: 'Mukta', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    }
     .patro-main-card {
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -37,7 +57,7 @@
     }
     .cal-weekday-th {
         padding: 8px 4px;
-        font-size: 13px;
+        font-size: 14.5px;
         font-weight: 700;
         color: #64748b;
         background: #f1f5f9;
@@ -88,10 +108,15 @@
         align-items: baseline;
     }
     .cal-bs-day {
-        font-size: 18px;
-        font-weight: 800;
+        font-size: 20px;
+        font-weight: 700;
         color: #0f172a;
         line-height: 1;
+    }
+    #liveClock {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
     }
     .cal-ad-day {
         font-size: 11px;
@@ -459,15 +484,19 @@
         var hours = npt.getHours();
         var minutes = npt.getMinutes();
         var seconds = npt.getSeconds();
-        var ampm = hours >= 12 ? 'PM' : 'AM';
+        var ampm = hours >= 12 ? 'अपराह्न' : 'पूर्वाह्न';
         hours = hours % 12;
         hours = hours ? hours : 12;
 
-        var strHours = hours < 10 ? '0' + hours : hours;
-        var strMin = minutes < 10 ? '0' + minutes : minutes;
-        var strSec = seconds < 10 ? '0' + seconds : seconds;
+        var strHours = hours < 10 ? '0' + hours : '' + hours;
+        var strMin = minutes < 10 ? '0' + minutes : '' + minutes;
+        var strSec = seconds < 10 ? '0' + seconds : '' + seconds;
 
-        document.getElementById("liveClock").textContent = strHours + ":" + strMin + ":" + strSec + " " + ampm;
+        var neClock = NepaliCalendar.toNepaliDigits(strHours) + ":" + 
+                      NepaliCalendar.toNepaliDigits(strMin) + ":" + 
+                      NepaliCalendar.toNepaliDigits(strSec) + " " + ampm;
+
+        document.getElementById("liveClock").textContent = neClock;
 
         try {
             var bs = NepaliCalendar.adToBs(npt.getFullYear(), npt.getMonth() + 1, npt.getDate());
@@ -484,7 +513,7 @@
         for (var y = 2075; y <= 2095; y++) {
             var opt = document.createElement("option");
             opt.value = y;
-            opt.textContent = NepaliCalendar.toNepaliDigits(y) + " (" + y + ")";
+            opt.textContent = NepaliCalendar.toNepaliDigits(y) + " साल";
             if (y === currentViewYear) opt.selected = true;
             yearSelect.appendChild(opt);
         }
@@ -492,7 +521,7 @@
         NepaliCalendar.BS_MONTHS_NE.forEach(function (mName, idx) {
             var opt = document.createElement("option");
             opt.value = idx + 1;
-            opt.textContent = mName + " (" + NepaliCalendar.BS_MONTHS_EN[idx] + ")";
+            opt.textContent = mName;
             if (idx + 1 === currentViewMonth) opt.selected = true;
             monthSelect.appendChild(opt);
         });
@@ -540,7 +569,7 @@
         var lastDayAd = NepaliCalendar.bsToAd(year, month, daysInMonth);
 
         var adMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        var adRangeText = adMonths[firstDayAd.adMonth - 1] + " " + firstDayAd.adDay + " - " + 
+        var adRangeText = "अंग्रेजी महिना: " + adMonths[firstDayAd.adMonth - 1] + " " + firstDayAd.adDay + " - " + 
                           adMonths[lastDayAd.adMonth - 1] + " " + lastDayAd.adDay + ", " + lastDayAd.adYear;
         document.getElementById("labelAdRange").textContent = adRangeText;
 
@@ -659,7 +688,7 @@
 
         var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         var weekdayEn = NepaliCalendar.DAYS_EN[adData.dayOfWeek];
-        var adText = weekdayEn + ", " + adMonths[adData.adMonth - 1] + " " + adData.adDay + ", " + adData.adYear;
+        var adText = "अंग्रेजी मिति (A.D.): " + weekdayEn + ", " + adMonths[adData.adMonth - 1] + " " + adData.adDay + ", " + adData.adYear;
 
         document.getElementById("selectedDateNe").textContent = bsMonthName + " " + bsDayNe + ", " + bsYearNe + " (" + weekdayNe + ")";
         document.getElementById("selectedDateAd").textContent = adText;

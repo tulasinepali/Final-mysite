@@ -6,10 +6,10 @@
    SmartStore CSS Variables & Design Tokens
    ---------------------------------------------------------- */
 :root {
-    /* Fonts — Poppins (body/nav) + Montserrat (headings) */
-    --default-font: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --heading-font: "Montserrat", sans-serif;
-    --nav-font: "Poppins", sans-serif;
+    /* Fonts — Poppins (body/nav) + Montserrat (headings) + Mukta / Noto Sans Devanagari (Nepali typography) */
+    --default-font: "Poppins", "Mukta", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --heading-font: "Montserrat", "Mukta", "Noto Sans Devanagari", sans-serif;
+    --nav-font: "Poppins", "Mukta", sans-serif;
     --mono-font: "Courier New", Courier, monospace;
 
     /* SmartStore Signature Royal/Cobalt Blue & Light Palette */

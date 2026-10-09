@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ widget.title|default:"नेपाली पात्रो २०८३ | Nepali Patro Widget" }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: {% if theme == 'dark' %}#0f172a{% else %}#ffffff{% endif %};
@@ -22,12 +25,14 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, select, button, input {
+            font-family: 'Mukta', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Mukta", sans-serif;
             background: var(--bg-color);
             color: var(--text-color);
             padding: 6px;
-            font-size: 13px;
+            font-size: 13.5px;
             line-height: 1.4;
             user-select: none;
             -webkit-user-select: none;
@@ -136,7 +141,7 @@
             text-align: center;
         }
         .weekday-label {
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--muted-color);
             padding: 3px 0;
@@ -189,7 +194,7 @@
             align-items: flex-start;
         }
         .bs-day-num {
-            font-size: 13px;
+            font-size: 16px;
             font-weight: 700;
             line-height: 1;
         }
@@ -507,7 +512,7 @@
             for (var y = 2075; y <= 2095; y++) {
                 var opt = document.createElement("option");
                 opt.value = y;
-                opt.textContent = NepaliCalendar.toNepaliDigits(y) + " (" + y + ")";
+                opt.textContent = NepaliCalendar.toNepaliDigits(y) + " साल";
                 if (y === currentViewYear) opt.selected = true;
                 yearSelect.appendChild(opt);
             }
@@ -516,7 +521,7 @@
             NepaliCalendar.BS_MONTHS_NE.forEach(function (mName, idx) {
                 var opt = document.createElement("option");
                 opt.value = idx + 1;
-                opt.textContent = mName + " (" + NepaliCalendar.BS_MONTHS_EN[idx] + ")";
+                opt.textContent = mName;
                 if (idx + 1 === currentViewMonth) opt.selected = true;
                 monthSelect.appendChild(opt);
             });
@@ -569,7 +574,7 @@
             var lastDayAd = NepaliCalendar.bsToAd(year, month, daysInMonth);
 
             var adMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            var adRangeText = adMonths[firstDayAd.adMonth - 1] + " " + firstDayAd.adDay + " - " + 
+            var adRangeText = "अंग्रेजी मिति: " + adMonths[firstDayAd.adMonth - 1] + " " + firstDayAd.adDay + " - " + 
                               adMonths[lastDayAd.adMonth - 1] + " " + lastDayAd.adDay + ", " + lastDayAd.adYear;
             document.getElementById("labelAdRange").textContent = adRangeText;
 
@@ -699,7 +704,7 @@
 
             var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             var weekdayEn = NepaliCalendar.DAYS_EN[adObj.dayOfWeek];
-            var adText = weekdayEn + ", " + adMonths[adObj.adMonth - 1] + " " + adObj.adDay + ", " + adObj.adYear;
+            var adText = "अंग्रेजी मिति: " + weekdayEn + ", " + adMonths[adObj.adMonth - 1] + " " + adObj.adDay + ", " + adObj.adYear;
 
             document.getElementById("detailBsText").textContent = bsMonthName + " " + bsDayNe + ", " + bsYearNe + " (" + weekdayNe + ")";
             document.getElementById("detailAdText").textContent = adText;

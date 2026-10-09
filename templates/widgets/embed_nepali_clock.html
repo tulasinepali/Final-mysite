@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ widget.title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: {% if theme == 'dark' %}#121824{% else %}#ffffff{% endif %};
@@ -16,11 +19,11 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Mukta", sans-serif;
+            font-family: 'Mukta', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             background: var(--bg-color);
             color: var(--text-color);
             padding: 16px;
-            font-size: 13px;
+            font-size: 13.5px;
             text-align: center;
         }
         .clock-container {
@@ -125,15 +128,19 @@
             var hours = npt.getHours();
             var minutes = npt.getMinutes();
             var seconds = npt.getSeconds();
-            var ampm = hours >= 12 ? 'PM' : 'AM';
+            var ampm = hours >= 12 ? 'अपराह्न' : 'पूर्वाह्न';
             hours = hours % 12;
             hours = hours ? hours : 12; // 0 becomes 12
 
-            var strHours = hours < 10 ? '0' + hours : hours;
-            var strMin = minutes < 10 ? '0' + minutes : minutes;
-            var strSec = seconds < 10 ? '0' + seconds : seconds;
+            var strHours = hours < 10 ? '0' + hours : '' + hours;
+            var strMin = minutes < 10 ? '0' + minutes : '' + minutes;
+            var strSec = seconds < 10 ? '0' + seconds : '' + seconds;
 
-            document.getElementById("nepalTime").textContent = strHours + ":" + strMin + ":" + strSec + " " + ampm;
+            var neTime = NepaliCalendar.toNepaliDigits(strHours) + ":" + 
+                         NepaliCalendar.toNepaliDigits(strMin) + ":" + 
+                         NepaliCalendar.toNepaliDigits(strSec) + " " + ampm;
+
+            document.getElementById("nepalTime").textContent = neTime;
 
             try {
                 var bs = NepaliCalendar.adToBs(npt.getFullYear(), npt.getMonth() + 1, npt.getDate());
@@ -141,7 +148,7 @@
 
                 var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                 var adDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                var adStr = adDays[npt.getDay()] + ", " + adMonths[npt.getMonth()] + " " + npt.getDate() + ", " + npt.getFullYear();
+                var adStr = "अंग्रेजी मिति: " + adDays[npt.getDay()] + ", " + adMonths[npt.getMonth()] + " " + npt.getDate() + ", " + npt.getFullYear();
                 document.getElementById("nepalDateAd").textContent = adStr;
             } catch(e) {}
         }
