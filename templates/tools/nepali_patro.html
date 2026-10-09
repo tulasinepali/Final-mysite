@@ -4,7 +4,7 @@
 {% block title %}{{ meta_title|default:"नेपाली पात्रो २०८३ | Nepali Patro (Calendar) with Tithi, Holidays & Festivals" }}{% endblock %}
 {% block meta_description %}{{ meta_description|default:"Interactive Nepali Patro (Calendar) 2083 Bikram Sambat with Tithi, official public holidays, Dashain & Tihar dates, and English calendar sync. Free utility by Tulasi Nepali." }}{% endblock %}
 
-{% block extra_head %}
+{% block extra_css %}
 <style>
     .patro-main-card {
         border-radius: 16px;
@@ -30,7 +30,7 @@
     }
     .cal-grid-header {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 6px;
         text-align: center;
         margin-bottom: 8px;
@@ -42,6 +42,7 @@
         color: #64748b;
         background: #f1f5f9;
         border-radius: 8px;
+        min-width: 0;
     }
     .cal-weekday-th.sat {
         color: #dc2626;
@@ -53,7 +54,7 @@
     }
     .cal-grid-days {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 6px;
     }
     .cal-day-cell {
@@ -61,6 +62,7 @@
         border: 1px solid #e2e8f0;
         border-radius: 10px;
         min-height: 72px;
+        min-width: 0;
         padding: 6px 8px;
         display: flex;
         flex-direction: column;

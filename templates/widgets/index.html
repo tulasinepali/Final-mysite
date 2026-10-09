@@ -101,7 +101,7 @@
                                     <i class="bi bi-check-circle me-1"></i> Copied to Clipboard!
                                 </span>
                             </div>
-                            <textarea id="embedCode-{{ widget.slug }}" class="form-control font-monospace small bg-light" rows="3" readonly onclick="this.select()">&lt;iframe src="{{ request.scheme }}://{{ request.get_host }}{% url 'tools:widget_embed' widget.slug %}?theme=light" width="{{ widget.default_width|default:'100%' }}" height="{{ widget.default_height|default:'380' }}" frameborder="0" style="border:1px solid #e2e8f0; border-radius:12px; max-width:100%;" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
+                            <textarea id="embedCode-{{ widget.slug }}" class="form-control font-monospace small bg-light" rows="3" readonly onclick="this.select()">&lt;iframe src="{{ request.scheme }}://{{ request.get_host }}{% url 'tools:widget_embed' widget.slug %}?theme=light" width="{{ widget.default_width|default:'100%' }}" height="{% if widget.slug == 'nepali-patro' %}580{% else %}{{ widget.default_height|default:'480' }}{% endif %}" frameborder="0" style="border:1px solid #e2e8f0; border-radius:12px; max-width:100%;" loading="lazy"&gt;&lt;/iframe&gt;</textarea>
                         </div>
 
                         <!-- Copy Button -->
@@ -138,11 +138,11 @@
                                 </span>
                                 <small class="text-muted" id="previewThemeLabel-{{ widget.slug }}">Theme: Light</small>
                             </div>
-                            <div class="rounded-3 overflow-hidden shadow-sm border bg-white" style="max-width: 440px; margin: 0 auto;">
+                            <div class="rounded-3 overflow-hidden shadow-sm border bg-white" style="max-width: 480px; margin: 0 auto;">
                                 <iframe id="previewIframe-{{ widget.slug }}" 
                                         src="{% url 'tools:widget_embed' widget.slug %}?theme=light" 
                                         width="100%" 
-                                        height="{{ widget.default_height|default:'380' }}" 
+                                        height="{% if widget.slug == 'nepali-patro' %}580{% else %}{{ widget.default_height|default:'480' }}{% endif %}" 
                                         frameborder="0" 
                                         style="display: block; width: 100%; border: none;"></iframe>
                             </div>
