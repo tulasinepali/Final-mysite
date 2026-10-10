@@ -62,16 +62,16 @@
 </div>
 
 <!-- Instant Action Command Bar -->
-<div class="card shadow-sm border-0 mb-4" style="background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%); border-radius: 14px; color: white;">
+<div class="card shadow-sm border mb-4" style="background: #ffffff; border-left: 5px solid #0559b7 !important; border-radius: 14px;">
     <div class="card-body p-4">
         <div class="row align-items-center">
             <div class="col-lg-7 mb-3 mb-lg-0">
                 <div class="d-flex align-items-center mb-2">
-                    <span class="badge badge-light text-primary px-3 py-1 font-weight-bold mr-2" style="font-size: 0.75rem;">⚡ INSTANT GENERATION</span>
-                    <span class="small text-light opacity-75">No waiting for daily cron</span>
+                    <span class="badge badge-primary px-3 py-1 font-weight-bold mr-2" style="background: #0559b7 !important; color: #ffffff !important; font-size: 0.75rem;">⚡ INSTANT GENERATION</span>
+                    <span class="small font-weight-bold text-muted">No waiting for daily cron</span>
                 </div>
-                <h4 class="font-weight-bold mb-1 text-white">Generate Content On Demand</h4>
-                <p class="mb-0 text-white-50 small">
+                <h4 class="font-weight-bold mb-1 text-dark" style="color: #0f172a !important;">Generate Content On Demand</h4>
+                <p class="mb-0 text-secondary small font-weight-500" style="color: #475569 !important;">
                     Pick the top queued topic and generate a complete, high-quality, SEO-optimized blog or study note right now.
                 </p>
             </div>
@@ -87,11 +87,11 @@
                     <form action="{% url 'dashboard:ai_generate_instant' %}" method="POST" class="d-inline mr-2 mb-2 mb-sm-0">
                         {% csrf_token %}
                         <input type="hidden" name="target_type" value="note">
-                        <button type="submit" class="btn btn-light font-weight-bold text-primary px-3 shadow-sm" onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm mr-1\'></span> Generating Note...';">
+                        <button type="submit" class="btn btn-primary font-weight-bold text-white px-3 shadow-sm" style="background: #0559b7 !important; border-color: #0559b7 !important;" onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm mr-1\'></span> Generating Note...';">
                             <i class="bi bi-file-earmark-text-fill mr-1"></i> Generate Note Now
                         </button>
                     </form>
-                    <button type="button" class="btn btn-outline-light font-weight-bold px-3 shadow-sm" data-toggle="modal" data-target="#suggestTopicsModal">
+                    <button type="button" class="btn btn-outline-primary font-weight-bold px-3 shadow-sm" data-toggle="modal" data-target="#suggestTopicsModal">
                         <i class="bi bi-magic mr-1"></i> Suggest Topics
                     </button>
                 </div>
