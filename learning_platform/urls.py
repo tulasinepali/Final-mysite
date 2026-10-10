@@ -33,6 +33,11 @@ urlpatterns = [
     path('health/', core_views.health_check, name='health_check'),
     path('up/', core_views.health_check, name='up'),
     path('ads.txt', core_views.ads_txt, name='ads_txt'),
+    # PWA (Progressive Web App) suite
+    path('manifest.json', core_views.manifest_json, name='manifest_json'),
+    path('manifest.webmanifest', core_views.manifest_json, name='manifest_webmanifest'),
+    path('sw.js', core_views.service_worker, name='service_worker'),
+    path('offline/', core_views.offline_view, name='offline_view'),
 ]
 
 if settings.DEBUG:

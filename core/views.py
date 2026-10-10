@@ -283,3 +283,65 @@ def subscribe_newsletter(request):
 
     return redirect(request.META.get('HTTP_REFERER', 'core:home'))
 
+
+def manifest_json(request):
+    """Serve Web App Manifest with dynamic branding fallback"""
+    import os
+    import json
+    from django.conf import settings
+    from django.http import HttpResponse
+
+    manifest_file = os.path.join(settings.BASE_DIR, 'static', 'manifest.json')
+    if os.path.exists(manifest_file):
+        with open(manifest_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    else:
+        data = {
+            "name": "Tulasi Nepali - Admin & Learning Platform",
+            "short_name": "Tulasi Nepali",
+            "start_url": "/",
+            "scope": "/",
+            "display": "standalone",
+            "background_color": "#ffffff",
+            "theme_color": "#0559b7"
+        }
+
+    try:
+        s = SiteSettings.objects.first()
+        if s and s.site_name:
+            data["name"] = f"{s.site_name} - Admin & Learning Platform"
+            data["short_name"] = s.site_name
+    except Exception:
+        pass
+
+    return HttpResponse(
+        json.dumps(data, indent=2, ensure_ascii=False),
+        content_type='application/manifest+json; charset=utf-8'
+    )
+
+
+def service_worker(request):
+    """Serve Service Worker from /sw.js with root scope authority"""
+    import os
+    from django.conf import settings
+    from django.http import HttpResponse
+
+    sw_file = os.path.join(settings.BASE_DIR, 'static', 'js', 'sw.js')
+    if os.path.exists(sw_file):
+        with open(sw_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+    else:
+        content = "self.addEventListener('fetch', () => {});"
+
+    response = HttpResponse(content, content_type='application/javascript; charset=utf-8')
+    response['Service-Worker-Allowed'] = '/'
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
+
+
+def offline_view(request):
+    """Serve offline fallback page"""
+    from django.shortcuts import render
+    return render(request, 'core/offline.html')
+
+

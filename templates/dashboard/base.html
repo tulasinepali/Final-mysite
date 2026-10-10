@@ -16,6 +16,17 @@
     <title>{% block title %}Dashboard - Tulasi Nepali{% endblock %}</title>
     {% if site_settings.site_favicon %}<link rel="icon" href="{{ site_settings.site_favicon.url }}" type="image/x-icon">{% else %}<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">{% endif %}
 
+    <!-- PWA Manifest & Mobile App Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0559b7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TN Admin">
+    <link rel="apple-touch-icon" href="/static/images/pwa/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/static/images/pwa/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/static/images/pwa/icon-512x512.png">
+
     <!-- Google Fonts: Manrope + Sora + JetBrains Mono (FlexAdmin Signature) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,6 +238,11 @@
         <!-- Right: Actions & User Dropdown -->
         <div class="ml-auto d-flex align-items-center">
             <div class="header-action-cluster mr-2">
+                <!-- Install Mobile App Action -->
+                <button type="button" id="headerPwaInstallBtn" class="header-action" title="Install App on Phone" style="display: none; border: none; background: transparent; color: #0559b7; cursor: pointer;">
+                    <i class="bi bi-phone"></i>
+                </button>
+
                 <!-- View Public Website -->
                 <a href="/" target="_blank" class="header-action" title="View Public Website">
                     <i class="bi bi-box-arrow-up-right"></i>
@@ -583,6 +599,13 @@
                 </ul>
             </nav>
 
+            <!-- PWA Install Button -->
+            <div id="pwaInstallContainer" class="px-3 mb-2" style="display: none;">
+                <button type="button" id="btnPwaInstall" class="btn btn-primary btn-block btn-sm rounded-pill shadow-sm d-flex align-items-center justify-content-center py-2" style="font-size: 0.82rem; font-weight: 700; gap: 6px;">
+                    <i class="bi bi-phone-fill"></i> Install Mobile App
+                </button>
+            </div>
+
             <!-- Sidebar Footer Help Card -->
             <a href="/" target="_blank" class="sidebar-help-card">
                 <span class="help-icon"><i class="bi bi-globe"></i></span>
@@ -658,5 +681,62 @@
 
 {% block extra_scripts %}{% endblock %}
 {% block javascript %}{% endblock %}
+
+<!-- PWA Service Worker Registration & Mobile Install Trigger -->
+<script>
+    (function () {
+        let deferredPrompt = null;
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .catch(function (err) {
+                        console.log('SW registration error:', err);
+                    });
+            });
+        }
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            var sidebarInstall = document.getElementById('pwaInstallContainer');
+            var headerInstall = document.getElementById('headerPwaInstallBtn');
+            if (sidebarInstall) sidebarInstall.style.display = 'block';
+            if (headerInstall) headerInstall.style.display = 'inline-flex';
+        });
+
+        function triggerInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function (choice) {
+                    if (choice.outcome === 'accepted') {
+                        var sidebarInstall = document.getElementById('pwaInstallContainer');
+                        var headerInstall = document.getElementById('headerPwaInstallBtn');
+                        if (sidebarInstall) sidebarInstall.style.display = 'none';
+                        if (headerInstall) headerInstall.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var btn1 = document.getElementById('btnPwaInstall');
+            var btn2 = document.getElementById('headerPwaInstallBtn');
+            if (btn1) btn1.addEventListener('click', triggerInstall);
+            if (btn2) btn2.addEventListener('click', triggerInstall);
+
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                var badge = document.querySelector('.brand-badge');
+                if (badge) {
+                    badge.textContent = 'App Mode';
+                    badge.style.background = '#0559b7';
+                    badge.style.color = '#ffffff';
+                }
+            }
+        });
+    })();
+</script>
 </body>
 </html>
