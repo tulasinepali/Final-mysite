@@ -7,7 +7,8 @@ using Google Gemini API (Free tier compatible).
 import os
 import json
 import re
-import requests
+import urllib.request
+import urllib.error
 from django.utils import timezone
 from django.utils.text import slugify
 from core.models import SiteSettings, Category, Tag, AITopicQueue, AIGenerationLog
@@ -33,6 +34,26 @@ def get_gemini_config():
         model = settings.gemini_model
 
     return api_key, model, settings
+
+
+def _call_gemini_api(url, payload, timeout=90):
+    """Call Gemini REST endpoint using Python standard library urllib (no pip dependencies required)"""
+    data_bytes = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        url,
+        data=data_bytes,
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            res_body = response.read().decode('utf-8')
+            return json.loads(res_body)
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode('utf-8', errors='ignore')[:300]
+        raise Exception(f"Gemini API Error ({e.code}): {err_body}")
+    except urllib.error.URLError as e:
+        raise Exception(f"Gemini Connection Error: {e.reason}")
 
 
 def sanitize_slug(text, max_len=180):
@@ -162,12 +183,7 @@ JSON Output Schema required:
     }
 
     try:
-        response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=90)
-        if response.status_code != 200:
-            err = f"Gemini API Error ({response.status_code}): {response.text[:300]}"
-            raise Exception(err)
-
-        resp_data = response.json()
+        resp_data = _call_gemini_api(url, payload, timeout=90)
         raw_text = resp_data['candidates'][0]['content']['parts'][0]['text']
 
         # Parse JSON
@@ -334,11 +350,8 @@ Do NOT include markdown fences, just pure JSON.
         "generationConfig": {"temperature": 0.7, "responseMimeType": "application/json"}
     }
 
-    response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=45)
-    if response.status_code != 200:
-        raise Exception(f"Gemini API Error ({response.status_code}): {response.text[:200]}")
-
-    raw = response.json()['candidates'][0]['content']['parts'][0]['text'].strip()
+    resp_data = _call_gemini_api(url, payload, timeout=45)
+    raw = resp_data['candidates'][0]['content']['parts'][0]['text'].strip()
     if raw.startswith("```json"):
         raw = raw[7:]
     if raw.startswith("```"):
