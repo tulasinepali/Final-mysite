@@ -131,4 +131,5 @@ urlpatterns = [
     path('ai-blogger/generate-instant/', views.ai_generate_instant, name='ai_generate_instant'),
     path('ai-blogger/settings/save/', views.ai_save_settings, name='ai_save_settings'),
     path('ai-blogger/suggest-topics/', views.ai_suggest_topics_ajax, name='ai_suggest_topics_ajax'),
+    path('ai-blogger/test-api-key/', views.ai_test_api_key, name='ai_test_api_key'),
 ]

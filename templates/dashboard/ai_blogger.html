@@ -388,8 +388,12 @@
                             <input type="password" name="gemini_api_key" id="geminiApiKeyInput" value="{{ settings.gemini_api_key|default:'' }}" class="form-control" placeholder="AIzaSy...">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility()"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-outline-primary font-weight-bold" type="button" id="btnTestApiKey" onclick="testGeminiConnection()">
+                                    <i class="bi bi-broadcast mr-1"></i> Test Key
+                                </button>
                             </div>
                         </div>
+                        <div id="apiKeyTestResult" class="mt-2" style="display: none;"></div>
                         <small class="text-muted">Free tier API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.</small>
                     </div>
 
@@ -587,6 +591,46 @@
 function toggleApiKeyVisibility() {
     const input = document.getElementById('geminiApiKeyInput');
     input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function testGeminiConnection() {
+    const key = document.getElementById('geminiApiKeyInput').value.trim();
+    const btn = document.getElementById('btnTestApiKey');
+    const resultDiv = document.getElementById('apiKeyTestResult');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span> Testing...';
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info py-2 px-3 small mb-0"><i class="bi bi-arrow-repeat mr-1"></i> Testing connection to Google Gemini API...</div>';
+
+    fetch(`{% url 'dashboard:ai_test_api_key' %}?key=${encodeURIComponent(key)}`)
+        .then(response => response.json().then(data => ({status: response.status, body: data})))
+        .then(res => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-broadcast mr-1"></i> Test Key';
+            if (res.status === 200 && res.body.status === 'success') {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success py-2 px-3 small mb-0">
+                        <i class="bi bi-check-circle-fill mr-1"></i> <strong>Success!</strong> ${res.body.message}
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger py-2 px-3 small mb-0">
+                        <i class="bi bi-x-circle-fill mr-1"></i> <strong>Failed:</strong> ${res.body.message || 'Connection failed'}
+                    </div>
+                `;
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-broadcast mr-1"></i> Test Key';
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger py-2 px-3 small mb-0">
+                    <i class="bi bi-exclamation-triangle-fill mr-1"></i> <strong>Network Error:</strong> ${err.message}
+                </div>
+            `;
+        });
 }
 
 document.getElementById('btnRunTopicSuggestion').addEventListener('click', function() {
