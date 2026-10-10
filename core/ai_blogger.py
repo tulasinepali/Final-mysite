@@ -23,7 +23,7 @@ def get_gemini_config():
     """Retrieve API key and model choice from SiteSettings or environment"""
     settings = SiteSettings.objects.first()
     api_key = ''
-    model = 'gemini-2.5-flash'
+    model = 'gemini-3.8-flash'
 
     if settings and settings.gemini_api_key:
         api_key = settings.gemini_api_key.strip()
@@ -32,9 +32,9 @@ def get_gemini_config():
 
     if settings and settings.gemini_model:
         model = settings.gemini_model.strip()
-        # Automatically upgrade deprecated 2.0-flash
-        if model in ['gemini-2.0-flash', 'gemini-2.0-flash-exp']:
-            model = 'gemini-2.5-flash'
+        # Automatically upgrade deprecated models to gemini-3.8-flash
+        if model in ['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
+            model = 'gemini-3.8-flash'
 
     return api_key, model, settings
 

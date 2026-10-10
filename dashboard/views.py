@@ -2038,8 +2038,8 @@ def ai_test_api_key(request):
     api_key, default_model, _ = get_gemini_config()
     test_key = request.GET.get('key', '').strip() or api_key
     model = request.GET.get('model', '').strip() or default_model
-    if model in ['gemini-2.0-flash', 'gemini-2.0-flash-exp']:
-        model = 'gemini-2.5-flash'
+    if model in ['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
+        model = 'gemini-3.8-flash'
 
     if not test_key:
         return JsonResponse({
