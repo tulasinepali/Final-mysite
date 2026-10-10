@@ -497,7 +497,7 @@
                         </div>
                         <div class="text-muted d-flex justify-content-between">
                             <span><i class="bi bi-clock mr-1"></i>{{ log.created_at|date:"M d, H:i" }}</span>
-                            <span>{{ log.execution_time_seconds|floatformat:1 }}s ({{ log.model_used }})</span>
+                            <span>{{ log.content_type|upper }} &bull; {{ log.word_count }} words</span>
                         </div>
                     </li>
                     {% empty %}

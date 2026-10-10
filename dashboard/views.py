@@ -1866,8 +1866,8 @@ def dashboard_ai_blogger(request):
     total_topics = AITopicQueue.objects.count()
     pending_topics = AITopicQueue.objects.filter(status='pending').count()
     completed_topics = AITopicQueue.objects.filter(status='completed').count()
-    total_ai_blogs = BlogPost.objects.filter(is_ai_generated=True).count()
-    total_ai_notes = Note.objects.filter(is_ai_generated=True).count()
+    total_ai_blogs = AITopicQueue.objects.filter(content_type='blog', status='completed', generated_blog__isnull=False).count()
+    total_ai_notes = AITopicQueue.objects.filter(content_type='note', status='completed', generated_note__isnull=False).count()
 
     paginator = Paginator(queue_qs, 15)
     page_obj = paginator.get_page(request.GET.get('page'))
