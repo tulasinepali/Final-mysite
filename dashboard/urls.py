@@ -122,4 +122,13 @@ urlpatterns = [
     # Visitor Logs
     path('visitors/', views.dashboard_visitor_logs, name='visitor_logs'),
     path('visitors/clear-old/', views.visitor_logs_clear_old, name='visitor_logs_clear_old'),
+
+    # AI Auto-Blogger & Notes Generator
+    path('ai-blogger/', views.dashboard_ai_blogger, name='ai_blogger'),
+    path('ai-blogger/topic/create/', views.ai_topic_create, name='ai_topic_create'),
+    path('ai-blogger/topic/<int:pk>/run/', views.ai_topic_run_now, name='ai_topic_run_now'),
+    path('ai-blogger/topic/<int:pk>/delete/', views.ai_topic_delete, name='ai_topic_delete'),
+    path('ai-blogger/generate-instant/', views.ai_generate_instant, name='ai_generate_instant'),
+    path('ai-blogger/settings/save/', views.ai_save_settings, name='ai_save_settings'),
+    path('ai-blogger/suggest-topics/', views.ai_suggest_topics_ajax, name='ai_suggest_topics_ajax'),
 ]

@@ -1,0 +1,644 @@
+{% extends 'dashboard/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}AI Auto-Blogger & Study Note Generator - Dashboard{% endblock %}
+{% block page_header %}AI Content Automation Suite{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">AI Auto-Blogger</li>
+{% endblock %}
+
+{% block content %}
+<!-- KPI Metrics Row -->
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white shadow-sm border" style="border-radius: 12px;">
+            <div class="inner p-3">
+                <span class="text-muted small text-uppercase font-weight-bold">Queued Topics</span>
+                <h3 class="font-weight-bold text-primary mt-1 mb-0">{{ pending_topics }} <small class="text-muted" style="font-size: 0.9rem;">pending</small></h3>
+                <p class="text-muted small mb-0 mt-1">Total added: {{ total_topics }}</p>
+            </div>
+            <div class="icon" style="top: 15px; right: 15px;">
+                <i class="bi bi-hourglass-split text-primary" style="font-size: 2.8rem; opacity: 0.25;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white shadow-sm border" style="border-radius: 12px;">
+            <div class="inner p-3">
+                <span class="text-muted small text-uppercase font-weight-bold">Completed Topics</span>
+                <h3 class="font-weight-bold text-success mt-1 mb-0">{{ completed_topics }}</h3>
+                <p class="text-muted small mb-0 mt-1">Generated successfully</p>
+            </div>
+            <div class="icon" style="top: 15px; right: 15px;">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 2.8rem; opacity: 0.25;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white shadow-sm border" style="border-radius: 12px;">
+            <div class="inner p-3">
+                <span class="text-muted small text-uppercase font-weight-bold">AI Blog Posts</span>
+                <h3 class="font-weight-bold text-info mt-1 mb-0">{{ total_ai_blogs }}</h3>
+                <p class="text-muted small mb-0 mt-1">Published or Draft</p>
+            </div>
+            <div class="icon" style="top: 15px; right: 15px;">
+                <i class="bi bi-newspaper text-info" style="font-size: 2.8rem; opacity: 0.25;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white shadow-sm border" style="border-radius: 12px;">
+            <div class="inner p-3">
+                <span class="text-muted small text-uppercase font-weight-bold">AI Study Notes</span>
+                <h3 class="font-weight-bold text-warning mt-1 mb-0">{{ total_ai_notes }}</h3>
+                <p class="text-muted small mb-0 mt-1">Exam & Curriculum notes</p>
+            </div>
+            <div class="icon" style="top: 15px; right: 15px;">
+                <i class="bi bi-journal-bookmark-fill text-warning" style="font-size: 2.8rem; opacity: 0.25;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instant Action Command Bar -->
+<div class="card shadow-sm border-0 mb-4" style="background: linear-gradient(135deg, #0559b7 0%, #032b5f 100%); border-radius: 14px; color: white;">
+    <div class="card-body p-4">
+        <div class="row align-items-center">
+            <div class="col-lg-7 mb-3 mb-lg-0">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge badge-light text-primary px-3 py-1 font-weight-bold mr-2" style="font-size: 0.75rem;">⚡ INSTANT GENERATION</span>
+                    <span class="small text-light opacity-75">No waiting for daily cron</span>
+                </div>
+                <h4 class="font-weight-bold mb-1 text-white">Generate Content On Demand</h4>
+                <p class="mb-0 text-white-50 small">
+                    Pick the top queued topic and generate a complete, high-quality, SEO-optimized blog or study note right now.
+                </p>
+            </div>
+            <div class="col-lg-5 text-lg-right">
+                <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+                    <form action="{% url 'dashboard:ai_generate_instant' %}" method="POST" class="d-inline mr-2 mb-2 mb-sm-0">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_type" value="blog">
+                        <button type="submit" class="btn btn-warning font-weight-bold text-dark px-3 shadow-sm" onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm mr-1\'></span> Generating Blog...';">
+                            <i class="bi bi-lightning-charge-fill mr-1"></i> Generate Blog Now
+                        </button>
+                    </form>
+                    <form action="{% url 'dashboard:ai_generate_instant' %}" method="POST" class="d-inline mr-2 mb-2 mb-sm-0">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_type" value="note">
+                        <button type="submit" class="btn btn-light font-weight-bold text-primary px-3 shadow-sm" onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm mr-1\'></span> Generating Note...';">
+                            <i class="bi bi-file-earmark-text-fill mr-1"></i> Generate Note Now
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-outline-light font-weight-bold px-3 shadow-sm" data-toggle="modal" data-target="#suggestTopicsModal">
+                        <i class="bi bi-magic mr-1"></i> Suggest Topics
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Add Topics & Queue Management -->
+    <div class="col-lg-8">
+        <!-- Add Topic Card (Tabs for Single vs Bulk) -->
+        <div class="card shadow-sm border mb-4" style="border-radius: 12px;">
+            <div class="card-header bg-white border-bottom p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="card-title font-weight-bold mb-0 text-dark">
+                        <i class="bi bi-plus-circle-fill text-primary mr-2"></i> Add Topics to AI Queue
+                    </h5>
+                    <ul class="nav nav-pills" id="topicModeTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active py-1 px-3 small font-weight-bold" id="single-tab" data-toggle="pill" href="#single-mode" role="tab">Single Topic</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-1 px-3 small font-weight-bold" id="bulk-tab" data-toggle="pill" href="#bulk-mode" role="tab">Bulk Paste (20+)</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="tab-content" id="topicModeTabContent">
+                    <!-- Single Topic Form -->
+                    <div class="tab-pane fade show active" id="single-mode" role="tabpanel">
+                        <form action="{% url 'dashboard:ai_topic_create' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="mode" value="single">
+
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold text-dark small">Topic Title <span class="text-danger">*</span></label>
+                                <input type="text" name="title" class="form-control" placeholder="e.g. कम्प्युटर अपरेटर परीक्षाको लागि आवश्यक नेटवर्किङ अवधारणाहरू / Data Types in Python" required>
+                                <small class="text-muted">Enter any topic across IT, Computer Operator, General Knowledge, Nepali Grammar, or Teacher Prep.</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 form-group mb-3">
+                                    <label class="font-weight-bold text-dark small">Content Type</label>
+                                    <select name="content_type" class="form-control">
+                                        <option value="blog">📝 Blog Article (/blog/)</option>
+                                        <option value="note">📚 Study Note (/notes/)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label class="font-weight-bold text-dark small">Language</label>
+                                    <select name="language" class="form-control">
+                                        <option value="bilingual">🇳🇵🇬🇧 Bilingual (Nepali + English IT terms)</option>
+                                        <option value="ne">🇳🇵 Pure Nepali (देवनागरी)</option>
+                                        <option value="en">🇬🇧 English</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label class="font-weight-bold text-dark small">Category (Optional)</label>
+                                    <select name="category" class="form-control">
+                                        <option value="">-- Auto-detect / Default --</option>
+                                        {% for cat in all_categories %}
+                                        <option value="{{ cat.pk }}">{{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold text-dark small">Focus / Custom Guidance Hint (Optional)</label>
+                                <input type="text" name="prompt_hint" class="form-control" placeholder="e.g. Include real-world examples, table of commands, and exam MCQ tips">
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary px-4 font-weight-bold">
+                                    <i class="bi bi-plus-lg mr-1"></i> Add to Queue
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Bulk Paste Form -->
+                    <div class="tab-pane fade" id="bulk-mode" role="tabpanel">
+                        <form action="{% url 'dashboard:ai_topic_create' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="mode" value="bulk">
+
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold text-dark small">Paste Multiple Topics (One per line) <span class="text-danger">*</span></label>
+                                <textarea name="bulk_topics" rows="6" class="form-control" placeholder="1. कम्प्युटरको पुस्ता र वर्गीकरण (Generations of Computer)&#10;2. Cyber Law and Electronic Transactions Act of Nepal&#10;3. नेपाली व्याकरण: कारक र विभक्ति नियमहरू&#10;4. Database Management System (DBMS) Basics for Beginners" required></textarea>
+                                <small class="text-muted">You can paste 10, 20, or 50 topics at once with or without numbering. AI will schedule them automatically.</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 form-group mb-3">
+                                    <label class="font-weight-bold text-dark small">Content Type for Bulk Topics</label>
+                                    <select name="content_type" class="form-control">
+                                        <option value="blog">📝 Blog Article (/blog/)</option>
+                                        <option value="note">📚 Study Note (/notes/)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label class="font-weight-bold text-dark small">Language</label>
+                                    <select name="language" class="form-control">
+                                        <option value="bilingual">🇳🇵🇬🇧 Bilingual (Nepali + English IT terms)</option>
+                                        <option value="ne">🇳🇵 Pure Nepali (देवनागरी)</option>
+                                        <option value="en">🇬🇧 English</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label class="font-weight-bold text-dark small">Assign Category</label>
+                                    <select name="category" class="form-control">
+                                        <option value="">-- Auto-detect / Default --</option>
+                                        {% for cat in all_categories %}
+                                        <option value="{{ cat.pk }}">{{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary px-4 font-weight-bold">
+                                    <i class="bi bi-stack mr-1"></i> Queue All Topics
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic Queue Table Card -->
+        <div class="card shadow-sm border mb-4" style="border-radius: 12px;">
+            <div class="card-header bg-white border-bottom p-3">
+                <div class="d-flex flex-wrap align-items-center justify-content-between">
+                    <h5 class="card-title font-weight-bold mb-2 mb-md-0 text-dark">
+                        <i class="bi bi-list-task text-primary mr-2"></i> Content Topic Bank & Queue
+                    </h5>
+                    <!-- Filter Controls -->
+                    <form method="GET" class="form-inline">
+                        <select name="type" class="form-control form-control-sm mr-2 mb-1" onchange="this.form.submit()">
+                            <option value="">All Types</option>
+                            <option value="blog" {% if content_filter == 'blog' %}selected{% endif %}>Blogs Only</option>
+                            <option value="note" {% if content_filter == 'note' %}selected{% endif %}>Notes Only</option>
+                        </select>
+                        <select name="status" class="form-control form-control-sm mr-2 mb-1" onchange="this.form.submit()">
+                            <option value="">All Statuses</option>
+                            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>Failed</option>
+                        </select>
+                        <input type="text" name="q" value="{{ search_q }}" placeholder="Search topics..." class="form-control form-control-sm mr-2 mb-1" style="width: 140px;">
+                        <button type="submit" class="btn btn-sm btn-outline-primary mb-1"><i class="bi bi-search"></i></button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small text-uppercase">
+                            <tr>
+                                <th style="width: 40px;" class="text-center">#</th>
+                                <th>Topic Title</th>
+                                <th>Type</th>
+                                <th>Language</th>
+                                <th>Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for topic in page_obj %}
+                            <tr>
+                                <td class="text-center text-muted small font-weight-bold">{{ forloop.counter }}</td>
+                                <td>
+                                    <div class="font-weight-600 text-dark" style="max-width: 380px;">{{ topic.title }}</div>
+                                    {% if topic.prompt_hint %}
+                                    <small class="text-muted d-block text-truncate" style="max-width: 380px;"><i class="bi bi-info-circle mr-1"></i>{{ topic.prompt_hint }}</small>
+                                    {% endif %}
+                                    {% if topic.category %}
+                                    <span class="badge badge-light border text-muted small mt-1">{{ topic.category.name }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if topic.content_type == 'blog' %}
+                                    <span class="badge badge-soft-primary px-2 py-1"><i class="bi bi-newspaper mr-1"></i>Blog</span>
+                                    {% else %}
+                                    <span class="badge badge-soft-warning px-2 py-1 text-dark" style="background: rgba(255, 193, 7, 0.15);"><i class="bi bi-journal-text mr-1"></i>Note</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if topic.language == 'ne' %}
+                                    <span class="badge badge-light border px-2 py-1">🇳🇵 Nepali</span>
+                                    {% elif topic.language == 'en' %}
+                                    <span class="badge badge-light border px-2 py-1">🇬🇧 English</span>
+                                    {% else %}
+                                    <span class="badge badge-light border px-2 py-1">🇳🇵🇬🇧 Bilingual</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if topic.status == 'completed' %}
+                                    <span class="badge badge-success px-2 py-1"><i class="bi bi-check-circle mr-1"></i>Done</span>
+                                    {% elif topic.status == 'failed' %}
+                                    <span class="badge badge-danger px-2 py-1" title="{{ topic.error_message }}"><i class="bi bi-exclamation-octagon mr-1"></i>Failed</span>
+                                    {% elif topic.status == 'processing' %}
+                                    <span class="badge badge-info px-2 py-1"><span class="spinner-border spinner-border-sm mr-1"></span>Working</span>
+                                    {% else %}
+                                    <span class="badge badge-secondary px-2 py-1"><i class="bi bi-hourglass-split mr-1"></i>Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right">
+                                    <div class="btn-group btn-group-sm">
+                                        {% if topic.status == 'completed' %}
+                                            {% if topic.generated_blog %}
+                                            <a href="{% url 'blog:detail' topic.generated_blog.slug %}" target="_blank" class="btn btn-outline-info" title="View Published Blog">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                            {% elif topic.generated_note %}
+                                            <a href="{% url 'notes:detail' topic.generated_note.slug %}" target="_blank" class="btn btn-outline-info" title="View Published Note">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        <!-- Run Now Trigger -->
+                                        <a href="{% url 'dashboard:ai_topic_run_now' topic.pk %}" class="btn btn-outline-primary" title="Generate this topic immediately" onclick="return confirm('Generate content for this topic now?');">
+                                            <i class="bi bi-play-fill"></i> Run
+                                        </a>
+
+                                        <!-- Delete Trigger -->
+                                        <form action="{% url 'dashboard:ai_topic_delete' topic.pk %}" method="POST" class="d-inline" onsubmit="return confirm('Delete topic from queue?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-journal-x d-block mb-2 text-muted" style="font-size: 2.5rem;"></i>
+                                    <strong>No topics in queue.</strong><br>
+                                    Add topics above or click <a href="#" data-toggle="modal" data-target="#suggestTopicsModal">"Suggest Topics"</a> to let AI brainstorm ideas!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&type={{ content_filter }}&status={{ status_filter }}&q={{ search_q }}">Previous</a></li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}&type={{ content_filter }}&status={{ status_filter }}&q={{ search_q }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&type={{ content_filter }}&status={{ status_filter }}&q={{ search_q }}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Settings & Automation Controls -->
+    <div class="col-lg-4">
+        <!-- Automation Settings Card -->
+        <div class="card shadow-sm border mb-4" style="border-radius: 12px;">
+            <div class="card-header bg-white border-bottom p-3">
+                <h5 class="card-title font-weight-bold mb-0 text-dark">
+                    <i class="bi bi-sliders2 text-primary mr-2"></i> Automation Configuration
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{% url 'dashboard:ai_save_settings' %}" method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold text-dark small">Google Gemini API Key</label>
+                        <div class="input-group">
+                            <input type="password" name="gemini_api_key" id="geminiApiKeyInput" value="{{ settings.gemini_api_key|default:'' }}" class="form-control" placeholder="AIzaSy...">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility()"><i class="bi bi-eye"></i></button>
+                            </div>
+                        </div>
+                        <small class="text-muted">Free tier API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.</small>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold text-dark small">Gemini Model</label>
+                        <select name="gemini_model" class="form-control">
+                            <option value="gemini-2.0-flash" {% if settings.gemini_model == 'gemini-2.0-flash' %}selected{% endif %}>gemini-2.0-flash (Recommended: Fastest & High Limits)</option>
+                            <option value="gemini-1.5-flash" {% if settings.gemini_model == 'gemini-1.5-flash' %}selected{% endif %}>gemini-1.5-flash (Standard)</option>
+                            <option value="gemini-1.5-pro" {% if settings.gemini_model == 'gemini-1.5-pro' %}selected{% endif %}>gemini-1.5-pro (In-depth Long Form)</option>
+                        </select>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <h6 class="font-weight-bold text-dark small text-uppercase mb-3">Daily Cron Automation</h6>
+
+                    <div class="custom-control custom-switch mb-3">
+                        <input type="checkbox" class="custom-control-input" id="enableDailyBlog" name="enable_daily_ai_blog" {% if settings.enable_daily_ai_blog %}checked{% endif %}>
+                        <label class="custom-control-label font-weight-600 text-dark" for="enableDailyBlog">
+                            Auto-Generate 1 Blog Post / Day
+                        </label>
+                        <small class="text-muted d-block">Picks next pending blog topic daily.</small>
+                    </div>
+
+                    <div class="custom-control custom-switch mb-3">
+                        <input type="checkbox" class="custom-control-input" id="enableDailyNote" name="enable_daily_ai_note" {% if settings.enable_daily_ai_note %}checked{% endif %}>
+                        <label class="custom-control-label font-weight-600 text-dark" for="enableDailyNote">
+                            Auto-Generate 1 Study Note / Day
+                        </label>
+                        <small class="text-muted d-block">Picks next pending note topic daily.</small>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold text-dark small">Blog Publish Mode</label>
+                        <select name="ai_blog_publish_mode" class="form-control">
+                            <option value="published" {% if settings.ai_blog_publish_mode == 'published' %}selected{% endif %}>🚀 Publish Immediately (Live on Site)</option>
+                            <option value="draft" {% if settings.ai_blog_publish_mode == 'draft' %}selected{% endif %}>📝 Save as Draft (Review Before Publishing)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold text-dark small">Study Note Publish Mode</label>
+                        <select name="ai_note_publish_mode" class="form-control">
+                            <option value="published" {% if settings.ai_note_publish_mode == 'published' %}selected{% endif %}>🚀 Publish Immediately (Live on Site)</option>
+                            <option value="draft" {% if settings.ai_note_publish_mode == 'draft' %}selected{% endif %}>📝 Save as Draft (Review Before Publishing)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="font-weight-bold text-dark small">Default Generation Language</label>
+                        <select name="ai_default_language" class="form-control">
+                            <option value="bilingual" {% if settings.ai_default_language == 'bilingual' %}selected{% endif %}>🇳🇵🇬🇧 Bilingual (Nepali with English IT terms)</option>
+                            <option value="ne" {% if settings.ai_default_language == 'ne' %}selected{% endif %}>🇳🇵 Pure Nepali (देवनागरी)</option>
+                            <option value="en" {% if settings.ai_default_language == 'en' %}selected{% endif %}>🇬🇧 English</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block font-weight-bold shadow-sm">
+                        <i class="bi bi-save2 mr-1"></i> Save AI Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- cPanel Cron Setup Guide Card -->
+        <div class="card shadow-sm border mb-4" style="border-radius: 12px; background: #f8fafc;">
+            <div class="card-header bg-white border-bottom p-3">
+                <h6 class="font-weight-bold mb-0 text-dark">
+                    <i class="bi bi-clock-history text-primary mr-2"></i> cPanel Daily Cron Setup
+                </h6>
+            </div>
+            <div class="card-body p-3">
+                <p class="small text-muted mb-2">
+                    To trigger automatic daily generation once a day at midnight (00:00), add this cron job in your cPanel <strong>Cron Jobs</strong> menu:
+                </p>
+                <div class="bg-dark text-light p-2 rounded small font-monospace position-relative" style="word-break: break-all; font-size: 0.75rem;">
+                    <code>cd /home/YOUR_CPANEL_USER/repositories/Final-mysite && /home/YOUR_CPANEL_USER/virtualenv/repositories/Final-mysite/3.11/bin/python manage.py generate_daily_content</code>
+                </div>
+                <small class="text-muted d-block mt-2">
+                    Schedule: <code>0 0 * * *</code> (Once a day at midnight)
+                </small>
+            </div>
+        </div>
+
+        <!-- Recent Generation Logs Card -->
+        <div class="card shadow-sm border mb-4" style="border-radius: 12px;">
+            <div class="card-header bg-white border-bottom p-3">
+                <h6 class="font-weight-bold mb-0 text-dark">
+                    <i class="bi bi-journal-check text-primary mr-2"></i> Recent AI Generation Activity
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush small">
+                    {% for log in recent_logs %}
+                    <li class="list-group-item p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="font-weight-bold text-dark text-truncate mr-2" style="max-width: 200px;">{{ log.topic_title }}</span>
+                            {% if log.status == 'success' %}
+                            <span class="badge badge-success px-2">Success</span>
+                            {% else %}
+                            <span class="badge badge-danger px-2">Failed</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted d-flex justify-content-between">
+                            <span><i class="bi bi-clock mr-1"></i>{{ log.created_at|date:"M d, H:i" }}</span>
+                            <span>{{ log.execution_time_seconds|floatformat:1 }}s ({{ log.model_used }})</span>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item p-3 text-muted text-center">
+                        No generation activity yet.
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: AI Topic Suggester -->
+<div class="modal fade" id="suggestTopicsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 14px;">
+            <div class="modal-header bg-primary text-white p-3">
+                <h5 class="modal-title font-weight-bold">
+                    <i class="bi bi-magic mr-2"></i> Brainstorm & Suggest Topics with Gemini
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-3">
+                    Select a domain and content type. Gemini AI will generate trending, high-interest topics across multiple fields (IT, Computer Operator, General Knowledge, Education, Grammar).
+                </p>
+
+                <div class="row">
+                    <div class="col-md-5 form-group">
+                        <label class="font-weight-bold small">Domain / Field Focus</label>
+                        <select id="modalSuggestDomain" class="form-control">
+                            <option value="Information Technology, Networking, Web & Cloud Skills">💻 Information Technology & Networking</option>
+                            <option value="Computer Operator Examination, Office Automation, MS Word, Excel">🖥️ Computer Operator & Office Apps</option>
+                            <option value="General Knowledge, Science, Current Affairs & World Geography">🌍 General Knowledge & Science</option>
+                            <option value="Nepali Grammar (नेपाली व्याकरण), Essay Writing & Linguistics">🇳🇵 Nepali Grammar & Language</option>
+                            <option value="Teacher Service Commission (TSC), Pedagogy & Education">📚 Education & Pedagogy</option>
+                            <option value="Mixed Multi-Discipline (Technology, Science, Exam Prep)">✨ Diverse Mixed Domains</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="font-weight-bold small">Content Target</label>
+                        <select id="modalSuggestType" class="form-control">
+                            <option value="blog">📝 Blog Post</option>
+                            <option value="note">📚 Study Note</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label class="font-weight-bold small">Language</label>
+                        <select id="modalSuggestLang" class="form-control">
+                            <option value="bilingual">🇳🇵🇬🇧 Bilingual</option>
+                            <option value="ne">🇳🇵 Nepali</option>
+                            <option value="en">🇬🇧 English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center my-3">
+                    <button type="button" id="btnRunTopicSuggestion" class="btn btn-primary px-4 font-weight-bold">
+                        <i class="bi bi-stars mr-1"></i> Generate 6 Topic Suggestions
+                    </button>
+                </div>
+
+                <div id="suggestLoadingSpinner" class="text-center my-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="small text-muted mt-2">Gemini AI is brainstorming topics...</p>
+                </div>
+
+                <div id="suggestResultsContainer" class="mt-4" style="display: none;">
+                    <h6 class="font-weight-bold text-dark border-bottom pb-2">
+                        Click any suggestion to add it directly to your queue:
+                    </h6>
+                    <div id="suggestResultsList" class="list-group">
+                        <!-- Populated by Ajax -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('geminiApiKeyInput');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+document.getElementById('btnRunTopicSuggestion').addEventListener('click', function() {
+    const domain = document.getElementById('modalSuggestDomain').value;
+    const type = document.getElementById('modalSuggestType').value;
+    const lang = document.getElementById('modalSuggestLang').value;
+
+    const spinner = document.getElementById('suggestLoadingSpinner');
+    const container = document.getElementById('suggestResultsContainer');
+    const list = document.getElementById('suggestResultsList');
+
+    spinner.style.display = 'block';
+    container.style.display = 'none';
+    list.innerHTML = '';
+
+    fetch(`{% url 'dashboard:ai_suggest_topics_ajax' %}?domain=${encodeURIComponent(domain)}&content_type=${encodeURIComponent(type)}&language=${encodeURIComponent(lang)}&count=6`)
+        .then(response => response.json())
+        .then(data => {
+            spinner.style.display = 'none';
+            if (data.status === 'success') {
+                container.style.display = 'block';
+                data.topics.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 mb-2 border rounded';
+                    el.innerHTML = `
+                        <div class="mr-3">
+                            <h6 class="font-weight-bold mb-1 text-primary">${item.title}</h6>
+                            <p class="small text-muted mb-0">${item.hint || ''}</p>
+                            <span class="badge badge-light border small mt-1">${item.category_name || type}</span>
+                        </div>
+                        <form action="{% url 'dashboard:ai_topic_create' %}" method="POST" class="m-0">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <input type="hidden" name="mode" value="single">
+                            <input type="hidden" name="title" value="${item.title.replace(/"/g, '&quot;')}">
+                            <input type="hidden" name="content_type" value="${type}">
+                            <input type="hidden" name="language" value="${lang}">
+                            <input type="hidden" name="prompt_hint" value="${(item.hint || '').replace(/"/g, '&quot;')}">
+                            <button type="submit" class="btn btn-sm btn-success px-3 font-weight-bold">
+                                <i class="bi bi-plus-lg mr-1"></i> Add
+                            </button>
+                        </form>
+                    `;
+                    list.appendChild(el);
+                });
+            } else {
+                alert('Suggestion Error: ' + (data.message || 'Failed to fetch suggestions'));
+            }
+        })
+        .catch(err => {
+            spinner.style.display = 'none';
+            alert('Request failed: ' + err);
+        });
+});
+</script>
+{% endblock %}

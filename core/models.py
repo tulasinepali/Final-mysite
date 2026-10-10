@@ -160,6 +160,80 @@ class SiteSettings(models.Model):
         help_text='Automatically email subscribers when a new Download file is published'
     )
 
+    # AI Auto-Blogger & Auto-Notes Configuration
+    gemini_api_key = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text='Google Gemini API Key from Google AI Studio (aistudio.google.com)'
+    )
+    gemini_model = models.CharField(
+        max_length=100,
+        default='gemini-2.0-flash',
+        choices=[
+            ('gemini-2.0-flash', 'Gemini 2.0 Flash (Fastest & Free Tier)'),
+            ('gemini-1.5-flash', 'Gemini 1.5 Flash (Reliable & Free Tier)'),
+            ('gemini-1.5-pro', 'Gemini 1.5 Pro (Deep & Comprehensive)'),
+        ],
+        help_text='Gemini AI model engine for article generation'
+    )
+    enable_daily_ai_blog = models.BooleanField(
+        default=False,
+        help_text='Enable daily automated generation of 1 blog post'
+    )
+    enable_daily_ai_note = models.BooleanField(
+        default=False,
+        help_text='Enable daily automated generation of 1 study note'
+    )
+    ai_blog_publish_mode = models.CharField(
+        max_length=20,
+        default='published',
+        choices=[
+            ('published', 'Publish Immediately (Live)'),
+            ('draft', 'Save as Draft (Require Review)'),
+        ],
+        help_text='Publication status for auto-generated blogs'
+    )
+    ai_note_publish_mode = models.CharField(
+        max_length=20,
+        default='published',
+        choices=[
+            ('published', 'Publish Immediately (Live)'),
+            ('draft', 'Save as Draft (Require Review)'),
+        ],
+        help_text='Publication status for auto-generated notes'
+    )
+    ai_default_language = models.CharField(
+        max_length=20,
+        default='bilingual',
+        choices=[
+            ('bilingual', 'Bilingual (नेपाली with English terms - Recommended)'),
+            ('ne', 'Pure Nepali (नेपाली - देवनागरी)'),
+            ('en', 'English'),
+        ],
+        help_text='Default language for generated articles'
+    )
+    ai_default_blog_category = models.ForeignKey(
+        'Category',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='default_ai_blogs',
+        limit_choices_to={'module': 'blog'},
+        help_text='Default category for auto-generated blogs if none specified'
+    )
+    ai_default_note_category = models.ForeignKey(
+        'Category',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='default_ai_notes',
+        limit_choices_to={'module': 'notes'},
+        help_text='Default category for auto-generated notes if none specified'
+    )
+    last_ai_blog_at = models.DateTimeField(null=True, blank=True)
+    last_ai_note_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         verbose_name = 'Site Settings'
         verbose_name_plural = 'Site Settings'
@@ -315,5 +389,90 @@ class VisitorLog(models.Model):
 
     def __str__(self):
         return f"{self.ip_address} visited {self.path} ({self.device_type}) at {self.timestamp}"
+
+
+class AITopicQueue(models.Model):
+    """Queue of topics for automated or 1-click AI generation"""
+    CONTENT_TYPE_CHOICES = [
+        ('blog', 'Blog Post (लेख / ब्लग)'),
+        ('note', 'Study Note (अध्ययन सामग्री / नोट)'),
+    ]
+    LANGUAGE_CHOICES = [
+        ('bilingual', 'Bilingual (नेपाली + English)'),
+        ('ne', 'Nepali (नेपाली - देवनागरी)'),
+        ('en', 'English'),
+    ]
+    STATUS_CHOICES = [
+        ('pending', 'Pending Queue'),
+        ('generating', 'Generating...'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
+
+    title = models.CharField(max_length=350, help_text='Topic title or prompt idea')
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPE_CHOICES, default='blog')
+    category = models.ForeignKey(
+        Category,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='ai_topics',
+        help_text='Target category (optional, will fallback to default)'
+    )
+    language = models.CharField(max_length=20, choices=LANGUAGE_CHOICES, default='bilingual')
+    prompt_hint = models.TextField(
+        blank=True,
+        help_text='Optional custom instructions, target audience, or specific subtopics to cover'
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    priority = models.PositiveIntegerField(default=10, help_text='Lower number = higher priority')
+
+    # Linked outputs
+    generated_blog = models.ForeignKey(
+        'blog.BlogPost',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='ai_source_topics'
+    )
+    generated_note = models.ForeignKey(
+        'notes.Note',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='ai_source_topics'
+    )
+    error_message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['priority', 'created_at']
+        verbose_name = 'AI Topic Queue'
+        verbose_name_plural = 'AI Topic Queue'
+
+    def __str__(self):
+        return f"[{self.get_content_type_display()}] {self.title} ({self.status})"
+
+
+class AIGenerationLog(models.Model):
+    """Audit log of AI content generation events"""
+    topic_title = models.CharField(max_length=350)
+    content_type = models.CharField(max_length=20)
+    language = models.CharField(max_length=20)
+    status = models.CharField(max_length=20)  # success, error
+    word_count = models.PositiveIntegerField(default=0)
+    message = models.TextField(blank=True)
+    article_url = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'AI Generation Log'
+        verbose_name_plural = 'AI Generation Logs'
+
+    def __str__(self):
+        return f"{self.created_at.strftime('%Y-%m-%d %H:%M')} - {self.topic_title} ({self.status})"
+
 
 

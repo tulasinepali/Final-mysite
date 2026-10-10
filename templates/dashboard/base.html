@@ -467,6 +467,13 @@
                             <p>Resource Downloads</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:ai_blogger' %}" class="nav-link {% if active_page == 'ai_blogger' %}active{% endif %}">
+                            <span class="nav-icon"><i class="bi bi-robot"></i></span>
+                            <p>AI Auto-Blogger</p>
+                            <span class="badge badge-soft-primary" style="background: rgba(13, 110, 253, 0.15) !important; color: #0559b7 !important; font-weight: 700;">AI</span>
+                        </a>
+                    </li>
 
                     <!-- EXAM & MCQS SECTION -->
                     <li class="nav-header">EXAMS &amp; MCQS</li>

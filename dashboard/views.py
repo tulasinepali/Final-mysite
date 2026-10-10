@@ -11,7 +11,8 @@ from django.utils.safestring import mark_safe
 import openpyxl
 from openpyxl import Workbook
 
-from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber, VisitorLog
+from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber, VisitorLog, AITopicQueue, AIGenerationLog
+from core.ai_blogger import generate_content_for_topic, suggest_topics_with_gemini
 from core.emails import send_broadcast_to_subscribers
 from notes.models import Note
 from blog.models import BlogPost, Comment
@@ -1837,6 +1838,196 @@ def quiz_feedback_delete(request, pk):
         fb.delete()
         messages.success(request, 'Feedback item deleted successfully!')
     return redirect('dashboard:quiz_feedbacks')
+
+
+# ========== AI AUTO-BLOGGER & NOTE GENERATOR ==========
+
+@staff_member_required
+def dashboard_ai_blogger(request):
+    """Main AI Content Generator Dashboard"""
+    settings = SiteSettings.objects.first()
+    if not settings:
+        settings = SiteSettings.objects.create()
+
+    # Filters
+    content_filter = request.GET.get('type', '')
+    status_filter = request.GET.get('status', '')
+    search_q = request.GET.get('q', '').strip()
+
+    queue_qs = AITopicQueue.objects.all()
+    if content_filter:
+        queue_qs = queue_qs.filter(content_type=content_filter)
+    if status_filter:
+        queue_qs = queue_qs.filter(status=status_filter)
+    if search_q:
+        queue_qs = queue_qs.filter(title__icontains=search_q)
+
+    # Metrics
+    total_topics = AITopicQueue.objects.count()
+    pending_topics = AITopicQueue.objects.filter(status='pending').count()
+    completed_topics = AITopicQueue.objects.filter(status='completed').count()
+    total_ai_blogs = BlogPost.objects.filter(is_ai_generated=True).count()
+    total_ai_notes = Note.objects.filter(is_ai_generated=True).count()
+
+    paginator = Paginator(queue_qs, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    recent_logs = AIGenerationLog.objects.select_related('topic').order_by('-created_at')[:10]
+    all_categories = Category.objects.all().order_by('name')
+
+    context = {
+        'settings': settings,
+        'page_obj': page_obj,
+        'recent_logs': recent_logs,
+        'all_categories': all_categories,
+        'total_topics': total_topics,
+        'pending_topics': pending_topics,
+        'completed_topics': completed_topics,
+        'total_ai_blogs': total_ai_blogs,
+        'total_ai_notes': total_ai_notes,
+        'content_filter': content_filter,
+        'status_filter': status_filter,
+        'search_q': search_q,
+        'active_page': 'ai_blogger',
+    }
+    return render(request, 'dashboard/ai_blogger.html', context)
+
+
+@staff_member_required
+def ai_topic_create(request):
+    """Add a new topic (single or bulk paste) to the AI queue"""
+    if request.method == 'POST':
+        mode = request.POST.get('mode', 'single')
+        content_type = request.POST.get('content_type', 'blog')
+        language = request.POST.get('language', 'bilingual')
+        category_id = request.POST.get('category')
+        priority = int(request.POST.get('priority', 5) or 5)
+        prompt_hint = request.POST.get('prompt_hint', '').strip()
+
+        category = None
+        if category_id:
+            category = Category.objects.filter(pk=category_id).first()
+
+        if mode == 'bulk':
+            bulk_text = request.POST.get('bulk_topics', '').strip()
+            lines = [l.strip() for l in bulk_text.splitlines() if l.strip()]
+            added_count = 0
+            for line in lines:
+                clean_title = re.sub(r'^\d+[\.\)]\s*', '', line).strip()
+                if clean_title:
+                    AITopicQueue.objects.create(
+                        title=clean_title,
+                        content_type=content_type,
+                        language=language,
+                        category=category,
+                        priority=priority,
+                        prompt_hint=prompt_hint,
+                        status='pending'
+                    )
+                    added_count += 1
+            messages.success(request, f'Successfully queued {added_count} topics for automatic AI generation!')
+        else:
+            title = request.POST.get('title', '').strip()
+            if title:
+                AITopicQueue.objects.create(
+                    title=title,
+                    content_type=content_type,
+                    language=language,
+                    category=category,
+                    priority=priority,
+                    prompt_hint=prompt_hint,
+                    status='pending'
+                )
+                messages.success(request, f'Topic "{title}" queued successfully!')
+            else:
+                messages.error(request, 'Topic title cannot be empty.')
+
+    return redirect('dashboard:ai_blogger')
+
+
+@staff_member_required
+def ai_topic_run_now(request, pk):
+    """Trigger immediate generation for a specific queued topic"""
+    topic = get_object_or_404(AITopicQueue, pk=pk)
+    success, res, log = generate_content_for_topic(topic)
+    if success:
+        messages.success(request, f'Successfully generated content for: "{topic.title}"!')
+    else:
+        messages.error(request, f'Failed to generate: {res}')
+    return redirect('dashboard:ai_blogger')
+
+
+@staff_member_required
+def ai_topic_delete(request, pk):
+    """Delete a topic from the AI queue"""
+    topic = get_object_or_404(AITopicQueue, pk=pk)
+    if request.method == 'POST':
+        title = topic.title
+        topic.delete()
+        messages.success(request, f'Topic "{title}" removed from queue.')
+    return redirect('dashboard:ai_blogger')
+
+
+@staff_member_required
+def ai_generate_instant(request):
+    """Instant 1-Click generation button for next pending blog or note"""
+    target_type = request.POST.get('target_type', 'blog')
+    topic = AITopicQueue.objects.filter(content_type=target_type, status='pending').first()
+
+    if not topic:
+        messages.warning(request, f'No pending topics found in queue for {target_type.upper()}. Please add topics first or use AI Topic Suggestions.')
+        return redirect('dashboard:ai_blogger')
+
+    success, res, log = generate_content_for_topic(topic)
+    if success:
+        target_name = "Blog article" if target_type == 'blog' else "Study note"
+        messages.success(request, f'⚡ {target_name} generated and created successfully: "{topic.title}"!')
+    else:
+        messages.error(request, f'Generation failed: {res}')
+    return redirect('dashboard:ai_blogger')
+
+
+@staff_member_required
+def ai_save_settings(request):
+    """Save AI Auto-Blogger Configuration & Automation toggles"""
+    if request.method == 'POST':
+        settings = SiteSettings.objects.first()
+        if not settings:
+            settings = SiteSettings.objects.create()
+
+        settings.gemini_api_key = request.POST.get('gemini_api_key', '').strip()
+        settings.gemini_model = request.POST.get('gemini_model', 'gemini-2.0-flash').strip()
+        settings.enable_daily_ai_blog = 'enable_daily_ai_blog' in request.POST
+        settings.enable_daily_ai_note = 'enable_daily_ai_note' in request.POST
+        settings.ai_blog_publish_mode = request.POST.get('ai_blog_publish_mode', 'published')
+        settings.ai_note_publish_mode = request.POST.get('ai_note_publish_mode', 'published')
+        settings.ai_default_language = request.POST.get('ai_default_language', 'bilingual')
+
+        cat_blog_id = request.POST.get('ai_default_blog_category')
+        cat_note_id = request.POST.get('ai_default_note_category')
+        settings.ai_default_blog_category = Category.objects.filter(pk=cat_blog_id).first() if cat_blog_id else None
+        settings.ai_default_note_category = Category.objects.filter(pk=cat_note_id).first() if cat_note_id else None
+
+        settings.save()
+        messages.success(request, 'AI Auto-Blogger settings saved successfully!')
+    return redirect('dashboard:ai_blogger')
+
+
+@staff_member_required
+def ai_suggest_topics_ajax(request):
+    """Ajax endpoint: Uses Gemini to suggest exciting topics across domains"""
+    from django.http import JsonResponse
+    domain = request.GET.get('domain', 'Technology, Computer Operator, Grammar & Education')
+    content_type = request.GET.get('content_type', 'blog')
+    language = request.GET.get('language', 'bilingual')
+    count = int(request.GET.get('count', 6))
+
+    try:
+        suggestions = suggest_topics_with_gemini(domain=domain, content_type=content_type, language=language, count=count)
+        return JsonResponse({'status': 'success', 'topics': suggestions})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 
 
