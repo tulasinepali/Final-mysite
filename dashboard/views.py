@@ -2035,8 +2035,11 @@ def ai_test_api_key(request):
     from django.http import JsonResponse
     from core.ai_blogger import get_gemini_config, _call_gemini_api, GEMINI_API_URL
 
-    api_key, model, _ = get_gemini_config()
+    api_key, default_model, _ = get_gemini_config()
     test_key = request.GET.get('key', '').strip() or api_key
+    model = request.GET.get('model', '').strip() or default_model
+    if model in ['gemini-2.0-flash', 'gemini-2.0-flash-exp']:
+        model = 'gemini-2.5-flash'
 
     if not test_key:
         return JsonResponse({

@@ -399,9 +399,9 @@
 
                     <div class="form-group mb-3">
                         <label class="font-weight-bold text-dark small">Gemini Model</label>
-                        <select name="gemini_model" class="form-control">
-                            <option value="gemini-2.0-flash" {% if settings.gemini_model == 'gemini-2.0-flash' %}selected{% endif %}>gemini-2.0-flash (Recommended: Fastest & High Limits)</option>
-                            <option value="gemini-1.5-flash" {% if settings.gemini_model == 'gemini-1.5-flash' %}selected{% endif %}>gemini-1.5-flash (Standard)</option>
+                        <select name="gemini_model" id="geminiModelSelect" class="form-control">
+                            <option value="gemini-2.5-flash" {% if settings.gemini_model == 'gemini-2.5-flash' or settings.gemini_model == 'gemini-2.0-flash' or not settings.gemini_model %}selected{% endif %}>gemini-2.5-flash (Recommended: Ultra-fast & High Limits)</option>
+                            <option value="gemini-1.5-flash" {% if settings.gemini_model == 'gemini-1.5-flash' %}selected{% endif %}>gemini-1.5-flash (Reliable Standard)</option>
                             <option value="gemini-1.5-pro" {% if settings.gemini_model == 'gemini-1.5-pro' %}selected{% endif %}>gemini-1.5-pro (In-depth Long Form)</option>
                         </select>
                     </div>
@@ -598,12 +598,14 @@ function testGeminiConnection() {
     const btn = document.getElementById('btnTestApiKey');
     const resultDiv = document.getElementById('apiKeyTestResult');
 
+    const model = document.getElementById('geminiModelSelect') ? document.getElementById('geminiModelSelect').value : 'gemini-2.5-flash';
+
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span> Testing...';
     resultDiv.style.display = 'block';
     resultDiv.innerHTML = '<div class="alert alert-info py-2 px-3 small mb-0"><i class="bi bi-arrow-repeat mr-1"></i> Testing connection to Google Gemini API...</div>';
 
-    fetch(`{% url 'dashboard:ai_test_api_key' %}?key=${encodeURIComponent(key)}`)
+    fetch(`{% url 'dashboard:ai_test_api_key' %}?key=${encodeURIComponent(key)}&model=${encodeURIComponent(model)}`)
         .then(response => response.json().then(data => ({status: response.status, body: data})))
         .then(res => {
             btn.disabled = false;
