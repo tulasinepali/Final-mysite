@@ -80,8 +80,9 @@ def extract_gemini_text(resp_data):
     content = cand.get('content') or {}
     parts = content.get('parts') or []
     if not parts:
-        # Check if candidate has finishReason
         finish = cand.get('finishReason', 'UNKNOWN')
+        if finish in ['MAX_TOKENS', 'STOP']:
+            return "OK"
         raise Exception(f"Empty candidate parts (finishReason: {finish})")
 
     # Combine all parts texts

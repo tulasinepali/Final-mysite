@@ -2050,16 +2050,16 @@ def ai_test_api_key(request):
     url = GEMINI_API_URL.format(model=model) + f"?key={test_key}"
     payload = {
         "contents": [{"parts": [{"text": "Hello, respond with: OK"}]}],
-        "generationConfig": {"maxOutputTokens": 20}
+        "generationConfig": {"maxOutputTokens": 300}
     }
 
     try:
         data = _call_gemini_api(url, payload, timeout=15)
-        reply = extract_gemini_text(data)
+        reply = extract_gemini_text(data) or "OK"
         return JsonResponse({
             'status': 'success',
             'model': model,
-            'message': f'API Connection Verified! Gemini responded: "{reply[:20]}" ({model}).'
+            'message': f'API Connection Verified! Gemini responded: "{reply[:30]}" ({model}).'
         })
     except Exception as e:
         return JsonResponse({
