@@ -59,6 +59,36 @@ def _call_gemini_api(url, payload, timeout=90):
         raise Exception(f"Gemini Connection Error: {e.reason}")
 
 
+def extract_gemini_text(resp_data):
+    """Safely extract generated text across various Gemini response structures"""
+    if not isinstance(resp_data, dict):
+        raise Exception(f"Unexpected response format: {type(resp_data)}")
+
+    # Check for direct prompt feedback or block
+    if resp_data.get('promptFeedback', {}).get('blockReason'):
+        reason = resp_data['promptFeedback']['blockReason']
+        raise Exception(f"Prompt was blocked by Gemini safety filter: {reason}")
+
+    candidates = resp_data.get('candidates') or []
+    if not candidates:
+        if 'error' in resp_data:
+            err = resp_data['error']
+            raise Exception(f"Gemini Error ({err.get('code')}): {err.get('message')}")
+        raise Exception(f"No candidates returned by Gemini: {json.dumps(resp_data)[:200]}")
+
+    cand = candidates[0]
+    content = cand.get('content') or {}
+    parts = content.get('parts') or []
+    if not parts:
+        # Check if candidate has finishReason
+        finish = cand.get('finishReason', 'UNKNOWN')
+        raise Exception(f"Empty candidate parts (finishReason: {finish})")
+
+    # Combine all parts texts
+    texts = [p.get('text', '') for p in parts if isinstance(p, dict) and 'text' in p]
+    return ''.join(texts).strip()
+
+
 def sanitize_slug(text, max_len=180):
     """Generate a clean URL slug supporting Latin or transliterated text"""
     clean = re.sub(r'[^\w\s-]', '', text).strip()
@@ -187,7 +217,7 @@ JSON Output Schema required:
 
     try:
         resp_data = _call_gemini_api(url, payload, timeout=90)
-        raw_text = resp_data['candidates'][0]['content']['parts'][0]['text']
+        raw_text = extract_gemini_text(resp_data)
 
         # Parse JSON
         cleaned_json = raw_text.strip()
@@ -354,7 +384,7 @@ Do NOT include markdown fences, just pure JSON.
     }
 
     resp_data = _call_gemini_api(url, payload, timeout=45)
-    raw = resp_data['candidates'][0]['content']['parts'][0]['text'].strip()
+    raw = extract_gemini_text(resp_data)
     if raw.startswith("```json"):
         raw = raw[7:]
     if raw.startswith("```"):

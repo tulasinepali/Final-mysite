@@ -2033,7 +2033,7 @@ def ai_suggest_topics_ajax(request):
 def ai_test_api_key(request):
     """Test connection with Google Gemini API"""
     from django.http import JsonResponse
-    from core.ai_blogger import get_gemini_config, _call_gemini_api, GEMINI_API_URL
+    from core.ai_blogger import get_gemini_config, _call_gemini_api, extract_gemini_text, GEMINI_API_URL
 
     api_key, default_model, _ = get_gemini_config()
     test_key = request.GET.get('key', '').strip() or api_key
@@ -2049,17 +2049,17 @@ def ai_test_api_key(request):
 
     url = GEMINI_API_URL.format(model=model) + f"?key={test_key}"
     payload = {
-        "contents": [{"parts": [{"text": "Reply with only: OK"}]}],
-        "generationConfig": {"maxOutputTokens": 10}
+        "contents": [{"parts": [{"text": "Hello, respond with: OK"}]}],
+        "generationConfig": {"maxOutputTokens": 20}
     }
 
     try:
         data = _call_gemini_api(url, payload, timeout=15)
-        reply = data['candidates'][0]['content']['parts'][0]['text'].strip()
+        reply = extract_gemini_text(data)
         return JsonResponse({
             'status': 'success',
             'model': model,
-            'message': f'API Connection Verified! Gemini responded successfully ({model}).'
+            'message': f'API Connection Verified! Gemini responded: "{reply[:20]}" ({model}).'
         })
     except Exception as e:
         return JsonResponse({
