@@ -5,6 +5,7 @@ from django.db.models import Count, Sum, Avg
 from django.db.models.functions import TruncDate
 from django.core.paginator import Paginator
 from django.http import HttpResponse
+import re
 import json
 import csv
 from django.utils.safestring import mark_safe
