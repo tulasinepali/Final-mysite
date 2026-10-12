@@ -26,10 +26,33 @@ def home(request):
     total_mcqs = Quiz.objects.filter(is_published=True).aggregate(total=Count('questions'))['total'] or 0
     total_users = User.objects.count()
     site_settings = SiteSettings.objects.first()
+
+    # Question of the Day: Fetch up to 10 published questions with related quiz/category
+    from quiz.models import Question
+    import json
+    daily_questions_qs = Question.objects.filter(
+        quiz__is_published=True
+    ).select_related('quiz', 'quiz__category').order_by('?')[:8]
+
+    daily_questions_data = []
+    choice_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+    for q in daily_questions_qs:
+        daily_questions_data.append({
+            'category': q.quiz.category.name if q.quiz.category else 'General Knowledge',
+            'categoryIcon': 'bi-laptop' if 'computer' in (q.quiz.category.name.lower() if q.quiz.category else '') else 'bi-question-circle',
+            'level': q.quiz.title,
+            'question': q.question_text,
+            'options': [q.option_a, q.option_b, q.option_c, q.option_d],
+            'correctIndex': choice_map.get(q.correct_answer.upper().strip(), 0),
+            'explanation': q.explanation or f"Option {q.correct_answer.upper()} is the correct answer.",
+            'quizUrl': q.quiz.get_absolute_url() if hasattr(q.quiz, 'get_absolute_url') else '/quizzes/'
+        })
+
     context = {
         'featured_notes': featured_notes, 'latest_notes': latest_notes,
         'trending_blogs': trending_blogs, 'popular_downloads': popular_downloads,
         'recent_quizzes': recent_quizzes,
+        'daily_questions_json': json.dumps(daily_questions_data) if daily_questions_data else '',
         'stats': {
             'total_notes': total_notes,
             'total_blogs': total_blogs,

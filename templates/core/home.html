@@ -534,7 +534,7 @@ body.dark-mode .student-avatar,
                                     <span class="live-dot-ping"></span>
                                     <span class="live-dot-solid" style="width: 7px; height: 7px; border-radius: 50%; background-color: #ef4444;"></span>
                                 </span>
-                                LIVE MCQ
+                                🎯 QUESTION OF THE DAY &bull; आजको प्रश्न
                             </span>
                             <button type="button" class="btn-mcq-shuffle" id="nextHeroMcqBtn" onclick="rotateHeroQuestion()" title="Load another question" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; background: #ffffff; border: 1.5px solid #cbd5e1; color: #334155; font-size: 11.5px; font-weight: 700; cursor: pointer;">
                                 <i class="bi bi-arrow-repeat me-1"></i><span>Next Q</span>
@@ -605,7 +605,7 @@ body.dark-mode .student-avatar,
                                     <span class="proof-subtext" style="font-size: 10.5px; color: #64748b; font-weight: 500;">Active Loksewa &amp; IT learners</span>
                                 </div>
                             </div>
-                            <a href="{% url 'quiz:list' %}" class="btn-mcq-hub" style="display: inline-flex; align-items: center; gap: 5px; padding: 7px 16px; border-radius: 50px; background: linear-gradient(135deg, #0559b3 0%, #034085 100%); color: #ffffff; font-size: 12px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 12px rgba(5,89,183,0.28);">
+                            <a href="{% url 'quiz:list' %}" id="heroFullPracticeBtn" class="btn-mcq-hub" style="display: inline-flex; align-items: center; gap: 5px; padding: 7px 16px; border-radius: 50px; background: linear-gradient(135deg, #0559b3 0%, #034085 100%); color: #ffffff; font-size: 12px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 12px rgba(5,89,183,0.28);">
                                 Full Practice <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -1133,8 +1133,9 @@ body.dark-mode .student-avatar,
 
 {% block extra_js %}
 <script>
-    // Interactive Live MCQ Pool & State Handler on Home
-    const heroMcqPool = [
+    // Question of the Day: Load dynamic pool passed from Django or fallback
+    const serverDailyQuestions = {{ daily_questions_json|default:"[]"|safe }};
+    const defaultHeroMcqPool = [
         {
             category: 'Computer Operator',
             categoryIcon: 'bi-laptop',
@@ -1142,7 +1143,8 @@ body.dark-mode .student-avatar,
             question: 'Q: Which shortcut key is used to duplicate the selected slide in PowerPoint?',
             options: ['Ctrl + M', 'Ctrl + D', 'Ctrl + Shift + N', 'Ctrl + K'],
             correctIndex: 1,
-            explanation: 'Ctrl + D immediately duplicates the active slide. (Ctrl + M inserts a blank new slide).'
+            explanation: 'Ctrl + D immediately duplicates the active slide. (Ctrl + M inserts a blank new slide).',
+            quizUrl: "{% url 'quiz:list' %}"
         },
         {
             category: 'Operating System',
@@ -1151,7 +1153,8 @@ body.dark-mode .student-avatar,
             question: 'Q: Which key combination directly opens the Task Manager in Windows?',
             options: ['Ctrl + Alt + Del', 'Ctrl + Shift + Esc', 'Win + X', 'Alt + F4'],
             correctIndex: 1,
-            explanation: 'Ctrl + Shift + Esc instantly opens Task Manager without routing to the lock screen.'
+            explanation: 'Ctrl + Shift + Esc instantly opens Task Manager without routing to the lock screen.',
+            quizUrl: "{% url 'quiz:list' %}"
         },
         {
             category: 'Spreadsheet',
@@ -1160,7 +1163,8 @@ body.dark-mode .student-avatar,
             question: 'Q: In Microsoft Excel, which function tallies cells containing numbers only?',
             options: ['COUNTA', 'COUNT', 'COUNTBLANK', 'COUNTIF'],
             correctIndex: 1,
-            explanation: 'COUNT counts only numeric entries, while COUNTA counts all non-empty cells.'
+            explanation: 'COUNT counts only numeric entries, while COUNTA counts all non-empty cells.',
+            quizUrl: "{% url 'quiz:list' %}"
         },
         {
             category: 'Cyber & Web',
@@ -1169,7 +1173,8 @@ body.dark-mode .student-avatar,
             question: 'Q: Which secure protocol encrypts web traffic using SSL/TLS over port 443?',
             options: ['HTTP', 'FTP', 'HTTPS', 'SMTP'],
             correctIndex: 2,
-            explanation: 'HTTPS encrypts HTTP requests and responses using SSL/TLS cryptography.'
+            explanation: 'HTTPS encrypts HTTP requests and responses using SSL/TLS cryptography.',
+            quizUrl: "{% url 'quiz:list' %}"
         },
         {
             category: 'Word Processing',
@@ -1178,9 +1183,12 @@ body.dark-mode .student-avatar,
             question: 'Q: Which shortcut key is used to insert a hard Page Break in Microsoft Word?',
             options: ['Ctrl + Enter', 'Shift + Enter', 'Alt + Enter', 'Ctrl + Space'],
             correctIndex: 0,
-            explanation: 'Ctrl + Enter immediately breaks to the next page in MS Word.'
+            explanation: 'Ctrl + Enter immediately breaks to the next page in MS Word.',
+            quizUrl: "{% url 'quiz:list' %}"
         }
     ];
+
+    const heroMcqPool = (serverDailyQuestions && serverDailyQuestions.length > 0) ? serverDailyQuestions : defaultHeroMcqPool;
 
     let currentHeroIndex = 0;
     let hasAnsweredCurrent = false;
@@ -1192,6 +1200,7 @@ body.dark-mode .student-avatar,
         const questionTitle = document.getElementById('heroQuestionTitle');
         const grid = document.getElementById('heroOptionGrid');
         const feedback = document.getElementById('mcqFeedback');
+        const fullPracticeLink = document.getElementById('heroFullPracticeBtn');
 
         if (!q || !grid) return;
 
@@ -1200,13 +1209,16 @@ body.dark-mode .student-avatar,
         feedback.innerHTML = '';
 
         if (categoryBadge) {
-            categoryBadge.innerHTML = `<i class="bi ${q.categoryIcon} me-1"></i>${q.category}`;
+            categoryBadge.innerHTML = `<i class="bi ${q.categoryIcon || 'bi-question-circle'} me-1"></i>${q.category}`;
         }
         if (levelBadge) {
             levelBadge.textContent = q.level;
         }
         if (questionTitle) {
-            questionTitle.textContent = q.question;
+            questionTitle.textContent = q.question.startsWith('Q:') ? q.question : `Q: ${q.question}`;
+        }
+        if (fullPracticeLink && q.quizUrl) {
+            fullPracticeLink.href = q.quizUrl;
         }
 
         const letters = ['A', 'B', 'C', 'D'];
@@ -1278,6 +1290,11 @@ body.dark-mode .student-avatar,
 
     // Animated Counter for Stats
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Question of the Day with first question from dynamic pool
+        if (heroMcqPool && heroMcqPool.length > 0) {
+            renderHeroQuestion(0);
+        }
+
         const counters = document.querySelectorAll('.stat-number');
         const speed = 75;
 

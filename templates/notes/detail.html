@@ -24,6 +24,57 @@
 {% endif %}
 {% endblock %}
 
+{% block extra_css %}
+<style>
+@media print {
+    /* Hide navigation, sidebars, footers, breadcrumbs, ads, and widgets when printing */
+    header, footer, nav, aside, .page-title, .ad-container, .header, .main-header,
+    #reading-progress-bar, .d-print-none, .instructor-card, #author-card,
+    .copy-link-btn, .btn, .breadcrumb, [role="search"], .related-card {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 12pt !important;
+        line-height: 1.6 !important;
+    }
+
+    article {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .note-content {
+        font-size: 12pt !important;
+        color: #111111 !important;
+    }
+
+    .note-content h1, .note-content h2, .note-content h3 {
+        color: #0559b7 !important;
+        page-break-after: avoid;
+    }
+
+    .note-content table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    .note-content th, .note-content td {
+        border: 1px solid #333333 !important;
+        padding: 6px 8px !important;
+    }
+
+    @page {
+        margin: 1.5cm;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Reading Progress Bar -->
 <div id="reading-progress-bar" style="position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: #0559b7; z-index: 9999; transition: width 0.1s ease;"></div>
@@ -117,17 +168,34 @@
                     {% endif %}
 
                     <!-- SmartStore Reader Toolbar -->
-                    <div class="d-flex justify-content-between align-items-center p-3 mb-4 rounded-3 border" style="background: #edf2f8; border-color: #e1e7f0 !important;">
+                    <div class="d-flex justify-content-between align-items-center p-3 mb-4 rounded-3 border d-print-none" style="background: #edf2f8; border-color: #e1e7f0 !important;">
                         <div class="d-flex align-items-center gap-2">
                             <span class="small text-muted fw-semibold" style="font-family: 'Poppins', sans-serif;"><i class="bi bi-fonts me-1"></i>Font:</span>
                             <button type="button" class="btn btn-sm bg-white border px-2 py-1 rounded" id="btn-font-decrease" title="Smaller font">A-</button>
                             <button type="button" class="btn btn-sm bg-white border px-2 py-1 rounded" id="btn-font-reset" title="Default font">A</button>
                             <button type="button" class="btn btn-sm bg-white border px-2 py-1 rounded" id="btn-font-increase" title="Larger font">A+</button>
                         </div>
-                        <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold shadow-sm text-white" onclick="window.print();" style="background: #0559b7; border-color: #0559b7; font-family: 'Poppins', sans-serif;">
+                                <i class="bi bi-printer-fill me-1"></i>Print / Save PDF
+                            </button>
                             <button type="button" class="btn btn-sm bg-white border rounded px-3 copy-link-btn" data-url="{{ request.build_absolute_uri }}" style="font-family: 'Poppins', sans-serif;">
                                 <i class="bi bi-link-45deg me-1"></i>Copy Link
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Clean Print Header (Visible ONLY when printing or saving as PDF) -->
+                    <div class="d-none d-print-block mb-4 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="h5 fw-bold mb-1" style="color: #0559b7;">Tulasi Nepali Learning Platform</h2>
+                                <p class="small text-muted mb-0">tulasinepali.com.np &bull; Official Educational &amp; Exam Preparation Notes</p>
+                            </div>
+                            <div class="text-end small text-muted">
+                                <div><strong>Date:</strong> {% now "Y-m-d" %}</div>
+                                <div><strong>Subject:</strong> {{ note.category.name }}</div>
+                            </div>
                         </div>
                     </div>
 

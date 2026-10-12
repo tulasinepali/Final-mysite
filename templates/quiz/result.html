@@ -57,7 +57,7 @@
                 </div>
 
                 <!-- Action CTA Buttons -->
-                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <div class="d-flex flex-wrap gap-2 justify-content-center mb-3">
                     <a href="{{ quiz.get_absolute_url }}" class="btn btn-light rounded-pill px-4 shadow-sm fw-bold" style="color: #0559b7; font-family: 'Poppins', sans-serif;">
                         <i class="bi bi-arrow-repeat me-2"></i>Retake Quiz
                     </a>
@@ -69,6 +69,30 @@
                         <i class="bi bi-trophy me-1"></i>Leaderboard
                     </a>
                     {% endif %}
+                </div>
+
+                <!-- Viral Scorecard Share Cluster -->
+                <div class="d-inline-flex flex-wrap align-items-center justify-content-center gap-2 p-2 px-3 rounded-pill" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);">
+                    <span class="small fw-semibold text-white-50 me-1" style="font-family: 'Poppins', sans-serif;">
+                        <i class="bi bi-share-fill me-1 text-warning"></i>Share Score:
+                    </span>
+                    <a href="https://api.whatsapp.com/send?text=🎯%20I%20just%20scored%20{{ percentage }}%25%20({{ final_score|floatformat:1 }}/{{ total_marks }})%20in%20'{{ quiz.title|urlencode }}'!%20Can%20you%20beat%20my%20score%3F%20Test%20here:%20{{ request.build_absolute_uri|urlencode }}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="btn btn-sm text-white rounded-pill px-3 fw-semibold shadow-sm"
+                       style="background: #25d366; font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                        <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="btn btn-sm text-white rounded-pill px-3 fw-semibold shadow-sm"
+                       style="background: #1877f2; font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                        <i class="bi bi-facebook me-1"></i>Facebook
+                    </a>
+                    <button type="button" class="btn btn-sm btn-light rounded-pill px-3 fw-semibold shadow-sm copy-link-btn"
+                            data-url="{{ request.build_absolute_uri }}"
+                            style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                        <i class="bi bi-clipboard-check me-1"></i>Copy Link
+                    </button>
                 </div>
             </div>
         </div>
@@ -554,6 +578,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 reportAlert.innerHTML = 'An unexpected error occurred.';
                 reportBtn.disabled = false;
                 reportBtn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Submit Report';
+            });
+        });
+    }
+
+    // Copy Link Button
+    var copyBtn = document.querySelector('.copy-link-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            var url = this.getAttribute('data-url');
+            navigator.clipboard.writeText(url).then(function() {
+                var orig = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="bi bi-check2 me-1 text-success"></i>Copied!';
+                setTimeout(function() { copyBtn.innerHTML = orig; }, 2000);
             });
         });
     }
