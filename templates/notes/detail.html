@@ -24,57 +24,6 @@
 {% endif %}
 {% endblock %}
 
-{% block extra_css %}
-<style>
-@media print {
-    /* Hide navigation, sidebars, footers, breadcrumbs, ads, and widgets when printing */
-    header, footer, nav, aside, .page-title, .ad-container, .header, .main-header,
-    #reading-progress-bar, .d-print-none, .instructor-card, #author-card,
-    .copy-link-btn, .btn, .breadcrumb, [role="search"], .related-card {
-        display: none !important;
-    }
-
-    body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        font-size: 12pt !important;
-        line-height: 1.6 !important;
-    }
-
-    article {
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    .note-content {
-        font-size: 12pt !important;
-        color: #111111 !important;
-    }
-
-    .note-content h1, .note-content h2, .note-content h3 {
-        color: #0559b7 !important;
-        page-break-after: avoid;
-    }
-
-    .note-content table {
-        border-collapse: collapse !important;
-        width: 100% !important;
-    }
-
-    .note-content th, .note-content td {
-        border: 1px solid #333333 !important;
-        padding: 6px 8px !important;
-    }
-
-    @page {
-        margin: 1.5cm;
-    }
-}
-</style>
-{% endblock %}
-
 {% block content %}
 <!-- Reading Progress Bar -->
 <div id="reading-progress-bar" style="position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: #0559b7; z-index: 9999; transition: width 0.1s ease;"></div>
@@ -403,6 +352,53 @@
         color: #0559b7;
         background-color: #edf2f8;
         font-weight: 600;
+    }
+
+    @media print {
+        /* Hide navigation, sidebars, footers, breadcrumbs, ads, and widgets when printing */
+        header, footer, nav, aside, .page-title, .ad-container, .header, .main-header,
+        #reading-progress-bar, .d-print-none, .instructor-card, #author-card,
+        .copy-link-btn, .btn, .breadcrumb, [role="search"], .related-card {
+            display: none !important;
+        }
+
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-size: 12pt !important;
+            line-height: 1.6 !important;
+        }
+
+        article {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .note-content {
+            font-size: 12pt !important;
+            color: #111111 !important;
+        }
+
+        .note-content h1, .note-content h2, .note-content h3 {
+            color: #0559b7 !important;
+            page-break-after: avoid;
+        }
+
+        .note-content table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+
+        .note-content th, .note-content td {
+            border: 1px solid #333333 !important;
+            padding: 6px 8px !important;
+        }
+
+        @page {
+            margin: 1.5cm;
+        }
     }
 </style>
 {% endblock %}
