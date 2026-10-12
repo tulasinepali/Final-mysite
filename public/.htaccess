@@ -4,6 +4,17 @@ PassengerEnabled on
 PassengerAppRoot /home/tulasine/learning-platformfinal
 PassengerPython /home/tulasine/virtualenv/learning-platformfinal/3.10/bin/python
 
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Block cgi-bin directory from search bots with 410 Gone / 403 Forbidden
+    RewriteRule ^cgi-bin(/.*)?$ - [F,L]
+
+    # 2. Redirect malformed &tag= URLs directly to canonical /blog/?tag= (301 Permanent)
+    RewriteCond %{THE_REQUEST} /blog/&tag=([^\s&]+) [NC]
+    RewriteRule ^blog/&tag=(.*)$ /blog/?tag=%1 [R=301,L,NE]
+</IfModule>
+
 # ── Security Headers ───────────────────────────────────────────────────────────
 <IfModule mod_headers.c>
     # HSTS — force HTTPS for 1 year (fixes "No HSTS header" flag)

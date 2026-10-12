@@ -6,6 +6,14 @@ from .forms import CommentForm
 from core.models import Category, Tag
 
 def blog_list(request):
+    # Fix malformed URLs crawled with literal &tag= instead of ?tag=
+    raw_query = request.META.get('QUERY_STRING', '')
+    if raw_query.startswith('&tag=') or '/&tag=' in request.path:
+        tag_val = request.GET.get('tag') or request.GET.get('&tag')
+        if tag_val:
+            from django.http import HttpResponsePermanentRedirect
+            return HttpResponsePermanentRedirect(f"/blog/?tag={tag_val}")
+
     posts = BlogPost.objects.filter(is_published=True)
     
     category_slug = request.GET.get('category')

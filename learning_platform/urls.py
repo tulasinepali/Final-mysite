@@ -27,6 +27,7 @@ urlpatterns = [
     path('tools/', include('tools.urls')),
     path('widgets/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
     path('widget/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
+    path('widgets/embed/', RedirectView.as_view(pattern_name='tools:widgets_index', permanent=False)),
     path('widgets/embed/<slug:slug>/', tools_views.widget_embed),
     path('robots.txt', core_views.robots_txt, name='robots_txt'),
     path('favicon.ico', core_views.favicon_view, name='favicon'),

@@ -101,7 +101,7 @@
                             {% if current_tag %}<input type="hidden" name="tag" value="{{ current_tag }}">{% endif %}
                             <button class="btn btn-explore" type="submit">Search</button>
                             {% if search_query %}
-                            <a href="{% url 'blog:list' %}{% if current_category %}?category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}" class="btn btn-outline-secondary" title="Clear search"><i class="bi bi-x-lg"></i></a>
+                            <a href="{% url 'blog:list' %}{% if current_category %}?category={{ current_category }}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% elif current_tag %}?tag={{ current_tag }}{% endif %}" class="btn btn-outline-secondary" title="Clear search"><i class="bi bi-x-lg"></i></a>
                             {% endif %}
                         </div>
                     </form>
@@ -109,7 +109,7 @@
                     <!-- Category Pills -->
                     <div class="d-flex flex-wrap gap-2 align-items-center">
                         <span class="small text-muted fw-semibold me-1" style="font-family: 'Poppins', sans-serif;"><i class="bi bi-funnel me-1"></i>Topic:</span>
-                        <a href="{% url 'blog:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}"
+                        <a href="{% url 'blog:list' %}{% if search_query %}?q={{ search_query }}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% elif current_tag %}?tag={{ current_tag }}{% endif %}"
                            class="btn btn-sm rounded-pill px-3 {% if not current_category %}btn-explore{% else %}btn-outline-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.82rem;">
                             All
                         </a>

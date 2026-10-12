@@ -150,12 +150,15 @@ Allow: /disclaimer/
 Allow: /sitemap.html
 Allow: /ads.txt
 
-# Block admin, login, and internal pages from crawlers
+# Block internal, server scripts, and embed widgets from search index
 Disallow: /admin/
+Disallow: /rishav/
+Disallow: /cgi-bin/
 Disallow: /login/
 Disallow: /logout/
 Disallow: /dashboard/
 Disallow: /ckeditor5/
+Disallow: /widgets/embed/
 Disallow: /media/site/
 
 # Sitemaps

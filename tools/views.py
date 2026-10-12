@@ -121,7 +121,9 @@ def widget_embed(request, slug):
         }
         context['events_json'] = json.dumps(events_dict)
 
-    return render(request, template_name, context)
+    response = render(request, template_name, context)
+    response['X-Robots-Tag'] = 'noindex, nofollow'
+    return response
 
 @require_POST
 def api_track_embed(request, slug):
