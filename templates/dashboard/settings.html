@@ -165,6 +165,38 @@
     </div>
 
     <div class="col-lg-4">
+        <!-- Maintenance Mode Status Card -->
+        <div class="card card-outline {% if settings.maintenance_mode %}card-danger{% else %}card-success{% endif %}">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tools mr-1"></i> Maintenance Mode
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if settings.maintenance_mode %}
+                    {% if settings.maintenance_banner_only %}
+                    <div class="alert alert-warning mb-2 py-2">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> <strong>Soft Mode Active:</strong> Public banner visible. Site still accessible.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger mb-2 py-2">
+                        <i class="fas fa-lock mr-1"></i> <strong>Full Lockdown Active:</strong> Visitors see 503 maintenance page.
+                    </div>
+                    {% endif %}
+                    <p class="small text-muted mb-2"><strong>Message:</strong> {{ settings.maintenance_message }}</p>
+                    <p class="small text-muted mb-3"><strong>Estimated End:</strong> {{ settings.maintenance_estimated_end|default:"Under 1 hour" }}</p>
+                {% else %}
+                    <div class="alert alert-success mb-2 py-2">
+                        <i class="fas fa-check-circle mr-1"></i> <strong>Live &amp; Operational:</strong> Site is online and open to everyone.
+                    </div>
+                    <p class="small text-muted mb-3">All public pages, quizzes, notes, and downloads are fully active.</p>
+                {% endif %}
+                <a href="/rishav/admin/core/sitesettings/{{ settings.id }}/change/" class="btn btn-block btn-outline-primary btn-sm">
+                    <i class="fas fa-sliders-h mr-1"></i> Toggle Maintenance in Admin
+                </a>
+            </div>
+        </div>
+
         <!-- Quick Links -->
         <div class="card">
             <div class="card-header">

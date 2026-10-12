@@ -168,6 +168,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Reading Progress Bar -->
     <div id="readingProgress" class="reading-progress-bar"></div>
 
+    <!-- Maintenance Announcement Banner (Soft Maintenance Mode) -->
+    {% if site_settings.maintenance_mode and site_settings.maintenance_banner_only %}
+    <div class="alert alert-warning border-0 rounded-0 mb-0 py-2 px-3 text-center small fw-semibold shadow-sm" role="alert" style="background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%); color: #92400e; border-bottom: 2px solid #f59e0b !important; z-index: 1060; position: relative;">
+        <i class="bi bi-tools me-1 text-warning"></i>
+        <span><strong>Maintenance Notice:</strong> {{ site_settings.maintenance_message|default:"We are performing scheduled updates. Some features may experience temporary delays." }}</span>
+        {% if site_settings.maintenance_estimated_end %}
+        <span class="badge bg-warning text-dark ms-2 rounded-pill">{{ site_settings.maintenance_estimated_end }}</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
     <!-- SmartStore 2-Tier Header -->
     <header id="header" class="header sticky-top">
         <!-- Tier 1: Header Bar -->

@@ -234,6 +234,27 @@ class SiteSettings(models.Model):
     last_ai_blog_at = models.DateTimeField(null=True, blank=True)
     last_ai_note_at = models.DateTimeField(null=True, blank=True)
 
+    # Maintenance Mode Suite
+    maintenance_mode = models.BooleanField(
+        default=False,
+        help_text='If checked, full maintenance screen is displayed to regular visitors. Staff and admins can still access the site and admin panel.'
+    )
+    maintenance_banner_only = models.BooleanField(
+        default=False,
+        help_text='If checked instead of full lockdown, the site stays accessible with a visible top warning banner.'
+    )
+    maintenance_message = models.TextField(
+        default='We are currently performing scheduled platform maintenance and upgrades. We will be back online shortly!',
+        blank=True,
+        help_text='Custom message shown on the maintenance page and top banner'
+    )
+    maintenance_estimated_end = models.CharField(
+        max_length=150,
+        blank=True,
+        default='Under 1 hour',
+        help_text='Estimated downtime shown to visitors (e.g., "Under 30 minutes", "10:30 PM NST")'
+    )
+
     class Meta:
         verbose_name = 'Site Settings'
         verbose_name_plural = 'Site Settings'

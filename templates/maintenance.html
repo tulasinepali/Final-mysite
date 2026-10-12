@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheduled Maintenance - {{ site_settings.site_name|default:"Tulasi Nepali" }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary: #0559b7;
+            --primary-dark: #033c7d;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0b0f19;
+                --card-bg: #111827;
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+                --border: #1f2937;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .maintenance-card {
+            background-color: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 24px;
+            max-width: 580px;
+            width: 100%;
+            padding: 44px 36px;
+            text-align: center;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .maintenance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #0559b7, #38bdf8, #f59e0b);
+        }
+
+        .icon-circle {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background: rgba(5, 89, 183, 0.1);
+            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .gear-spin {
+            animation: spin 9s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 50px;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #f59e0b;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        p.lead {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .info-pill-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            padding: 14px;
+            background: rgba(5, 89, 183, 0.04);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .info-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .info-pill i {
+            color: var(--primary);
+        }
+
+        .btn-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(5, 89, 183, 0.25);
+        }
+
+        .btn-refresh:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(5, 89, 183, 0.35);
+        }
+
+        .admin-link {
+            display: inline-block;
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .admin-link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-card">
+        <div class="icon-circle">
+            <i class="bi bi-gear-wide-connected gear-spin"></i>
+        </div>
+
+        <div>
+            <span class="badge-status">
+                <span class="live-dot"></span> Under Maintenance
+            </span>
+        </div>
+
+        <h1>Platform Upgrade in Progress</h1>
+
+        <p class="lead">
+            {{ maintenance_message|default:"We are currently performing scheduled platform maintenance and system updates to improve your learning experience. We will be back online shortly!" }}
+        </p>
+
+        <div class="info-pill-group">
+            <span class="info-pill">
+                <i class="bi bi-clock-history"></i>
+                <span>Estimated Time: <strong>{{ estimated_end|default:"Under 1 hour" }}</strong></span>
+            </span>
+            <span class="info-pill">
+                <i class="bi bi-shield-check"></i>
+                <span>Your Data is Safe</span>
+            </span>
+        </div>
+
+        <div>
+            <button class="btn-refresh" onclick="window.location.reload();">
+                <i class="bi bi-arrow-clockwise"></i> Check Again
+            </button>
+        </div>
+
+        <div>
+            <a href="/rishav/login/" class="admin-link">
+                <i class="bi bi-lock-fill me-1"></i> Staff &amp; Administrator Login
+            </a>
+        </div>
+    </div>
+</body>
+</html>

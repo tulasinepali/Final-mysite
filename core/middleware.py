@@ -149,3 +149,61 @@ class VisitorCountMiddleware:
             )
 
         return response
+
+
+class MaintenanceModeMiddleware:
+    """
+    Guards the public website when maintenance mode is active.
+    - Staff / superusers can always bypass and access the entire site.
+    - Whitelisted admin, login, and static/media paths are always accessible.
+    - Non-staff visitors receive HTTP 503 Service Unavailable with a polished maintenance page.
+    """
+    WHITELIST_PREFIXES = (
+        '/rishav/',
+        '/static/',
+        '/media/',
+        '/health/',
+        '/up/',
+        '/robots.txt',
+        '/favicon.ico',
+    )
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        path = request.path_info
+
+        # 1. Always allow whitelisted URL prefixes (Admin, Login, Static, Health)
+        for prefix in self.WHITELIST_PREFIXES:
+            if path.startswith(prefix):
+                return self.get_response(request)
+
+        # 2. Authenticated staff or superusers bypass maintenance unconditionally
+        if getattr(request, 'user', None) and request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+            return self.get_response(request)
+
+        # 3. Check SiteSettings maintenance state
+        try:
+            from core.models import SiteSettings
+            from django.shortcuts import render
+            settings = SiteSettings.objects.first()
+
+            if settings and settings.maintenance_mode and not settings.maintenance_banner_only:
+                response = render(
+                    request,
+                    'maintenance.html',
+                    {
+                        'site_settings': settings,
+                        'maintenance_message': settings.maintenance_message,
+                        'estimated_end': settings.maintenance_estimated_end,
+                    },
+                    status=503
+                )
+                response['Retry-After'] = '3600'  # Informs search engines and browsers to retry in 1 hour
+                return response
+        except Exception:
+            # If database table is in migration, fail safe and continue
+            pass
+
+        return self.get_response(request)

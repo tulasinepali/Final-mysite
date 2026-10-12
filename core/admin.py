@@ -44,6 +44,12 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             ),
             'description': 'Configure SMTP credentials and auto-notification triggers for email subscribers.'
         }),
+        ('🛠️ Maintenance Mode Suite', {
+            'fields': (
+                'maintenance_mode', 'maintenance_banner_only', 'maintenance_message', 'maintenance_estimated_end'
+            ),
+            'description': 'Control public maintenance mode. Staff and admins can always access the site and admin panel even when active.'
+        }),
     )
 
     def has_add_permission(self, request):
