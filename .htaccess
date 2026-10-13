@@ -10,3 +10,8 @@ RewriteRule ^static/(.*)$ /home/tulasine/learning-platformfinal/staticfiles/$1 [
 
 # 3. Media files
 RewriteRule ^media/(.*)$ /home/tulasine/learning-platformfinal/media/$1 [L]
+
+# 4. Permissions-Policy Security Header
+<IfModule mod_headers.c>
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), display-capture=(), accelerometer=(), gyroscope=(), magnetometer=()"
+</IfModule>
