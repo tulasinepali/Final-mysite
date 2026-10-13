@@ -33,7 +33,7 @@ def get_gemini_config():
     if settings and settings.gemini_model:
         model = settings.gemini_model.strip()
         # Automatically upgrade deprecated models to gemini-3.8-flash
-        if model in ['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
+        if model in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
             model = 'gemini-3.8-flash'
 
     return api_key, model, settings
@@ -286,9 +286,9 @@ JSON Output Schema required:
         try:
             resp_data = _call_gemini_api(url, payload, timeout=90)
         except Exception as primary_err:
-            # If primary model is unavailable (503 / 429), try gemini-1.5-flash as fallback
+            # If primary model is unavailable (503 / 429), try gemini-3.8-flash as fallback
             if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err) or "429" in str(primary_err):
-                fallback_model = "gemini-1.5-flash"
+                fallback_model = "gemini-3.8-flash"
                 if model != fallback_model:
                     fallback_url = GEMINI_API_URL.format(model=fallback_model) + f"?key={api_key}"
                     resp_data = _call_gemini_api(fallback_url, payload, timeout=90)
