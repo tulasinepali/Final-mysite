@@ -13,5 +13,6 @@ RewriteRule ^media/(.*)$ /home/tulasine/learning-platformfinal/media/$1 [L]
 
 # 4. Permissions-Policy Security Header
 <IfModule mod_headers.c>
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), display-capture=(), accelerometer=(), gyroscope=(), magnetometer=()"
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), display-capture=(), accelerometer=(), gyroscope=(), magnetometer=()"
 </IfModule>

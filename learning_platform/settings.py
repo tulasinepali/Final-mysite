@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'core.middleware.SecurityHeadersMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,7 +61,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.VisitorCountMiddleware',
     "csp.middleware.CSPMiddleware",
-    'core.middleware.SecurityHeadersMiddleware',
 ]
 
 ROOT_URLCONF = 'learning_platform.urls'
@@ -288,7 +288,7 @@ CONTENT_SECURITY_POLICY = {
     'DIRECTIVES': {
         'default-src': ("'self'",),
         'script-src': (
-            "'self'", "'unsafe-inline'", "'unsafe-eval'",
+            "'self'", "'unsafe-inline'",
             'https://cdn.jsdelivr.net',
             'https://cdnjs.cloudflare.com',
             'https://pagead2.googlesyndication.com',

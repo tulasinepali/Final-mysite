@@ -219,16 +219,15 @@ class SecurityHeadersMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        if 'Permissions-Policy' not in response:
-            response['Permissions-Policy'] = (
-                "camera=(), "
-                "microphone=(), "
-                "geolocation=(), "
-                "payment=(), "
-                "usb=(), "
-                "display-capture=(), "
-                "accelerometer=(), "
-                "gyroscope=(), "
-                "magnetometer=()"
-            )
+        response['Permissions-Policy'] = (
+            "camera=(), "
+            "microphone=(), "
+            "geolocation=(), "
+            "payment=(), "
+            "usb=(), "
+            "display-capture=(), "
+            "accelerometer=(), "
+            "gyroscope=(), "
+            "magnetometer=()"
+        )
         return response

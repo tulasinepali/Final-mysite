@@ -19,4 +19,17 @@ os.environ.setdefault(
 )
 
 from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
+_django_app = get_wsgi_application()
+
+
+def application(environ, start_response):
+    def custom_start_response(status, response_headers, exc_info=None):
+        header_names = [h[0].lower() for h in response_headers]
+        if 'permissions-policy' not in header_names:
+            response_headers.append((
+                'Permissions-Policy',
+                'camera=(), microphone=(), geolocation=(), payment=(), usb=(), display-capture=(), accelerometer=(), gyroscope=(), magnetometer=()'
+            ))
+        return start_response(status, response_headers, exc_info)
+
+    return _django_app(environ, custom_start_response)
