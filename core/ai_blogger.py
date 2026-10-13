@@ -31,9 +31,9 @@ def get_ai_config():
         provider = getattr(settings, 'ai_provider', 'gemini') or 'gemini'
         if provider == 'groq':
             api_key = (getattr(settings, 'groq_api_key', '') or '').strip()
-            model = getattr(settings, 'gemini_model', '') or 'llama-3.3-70b-versatile'
+            model = getattr(settings, 'gemini_model', '') or 'llama-3.1-8b-instant'
             if not model or 'gemini' in model:
-                model = 'llama-3.3-70b-versatile'
+                model = 'llama-3.1-8b-instant'
         else:
             api_key = (settings.gemini_api_key or '').strip()
             model = (settings.gemini_model or '').strip() or 'gemini-3.8-flash'
@@ -45,8 +45,8 @@ def get_ai_config():
     # Auto-detect Groq if key starts with gsk_
     if api_key.startswith('gsk_'):
         provider = 'groq'
-        if 'gemini' in model:
-            model = 'llama-3.3-70b-versatile'
+        if 'gemini' in model or model == 'llama-3.3-70b-versatile':
+            model = 'llama-3.1-8b-instant'
 
     return provider, api_key, model, settings
 
@@ -59,6 +59,10 @@ def get_gemini_config():
 
 def _call_groq_api(api_key, model, system_prompt, user_prompt, timeout=90):
     """Call Groq OpenAI-compatible chat completion endpoint using standard library urllib"""
+    # Use reliable production model llama-3.1-8b-instant
+    if not model or model == 'llama-3.3-70b-versatile' or 'gemini' in model:
+        model = 'llama-3.1-8b-instant'
+
     payload = {
         "model": model,
         "messages": [
@@ -91,6 +95,9 @@ def _call_groq_api(api_key, model, system_prompt, user_prompt, timeout=90):
             return choices[0].get('message', {}).get('content', '')
     except urllib.error.HTTPError as e:
         err_body = e.read().decode('utf-8', errors='ignore')[:300]
+        # If 70b is not enabled on this free key, retry automatically with 8b instant
+        if e.code == 404 and model != 'llama-3.1-8b-instant':
+            return _call_groq_api(api_key, 'llama-3.1-8b-instant', system_prompt, user_prompt, timeout=timeout)
         raise Exception(f"Groq API Error ({e.code}): {err_body}")
     except urllib.error.URLError as e:
         raise Exception(f"Groq Connection Error: {e.reason}")

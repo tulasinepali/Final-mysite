@@ -426,8 +426,8 @@
                         <label class="font-weight-bold text-dark small">Active Model</label>
                         <select name="gemini_model" id="geminiModelSelect" class="form-control">
                             <!-- Groq Models -->
-                            <option value="llama-3.3-70b-versatile" class="groq-model-opt" {% if settings.gemini_model == 'llama-3.3-70b-versatile' or not settings.gemini_model %}selected{% endif %}>Llama 3.3 70B Versatile (Groq - Most Powerful &amp; Free)</option>
-                            <option value="llama-3.1-8b-instant" class="groq-model-opt" {% if settings.gemini_model == 'llama-3.1-8b-instant' %}selected{% endif %}>Llama 3.1 8B Instant (Groq - Super Fast)</option>
+                            <option value="llama-3.1-8b-instant" class="groq-model-opt" {% if settings.gemini_model == 'llama-3.1-8b-instant' or not settings.gemini_model or '70b' in settings.gemini_model %}selected{% endif %}>Llama 3.1 8B Instant (Groq - Free, Fast &amp; Reliable)</option>
+                            <option value="llama-3.3-70b-versatile" class="groq-model-opt" {% if settings.gemini_model == 'llama-3.3-70b-versatile' %}selected{% endif %}>Llama 3.3 70B Versatile (Groq - 70B Model)</option>
                             <!-- Gemini Models -->
                             <option value="gemini-3.8-flash" class="gemini-model-opt" {% if settings.gemini_model == 'gemini-3.8-flash' %}selected{% endif %}>gemini-3.8-flash (Google AI Studio)</option>
                             <option value="gemini-3.5-flash-lite" class="gemini-model-opt" {% if settings.gemini_model == 'gemini-3.5-flash-lite' %}selected{% endif %}>gemini-3.5-flash-lite (Google AI Studio)</option>
@@ -637,7 +637,7 @@ function toggleProviderFields() {
         geminiGroup.style.display = 'none';
         // Select first groq option if gemini was selected
         if (modelSelect.value.startsWith('gemini')) {
-            modelSelect.value = 'llama-3.3-70b-versatile';
+            modelSelect.value = 'llama-3.1-8b-instant';
         }
     } else {
         groqGroup.style.display = 'none';
