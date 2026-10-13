@@ -1,7 +1,12 @@
 RewriteEngine On
 
-# Static files
+# 1. Force HTTP to HTTPS 301 Redirect
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 2. Static files
 RewriteRule ^static/(.*)$ /home/tulasine/learning-platformfinal/staticfiles/$1 [L]
 
-# Media files
+# 3. Media files
 RewriteRule ^media/(.*)$ /home/tulasine/learning-platformfinal/media/$1 [L]

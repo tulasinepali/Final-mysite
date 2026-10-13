@@ -270,6 +270,9 @@ REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
+# Trust reverse proxy header from cPanel / LiteSpeed / Nginx / Cloudflare
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # HSTS — tells browsers to only use HTTPS for 1 year (fixes "No HSTS" flag)
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
