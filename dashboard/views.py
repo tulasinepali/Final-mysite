@@ -1996,8 +1996,20 @@ def ai_save_settings(request):
         if not settings:
             settings = SiteSettings.objects.create()
 
-        settings.gemini_api_key = request.POST.get('gemini_api_key', '').strip()
-        settings.gemini_model = request.POST.get('gemini_model', 'gemini-2.0-flash').strip()
+        provider = request.POST.get('ai_provider', 'gemini').strip()
+        gemini_key = request.POST.get('gemini_api_key', '').strip()
+        groq_key = request.POST.get('groq_api_key', '').strip()
+
+        # If user pasted a Groq key (starts with gsk_) in the gemini field, auto-fix
+        if gemini_key.startswith('gsk_'):
+            groq_key = gemini_key
+            gemini_key = ''
+            provider = 'groq'
+
+        settings.ai_provider = provider
+        settings.gemini_api_key = gemini_key
+        settings.groq_api_key = groq_key
+        settings.gemini_model = request.POST.get('gemini_model', 'gemini-3.8-flash').strip()
         settings.enable_daily_ai_blog = 'enable_daily_ai_blog' in request.POST
         settings.enable_daily_ai_note = 'enable_daily_ai_note' in request.POST
         settings.ai_blog_publish_mode = request.POST.get('ai_blog_publish_mode', 'published')
@@ -2032,36 +2044,49 @@ def ai_suggest_topics_ajax(request):
 
 @staff_member_required
 def ai_test_api_key(request):
-    """Test connection with Google Gemini API"""
+    """Test connection with Groq or Google Gemini API"""
     from django.http import JsonResponse
-    from core.ai_blogger import get_gemini_config, _call_gemini_api, extract_gemini_text, GEMINI_API_URL
+    from core.ai_blogger import get_ai_config, _call_gemini_api, _call_groq_api, extract_gemini_text, GEMINI_API_URL
 
-    api_key, default_model, _ = get_gemini_config()
+    default_provider, api_key, default_model, _ = get_ai_config()
     test_key = request.GET.get('key', '').strip() or api_key
     model = request.GET.get('model', '').strip() or default_model
-    if model in ['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
-        model = 'gemini-3.8-flash'
+    provider = request.GET.get('provider', '').strip() or default_provider
+
+    if test_key.startswith('gsk_'):
+        provider = 'groq'
 
     if not test_key:
         return JsonResponse({
             'status': 'error',
-            'message': 'No API key provided. Please paste your Gemini API key first.'
+            'message': 'No API key provided. Please paste your API key first.'
         }, status=400)
 
-    url = GEMINI_API_URL.format(model=model) + f"?key={test_key}"
-    payload = {
-        "contents": [{"parts": [{"text": "Hello, respond with: OK"}]}],
-        "generationConfig": {"maxOutputTokens": 300}
-    }
-
     try:
-        data = _call_gemini_api(url, payload, timeout=15)
-        reply = extract_gemini_text(data) or "OK"
-        return JsonResponse({
-            'status': 'success',
-            'model': model,
-            'message': f'API Connection Verified! Gemini responded: "{reply[:30]}" ({model}).'
-        })
+        if provider == 'groq':
+            if 'gemini' in model:
+                model = 'llama-3.3-70b-versatile'
+            reply = _call_groq_api(test_key, model, "You are a helpful assistant.", "Respond with JSON: {\"status\": \"OK\"}", timeout=15)
+            return JsonResponse({
+                'status': 'success',
+                'model': model,
+                'message': f'Groq API Verified! Responded: "{reply[:40]}" ({model}).'
+            })
+        else:
+            if model in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
+                model = 'gemini-3.8-flash'
+            url = GEMINI_API_URL.format(model=model) + f"?key={test_key}"
+            payload = {
+                "contents": [{"parts": [{"text": "Hello, respond with: OK"}]}],
+                "generationConfig": {"maxOutputTokens": 300}
+            }
+            data = _call_gemini_api(url, payload, timeout=15)
+            reply = extract_gemini_text(data) or "OK"
+            return JsonResponse({
+                'status': 'success',
+                'model': model,
+                'message': f'Gemini API Verified! Responded: "{reply[:30]}" ({model}).'
+            })
     except Exception as e:
         return JsonResponse({
             'status': 'error',

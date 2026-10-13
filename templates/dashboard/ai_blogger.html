@@ -383,25 +383,54 @@
                     {% csrf_token %}
 
                     <div class="form-group mb-3">
-                        <label class="font-weight-bold text-dark small">Google Gemini API Key</label>
+                        <label class="font-weight-bold text-dark small">AI Engine Provider</label>
+                        <select name="ai_provider" id="aiProviderSelect" class="form-control" onchange="toggleProviderFields()">
+                            <option value="groq" {% if settings.ai_provider == 'groq' or settings.groq_api_key %}selected{% endif %}>🚀 Groq (Free, Ultra-Fast, No 429 Quota Limits - Recommended)</option>
+                            <option value="gemini" {% if settings.ai_provider == 'gemini' and not settings.groq_api_key %}selected{% endif %}>✨ Google Gemini (Google AI Studio)</option>
+                        </select>
+                    </div>
+
+                    <!-- Groq Key Block -->
+                    <div class="form-group mb-3" id="groqKeyGroup">
+                        <label class="font-weight-bold text-dark small">Groq API Key (starts with <code>gsk_...</code>)</label>
+                        <div class="input-group">
+                            <input type="password" name="groq_api_key" id="groqApiKeyInput" value="{{ settings.groq_api_key|default:'' }}" class="form-control" placeholder="gsk_...">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" onclick="toggleGroqKeyVisibility()"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-outline-success font-weight-bold" type="button" id="btnTestGroqKey" onclick="testApiKeyConnection('groq')">
+                                    <i class="bi bi-broadcast mr-1"></i> Test Groq
+                                </button>
+                            </div>
+                        </div>
+                        <small class="text-muted">Get your free key in 30 seconds at <a href="https://console.groq.com/keys" target="_blank" class="font-weight-bold">console.groq.com/keys</a> (No credit card required).</small>
+                    </div>
+
+                    <!-- Gemini Key Block -->
+                    <div class="form-group mb-3" id="geminiKeyGroup">
+                        <label class="font-weight-bold text-dark small">Google Gemini API Key (starts with <code>AIzaSy...</code>)</label>
                         <div class="input-group">
                             <input type="password" name="gemini_api_key" id="geminiApiKeyInput" value="{{ settings.gemini_api_key|default:'' }}" class="form-control" placeholder="AIzaSy...">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility()"><i class="bi bi-eye"></i></button>
-                                <button class="btn btn-outline-primary font-weight-bold" type="button" id="btnTestApiKey" onclick="testGeminiConnection()">
-                                    <i class="bi bi-broadcast mr-1"></i> Test Key
+                                <button class="btn btn-outline-primary font-weight-bold" type="button" id="btnTestApiKey" onclick="testApiKeyConnection('gemini')">
+                                    <i class="bi bi-broadcast mr-1"></i> Test Gemini
                                 </button>
                             </div>
                         </div>
-                        <div id="apiKeyTestResult" class="mt-2" style="display: none;"></div>
                         <small class="text-muted">Free tier API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.</small>
                     </div>
 
+                    <div id="apiKeyTestResult" class="mb-3" style="display: none;"></div>
+
                     <div class="form-group mb-3">
-                        <label class="font-weight-bold text-dark small">Gemini Model</label>
+                        <label class="font-weight-bold text-dark small">Active Model</label>
                         <select name="gemini_model" id="geminiModelSelect" class="form-control">
-                            <option value="gemini-3.8-flash" {% if settings.gemini_model == 'gemini-3.8-flash' or not settings.gemini_model or '1.5' in settings.gemini_model or '2.0' in settings.gemini_model or '2.5' in settings.gemini_model %}selected{% endif %}>gemini-3.8-flash (Recommended: Fastest, Free Tier &amp; Active)</option>
-                            <option value="gemini-3.5-flash-lite" {% if settings.gemini_model == 'gemini-3.5-flash-lite' %}selected{% endif %}>gemini-3.5-flash-lite (Ultra-Fast Lightweight)</option>
+                            <!-- Groq Models -->
+                            <option value="llama-3.3-70b-versatile" class="groq-model-opt" {% if settings.gemini_model == 'llama-3.3-70b-versatile' or not settings.gemini_model %}selected{% endif %}>Llama 3.3 70B Versatile (Groq - Most Powerful &amp; Free)</option>
+                            <option value="llama-3.1-8b-instant" class="groq-model-opt" {% if settings.gemini_model == 'llama-3.1-8b-instant' %}selected{% endif %}>Llama 3.1 8B Instant (Groq - Super Fast)</option>
+                            <!-- Gemini Models -->
+                            <option value="gemini-3.8-flash" class="gemini-model-opt" {% if settings.gemini_model == 'gemini-3.8-flash' %}selected{% endif %}>gemini-3.8-flash (Google AI Studio)</option>
+                            <option value="gemini-3.5-flash-lite" class="gemini-model-opt" {% if settings.gemini_model == 'gemini-3.5-flash-lite' %}selected{% endif %}>gemini-3.5-flash-lite (Google AI Studio)</option>
                         </select>
                     </div>
 
@@ -592,27 +621,68 @@ function toggleApiKeyVisibility() {
     input.type = input.type === 'password' ? 'text' : 'password';
 }
 
-function testGeminiConnection() {
-    const key = document.getElementById('geminiApiKeyInput').value.trim();
-    const btn = document.getElementById('btnTestApiKey');
-    const resultDiv = document.getElementById('apiKeyTestResult');
+function toggleGroqKeyVisibility() {
+    const input = document.getElementById('groqApiKeyInput');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
 
-    const model = document.getElementById('geminiModelSelect') ? document.getElementById('geminiModelSelect').value : 'gemini-3.8-flash';
+function toggleProviderFields() {
+    const provider = document.getElementById('aiProviderSelect').value;
+    const groqGroup = document.getElementById('groqKeyGroup');
+    const geminiGroup = document.getElementById('geminiKeyGroup');
+    const modelSelect = document.getElementById('geminiModelSelect');
+
+    if (provider === 'groq') {
+        groqGroup.style.display = 'block';
+        geminiGroup.style.display = 'none';
+        // Select first groq option if gemini was selected
+        if (modelSelect.value.startsWith('gemini')) {
+            modelSelect.value = 'llama-3.3-70b-versatile';
+        }
+    } else {
+        groqGroup.style.display = 'none';
+        geminiGroup.style.display = 'block';
+        if (modelSelect.value.startsWith('llama')) {
+            modelSelect.value = 'gemini-3.8-flash';
+        }
+    }
+}
+
+function testApiKeyConnection(provider) {
+    let key = '';
+    let btn = null;
+    const resultDiv = document.getElementById('apiKeyTestResult');
+    const model = document.getElementById('geminiModelSelect').value;
+
+    if (provider === 'groq') {
+        key = document.getElementById('groqApiKeyInput').value.trim();
+        btn = document.getElementById('btnTestGroqKey');
+    } else {
+        key = document.getElementById('geminiApiKeyInput').value.trim();
+        btn = document.getElementById('btnTestApiKey');
+    }
+
+    if (!key) {
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `<div class="alert alert-warning py-2 px-3 small mb-0"><i class="bi bi-exclamation-triangle mr-1"></i> Please paste your ${provider.toUpperCase()} API key first.</div>`;
+        return;
+    }
 
     btn.disabled = true;
+    const origText = btn.innerHTML;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span> Testing...';
     resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '<div class="alert alert-info py-2 px-3 small mb-0"><i class="bi bi-arrow-repeat mr-1"></i> Testing connection to Google Gemini API...</div>';
+    resultDiv.innerHTML = `<div class="alert alert-info py-2 px-3 small mb-0"><i class="bi bi-arrow-repeat mr-1"></i> Connecting to ${provider.toUpperCase()} API...</div>`;
 
-    fetch(`{% url 'dashboard:ai_test_api_key' %}?key=${encodeURIComponent(key)}&model=${encodeURIComponent(model)}`)
+    fetch(`{% url 'dashboard:ai_test_api_key' %}?key=${encodeURIComponent(key)}&model=${encodeURIComponent(model)}&provider=${encodeURIComponent(provider)}`)
         .then(response => response.json().then(data => ({status: response.status, body: data})))
         .then(res => {
             btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-broadcast mr-1"></i> Test Key';
+            btn.innerHTML = origText;
             if (res.status === 200 && res.body.status === 'success') {
                 resultDiv.innerHTML = `
                     <div class="alert alert-success py-2 px-3 small mb-0">
-                        <i class="bi bi-check-circle-fill mr-1"></i> <strong>Success!</strong> ${res.body.message}
+                        <i class="bi bi-check-circle-fill mr-1"></i> <strong>Connected!</strong> ${res.body.message}
                     </div>
                 `;
             } else {
@@ -625,7 +695,7 @@ function testGeminiConnection() {
         })
         .catch(err => {
             btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-broadcast mr-1"></i> Test Key';
+            btn.innerHTML = origText;
             resultDiv.innerHTML = `
                 <div class="alert alert-danger py-2 px-3 small mb-0">
                     <i class="bi bi-exclamation-triangle-fill mr-1"></i> <strong>Network Error:</strong> ${err.message}
@@ -633,6 +703,11 @@ function testGeminiConnection() {
             `;
         });
 }
+
+// Initialize provider view on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleProviderFields();
+});
 
 document.getElementById('btnRunTopicSuggestion').addEventListener('click', function() {
     const domain = document.getElementById('modalSuggestDomain').value;

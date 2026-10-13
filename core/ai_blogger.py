@@ -17,26 +17,81 @@ from notes.models import Note
 
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 
-def get_gemini_config():
-    """Retrieve API key and model choice from SiteSettings or environment"""
+def get_ai_config():
+    """Retrieve Provider, API key, and model choice from SiteSettings or environment"""
     settings = SiteSettings.objects.first()
+    provider = 'gemini'
     api_key = ''
     model = 'gemini-3.8-flash'
 
-    if settings and settings.gemini_api_key:
-        api_key = settings.gemini_api_key.strip()
-    if not api_key:
-        api_key = os.environ.get('GEMINI_API_KEY', '').strip()
+    if settings:
+        provider = getattr(settings, 'ai_provider', 'gemini') or 'gemini'
+        if provider == 'groq':
+            api_key = (getattr(settings, 'groq_api_key', '') or '').strip()
+            model = getattr(settings, 'gemini_model', '') or 'llama-3.3-70b-versatile'
+            if not model or 'gemini' in model:
+                model = 'llama-3.3-70b-versatile'
+        else:
+            api_key = (settings.gemini_api_key or '').strip()
+            model = (settings.gemini_model or '').strip() or 'gemini-3.8-flash'
+            if model in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
+                model = 'gemini-3.8-flash'
+            elif 'llama' in model:
+                model = 'gemini-3.8-flash'
 
-    if settings and settings.gemini_model:
-        model = settings.gemini_model.strip()
-        # Automatically upgrade deprecated models to gemini-3.8-flash
-        if model in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
-            model = 'gemini-3.8-flash'
+    # Auto-detect Groq if key starts with gsk_
+    if api_key.startswith('gsk_'):
+        provider = 'groq'
+        if 'gemini' in model:
+            model = 'llama-3.3-70b-versatile'
 
+    return provider, api_key, model, settings
+
+
+def get_gemini_config():
+    """Backward compatibility wrapper"""
+    provider, api_key, model, settings = get_ai_config()
     return api_key, model, settings
+
+
+def _call_groq_api(api_key, model, system_prompt, user_prompt, timeout=90):
+    """Call Groq OpenAI-compatible chat completion endpoint using standard library urllib"""
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.4,
+        "max_tokens": 4096,
+        "response_format": {"type": "json_object"}
+    }
+    data_bytes = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        GROQ_API_URL,
+        data=data_bytes,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        },
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            res_body = response.read().decode('utf-8')
+            res_json = json.loads(res_body)
+            choices = res_json.get('choices') or []
+            if not choices:
+                raise Exception(f"No choices returned by Groq: {res_body[:200]}")
+            return choices[0].get('message', {}).get('content', '')
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode('utf-8', errors='ignore')[:300]
+        raise Exception(f"Groq API Error ({e.code}): {err_body}")
+    except urllib.error.URLError as e:
+        raise Exception(f"Groq Connection Error: {e.reason}")
 
 
 def _call_gemini_api(url, payload, timeout=90, max_retries=3):
@@ -179,11 +234,13 @@ def fetch_and_attach_featured_image(blog_post: BlogPost, topic_title: str, categ
 def generate_content_for_topic(topic: AITopicQueue):
     """
     Generate and save a full Blog Post or Study Note from a queued topic.
+    Supports both Groq (Llama 3.3 70B) and Google Gemini engines.
     Returns: (success: bool, result_obj_or_error_msg, log_obj)
     """
-    api_key, model, settings = get_gemini_config()
+    provider, api_key, model, settings = get_ai_config()
     if not api_key:
-        err = "Google Gemini API Key is missing. Please enter your free Gemini API Key in AI Settings."
+        engine_name = "Groq" if provider == 'groq' else "Google Gemini"
+        err = f"{engine_name} API Key is missing. Please enter your API Key in AI Settings."
         topic.status = 'failed'
         topic.error_message = err
         topic.save(update_fields=['status', 'error_message'])
@@ -266,38 +323,40 @@ JSON Output Schema required:
 }}
 """
 
-    url = GEMINI_API_URL.format(model=model) + f"?key={api_key}"
-    payload = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": system_prompt + "\n\n" + user_prompt}
-                ]
-            }
-        ],
-        "generationConfig": {
-            "temperature": 0.4,
-            "maxOutputTokens": 6000,
-            "responseMimeType": "application/json"
-        }
-    }
-
     try:
-        try:
-            resp_data = _call_gemini_api(url, payload, timeout=90)
-        except Exception as primary_err:
-            # If primary model is unavailable (503 / 429), try gemini-3.8-flash as fallback
-            if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err) or "429" in str(primary_err):
-                fallback_model = "gemini-3.8-flash"
-                if model != fallback_model:
-                    fallback_url = GEMINI_API_URL.format(model=fallback_model) + f"?key={api_key}"
-                    resp_data = _call_gemini_api(fallback_url, payload, timeout=90)
+        if provider == 'groq':
+            raw_text = _call_groq_api(api_key, model, system_prompt, user_prompt, timeout=90)
+        else:
+            url = GEMINI_API_URL.format(model=model) + f"?key={api_key}"
+            payload = {
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": system_prompt + "\n\n" + user_prompt}
+                        ]
+                    }
+                ],
+                "generationConfig": {
+                    "temperature": 0.4,
+                    "maxOutputTokens": 6000,
+                    "responseMimeType": "application/json"
+                }
+            }
+            try:
+                resp_data = _call_gemini_api(url, payload, timeout=90)
+            except Exception as primary_err:
+                # If primary model is unavailable (503 / 429), try gemini-3.8-flash as fallback
+                if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err) or "429" in str(primary_err):
+                    fallback_model = "gemini-3.8-flash"
+                    if model != fallback_model:
+                        fallback_url = GEMINI_API_URL.format(model=fallback_model) + f"?key={api_key}"
+                        resp_data = _call_gemini_api(fallback_url, payload, timeout=90)
+                    else:
+                        raise primary_err
                 else:
                     raise primary_err
-            else:
-                raise primary_err
 
-        raw_text = extract_gemini_text(resp_data)
+            raw_text = extract_gemini_text(resp_data)
 
         # Parse JSON
         cleaned_json = raw_text.strip()
@@ -430,9 +489,9 @@ def suggest_topics_with_gemini(domain="diverse", content_type="blog", language="
     Ask Gemini to brainstorm high-value, educational topics.
     Returns: list of dicts [{'title': '...', 'content_type': '...', 'category_name': '...', 'hint': '...'}]
     """
-    api_key, model, _ = get_gemini_config()
+    provider, api_key, model, _ = get_ai_config()
     if not api_key:
-        raise ValueError("Google Gemini API Key is missing. Please add it in AI Settings.")
+        raise ValueError("AI API Key is missing. Please add your Groq or Gemini API Key in AI Settings.")
 
     if language == 'ne':
         lang_note = "Topics should be phrased in clean Nepali (नेपाली - देवनागरी)."
@@ -460,14 +519,17 @@ Return a valid JSON array of {count} objects matching this exact schema:
 Do NOT include markdown fences, just pure JSON.
 """
 
-    url = GEMINI_API_URL.format(model=model) + f"?key={api_key}"
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.7, "responseMimeType": "application/json"}
-    }
+    if provider == 'groq':
+        raw = _call_groq_api(api_key, model, "You are a helpful educational topic brainstormer.", prompt, timeout=45)
+    else:
+        url = GEMINI_API_URL.format(model=model) + f"?key={api_key}"
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"temperature": 0.7, "responseMimeType": "application/json"}
+        }
+        resp_data = _call_gemini_api(url, payload, timeout=45)
+        raw = extract_gemini_text(resp_data)
 
-    resp_data = _call_gemini_api(url, payload, timeout=45)
-    raw = extract_gemini_text(resp_data)
     if raw.startswith("```json"):
         raw = raw[7:]
     if raw.startswith("```"):

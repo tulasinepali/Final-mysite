@@ -161,21 +161,37 @@ class SiteSettings(models.Model):
     )
 
     # AI Auto-Blogger & Auto-Notes Configuration
+    ai_provider = models.CharField(
+        max_length=20,
+        default='gemini',
+        choices=[
+            ('gemini', 'Google Gemini (Google AI Studio)'),
+            ('groq', 'Groq (Llama 3.3 70B - Free, Ultra-Fast, No Rate Limits)'),
+        ],
+        help_text='AI Engine provider for content generation'
+    )
     gemini_api_key = models.CharField(
         max_length=255,
         blank=True,
         default='',
         help_text='Google Gemini API Key from Google AI Studio (aistudio.google.com)'
     )
+    groq_api_key = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text='Groq API Key (starts with gsk_...) from console.groq.com'
+    )
     gemini_model = models.CharField(
         max_length=100,
-        default='gemini-2.0-flash',
+        default='gemini-3.8-flash',
         choices=[
-            ('gemini-2.0-flash', 'Gemini 2.0 Flash (Fastest & Free Tier)'),
-            ('gemini-1.5-flash', 'Gemini 1.5 Flash (Reliable & Free Tier)'),
-            ('gemini-1.5-pro', 'Gemini 1.5 Pro (Deep & Comprehensive)'),
+            ('gemini-3.8-flash', 'Gemini 3.8 Flash (Google)'),
+            ('gemini-3.5-flash-lite', 'Gemini 3.5 Flash-Lite (Google)'),
+            ('llama-3.3-70b-versatile', 'Llama 3.3 70B Versatile (Groq - Recommended)'),
+            ('llama-3.1-8b-instant', 'Llama 3.1 8B Instant (Groq - Super Fast)'),
         ],
-        help_text='Gemini AI model engine for article generation'
+        help_text='AI model engine for article generation'
     )
     enable_daily_ai_blog = models.BooleanField(
         default=False,
