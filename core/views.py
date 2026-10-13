@@ -193,17 +193,15 @@ Sitemap: https://tulasinepali.com.np/sitemap.xml
 def ads_txt(request):
     """Serve /ads.txt dynamically from SiteSettings or fallback to default publisher snippet."""
     from django.http import HttpResponse
+    default_snippet = "google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0"
+    content = default_snippet
     try:
         s = SiteSettings.objects.first()
-        if s and hasattr(s, 'enable_ads_txt') and not s.enable_ads_txt:
-            return HttpResponse("", content_type='text/plain; charset=utf-8')
-        if s and s.ads_txt_content:
+        if s and s.ads_txt_content and s.ads_txt_content.strip():
             content = s.ads_txt_content.strip()
-        else:
-            content = "google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0"
     except Exception:
-        content = "google.com, pub-3956705237421931, DIRECT, f08c47fec0942fa0"
-    return HttpResponse(content + "\n", content_type='text/plain; charset=utf-8')
+        pass
+    return HttpResponse(content.strip() + "\n", content_type='text/plain; charset=utf-8')
 
 
 def favicon_view(request):
