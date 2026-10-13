@@ -39,24 +39,38 @@ def get_gemini_config():
     return api_key, model, settings
 
 
-def _call_gemini_api(url, payload, timeout=90):
-    """Call Gemini REST endpoint using Python standard library urllib (no pip dependencies required)"""
+def _call_gemini_api(url, payload, timeout=90, max_retries=3):
+    """
+    Call Gemini REST endpoint using Python standard library urllib.
+    Includes automated exponential backoff retry for transient 503 (high demand) and 429 (rate limit) errors.
+    """
+    import time
     data_bytes = json.dumps(payload).encode('utf-8')
-    req = urllib.request.Request(
-        url,
-        data=data_bytes,
-        headers={"Content-Type": "application/json"},
-        method="POST"
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            res_body = response.read().decode('utf-8')
-            return json.loads(res_body)
-    except urllib.error.HTTPError as e:
-        err_body = e.read().decode('utf-8', errors='ignore')[:300]
-        raise Exception(f"Gemini API Error ({e.code}): {err_body}")
-    except urllib.error.URLError as e:
-        raise Exception(f"Gemini Connection Error: {e.reason}")
+
+    for attempt in range(max_retries):
+        req = urllib.request.Request(
+            url,
+            data=data_bytes,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                res_body = response.read().decode('utf-8')
+                return json.loads(res_body)
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode('utf-8', errors='ignore')[:300]
+            # If server is overloaded (503) or rate-limited (429), retry with backoff
+            if e.code in (503, 429) and attempt < max_retries - 1:
+                sleep_sec = 2 ** attempt * 2  # 2s, 4s, 8s
+                time.sleep(sleep_sec)
+                continue
+            raise Exception(f"Gemini API Error ({e.code}): {err_body}")
+        except urllib.error.URLError as e:
+            if attempt < max_retries - 1:
+                time.sleep(2)
+                continue
+            raise Exception(f"Gemini Connection Error: {e.reason}")
 
 
 def extract_gemini_text(resp_data):
@@ -269,7 +283,20 @@ JSON Output Schema required:
     }
 
     try:
-        resp_data = _call_gemini_api(url, payload, timeout=90)
+        try:
+            resp_data = _call_gemini_api(url, payload, timeout=90)
+        except Exception as primary_err:
+            # If primary model is unavailable (503 / 429), try gemini-1.5-flash as fallback
+            if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err) or "429" in str(primary_err):
+                fallback_model = "gemini-1.5-flash"
+                if model != fallback_model:
+                    fallback_url = GEMINI_API_URL.format(model=fallback_model) + f"?key={api_key}"
+                    resp_data = _call_gemini_api(fallback_url, payload, timeout=90)
+                else:
+                    raise primary_err
+            else:
+                raise primary_err
+
         raw_text = extract_gemini_text(resp_data)
 
         # Parse JSON
