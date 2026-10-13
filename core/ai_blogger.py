@@ -302,54 +302,67 @@ def ensure_unique_slug(model_cls, base_slug):
     return slug
 
 
-def fetch_and_attach_featured_image(blog_post: BlogPost, topic_title: str, category_name: str = ""):
+def fetch_and_attach_featured_image(content_obj, topic_title: str, category_name: str = "", content_type: str = "blog"):
     """
-    Automatically attach a clean, high-resolution, relevant featured image to the blog post.
-    Uses high-quality open educational/tech image sources based on topic keywords.
+    Automatically attach a clean, high-resolution, relevant featured image to the Note or Blog post.
+    Uses high-quality open educational and technical image sources based on topic keywords and category.
     """
     from django.core.files.base import ContentFile
     import urllib.parse
 
-    # Extract keywords
-    clean_kw = re.sub(r'[^\w\s]', '', topic_title.lower())
-    words = [w for w in clean_kw.split() if len(w) > 3 and not re.search(r'[\u0900-\u097F]', w)]
-    search_term = words[0] if words else "technology"
-    if category_name and not re.search(r'[\u0900-\u097F]', category_name):
-        search_term = f"{search_term},{category_name.lower().split()[0]}"
-
-    # Unsplash Source with educational/tech fallback
-    encoded_query = urllib.parse.quote(search_term)
-    img_urls = [
-        f"https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80",
-        f"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80",
-        f"https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&auto=format&fit=crop&q=80",
-        f"https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&auto=format&fit=crop&q=80"
-    ]
-
-    # Select thematic image
     title_lower = topic_title.lower()
-    if any(k in title_lower for k in ['code', 'python', 'program', 'html', 'css', 'software', 'developer']):
-        chosen_url = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&auto=format&fit=crop&q=80"
-    elif any(k in title_lower for k in ['network', 'cloud', 'cyber', 'security', 'internet', 'server', 'data']):
-        chosen_url = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80"
-    elif any(k in title_lower for k in ['book', 'grammar', 'nepali', 'literature', 'study', 'exam', 'tsc', 'teacher']):
-        chosen_url = "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&auto=format&fit=crop&q=80"
+    cat_lower = (category_name or '').lower()
+    combined = f"{title_lower} {cat_lower}"
+
+    # Curated, fast-loading, high-resolution educational and technical imagery
+    THEMED_IMAGES = {
+        'code': "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&auto=format&fit=crop&q=80",
+        'network': "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80",
+        'computer_operator': "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&auto=format&fit=crop&q=80",
+        'study_books': "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1200&auto=format&fit=crop&q=80",
+        'writing_notes': "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&auto=format&fit=crop&q=80",
+        'general_knowledge': "https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=1200&auto=format&fit=crop&q=80",
+        'data_analytics': "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop&q=80",
+        'science': "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&auto=format&fit=crop&q=80",
+        'education_classroom': "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&auto=format&fit=crop&q=80",
+        'default': "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=1200&auto=format&fit=crop&q=80"
+    }
+
+    if any(k in combined for k in ['code', 'python', 'program', 'html', 'css', 'software', 'developer', 'javascript', 'django', 'react', 'sql']):
+        chosen_url = THEMED_IMAGES['code']
+    elif any(k in combined for k in ['network', 'cloud', 'cyber', 'security', 'internet', 'server', 'protocol', 'ip address', 'router', 'wifi']):
+        chosen_url = THEMED_IMAGES['network']
+    elif any(k in combined for k in ['operator', 'computer operator', 'excel', 'word', 'office', 'powerpoint', 'typing', 'hardware', 'ms ']):
+        chosen_url = THEMED_IMAGES['computer_operator']
+    elif any(k in combined for k in ['grammar', 'nepali', 'literature', 'व्याकरण', 'भाषा', 'साहित्य', 'निबन्ध']):
+        chosen_url = THEMED_IMAGES['study_books']
+    elif any(k in combined for k in ['teacher', 'tsc', 'pedagogy', 'शिक्षा', 'शिक्षक', 'curriculum', 'teaching']):
+        chosen_url = THEMED_IMAGES['education_classroom']
+    elif any(k in combined for k in ['data', 'database', 'analysis', 'chart', 'statistics', 'तथ्यांक']):
+        chosen_url = THEMED_IMAGES['data_analytics']
+    elif any(k in combined for k in ['science', 'physics', 'chemistry', 'biology', 'math', 'गणित', 'विज्ञान']):
+        chosen_url = THEMED_IMAGES['science']
+    elif any(k in combined for k in ['gk', 'general knowledge', 'samanya gyan', 'world', 'geography', 'history', 'सामान्य ज्ञान']):
+        chosen_url = THEMED_IMAGES['general_knowledge']
+    elif content_type == 'note':
+        chosen_url = THEMED_IMAGES['writing_notes']
     else:
-        chosen_url = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80"
+        chosen_url = THEMED_IMAGES['default']
 
     try:
         req = urllib.request.Request(
             chosen_url,
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'}
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=12) as resp:
             if resp.status == 200:
                 img_data = resp.read()
-                filename = f"ai_blog_{blog_post.slug[:50]}.jpg"
-                blog_post.featured_image.save(filename, ContentFile(img_data), save=True)
+                prefix = "ai_note" if content_type == 'note' else "ai_blog"
+                filename = f"{prefix}_{content_obj.slug[:45]}.jpg"
+                content_obj.featured_image.save(filename, ContentFile(img_data), save=True)
                 return True
-    except Exception as e:
-        # Silently log without failing article generation
+    except Exception:
+        # Silently log without failing content generation
         pass
     return False
 
@@ -538,6 +551,9 @@ JSON Output Schema required:
                 meta_description=article_meta_desc,
                 is_published=is_pub
             )
+            # Automatically fetch & attach high-res featured image for Note
+            fetch_and_attach_featured_image(obj, article_title, category.name if category else "", content_type="note")
+
             topic.generated_note = obj
             if settings:
                 settings.last_ai_note_at = timezone.now()
@@ -554,8 +570,8 @@ JSON Output Schema required:
                 meta_description=article_meta_desc,
                 is_published=is_pub
             )
-            # Automatically fetch & attach high-res featured image
-            fetch_and_attach_featured_image(obj, article_title, category.name if category else "")
+            # Automatically fetch & attach high-res featured image for Blog
+            fetch_and_attach_featured_image(obj, article_title, category.name if category else "", content_type="blog")
 
             topic.generated_blog = obj
             if settings:

@@ -267,13 +267,22 @@
                             <tr>
                                 <td class="text-center text-muted small font-weight-bold">{{ forloop.counter }}</td>
                                 <td>
-                                    <div class="font-weight-600 text-dark" style="max-width: 380px;">{{ topic.title }}</div>
-                                    {% if topic.prompt_hint %}
-                                    <small class="text-muted d-block text-truncate" style="max-width: 380px;"><i class="bi bi-info-circle mr-1"></i>{{ topic.prompt_hint }}</small>
-                                    {% endif %}
-                                    {% if topic.category %}
-                                    <span class="badge badge-light border text-muted small mt-1">{{ topic.category.name }}</span>
-                                    {% endif %}
+                                    <div class="d-flex align-items-center">
+                                        {% if topic.generated_blog and topic.generated_blog.featured_image %}
+                                        <img src="{{ topic.generated_blog.featured_image.url }}" class="rounded mr-2 shadow-sm border" style="width: 44px; height: 44px; object-fit: cover; flex-shrink: 0;" alt="preview">
+                                        {% elif topic.generated_note and topic.generated_note.featured_image %}
+                                        <img src="{{ topic.generated_note.featured_image.url }}" class="rounded mr-2 shadow-sm border" style="width: 44px; height: 44px; object-fit: cover; flex-shrink: 0;" alt="preview">
+                                        {% endif %}
+                                        <div>
+                                            <div class="font-weight-600 text-dark" style="max-width: 360px;">{{ topic.title }}</div>
+                                            {% if topic.prompt_hint %}
+                                            <small class="text-muted d-block text-truncate" style="max-width: 360px;"><i class="bi bi-info-circle mr-1"></i>{{ topic.prompt_hint }}</small>
+                                            {% endif %}
+                                            {% if topic.category %}
+                                            <span class="badge badge-light border text-muted small mt-1">{{ topic.category.name }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     {% if topic.content_type == 'blog' %}
