@@ -105,7 +105,8 @@ def get_groq_available_models(api_key):
 def pick_best_groq_model(available_models, preferred=None, exclude=None):
     """
     Pick the optimal chat completion model from available models for this Groq account.
-    Prioritizes fast and versatile models (Llama 3.3/3.1, Gemma 2, Mixtral, Qwen).
+    Prioritizes models with massive token limits (e.g. OpenAI GPT-OSS, Llama 3.3/3.1, Mixtral)
+    and avoids models with strict 1000 OTPM limits on free tiers.
     """
     if not available_models:
         return 'llama-3.3-70b-versatile'
@@ -118,21 +119,25 @@ def pick_best_groq_model(available_models, preferred=None, exclude=None):
     if preferred and preferred in candidates:
         return preferred
 
-    # Ranking patterns
+    # Ranking patterns: High-capacity models first (250k / 12k TPM)
     priority_patterns = [
+        'openai/gpt-oss-120b',
+        'openai/gpt-oss-20b',
+        'gpt-oss-120b',
+        'gpt-oss-20b',
         'llama-3.3-70b-versatile',
         'llama-3.1-8b-instant',
         'llama-3.3-70b',
         'llama-3.1-70b',
         'llama-3.1-8b',
-        'gemma2-9b-it',
         'mixtral-8x7b-32768',
-        'qwen',
+        'gemma2-9b-it',
         'llama3-70b',
         'llama3-8b',
         'llama',
         'gemma',
         'mistral',
+        'qwen',
     ]
 
     for pat in priority_patterns:
@@ -157,7 +162,14 @@ def _call_groq_api(api_key, model='', system_prompt="", user_prompt="", timeout=
         except Exception:
             model = 'llama-3.3-70b-versatile'
 
-    def _execute(target_model, use_json_format=True):
+    def _execute(target_model, use_json_format=True, max_tokens=None):
+        if max_tokens is None:
+            # On qwen, Groq enforces a strict 1000 Output Tokens Per Minute (OTPM) limit
+            if 'qwen' in target_model.lower():
+                max_tokens = 850
+            else:
+                max_tokens = 2048
+
         payload = {
             "model": target_model,
             "messages": [
@@ -165,7 +177,7 @@ def _call_groq_api(api_key, model='', system_prompt="", user_prompt="", timeout=
                 {"role": "user", "content": user_prompt}
             ],
             "temperature": 0.4,
-            "max_tokens": 4096,
+            "max_tokens": max_tokens,
         }
         if use_json_format:
             payload["response_format"] = {"type": "json_object"}
@@ -195,14 +207,30 @@ def _call_groq_api(api_key, model='', system_prompt="", user_prompt="", timeout=
     except urllib.error.HTTPError as e:
         err_body = e.read().decode('utf-8', errors='ignore')[:350]
 
-        # Retry without json_object if this model does not support response_format
+        # 1. Retry without json_object if model does not support response_format
         if e.code == 400 and 'response_format' in err_body.lower():
             try:
                 return _execute(model, use_json_format=False)
             except Exception:
                 pass
 
-        # If model is not found or not accessible (404/400), dynamically discover available models and retry
+        # 2. If rate limited (429) - e.g. OTPM 1000 limit on qwen or TPM spike:
+        if e.code == 429:
+            # Automatically fail over to a higher-capacity model (e.g. gpt-oss or llama)
+            try:
+                available = get_groq_available_models(api_key)
+                alt_model = pick_best_groq_model(available, exclude=[model, 'qwen/qwen3.8-27b'])
+                if alt_model and alt_model != model:
+                    return _execute(alt_model, use_json_format=True, max_tokens=2048)
+            except Exception:
+                pass
+            # Or retry current model with minimal tokens (700 tokens)
+            try:
+                return _execute(model, use_json_format=True, max_tokens=700)
+            except Exception:
+                pass
+
+        # 3. If model is not found or not accessible (404/400), dynamically discover available models and retry
         if e.code in (400, 404) and ('model_not_found' in err_body.lower() or 'does not exist' in err_body.lower()):
             try:
                 available = get_groq_available_models(api_key)
@@ -367,10 +395,136 @@ def fetch_and_attach_featured_image(content_obj, topic_title: str, category_name
     return False
 
 
+def resolve_category_for_content(topic: AITopicQueue, data: dict = None, settings: SiteSettings = None) -> Category:
+    """
+    Intelligently determine and assign the best Category for this topic.
+    Fixes the issue where all notes were forced into 'Computer Operator'.
+    
+    1. If user explicitly chose a Category in the queue:
+       - Uses it if module matches ('notes' or 'blog').
+       - If module doesn't match, finds or creates a sibling Category in the target module.
+    2. If no category was assigned (or auto-detect):
+       - Uses keywords from topic title and AI-detected category to route to:
+         * नेपाली व्याकरण (Nepali Grammar)
+         * सामान्य ज्ञान (General Knowledge)
+         * शिक्षक सेवा आयोग (TSC Prep)
+         * लोक सेवा आयोग (Loksewa PSC)
+         * Information Technology & Programming
+         * Computer Operator
+         * विज्ञान तथा गणित (Science & Math)
+         * शिक्षा तथा शिक्षण विधि (Pedagogy)
+    3. Auto-creates the category under the target module if it doesn't already exist.
+    """
+    target_module = 'notes' if topic.content_type == 'note' else 'blog'
+    title = (topic.title or '').strip()
+    data = data or {}
+    ai_cat = (data.get('category_name') or data.get('category') or '').strip()
+    combined_text = f"{title} {ai_cat}".lower()
+
+    # 1. Topic has explicit category assigned
+    if topic.category:
+        if topic.category.module == target_module:
+            return topic.category
+        sibling = Category.objects.filter(module=target_module, name__iexact=topic.category.name).first()
+        if sibling:
+            return sibling
+        new_cat, _ = Category.objects.get_or_create(
+            name=topic.category.name,
+            module=target_module,
+            defaults={'slug': f"{slugify(topic.category.name, allow_unicode=True) or 'cat'}-{target_module}"}
+        )
+        return new_cat
+
+    # 2. Intelligent Keyword & Domain Mapping
+    cat_mappings = [
+        (
+            ['व्याकरण', 'grammar', 'पदवर्ग', 'काल', 'वर्णविन्यास', 'कारक', 'विभक्ति', 'वाच्य', 'निबन्ध', 'शब्दवर्ग', 'नेपाली भाषा'],
+            "नेपाली व्याकरण (Nepali Grammar)",
+            f"nepali-grammar-{target_module}"
+        ),
+        (
+            ['सामान्य ज्ञान', 'gk', 'samanya gyan', 'भूगोल', 'इतिहास', 'संविधान', 'समसामयिक', 'विश्वको', 'नेपालको भूगोल', 'सार्क'],
+            "सामान्य ज्ञान (General Knowledge)",
+            f"general-knowledge-{target_module}"
+        ),
+        (
+            ['शिक्षक', 'tsc', 'शिक्षक सेवा', 'प्रावि', 'निमावि', 'मावि', 'शिक्षण सिकाइ', 'शिक्षा ऐन', 'शिक्षक तयारी'],
+            "शिक्षक सेवा आयोग (TSC Prep)",
+            f"tsc-prep-{target_module}"
+        ),
+        (
+            ['लोक सेवा', 'psc', 'loksewa', 'नायब सुब्बा', 'खरिदार', 'शाखा अधिकृत', 'प्रशासन', 'सेवा आयोग'],
+            "लोक सेवा आयोग (Loksewa PSC)",
+            f"loksewa-psc-{target_module}"
+        ),
+        (
+            ['python', 'programming', 'code', 'html', 'css', 'javascript', 'django', 'react', 'sql', 'database', 'web development', 'सफ्टवेयर', 'नेटवर्किङ', 'network'],
+            "Information Technology & Programming",
+            f"it-programming-{target_module}"
+        ),
+        (
+            ['कम्प्युटर अपरेटर', 'computer operator', 'excel', 'word', 'powerpoint', 'typing', 'operator', 'hardware', 'ms office', 'अफिस अटोमेसन', 'कम्प्युटर'],
+            "Computer Operator",
+            f"computer-operator-{target_module}"
+        ),
+        (
+            ['विज्ञान', 'science', 'physics', 'chemistry', 'biology', 'गणित', 'math', 'प्रविधि'],
+            "विज्ञान तथा गणित (Science & Math)",
+            f"science-math-{target_module}"
+        ),
+        (
+            ['शिक्षा', 'pedagogy', 'curriculum', 'पाठ्यक्रम', 'बालमनोविज्ञान', 'शैक्षिक', 'शिक्षण विधि'],
+            "शिक्षा तथा शिक्षण विधि (Pedagogy)",
+            f"pedagogy-education-{target_module}"
+        ),
+    ]
+
+    for keywords, cat_name, cat_slug in cat_mappings:
+        if any(kw in combined_text for kw in keywords):
+            cat_obj = Category.objects.filter(module=target_module, name=cat_name).first()
+            if not cat_obj:
+                cat_obj = Category.objects.filter(module=target_module, slug=cat_slug).first()
+            if not cat_obj:
+                cat_obj, _ = Category.objects.get_or_create(
+                    slug=cat_slug,
+                    defaults={'name': cat_name, 'module': target_module}
+                )
+            return cat_obj
+
+    # 3. AI-suggested category name if present
+    if ai_cat and len(ai_cat) > 2 and 'default' not in ai_cat.lower() and 'general' not in ai_cat.lower() and 'education & technology' not in ai_cat.lower():
+        clean_ai_name = ai_cat.split('/')[0].strip()[:50]
+        cat_obj = Category.objects.filter(module=target_module, name__iexact=clean_ai_name).first()
+        if not cat_obj:
+            cat_obj, _ = Category.objects.get_or_create(
+                name=clean_ai_name,
+                module=target_module,
+                defaults={'slug': f"{slugify(clean_ai_name, allow_unicode=True) or 'cat'}-{target_module}"}
+            )
+        return cat_obj
+
+    # 4. Settings Default if set and module matches
+    if settings:
+        if target_module == 'notes' and settings.ai_default_note_category and settings.ai_default_note_category.module == 'notes':
+            return settings.ai_default_note_category
+        elif target_module == 'blog' and settings.ai_default_blog_category and settings.ai_default_blog_category.module == 'blog':
+            return settings.ai_default_blog_category
+
+    # 5. Fallback to General Study Notes / General Blog
+    default_name = "General Study Notes" if target_module == 'notes' else "General Blog"
+    default_slug = f"general-{target_module}"
+    cat_obj, _ = Category.objects.get_or_create(
+        module=target_module,
+        slug=default_slug,
+        defaults={'name': default_name}
+    )
+    return cat_obj
+
+
 def generate_content_for_topic(topic: AITopicQueue):
     """
     Generate and save a full Blog Post or Study Note from a queued topic.
-    Supports both Groq (Llama 3.3 70B) and Google Gemini engines.
+    Supports both Groq (Llama 3.3 70B / GPT-OSS) and Google Gemini engines.
     Returns: (success: bool, result_obj_or_error_msg, log_obj)
     """
     provider, api_key, model, settings = get_ai_config()
@@ -455,7 +609,8 @@ JSON Output Schema required:
   "meta_title": "SEO title under 70 characters",
   "meta_description": "SEO description under 160 characters",
   "content": "Rich HTML content (at least 900-1400 words) using <h2>, <h3>, <p>, <ul>, <ol>, <li>, <table>, <blockquote>. Do NOT wrap with <html> or <body> tags. Do NOT use markdown code blocks inside the HTML.",
-  "tags": ["Tag1", "Tag2", "Tag3", "Tag4"]
+  "tags": ["Tag1", "Tag2", "Tag3", "Tag4"],
+  "category_name": "Suggested accurate category (e.g. Nepali Grammar, General Knowledge, Information Technology, TSC Prep, Computer Operator, Science, Pedagogy)"
 }}
 """
 
@@ -514,22 +669,8 @@ JSON Output Schema required:
         article_meta_desc = data.get('meta_description') or article_summary[:280]
         tags_list = data.get('tags') or []
 
-        # Find or assign Category
-        target_module = 'notes' if topic.content_type == 'note' else 'blog'
-        category = topic.category
-        if not category or category.module != target_module:
-            if topic.content_type == 'note' and settings and settings.ai_default_note_category:
-                category = settings.ai_default_note_category
-            elif topic.content_type == 'blog' and settings and settings.ai_default_blog_category:
-                category = settings.ai_default_blog_category
-            else:
-                category = Category.objects.filter(module=target_module).first()
-                if not category:
-                    category = Category.objects.create(
-                        name="General Study" if topic.content_type == 'note' else "General Blog",
-                        slug=f"general-{target_module}",
-                        module=target_module
-                    )
+        # Intelligently assign the accurate Category (Grammar, GK, TSC, IT, Science, Computer Operator, etc.)
+        category = resolve_category_for_content(topic, data=data, settings=settings)
 
         # Determine publication status
         if topic.content_type == 'note':

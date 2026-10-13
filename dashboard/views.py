@@ -1874,7 +1874,7 @@ def dashboard_ai_blogger(request):
     page_obj = paginator.get_page(request.GET.get('page'))
 
     recent_logs = AIGenerationLog.objects.order_by('-created_at')[:10]
-    all_categories = Category.objects.all().order_by('name')
+    all_categories = Category.objects.filter(module__in=['notes', 'blog']).order_by('module', 'name')
 
     context = {
         'settings': settings,
