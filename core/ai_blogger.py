@@ -18,6 +18,7 @@ from notes.models import Note
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models"
 
 
 def get_ai_config():
@@ -25,15 +26,15 @@ def get_ai_config():
     settings = SiteSettings.objects.first()
     provider = 'gemini'
     api_key = ''
-    model = 'gemini-3.8-flash'
+    model = ''
 
     if settings:
         provider = getattr(settings, 'ai_provider', 'gemini') or 'gemini'
         if provider == 'groq':
             api_key = (getattr(settings, 'groq_api_key', '') or '').strip()
-            model = getattr(settings, 'gemini_model', '') or 'llama-3.1-8b-instant'
-            if not model or 'gemini' in model:
-                model = 'llama-3.1-8b-instant'
+            model = (getattr(settings, 'gemini_model', '') or '').strip()
+            if 'gemini' in model:
+                model = ''
         else:
             api_key = (settings.gemini_api_key or '').strip()
             model = (settings.gemini_model or '').strip() or 'gemini-3.8-flash'
@@ -45,8 +46,8 @@ def get_ai_config():
     # Auto-detect Groq if key starts with gsk_
     if api_key.startswith('gsk_'):
         provider = 'groq'
-        if 'gemini' in model or model == 'llama-3.3-70b-versatile':
-            model = 'llama-3.1-8b-instant'
+        if 'gemini' in model:
+            model = ''
 
     return provider, api_key, model, settings
 
@@ -57,35 +58,130 @@ def get_gemini_config():
     return api_key, model, settings
 
 
-def _call_groq_api(api_key, model, system_prompt, user_prompt, timeout=90):
-    """Call Groq OpenAI-compatible chat completion endpoint using standard library urllib"""
-    # Use reliable production model llama-3.1-8b-instant
-    if not model or model == 'llama-3.3-70b-versatile' or 'gemini' in model:
-        model = 'llama-3.1-8b-instant'
+def get_groq_available_models(api_key):
+    """
+    Fetch all active chat models available on this Groq account from the official Groq models endpoint.
+    Filters out audio, whisper, embedding, and moderation models.
+    """
+    api_key = (api_key or '').strip()
+    if not api_key:
+        return []
 
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        "temperature": 0.4,
-        "max_tokens": 4096,
-        "response_format": {"type": "json_object"}
-    }
-    data_bytes = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(
-        GROQ_API_URL,
-        data=data_bytes,
+        GROQ_MODELS_URL,
         headers={
-            "Content-Type": "application/json",
             "Authorization": f"Bearer {api_key}",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
             "Accept": "application/json",
         },
-        method="POST"
+        method="GET"
     )
     try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            body = json.loads(resp.read().decode('utf-8'))
+            raw_list = body.get('data', [])
+
+            chat_models = []
+            for item in raw_list:
+                model_id = item.get('id', '')
+                if not model_id:
+                    continue
+                if item.get('active') is False:
+                    continue
+                mid_lower = model_id.lower()
+                # Skip non-chat models
+                if any(skip in mid_lower for skip in ['whisper', 'safeguard', 'guard', 'embedding', 'embed', 'tts', 'moderation']):
+                    continue
+                chat_models.append(model_id)
+
+            return chat_models
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode('utf-8', errors='ignore')[:300]
+        raise Exception(f"Groq API Error ({e.code}): {err_body}")
+    except urllib.error.URLError as e:
+        raise Exception(f"Groq Connection Error: {e.reason}")
+
+
+def pick_best_groq_model(available_models, preferred=None, exclude=None):
+    """
+    Pick the optimal chat completion model from available models for this Groq account.
+    Prioritizes fast and versatile models (Llama 3.3/3.1, Gemma 2, Mixtral, Qwen).
+    """
+    if not available_models:
+        return 'llama-3.3-70b-versatile'
+
+    exclude = exclude or []
+    candidates = [m for m in available_models if m not in exclude]
+    if not candidates:
+        candidates = available_models
+
+    if preferred and preferred in candidates:
+        return preferred
+
+    # Ranking patterns
+    priority_patterns = [
+        'llama-3.3-70b-versatile',
+        'llama-3.1-8b-instant',
+        'llama-3.3-70b',
+        'llama-3.1-70b',
+        'llama-3.1-8b',
+        'gemma2-9b-it',
+        'mixtral-8x7b-32768',
+        'qwen',
+        'llama3-70b',
+        'llama3-8b',
+        'llama',
+        'gemma',
+        'mistral',
+    ]
+
+    for pat in priority_patterns:
+        for m in candidates:
+            if pat in m.lower():
+                return m
+
+    return candidates[0]
+
+
+def _call_groq_api(api_key, model='', system_prompt="", user_prompt="", timeout=90):
+    """Call Groq OpenAI-compatible chat completion endpoint using standard library urllib"""
+    api_key = (api_key or '').strip()
+    if not api_key:
+        raise Exception("Groq API key is missing.")
+
+    # Auto-discover available models if no valid model specified
+    if not model or 'gemini' in model:
+        try:
+            available = get_groq_available_models(api_key)
+            model = pick_best_groq_model(available)
+        except Exception:
+            model = 'llama-3.3-70b-versatile'
+
+    def _execute(target_model, use_json_format=True):
+        payload = {
+            "model": target_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.4,
+            "max_tokens": 4096,
+        }
+        if use_json_format:
+            payload["response_format"] = {"type": "json_object"}
+
+        data_bytes = json.dumps(payload).encode('utf-8')
+        req = urllib.request.Request(
+            GROQ_API_URL,
+            data=data_bytes,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+                "Accept": "application/json",
+            },
+            method="POST"
+        )
         with urllib.request.urlopen(req, timeout=timeout) as response:
             res_body = response.read().decode('utf-8')
             res_json = json.loads(res_body)
@@ -93,11 +189,29 @@ def _call_groq_api(api_key, model, system_prompt, user_prompt, timeout=90):
             if not choices:
                 raise Exception(f"No choices returned by Groq: {res_body[:200]}")
             return choices[0].get('message', {}).get('content', '')
+
+    try:
+        return _execute(model, use_json_format=True)
     except urllib.error.HTTPError as e:
-        err_body = e.read().decode('utf-8', errors='ignore')[:300]
-        # If 70b is not enabled on this free key, retry automatically with 8b instant
-        if e.code == 404 and model != 'llama-3.1-8b-instant':
-            return _call_groq_api(api_key, 'llama-3.1-8b-instant', system_prompt, user_prompt, timeout=timeout)
+        err_body = e.read().decode('utf-8', errors='ignore')[:350]
+
+        # Retry without json_object if this model does not support response_format
+        if e.code == 400 and 'response_format' in err_body.lower():
+            try:
+                return _execute(model, use_json_format=False)
+            except Exception:
+                pass
+
+        # If model is not found or not accessible (404/400), dynamically discover available models and retry
+        if e.code in (400, 404) and ('model_not_found' in err_body.lower() or 'does not exist' in err_body.lower()):
+            try:
+                available = get_groq_available_models(api_key)
+                alt_model = pick_best_groq_model(available, exclude=[model])
+                if alt_model and alt_model != model:
+                    return _execute(alt_model, use_json_format=True)
+            except Exception:
+                pass
+
         raise Exception(f"Groq API Error ({e.code}): {err_body}")
     except urllib.error.URLError as e:
         raise Exception(f"Groq Connection Error: {e.reason}")
@@ -515,23 +629,25 @@ Domain Focus: {domain} (Include topics across Information Technology & Computer 
 Target Content Type: {content_type}
 Language Requirement: {lang_note}
 
-Return a valid JSON array of {count} objects matching this exact schema:
-[
-  {{
-    "title": "Clear, engaging topic title",
-    "content_type": "{content_type}",
-    "language": "{language}",
-    "category_name": "Technology / Notes / GK / Education",
-    "hint": "Brief 1-sentence note on key aspects to cover"
-  }}
-]
+Return a valid JSON object with a single key "topics" containing a list of {count} items matching this schema:
+{{
+  "topics": [
+    {{
+      "title": "Clear, engaging topic title",
+      "content_type": "{content_type}",
+      "language": "{language}",
+      "category_name": "Technology / Notes / GK / Education",
+      "hint": "Brief 1-sentence note on key aspects to cover"
+    }}
+  ]
+}}
 Do NOT include markdown fences, just pure JSON.
 """
 
     if provider == 'groq':
-        raw = _call_groq_api(api_key, model, "You are a helpful educational topic brainstormer.", prompt, timeout=45)
+        raw = _call_groq_api(api_key, model, "You are a helpful educational topic brainstormer. Respond strictly in valid JSON.", prompt, timeout=45)
     else:
-        url = GEMINI_API_URL.format(model=model) + f"?key={api_key}"
+        url = GEMINI_API_URL.format(model=model or 'gemini-3.8-flash') + f"?key={api_key}"
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 0.7, "responseMimeType": "application/json"}
@@ -545,7 +661,12 @@ Do NOT include markdown fences, just pure JSON.
         raw = raw[3:]
     if raw.endswith("```"):
         raw = raw[:-3]
-    return json.loads(raw.strip())
+    parsed = json.loads(raw.strip())
+    if isinstance(parsed, dict) and 'topics' in parsed:
+        return parsed['topics']
+    if isinstance(parsed, list):
+        return parsed
+    return []
 
 
 def run_daily_ai_generation_job():

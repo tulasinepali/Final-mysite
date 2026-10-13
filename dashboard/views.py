@@ -2046,7 +2046,10 @@ def ai_suggest_topics_ajax(request):
 def ai_test_api_key(request):
     """Test connection with Groq or Google Gemini API"""
     from django.http import JsonResponse
-    from core.ai_blogger import get_ai_config, _call_gemini_api, _call_groq_api, extract_gemini_text, GEMINI_API_URL
+    from core.ai_blogger import (
+        get_ai_config, _call_gemini_api, _call_groq_api, extract_gemini_text,
+        GEMINI_API_URL, get_groq_available_models, pick_best_groq_model
+    )
 
     default_provider, api_key, default_model, _ = get_ai_config()
     test_key = request.GET.get('key', '').strip() or api_key
@@ -2064,23 +2067,45 @@ def ai_test_api_key(request):
 
     try:
         if provider == 'groq':
-            if 'gemini' in model:
-                model = 'llama-3.3-70b-versatile'
-            reply = _call_groq_api(test_key, model, "You are a helpful assistant.", "Respond with JSON: {\"status\": \"OK\"}", timeout=15)
+            available_models = get_groq_available_models(test_key)
+            if not available_models:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Groq connection succeeded, but no active models were found on your account.'
+                }, status=400)
+
+            chosen_model = pick_best_groq_model(available_models, preferred=model)
+            reply = _call_groq_api(
+                test_key,
+                chosen_model,
+                "You are a helpful assistant.",
+                "Respond with JSON: {\"status\": \"OK\"}",
+                timeout=20
+            )
+
+            # Auto-save verified model and key in SiteSettings
+            settings = SiteSettings.objects.first()
+            if settings:
+                settings.groq_api_key = test_key
+                settings.ai_provider = 'groq'
+                settings.gemini_model = chosen_model
+                settings.save(update_fields=['groq_api_key', 'ai_provider', 'gemini_model'])
+
             return JsonResponse({
                 'status': 'success',
-                'model': model,
-                'message': f'Groq API Verified! Responded: "{reply[:40]}" ({model}).'
+                'model': chosen_model,
+                'available_models': available_models,
+                'message': f'Groq API Verified! Working model: "{chosen_model}". Found {len(available_models)} supported models on your account.'
             })
         else:
-            if model in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash']:
+            if model in ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-2.5-flash'] or not model:
                 model = 'gemini-3.8-flash'
             url = GEMINI_API_URL.format(model=model) + f"?key={test_key}"
             payload = {
                 "contents": [{"parts": [{"text": "Hello, respond with: OK"}]}],
                 "generationConfig": {"maxOutputTokens": 300}
             }
-            data = _call_gemini_api(url, payload, timeout=15)
+            data = _call_gemini_api(url, payload, timeout=20)
             reply = extract_gemini_text(data) or "OK"
             return JsonResponse({
                 'status': 'success',

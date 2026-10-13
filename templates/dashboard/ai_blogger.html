@@ -635,15 +635,22 @@ function toggleProviderFields() {
     if (provider === 'groq') {
         groqGroup.style.display = 'block';
         geminiGroup.style.display = 'none';
-        // Select first groq option if gemini was selected
+        Array.from(modelSelect.options).forEach(opt => {
+            opt.style.display = opt.classList.contains('groq-model-opt') ? '' : 'none';
+        });
         if (modelSelect.value.startsWith('gemini')) {
-            modelSelect.value = 'llama-3.1-8b-instant';
+            const firstGroq = modelSelect.querySelector('.groq-model-opt');
+            if (firstGroq) modelSelect.value = firstGroq.value;
         }
     } else {
         groqGroup.style.display = 'none';
         geminiGroup.style.display = 'block';
-        if (modelSelect.value.startsWith('llama')) {
-            modelSelect.value = 'gemini-3.8-flash';
+        Array.from(modelSelect.options).forEach(opt => {
+            opt.style.display = opt.classList.contains('gemini-model-opt') ? '' : 'none';
+        });
+        if (!modelSelect.value.startsWith('gemini')) {
+            const firstGemini = modelSelect.querySelector('.gemini-model-opt');
+            if (firstGemini) modelSelect.value = firstGemini.value;
         }
     }
 }
@@ -672,7 +679,7 @@ function testApiKeyConnection(provider) {
     const origText = btn.innerHTML;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span> Testing...';
     resultDiv.style.display = 'block';
-    resultDiv.innerHTML = `<div class="alert alert-info py-2 px-3 small mb-0"><i class="bi bi-arrow-repeat mr-1"></i> Connecting to ${provider.toUpperCase()} API...</div>`;
+    resultDiv.innerHTML = `<div class="alert alert-info py-2 px-3 small mb-0"><i class="bi bi-arrow-repeat mr-1"></i> Connecting to ${provider.toUpperCase()} API & discovering active models...</div>`;
 
     fetch(`{% url 'dashboard:ai_test_api_key' %}?key=${encodeURIComponent(key)}&model=${encodeURIComponent(model)}&provider=${encodeURIComponent(provider)}`)
         .then(response => response.json().then(data => ({status: response.status, body: data})))
@@ -685,6 +692,21 @@ function testApiKeyConnection(provider) {
                         <i class="bi bi-check-circle-fill mr-1"></i> <strong>Connected!</strong> ${res.body.message}
                     </div>
                 `;
+                if (res.body.available_models && res.body.available_models.length > 0 && provider === 'groq') {
+                    const modelSelect = document.getElementById('geminiModelSelect');
+                    const geminiOpts = Array.from(modelSelect.querySelectorAll('.gemini-model-opt'));
+                    modelSelect.innerHTML = '';
+                    res.body.available_models.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m;
+                        opt.textContent = `${m} (Groq Active)`;
+                        opt.className = 'groq-model-opt';
+                        if (m === res.body.model) opt.selected = true;
+                        modelSelect.appendChild(opt);
+                    });
+                    geminiOpts.forEach(opt => modelSelect.appendChild(opt));
+                    toggleProviderFields();
+                }
             } else {
                 resultDiv.innerHTML = `
                     <div class="alert alert-danger py-2 px-3 small mb-0">
