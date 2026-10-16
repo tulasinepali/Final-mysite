@@ -105,26 +105,22 @@ def get_groq_available_models(api_key):
 def pick_best_groq_model(available_models, preferred=None, exclude=None):
     """
     Pick the optimal chat completion model from available models for this Groq account.
-    Prioritizes models with massive token limits (e.g. OpenAI GPT-OSS, Llama 3.3/3.1, Mixtral)
-    and avoids models with strict 1000 OTPM limits on free tiers.
+    Prioritizes models with massive token limits (e.g. Llama 3.3 70B, Llama 3.1 8B, Mixtral)
+    and avoids models with strict 1000 OTPM limits on free tiers (like Qwen).
     """
     if not available_models:
         return 'llama-3.3-70b-versatile'
 
     exclude = exclude or []
-    candidates = [m for m in available_models if m not in exclude]
+    candidates = [m for m in available_models if not any(x.lower() in m.lower() for x in exclude)]
     if not candidates:
         candidates = available_models
 
     if preferred and preferred in candidates:
         return preferred
 
-    # Ranking patterns: High-capacity models first (250k / 12k TPM)
+    # Ranking patterns: High-capacity, robust production models first
     priority_patterns = [
-        'openai/gpt-oss-120b',
-        'openai/gpt-oss-20b',
-        'gpt-oss-120b',
-        'gpt-oss-20b',
         'llama-3.3-70b-versatile',
         'llama-3.1-8b-instant',
         'llama-3.3-70b',
@@ -132,12 +128,15 @@ def pick_best_groq_model(available_models, preferred=None, exclude=None):
         'llama-3.1-8b',
         'mixtral-8x7b-32768',
         'gemma2-9b-it',
+        'openai/gpt-oss-120b',
+        'openai/gpt-oss-20b',
+        'gpt-oss-120b',
+        'gpt-oss-20b',
         'llama3-70b',
         'llama3-8b',
         'llama',
         'gemma',
         'mistral',
-        'qwen',
     ]
 
     for pat in priority_patterns:
@@ -154,21 +153,21 @@ def _call_groq_api(api_key, model='', system_prompt="", user_prompt="", timeout=
     if not api_key:
         raise Exception("Groq API key is missing.")
 
-    # Auto-discover available models if no valid model specified
+    # Auto-discover available models if no valid model specified or gemini leftover
     if not model or 'gemini' in model:
         try:
             available = get_groq_available_models(api_key)
-            model = pick_best_groq_model(available)
+            model = pick_best_groq_model(available, exclude=['qwen'])
         except Exception:
             model = 'llama-3.3-70b-versatile'
 
     def _execute(target_model, use_json_format=True, max_tokens=None):
         if max_tokens is None:
-            # On qwen, Groq enforces a strict 1000 Output Tokens Per Minute (OTPM) limit
+            # On qwen, Groq enforces a strict 1000 Output Tokens Per Minute limit on free tier
             if 'qwen' in target_model.lower():
-                max_tokens = 850
+                max_tokens = 1500
             else:
-                max_tokens = 2048
+                max_tokens = 4096
 
         payload = {
             "model": target_model,
@@ -205,33 +204,46 @@ def _call_groq_api(api_key, model='', system_prompt="", user_prompt="", timeout=
     try:
         return _execute(model, use_json_format=True)
     except urllib.error.HTTPError as e:
-        err_body = e.read().decode('utf-8', errors='ignore')[:350]
+        err_body = e.read().decode('utf-8', errors='ignore')[:500]
+        err_lower = err_body.lower()
 
-        # 1. Retry without json_object if model does not support response_format
-        if e.code == 400 and 'response_format' in err_body.lower():
+        # 1. If JSON validation failed (e.g. max completion tokens reached before closing braces)
+        # or response_format unsupported:
+        if e.code == 400 and any(k in err_lower for k in [
+            'json_validate_failed', 'max completion tokens', 'failed to generate json',
+            'response_format', 'failed_generation'
+        ]):
+            # First fallback: switch to high-capacity model (excluding qwen) and use_json_format=False with 4096 tokens
             try:
-                return _execute(model, use_json_format=False)
+                available = get_groq_available_models(api_key)
+                alt_model = pick_best_groq_model(available, exclude=[model, 'qwen'])
+                if alt_model:
+                    return _execute(alt_model, use_json_format=False, max_tokens=4096)
+            except Exception:
+                pass
+
+            # Second fallback: retry same model with use_json_format=False and 4096 tokens
+            try:
+                return _execute(model, use_json_format=False, max_tokens=4096)
             except Exception:
                 pass
 
         # 2. If rate limited (429) - e.g. OTPM 1000 limit on qwen or TPM spike:
         if e.code == 429:
-            # Automatically fail over to a higher-capacity model (e.g. gpt-oss or llama)
             try:
                 available = get_groq_available_models(api_key)
-                alt_model = pick_best_groq_model(available, exclude=[model, 'qwen/qwen3.8-27b'])
+                alt_model = pick_best_groq_model(available, exclude=[model, 'qwen'])
                 if alt_model and alt_model != model:
-                    return _execute(alt_model, use_json_format=True, max_tokens=2048)
+                    return _execute(alt_model, use_json_format=False, max_tokens=3000)
             except Exception:
                 pass
-            # Or retry current model with minimal tokens (700 tokens)
             try:
-                return _execute(model, use_json_format=True, max_tokens=700)
+                return _execute(model, use_json_format=False, max_tokens=1500)
             except Exception:
                 pass
 
-        # 3. If model is not found or not accessible (404/400), dynamically discover available models and retry
-        if e.code in (400, 404) and ('model_not_found' in err_body.lower() or 'does not exist' in err_body.lower()):
+        # 3. If model is not found or not accessible (404/400)
+        if e.code in (400, 404) and any(k in err_lower for k in ['model_not_found', 'does not exist']):
             try:
                 available = get_groq_available_models(api_key)
                 alt_model = pick_best_groq_model(available, exclude=[model])
@@ -308,6 +320,100 @@ def extract_gemini_text(resp_data):
     # Combine all parts texts
     texts = [p.get('text', '') for p in parts if isinstance(p, dict) and 'text' in p]
     return ''.join(texts).strip()
+
+
+def repair_and_parse_json(raw_text: str) -> dict:
+    """
+    Robust JSON parser for LLM outputs.
+    Handles markdown code fences, conversational wrapper text,
+    truncated JSON documents (auto-closing strings, lists, objects),
+    and regex fallback extraction.
+    """
+    if not raw_text or not raw_text.strip():
+        raise ValueError("Empty response received from AI model.")
+
+    cleaned = raw_text.strip()
+    if cleaned.startswith("```json"):
+        cleaned = cleaned[7:]
+    elif cleaned.startswith("```"):
+        cleaned = cleaned[3:]
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
+    cleaned = cleaned.strip()
+
+    # Find boundaries of outermost JSON object { ... }
+    first_b = cleaned.find('{')
+    last_b = cleaned.rfind('}')
+    if first_b != -1 and last_b != -1 and last_b > first_b:
+        cand = cleaned[first_b:last_b+1]
+    elif first_b != -1:
+        cand = cleaned[first_b:]
+    else:
+        cand = cleaned
+
+    try:
+        return json.loads(cand)
+    except Exception:
+        pass
+
+    # Attempt repairing truncated JSON
+    repaired = cand.strip()
+    quotes = len(re.findall(r'(?<!\\)"', repaired))
+    if quotes % 2 != 0:
+        repaired += '"'
+    ob = repaired.count('[') - repaired.count(']')
+    if ob > 0:
+        repaired += ']' * ob
+    oc = repaired.count('{') - repaired.count('}')
+    if oc > 0:
+        repaired += '}' * oc
+
+    try:
+        return json.loads(repaired)
+    except Exception:
+        pass
+
+    # Regex fallback extraction for standard fields
+    extracted = {}
+    title_m = re.search(r'"title"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', cleaned)
+    if title_m:
+        try:
+            extracted['title'] = title_m.group(1).encode().decode('unicode_escape', errors='ignore')
+        except Exception:
+            extracted['title'] = title_m.group(1)
+
+    slug_m = re.search(r'"slug"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', cleaned)
+    if slug_m:
+        extracted['slug'] = slug_m.group(1)
+
+    summary_m = re.search(r'"summary"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', cleaned)
+    if summary_m:
+        try:
+            extracted['summary'] = summary_m.group(1).encode().decode('unicode_escape', errors='ignore')
+        except Exception:
+            extracted['summary'] = summary_m.group(1)
+
+    content_m = re.search(r'"content"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', cleaned, re.DOTALL)
+    if content_m:
+        try:
+            extracted['content'] = content_m.group(1).encode().decode('unicode_escape', errors='ignore')
+        except Exception:
+            extracted['content'] = content_m.group(1)
+    elif '"content"' in cleaned:
+        idx = cleaned.find('"content"')
+        after = cleaned[idx:]
+        start_q = after.find('": "')
+        if start_q != -1:
+            raw_c = after[start_q + 4:]
+            end_q = raw_c.find('",')
+            if end_q == -1:
+                end_q = raw_c.rfind('"')
+            extracted['content'] = raw_c[:end_q] if end_q != -1 else raw_c
+
+    if extracted.get('title') or extracted.get('content'):
+        return extracted
+
+    raise ValueError(f"Could not parse valid JSON from AI response: {cleaned[:200]}")
 
 
 def sanitize_slug(text, max_len=180):
@@ -608,7 +714,7 @@ JSON Output Schema required:
   "summary": "Concise 120-180 character meta summary / excerpt for Google and cards",
   "meta_title": "SEO title under 70 characters",
   "meta_description": "SEO description under 160 characters",
-  "content": "Rich HTML content (at least 900-1400 words) using <h2>, <h3>, <p>, <ul>, <ol>, <li>, <table>, <blockquote>. Do NOT wrap with <html> or <body> tags. Do NOT use markdown code blocks inside the HTML.",
+  "content": "Comprehensive, curriculum-grade HTML content (approx 700-1100 words) using <h2>, <h3>, <p>, <ul>, <ol>, <li>, <table>, <blockquote>. Be detailed, clear, and well-structured. Do NOT wrap with <html> or <body> tags. Do NOT use markdown code blocks inside the HTML.",
   "tags": ["Tag1", "Tag2", "Tag3", "Tag4"],
   "category_name": "Suggested accurate category (e.g. Nepali Grammar, General Knowledge, Information Technology, TSC Prep, Computer Operator, Science, Pedagogy)"
 }}
@@ -649,17 +755,8 @@ JSON Output Schema required:
 
             raw_text = extract_gemini_text(resp_data)
 
-        # Parse JSON
-        cleaned_json = raw_text.strip()
-        if cleaned_json.startswith("```json"):
-            cleaned_json = cleaned_json[7:]
-        if cleaned_json.startswith("```"):
-            cleaned_json = cleaned_json[3:]
-        if cleaned_json.endswith("```"):
-            cleaned_json = cleaned_json[:-3]
-        cleaned_json = cleaned_json.strip()
-
-        data = json.loads(cleaned_json)
+        # Parse JSON safely with truncation repair and fallback extraction
+        data = repair_and_parse_json(raw_text)
 
         article_title = data.get('title') or topic.title
         article_slug = sanitize_slug(data.get('slug') or article_title)
@@ -812,17 +909,14 @@ Do NOT include markdown fences, just pure JSON.
         resp_data = _call_gemini_api(url, payload, timeout=45)
         raw = extract_gemini_text(resp_data)
 
-    if raw.startswith("```json"):
-        raw = raw[7:]
-    if raw.startswith("```"):
-        raw = raw[3:]
-    if raw.endswith("```"):
-        raw = raw[:-3]
-    parsed = json.loads(raw.strip())
-    if isinstance(parsed, dict) and 'topics' in parsed:
-        return parsed['topics']
-    if isinstance(parsed, list):
-        return parsed
+    try:
+        parsed = repair_and_parse_json(raw)
+        if isinstance(parsed, dict) and 'topics' in parsed:
+            return parsed['topics']
+        if isinstance(parsed, list):
+            return parsed
+    except Exception:
+        pass
     return []
 
 
