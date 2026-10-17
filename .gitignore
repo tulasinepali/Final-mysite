@@ -18,6 +18,7 @@ stderr.log
 
 # Archives
 *.zip
+*.apk
 
 # Temporary & Backup files
 tmp/

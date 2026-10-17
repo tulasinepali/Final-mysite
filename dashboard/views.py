@@ -2161,6 +2161,17 @@ def dashboard_videos(request):
     active_count = YouTubeVideo.objects.filter(is_active=True).count()
     inactive_count = total_count - active_count
 
+    # Engagement Analytics Aggregation
+    analytics = YouTubeVideo.objects.aggregate(
+        total_views=Sum('views_count'),
+        total_clicks=Sum('clicks_count'),
+        total_subs=Sum('sub_clicks_count')
+    )
+    total_views = analytics.get('total_views') or 0
+    total_clicks = (analytics.get('total_clicks') or 0) + (analytics.get('total_subs') or 0)
+    total_subs = analytics.get('total_subs') or 0
+    overall_ctr = round((total_clicks / total_views * 100), 1) if total_views > 0 else 0.0
+
     paginator = Paginator(videos_qs, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -2172,6 +2183,10 @@ def dashboard_videos(request):
         'total_count': total_count,
         'active_count': active_count,
         'inactive_count': inactive_count,
+        'total_views': total_views,
+        'total_clicks': total_clicks,
+        'total_subs': total_subs,
+        'overall_ctr': overall_ctr,
         'status_filter': status_filter,
         'category_filter': category_filter,
         'search': search or '',

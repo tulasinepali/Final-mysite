@@ -272,6 +272,20 @@ class SiteSettings(models.Model):
         help_text='Estimated downtime shown to visitors (e.g., "Under 30 minutes", "10:30 PM NST")'
     )
 
+    # YouTube & Study Break Rewards
+    enable_video_break_rewards = models.BooleanField(
+        default=True,
+        help_text='Master switch to enable or disable floating study break and completion reward video popups across the site'
+    )
+    video_break_popup_delay = models.PositiveIntegerField(
+        default=18,
+        help_text='Delay in seconds before the floating break card appears on lesson/blog pages (default: 18 seconds)'
+    )
+    video_break_scroll_threshold = models.PositiveIntegerField(
+        default=65,
+        help_text='Scroll percentage (0-100%) down a lesson or note before triggering the study break card (default: 65%)'
+    )
+
     class Meta:
         verbose_name = 'Site Settings'
         verbose_name_plural = 'Site Settings'
@@ -558,6 +572,19 @@ class YouTubeVideo(models.Model):
         default=0,
         help_text="Display priority (lower numbers appear first)"
     )
+    # Analytics & Engagement Tracking
+    views_count = models.PositiveIntegerField(
+        default=0,
+        help_text="Number of times this video popup/card was displayed to visitors"
+    )
+    clicks_count = models.PositiveIntegerField(
+        default=0,
+        help_text="Number of times visitors clicked to watch/play this video"
+    )
+    sub_clicks_count = models.PositiveIntegerField(
+        default=0,
+        help_text="Number of times visitors clicked the + Subscribe button"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -568,6 +595,12 @@ class YouTubeVideo(models.Model):
 
     def __str__(self):
         return f"{self.title or self.video_id} [{self.category}]"
+
+    @property
+    def click_through_rate(self):
+        if self.views_count > 0:
+            return round(((self.clicks_count + self.sub_clicks_count) / self.views_count) * 100, 1)
+        return 0.0
 
     def clean(self):
         self.fetch_youtube_metadata()

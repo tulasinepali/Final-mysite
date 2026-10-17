@@ -369,3 +369,25 @@ def offline_view(request):
     return render(request, 'core/offline.html')
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models import F
+
+@csrf_exempt
+def track_video_engagement(request, video_id, action_type):
+    """Asynchronously track impressions, watch clicks, and subscribe clicks without affecting UX."""
+    if request.method in ('POST', 'GET'):
+        try:
+            from core.models import YouTubeVideo
+            if action_type == 'view':
+                YouTubeVideo.objects.filter(pk=video_id).update(views_count=F('views_count') + 1)
+            elif action_type == 'click':
+                YouTubeVideo.objects.filter(pk=video_id).update(clicks_count=F('clicks_count') + 1)
+            elif action_type == 'sub':
+                YouTubeVideo.objects.filter(pk=video_id).update(sub_clicks_count=F('sub_clicks_count') + 1)
+            return JsonResponse({'status': 'ok'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'method_not_allowed'}, status=405)
+
+
+

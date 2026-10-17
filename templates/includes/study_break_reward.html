@@ -1,3 +1,4 @@
+{% if site_settings.enable_video_break_rewards %}
 {% comment %}
     Study Break / Completion Reward Video Popup Component
     Triggers automatically when a visitor finishes reading a note/blog or completes a quiz.
@@ -523,17 +524,17 @@
 <script>
 /**
  * Study Break & Video Recommendation Engine
- * Randomly picks from your curated YouTube videos & channels.
- * Seamless trigger on article completion or quiz finish.
+ * Intelligently picks contextual YouTube videos & tracks impressions, clicks, and subscribes.
+ * Configured dynamically via Site Settings in Admin Dashboard.
  */
 (function() {
     // -------------------------------------------------------------
     // 1. DYNAMIC YOUTUBE VIDEOS FROM ADMIN DATABASE
-    // (Managed via Django Admin: Core > YouTube Videos)
     // -------------------------------------------------------------
     var dbVideos = {{ promoted_youtube_videos_json|default:"[]"|safe }};
     var YOUTUBE_VIDEOS = (dbVideos && dbVideos.length > 0) ? dbVideos.map(function(v) {
         return {
+            dbId: v.id,
             id: v.video_id,
             title: v.title,
             category: v.category || '🎧 Anime ASMR',
@@ -543,7 +544,8 @@
         };
     }) : [
         {
-            id: 'jfKfPfyJRdk', // Lofi Chill Study Ambience placeholder
+            dbId: null,
+            id: 'jfKfPfyJRdk',
             title: 'Anime Rain & Study Room Ambience 🌧️ (Deep Focus & Calm)',
             category: '🎧 Anime ASMR',
             channelName: 'Tulasi Nepali / Creative ASMR',
@@ -551,7 +553,8 @@
             customThumbnail: ''
         },
         {
-            id: '5qap5aO4i9A', // Lofi Chill Beats
+            dbId: null,
+            id: '5qap5aO4i9A',
             title: 'Late Night Anime Bedroom Study & Relaxation ASMR ✨',
             category: '🌸 Cozy Ambience',
             channelName: 'Tulasi Nepali / Creative ASMR',
@@ -559,7 +562,8 @@
             customThumbnail: ''
         },
         {
-            id: 'DWcJFNfaw9c', // Peaceful Ambient Piano
+            dbId: null,
+            id: 'DWcJFNfaw9c',
             title: 'Soft Rain & Cozy Library Ambience for Sleep & Reading 📚',
             category: '🌙 Sleep & Relax',
             channelName: 'Tulasi Nepali / Creative ASMR',
@@ -567,7 +571,8 @@
             customThumbnail: ''
         },
         {
-            id: 'WPni755-Krg', // Gentle Coffee Shop
+            dbId: null,
+            id: 'WPni755-Krg',
             title: 'Tokyo Cafe Morning Vibe — Chill Coffee & Gentle Chatter ☕',
             category: '✨ Lifestyle & Chill',
             channelName: 'SkillUp with Tulasi Nepali',
@@ -576,9 +581,71 @@
         }
     ];
 
-    // Pick random video
-    var currentIndex = Math.floor(Math.random() * YOUTUBE_VIDEOS.length);
+    // Contextual Matching
+    function pickContextualVideoIndex() {
+        if (!YOUTUBE_VIDEOS || YOUTUBE_VIDEOS.length === 0) return 0;
+        if (YOUTUBE_VIDEOS.length === 1) return 0;
+
+        var contextText = (window.location.pathname + ' ' + document.title).toLowerCase();
+        var mainH1 = document.querySelector('h1');
+        if (mainH1) contextText += ' ' + mainH1.textContent.toLowerCase();
+        var badge = document.querySelector('.badge, .category-badge');
+        if (badge) contextText += ' ' + badge.textContent.toLowerCase();
+
+        var isTech = /tech|coding|code|python|django|programming|web|javascript|html|css|developer|computer|software|git|linux|api|database|sql/.test(contextText);
+        var isRelaxExam = /quiz|exam|test|result|loksewa|practice|study|note|revision|stress|peace|sleep|calm/.test(contextText);
+
+        var scored = YOUTUBE_VIDEOS.map(function(vid, idx) {
+            var score = 0;
+            var cat = (vid.category || '').toLowerCase();
+            var title = (vid.title || '').toLowerCase();
+
+            if (isTech) {
+                if (/tech|coding|code|python|guide|tutorial|dev/.test(cat)) score += 10;
+                if (/tech|coding|python|guide|tutorial|learn/.test(title)) score += 5;
+            }
+            if (isRelaxExam) {
+                if (/asmr|ambient|chill|relax|sleep|calm|cozy|focus/.test(cat)) score += 10;
+                if (/asmr|rain|relax|sleep|calm|cozy|focus|piano|study/.test(title)) score += 5;
+            }
+
+            var words = contextText.split(/[^a-z0-9]+/);
+            words.forEach(function(w) {
+                if (w.length > 3) {
+                    if (title.indexOf(w) !== -1) score += 3;
+                    if (cat.indexOf(w) !== -1) score += 3;
+                }
+            });
+
+            return { index: idx, score: score };
+        });
+
+        var maxScore = Math.max.apply(null, scored.map(function(s) { return s.score; }));
+        if (maxScore > 0) {
+            var best = scored.filter(function(s) { return s.score === maxScore; });
+            var chosen = best[Math.floor(Math.random() * best.length)];
+            return chosen.index;
+        }
+
+        return Math.floor(Math.random() * YOUTUBE_VIDEOS.length);
+    }
+
+    var currentIndex = pickContextualVideoIndex();
     var currentVideo = YOUTUBE_VIDEOS[currentIndex];
+
+    // Analytics Tracking (view, click, sub)
+    var viewTracked = false;
+    function trackEngagement(actionType) {
+        if (!currentVideo || !currentVideo.dbId) return;
+        var url = '/api/videos/' + currentVideo.dbId + '/track/' + actionType + '/';
+        try {
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(url);
+            } else {
+                fetch(url, { method: 'POST', keepalive: true }).catch(function(){});
+            }
+        } catch(e) {}
+    }
 
     // Elements
     var widget = document.getElementById('study-break-widget');
@@ -621,7 +688,7 @@
 
     renderVideo(currentVideo);
 
-    // Contextual Title (Notes vs Quiz vs Blog vs Downloads)
+    // Contextual Title
     if (window.location.pathname.indexOf('/quiz/') !== -1) {
         bannerTitle.textContent = '🎉 Quiz Completed! (Take a Break)';
     } else if (window.location.pathname.indexOf('/downloads/') !== -1) {
@@ -634,7 +701,7 @@
 
     // Modal Handlers
     function openModal() {
-        // Build embed URL with autoplay=1 (works because user initiated click)
+        trackEngagement('click');
         modalIframe.src = 'https://www.youtube-nocookie.com/embed/' + currentVideo.id + '?autoplay=1&rel=0&modestbranding=1';
         modalBackdrop.classList.add('is-open');
         document.body.style.overflow = 'hidden';
@@ -642,7 +709,7 @@
 
     function closeModal() {
         modalBackdrop.classList.remove('is-open');
-        modalIframe.src = ''; // stop playback
+        modalIframe.src = '';
         document.body.style.overflow = '';
     }
 
@@ -654,11 +721,20 @@
         if (e.target === modalBackdrop) closeModal();
     });
 
-    // Dice button: Play another random video inside modal
+    // Subscribe tracking
+    btnSub.addEventListener('click', function() {
+        trackEngagement('sub');
+    });
+    modalSub.addEventListener('click', function() {
+        trackEngagement('sub');
+    });
+
+    // Dice button: Play another video inside modal
     btnDice.addEventListener('click', function() {
         var nextIndex = (currentIndex + 1) % YOUTUBE_VIDEOS.length;
         currentIndex = nextIndex;
         renderVideo(YOUTUBE_VIDEOS[currentIndex]);
+        trackEngagement('click');
         modalIframe.src = 'https://www.youtube-nocookie.com/embed/' + currentVideo.id + '?autoplay=1&rel=0&modestbranding=1';
     });
 
@@ -670,7 +746,6 @@
         } catch(e) {}
     });
 
-    // Check if dismissed in this session
     var isDismissed = false;
     try {
         isDismissed = sessionStorage.getItem('sb_dismissed_' + window.location.pathname) === 'true';
@@ -678,23 +753,31 @@
 
     if (isDismissed) return;
 
-    // Trigger Logic:
+    // Trigger Logic & Settings
+    var POPUP_DELAY_SECONDS = {{ site_settings.video_break_popup_delay|default:18 }};
+    var SCROLL_THRESHOLD_PERCENT = {{ site_settings.video_break_scroll_threshold|default:65 }};
+    var scrollThresholdRatio = (SCROLL_THRESHOLD_PERCENT || 65) / 100;
+
     var triggered = false;
     function showWidget() {
         if (triggered) return;
         triggered = true;
         setTimeout(function() {
             widget.classList.add('is-visible');
+            if (!viewTracked) {
+                viewTracked = true;
+                trackEngagement('view');
+            }
         }, 800);
     }
 
-    // 1. If on Quiz Result page: trigger after a short celebratory delay
+    // 1. If on Quiz Result page: trigger after a celebratory delay
     if (window.location.pathname.indexOf('/quiz/') !== -1 && window.location.pathname.indexOf('/result') !== -1) {
-        setTimeout(showWidget, 1500);
+        setTimeout(showWidget, Math.min(POPUP_DELAY_SECONDS * 1000, 2000));
         return;
     }
 
-    // 2. If on Downloads: trigger when user clicks ANY Download / Get File button!
+    // 2. If on Downloads: trigger when user clicks ANY Download / Get File button
     document.addEventListener('click', function(e) {
         var btn = e.target.closest('#downloadBtn, a[href*="/download/"]');
         if (btn) {
@@ -702,7 +785,6 @@
             e.stopPropagation();
             var downloadUrl = btn.href;
 
-            // Trigger silent background download on the SAME page without navigating away
             var hiddenFrame = document.getElementById('silentDownloadFrame');
             if (!hiddenFrame) {
                 hiddenFrame = document.createElement('iframe');
@@ -712,7 +794,6 @@
             }
             hiddenFrame.src = downloadUrl;
 
-            // Open the video modal popup immediately on the same page
             bannerTitle.textContent = '📥 Downloading File... (Watch & Relax)';
             modalBadge.textContent = '📥 File Downloading...';
             modalBadge.style.background = '#0559b7';
@@ -720,10 +801,13 @@
         }
     });
 
-    // 3. For Notes & Blog: Trigger when user reaches the end of reading content
+    // 3. For Notes & Blog: Timer trigger + Scroll depth / Sentinel trigger
+    if (POPUP_DELAY_SECONDS > 0) {
+        setTimeout(showWidget, POPUP_DELAY_SECONDS * 1000);
+    }
+
     var contentEl = document.getElementById('note-content') || document.getElementById('post-content');
     if (contentEl && 'IntersectionObserver' in window) {
-        // Create a sentinel at the end of content
         var sentinel = document.createElement('div');
         sentinel.style.height = '1px';
         sentinel.style.width = '100%';
@@ -740,17 +824,18 @@
         }, { threshold: 0.1 });
 
         observer.observe(sentinel);
-    } else {
-        // Fallback: Scroll depth check (>= 75% of page)
-        window.addEventListener('scroll', function onScroll() {
-            var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-            if (scrollHeight <= 0) return;
-            var scrolled = window.scrollY / scrollHeight;
-            if (scrolled >= 0.75) {
-                showWidget();
-                window.removeEventListener('scroll', onScroll);
-            }
-        }, { passive: true });
     }
+
+    // Fallback & custom scroll threshold
+    window.addEventListener('scroll', function onScroll() {
+        var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (scrollHeight <= 0) return;
+        var scrolled = window.scrollY / scrollHeight;
+        if (scrolled >= scrollThresholdRatio) {
+            showWidget();
+            window.removeEventListener('scroll', onScroll);
+        }
+    }, { passive: true });
 })();
 </script>
+{% endif %}

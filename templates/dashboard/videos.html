@@ -20,6 +20,21 @@
                 <div>
                     <span class="text-muted small text-uppercase font-weight-bold d-block">Total Videos</span>
                     <h3 class="mb-0 font-weight-bold" style="color: #0f172a;">{{ total_count }}</h3>
+                    <small class="text-muted">{{ active_count }} Active in Rotation</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3 mb-3 mb-xl-0">
+        <div class="card h-100 border shadow-sm" style="border-radius: 12px; background: #ffffff; border-left: 4px solid #0284c7 !important;">
+            <div class="card-body d-flex align-items-center p-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px; min-width: 48px; background: #e0f2fe; color: #0284c7; font-size: 1.4rem;">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase font-weight-bold d-block">Popup Impressions</span>
+                    <h3 class="mb-0 font-weight-bold" style="color: #0369a1;">{{ total_views }}</h3>
+                    <small class="text-muted">Displays across site</small>
                 </div>
             </div>
         </div>
@@ -28,37 +43,26 @@
         <div class="card h-100 border shadow-sm" style="border-radius: 12px; background: #ffffff; border-left: 4px solid #10b981 !important;">
             <div class="card-body d-flex align-items-center p-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px; min-width: 48px; background: #d1fae5; color: #10b981; font-size: 1.4rem;">
-                    <i class="fas fa-play-circle"></i>
+                    <i class="fas fa-play"></i>
                 </div>
                 <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Active in Rotation</span>
-                    <h3 class="mb-0 font-weight-bold text-success">{{ active_count }}</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3 mb-3 mb-xl-0">
-        <div class="card h-100 border shadow-sm" style="border-radius: 12px; background: #ffffff; border-left: 4px solid #f59e0b !important;">
-            <div class="card-body d-flex align-items-center p-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px; min-width: 48px; background: #fef3c7; color: #f59e0b; font-size: 1.4rem;">
-                    <i class="fas fa-pause-circle"></i>
-                </div>
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Paused Videos</span>
-                    <h3 class="mb-0 font-weight-bold text-warning">{{ inactive_count }}</h3>
+                    <span class="text-muted small text-uppercase font-weight-bold d-block">Plays &amp; Clicks</span>
+                    <h3 class="mb-0 font-weight-bold text-success">{{ total_clicks }}</h3>
+                    <small class="text-success font-weight-bold">CTR: {{ overall_ctr }}%</small>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <div class="card h-100 border shadow-sm" style="border-radius: 12px; background: #ffffff; border-left: 4px solid #6366f1 !important;">
+        <div class="card h-100 border shadow-sm" style="border-radius: 12px; background: #ffffff; border-left: 4px solid #dc2626 !important;">
             <div class="card-body d-flex align-items-center p-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px; min-width: 48px; background: #e0e7ff; color: #6366f1; font-size: 1.4rem;">
-                    <i class="fas fa-tags"></i>
+                <div class="rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px; min-width: 48px; background: #fee2e2; color: #dc2626; font-size: 1.4rem;">
+                    <i class="fas fa-user-plus"></i>
                 </div>
                 <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Categories</span>
-                    <h3 class="mb-0 font-weight-bold" style="color: #0f172a;">{{ categories|length }}</h3>
+                    <span class="text-muted small text-uppercase font-weight-bold d-block">Sub Clicks</span>
+                    <h3 class="mb-0 font-weight-bold" style="color: #dc2626;">{{ total_subs }}</h3>
+                    <small class="text-muted">Channel leads</small>
                 </div>
             </div>
         </div>
@@ -130,14 +134,15 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="thead-light">
                             <tr>
-                                <th style="width: 50px;" class="text-center">#</th>
-                                <th style="width: 140px;">Preview</th>
+                                <th style="width: 45px;" class="text-center">#</th>
+                                <th style="width: 130px;">Preview</th>
                                 <th>Video Title & ID</th>
                                 <th>Category</th>
                                 <th>Channel Attribution</th>
-                                <th style="width: 110px;" class="text-center">Rotation</th>
-                                <th style="width: 80px;" class="text-center">Order</th>
-                                <th style="width: 150px;" class="text-center">Actions</th>
+                                <th style="width: 140px;" class="text-center">Engagement (CTR)</th>
+                                <th style="width: 100px;" class="text-center">Rotation</th>
+                                <th style="width: 70px;" class="text-center">Order</th>
+                                <th style="width: 140px;" class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -177,10 +182,28 @@
                                 <td>
                                     <div class="font-weight-bold" style="color: #0f172a;">{{ video.channel_name }}</div>
                                     {% if video.channel_url %}
-                                    <a href="{{ video.channel_url }}" target="_blank" rel="noopener noreferrer" class="small text-muted text-truncate d-inline-block" style="max-width: 220px;">
+                                    <a href="{{ video.channel_url }}" target="_blank" rel="noopener noreferrer" class="small text-muted text-truncate d-inline-block" style="max-width: 200px;">
                                         <i class="fas fa-link mr-1"></i> Channel Link
                                     </a>
                                     {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="small">
+                                        <span class="d-inline-block font-weight-bold text-dark" title="Popup Impressions">
+                                            <i class="fas fa-eye text-muted mr-1"></i>{{ video.views_count }}
+                                        </span>
+                                        <span class="text-muted mx-1">|</span>
+                                        <span class="d-inline-block font-weight-bold text-primary" title="Plays / Clicks">
+                                            <i class="fas fa-play text-primary mr-1"></i>{{ video.clicks_count }}
+                                        </span>
+                                        <span class="text-muted mx-1">|</span>
+                                        <span class="d-inline-block font-weight-bold text-danger" title="Subscribe Clicks">
+                                            <i class="fab fa-youtube text-danger mr-1"></i>{{ video.sub_clicks_count }}
+                                        </span>
+                                    </div>
+                                    <span class="badge badge-light border text-muted mt-1" style="font-size: 0.72rem;">
+                                        CTR: <strong>{{ video.click_through_rate }}%</strong>
+                                    </span>
                                 </td>
                                 <td class="text-center">
                                     <form method="post" action="{% url 'dashboard:video_toggle_active' video.id %}" style="display:inline;">

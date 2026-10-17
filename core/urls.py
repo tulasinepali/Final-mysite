@@ -13,5 +13,6 @@ urlpatterns = [
     path('subscribe/', views.subscribe_newsletter, name='subscribe'),
     path('sitemap.html', views.sitemap_view, name='sitemap'),
     path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
+    path('api/videos/<int:video_id>/track/<str:action_type>/', views.track_video_engagement, name='track_video_engagement'),
 ]
 

@@ -918,6 +918,47 @@
                                 </div>
                             </div>
 
+                            <!-- Master Switch Card -->
+                            <div class="card border mb-3">
+                                <div class="card-body py-3">
+                                    <div class="custom-control custom-switch">
+                                        {{ form.enable_video_break_rewards|add_class:'custom-control-input'|attr:'id:enableVideoBreakRewardsToggle' }}
+                                        <label class="custom-control-label font-weight-bold" for="enableVideoBreakRewardsToggle" style="cursor: pointer;">
+                                            Enable Study Break &amp; Download Completion Video Popups Site-wide
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block pl-4">Master toggle. If turned off, all floating break cards and completion video popups are paused site-wide.</small>
+                                </div>
+                            </div>
+
+                            <!-- Timing & Scroll Settings -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.video_break_popup_delay.errors %}has-error{% endif %}">
+                                        <label for="{{ form.video_break_popup_delay.id_for_label }}" class="font-weight-bold">
+                                            <i class="fas fa-clock text-info mr-1"></i> Break Popup Reading Delay (Seconds)
+                                        </label>
+                                        {{ form.video_break_popup_delay|add_class:'form-control'|attr:'min:5'|attr:'max:300' }}
+                                        <small class="form-text text-muted">Number of seconds of reading before the floating break card appears (default: 18 seconds).</small>
+                                        {% for error in form.video_break_popup_delay.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group {% if form.video_break_scroll_threshold.errors %}has-error{% endif %}">
+                                        <label for="{{ form.video_break_scroll_threshold.id_for_label }}" class="font-weight-bold">
+                                            <i class="fas fa-arrows-alt-v text-primary mr-1"></i> Scroll Threshold Percentage (%)
+                                        </label>
+                                        {{ form.video_break_scroll_threshold|add_class:'form-control'|attr:'min:10'|attr:'max:100' }}
+                                        <small class="form-text text-muted">Trigger break card after student scrolls this far down the lesson (default: 65%).</small>
+                                        {% for error in form.video_break_scroll_threshold.errors %}
+                                        <span class="error invalid-feedback d-block">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group {% if form.youtube_url.errors %}has-error{% endif %}">
                                 <label for="{{ form.youtube_url.id_for_label }}"><i class="fab fa-youtube mr-1 text-danger"></i> Main Public YouTube Channel URL</label>
                                 <div class="input-group">
@@ -936,7 +977,7 @@
 
                             <div class="mt-3">
                                 <a href="{% url 'dashboard:videos' %}" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-collection-play-fill mr-1"></i> Manage All Rotating YouTube Videos &amp; Channels
+                                    <i class="fas fa-play-circle mr-1"></i> Manage All Rotating YouTube Videos &amp; Channels
                                 </a>
                             </div>
                         </div>
