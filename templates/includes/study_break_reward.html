@@ -7,42 +7,63 @@
 
 <style>
 /* ==========================================================================
-   STUDY BREAK / COMPLETION REWARD POPUP (UI/UX DESIGN)
+   STUDY BREAK / COMPLETION REWARD POPUP (UI/UX DESIGN - MOBILE FIRST)
    ========================================================================== */
+#study-break-widget,
+#study-break-widget * {
+    box-sizing: border-box;
+}
+
 #study-break-widget {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    left: 50%;
+    transform: translate(-50%, 130%) scale(0.95);
+    width: calc(100% - 24px);
+    max-width: 360px;
     z-index: 1045;
-    max-width: 370px;
-    width: calc(100% - 32px);
     font-family: inherit;
     pointer-events: none;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
-    transform: translateY(120%) scale(0.94);
     opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
 }
 
 #study-break-widget.is-visible {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-    pointer-events: auto;
+    transform: translate(-50%, 0) scale(1) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+@media (min-width: 769px) {
+    #study-break-widget {
+        left: auto;
+        right: 24px;
+        bottom: 24px;
+        width: 360px;
+        max-width: 360px;
+        transform: translateY(130%) scale(0.95);
+    }
+
+    #study-break-widget.is-visible {
+        transform: translateY(0) scale(1) !important;
+    }
 }
 
 .sb-card {
     background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(226, 232, 240, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(226, 232, 240, 0.95);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     position: relative;
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    border: 1px solid rgba(226, 232, 240, 0.85);
+    width: 100%;
 }
 
 @supports (backdrop-filter: blur(16px)) {
     .sb-card {
-        background: rgba(255, 255, 255, 0.94);
+        background: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
     }
@@ -53,7 +74,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px 10px;
+    padding: 10px 14px 9px;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border-bottom: 1px solid #e2e8f0;
     gap: 8px;
@@ -63,7 +84,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: #0f172a;
     letter-spacing: -0.2px;
@@ -83,13 +104,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
     border-radius: 6px;
     background: linear-gradient(135deg, #ffedd5 0%, #fef3c7 100%);
     color: #ea580c;
-    font-size: 13px;
+    font-size: 12px;
     flex-shrink: 0;
 }
 
@@ -97,9 +118,9 @@
     background: transparent;
     border: none;
     color: #64748b;
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -116,12 +137,11 @@
 .sb-close-btn:hover {
     background: #e2e8f0;
     color: #0f172a;
-    transform: rotate(90deg);
 }
 
 /* Video Thumbnail & Preview Area */
 .sb-body {
-    padding: 12px 16px 14px;
+    padding: 12px 14px 14px;
 }
 
 .sb-thumb-wrap {
@@ -130,6 +150,7 @@
     overflow: hidden;
     cursor: pointer;
     aspect-ratio: 16 / 9;
+    width: 100%;
     background: #0f172a;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
@@ -143,8 +164,8 @@
 }
 
 .sb-thumb-wrap:hover .sb-thumb-img {
-    transform: scale(1.05);
-    filter: brightness(0.88);
+    transform: scale(1.04);
+    filter: brightness(0.9);
 }
 
 /* Category Pill over thumbnail */
@@ -159,11 +180,16 @@
     padding: 3px 8px;
     border-radius: 20px;
     backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     display: inline-flex;
     align-items: center;
     gap: 4px;
     z-index: 2;
     border: 1px solid rgba(255, 255, 255, 0.15);
+    max-width: calc(100% - 16px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Play button overlay */
@@ -172,31 +198,33 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5), 0 0 0 4px rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 18px rgba(220, 38, 38, 0.55), 0 0 0 3px rgba(255, 255, 255, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    font-size: 20px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 18px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 2;
+    pointer-events: none;
 }
 
 .sb-thumb-wrap:hover .sb-play-btn {
-    transform: translate(-50%, -50%) scale(1.15);
-    box-shadow: 0 10px 28px rgba(220, 38, 38, 0.65), 0 0 0 6px rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 22px rgba(220, 38, 38, 0.7), 0 0 0 4px rgba(255, 255, 255, 0.6);
 }
 
 .sb-video-meta {
     margin-top: 10px;
+    min-width: 0;
 }
 
 .sb-video-title {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 700;
     color: #1e293b;
     line-height: 1.35;
@@ -206,6 +234,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     cursor: pointer;
+    word-break: break-word;
 }
 
 .sb-video-title:hover {
@@ -213,65 +242,72 @@
 }
 
 .sb-channel-name {
-    font-size: 12px;
+    font-size: 11.5px;
     color: #64748b;
     display: flex;
     align-items: center;
     gap: 5px;
+    min-width: 0;
 }
 
 .sb-channel-name svg {
     color: #dc2626;
+    flex-shrink: 0;
+}
+
+.sb-channel-name span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Action Buttons Bar */
 .sb-actions {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-top: 10px;
+}
+
+.sb-btn-watch,
+.sb-btn-sub {
+    height: 38px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+    touch-action: manipulation;
+    padding: 0 8px;
 }
 
 .sb-btn-watch {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     color: #ffffff;
     border: none;
-    border-radius: 10px;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.28);
     transition: all 0.2s ease;
-    text-decoration: none;
 }
 
 .sb-btn-watch:hover {
     background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
     color: #ffffff;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+    box-shadow: 0 5px 14px rgba(220, 38, 38, 0.38);
 }
 
 .sb-btn-sub {
     background: #f1f5f9;
     color: #334155;
     border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 12.5px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
     transition: all 0.2s ease;
-    text-decoration: none;
-    white-space: nowrap;
 }
 
 .sb-btn-sub:hover {
@@ -280,26 +316,52 @@
     color: #dc2626;
 }
 
+/* Screen width <= 340px adjustment */
+@media (max-width: 340px) {
+    #study-break-widget {
+        width: calc(100% - 16px);
+        bottom: max(10px, env(safe-area-inset-bottom, 10px));
+    }
+    .sb-btn-watch, .sb-btn-sub {
+        font-size: 11px;
+        gap: 3px;
+        padding: 0 4px;
+    }
+    .sb-header {
+        padding: 8px 10px 7px;
+    }
+    .sb-body {
+        padding: 10px 10px 12px;
+    }
+}
+
 /* ==========================================================================
    VIDEO PLAYER MODAL (EXPANDED WATCH MODE)
    ========================================================================== */
+.sb-modal-backdrop,
+.sb-modal-backdrop * {
+    box-sizing: border-box;
+}
+
 .sb-modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(15, 23, 42, 0.75);
+    background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 1060;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 12px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .sb-modal-backdrop.is-open {
@@ -309,9 +371,11 @@
 
 .sb-modal-dialog {
     background: #0f172a;
-    border-radius: 20px;
+    border-radius: 18px;
     width: 100%;
     max-width: 820px;
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
     overflow: hidden;
     box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -319,6 +383,7 @@
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
+    margin: auto;
 }
 
 .sb-modal-backdrop.is-open .sb-modal-dialog {
@@ -326,23 +391,24 @@
 }
 
 .sb-modal-header {
-    padding: 14px 20px;
+    padding: 12px 18px;
     background: #1e293b;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    gap: 12px;
+    gap: 10px;
+    min-width: 0;
 }
 
 .sb-modal-title {
     color: #f8fafc;
-    font-size: 14.5px;
+    font-size: 13.5px;
     font-weight: 600;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     min-width: 0;
     flex: 1;
     overflow: hidden;
@@ -364,18 +430,19 @@
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: #94a3b8;
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     transition: all 0.2s ease;
     flex-shrink: 0;
     touch-action: manipulation;
+    padding: 0;
 }
 
 .sb-modal-close:hover {
@@ -388,6 +455,7 @@
     padding-bottom: 56.25%;
     height: 0;
     background: #000000;
+    flex-shrink: 0;
 }
 
 .sb-iframe-container iframe {
@@ -400,12 +468,11 @@
 }
 
 .sb-modal-footer {
-    padding: 14px 20px;
+    padding: 12px 18px;
     background: #1e293b;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 12px;
 }
 
@@ -413,38 +480,47 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
+    flex: 1;
 }
 
 .sb-modal-channel-name {
     color: #f1f5f9;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sb-modal-channel-sub {
     color: #94a3b8;
-    font-size: 12px;
+    font-size: 11.5px;
 }
 
 .sb-modal-controls {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .sb-btn-dice {
     background: rgba(255, 255, 255, 0.08);
     color: #f1f5f9;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    padding: 7px 12px;
-    font-size: 13px;
+    border-radius: 9px;
+    height: 38px;
+    padding: 0 12px;
+    font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    touch-action: manipulation;
 }
 
 .sb-btn-dice:hover {
@@ -452,142 +528,26 @@
     color: #ffffff;
 }
 
-.sb-media-row {
-    display: block;
+#sb-modal-sub {
+    height: 38px;
+    border-radius: 9px;
+    padding: 0 14px;
+    font-size: 12.5px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (max-width: 576px) {
-    #study-break-widget {
-        bottom: max(12px, env(safe-area-inset-bottom, 12px));
-        right: 12px;
-        left: 12px;
-        width: auto;
-        max-width: 440px;
-        margin: 0 auto;
-    }
-
-    .sb-card {
-        border-radius: 14px;
-        box-shadow: 0 12px 36px -6px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(226, 232, 240, 0.95);
-    }
-
-    .sb-header {
-        padding: 9px 12px 8px;
-        gap: 8px;
-    }
-
-    .sb-header-badge {
-        font-size: 12px;
-        min-width: 0;
-        flex: 1;
-        overflow: hidden;
-    }
-
-    #sb-banner-title {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        min-width: 0;
-    }
-
-    .sb-header-badge .sb-icon-sparkle {
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
-        font-size: 11px;
-    }
-
-    .sb-close-btn {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-        font-size: 16px;
-    }
-
-    .sb-body {
-        padding: 10px 12px 12px;
-    }
-
-    /* Modern compact horizontal media row on mobile */
-    .sb-media-row {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .sb-thumb-wrap {
-        width: 108px;
-        min-width: 108px;
-        height: 61px;
-        aspect-ratio: 16 / 9;
-        border-radius: 8px;
-        margin-bottom: 0;
-    }
-
-    .sb-category-tag {
-        display: none;
-    }
-
-    .sb-play-btn {
-        width: 28px;
-        height: 28px;
-        box-shadow: 0 3px 10px rgba(220, 38, 38, 0.5);
-    }
-
-    .sb-play-btn svg {
-        width: 13px;
-        height: 13px;
-    }
-
-    .sb-video-meta {
-        margin-top: 0;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .sb-video-title {
-        font-size: 12px;
-        line-height: 1.3;
-        margin: 0 0 3px;
-        -webkit-line-clamp: 2;
-    }
-
-    .sb-channel-name {
-        font-size: 11px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .sb-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-top: 9px;
-    }
-
-    .sb-btn-watch,
-    .sb-btn-sub {
-        padding: 7px 10px;
-        font-size: 12px;
-        justify-content: center;
-        border-radius: 8px;
-        touch-action: manipulation;
-    }
-
-    /* Video Player Modal on mobile */
     .sb-modal-backdrop {
         padding: 8px;
-        align-items: center;
     }
 
     .sb-modal-dialog {
         border-radius: 14px;
         max-height: calc(100vh - 16px);
         max-height: calc(100dvh - 16px);
-        width: 100%;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
     }
 
     .sb-modal-header {
@@ -596,20 +556,7 @@
     }
 
     .sb-modal-title {
-        font-size: 12.5px;
-        gap: 6px;
-    }
-
-    #sb-modal-badge {
-        font-size: 10px !important;
-        padding: 2px 6px !important;
-    }
-
-    .sb-modal-close {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
-        margin-left: 4px;
+        font-size: 12px;
     }
 
     .sb-modal-footer {
@@ -617,26 +564,6 @@
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
-    }
-
-    .sb-modal-channel {
-        gap: 8px;
-    }
-
-    .sb-modal-channel svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    .sb-modal-channel-name {
-        font-size: 12.5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .sb-modal-channel-sub {
-        font-size: 10.5px;
     }
 
     .sb-modal-controls {
@@ -648,13 +575,10 @@
 
     .sb-btn-dice,
     #sb-modal-sub {
-        justify-content: center;
-        text-align: center;
-        padding: 8px 10px !important;
-        font-size: 12px !important;
         width: 100%;
-        border-radius: 8px;
-        touch-action: manipulation;
+        justify-content: center;
+        font-size: 12px;
+        padding: 0 8px;
     }
 }
 
@@ -662,28 +586,26 @@
     .sb-modal-backdrop {
         padding: 4px;
     }
+
     .sb-modal-dialog {
         max-height: calc(100vh - 8px);
         max-height: calc(100dvh - 8px);
         border-radius: 10px;
     }
+
     .sb-modal-header {
         padding: 6px 12px;
     }
+
     .sb-modal-footer {
         padding: 6px 12px;
         flex-direction: row;
         align-items: center;
     }
+
     .sb-modal-controls {
         display: flex;
         width: auto;
-    }
-    #study-break-widget {
-        bottom: 8px;
-        right: 8px;
-        left: auto;
-        max-width: 320px;
     }
 }
 </style>
@@ -700,31 +622,29 @@
         </div>
 
         <div class="sb-body">
-            <div class="sb-media-row">
-                <div class="sb-thumb-wrap" id="sb-thumb-trigger">
-                    <img src="" alt="Video Preview" id="sb-thumb-img" class="sb-thumb-img" loading="lazy">
-                    <div class="sb-category-tag" id="sb-category-tag">🎧 Anime ASMR</div>
-                    <div class="sb-play-btn" aria-label="Play Video">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M8 5v14l11-7z"/>
-                        </svg>
-                    </div>
+            <div class="sb-thumb-wrap" id="sb-thumb-trigger">
+                <img src="" alt="Video Preview" id="sb-thumb-img" class="sb-thumb-img" loading="lazy">
+                <div class="sb-category-tag" id="sb-category-tag">🎧 Anime ASMR</div>
+                <div class="sb-play-btn" aria-label="Play Video">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
                 </div>
+            </div>
 
-                <div class="sb-video-meta">
-                    <h4 class="sb-video-title" id="sb-video-title">Anime ASMR Relaxation Ambience</h4>
-                    <div class="sb-channel-name">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                        </svg>
-                        <span id="sb-channel-name">SkillUp with Tulasi Nepali</span>
-                    </div>
+            <div class="sb-video-meta">
+                <h4 class="sb-video-title" id="sb-video-title">Anime ASMR Relaxation Ambience</h4>
+                <div class="sb-channel-name">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    <span id="sb-channel-name">SkillUp with Tulasi Nepali</span>
                 </div>
             </div>
 
             <div class="sb-actions">
                 <button type="button" class="sb-btn-watch" id="sb-btn-watch">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     <span>Watch &amp; Relax</span>
                 </button>
                 <a href="#" target="_blank" rel="noopener noreferrer" class="sb-btn-sub" id="sb-btn-sub">
