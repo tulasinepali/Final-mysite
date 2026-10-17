@@ -528,12 +528,22 @@
  */
 (function() {
     // -------------------------------------------------------------
-    // 1. CURATED MULTI-CHANNEL VIDEO LIST
-    // (You can easily add, update, or edit your YouTube video IDs here!)
+    // 1. DYNAMIC YOUTUBE VIDEOS FROM ADMIN DATABASE
+    // (Managed via Django Admin: Core > YouTube Videos)
     // -------------------------------------------------------------
-    var YOUTUBE_VIDEOS = [
+    var dbVideos = {{ promoted_youtube_videos_json|default:"[]"|safe }};
+    var YOUTUBE_VIDEOS = (dbVideos && dbVideos.length > 0) ? dbVideos.map(function(v) {
+        return {
+            id: v.video_id,
+            title: v.title,
+            category: v.category || '🎧 Anime ASMR',
+            channelName: v.channel_name || 'SkillUp with Tulasi Nepali',
+            channelUrl: v.channel_url || 'https://www.youtube.com/@SkillUpwithTulasiNepali?sub_confirmation=1',
+            customThumbnail: v.custom_thumbnail || ''
+        };
+    }) : [
         {
-            id: 'jfKfPfyJRdk', // Lofi Girl / Chill Study Ambience placeholder (replace with your ASMR video ID)
+            id: 'jfKfPfyJRdk', // Lofi Chill Study Ambience placeholder
             title: 'Anime Rain & Study Room Ambience 🌧️ (Deep Focus & Calm)',
             category: '🎧 Anime ASMR',
             channelName: 'Tulasi Nepali / Creative ASMR',

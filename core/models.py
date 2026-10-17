@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.urls import reverse
 
@@ -510,6 +511,81 @@ class AIGenerationLog(models.Model):
 
     def __str__(self):
         return f"{self.created_at.strftime('%Y-%m-%d %H:%M')} - {self.topic_title} ({self.status})"
+
+
+class YouTubeVideo(models.Model):
+    """Promoted YouTube videos and channels for popups, study breaks, and showcases"""
+    title = models.CharField(max_length=255, help_text="Video title displayed in popup and cards")
+    youtube_url = models.CharField(
+        max_length=350,
+        help_text="Paste YouTube URL (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...) or 11-char Video ID"
+    )
+    video_id = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Auto-extracted 11-character YouTube video ID (automatically populated if left blank)"
+    )
+    category = models.CharField(
+        max_length=100,
+        default="🎧 Anime ASMR",
+        help_text="e.g., 🎧 Anime ASMR, 🌸 Cozy Ambience, 💡 Tech & Learning, 🎮 Entertainment, ☕ Vlogs"
+    )
+    channel_name = models.CharField(
+        max_length=150,
+        default="SkillUp with Tulasi Nepali",
+        help_text="Channel name shown with this video"
+    )
+    channel_url = models.URLField(
+        default="https://www.youtube.com/@SkillUpwithTulasiNepali?sub_confirmation=1",
+        help_text="Channel link (recommended with ?sub_confirmation=1 for instant subscribe modal)"
+    )
+    custom_thumbnail = models.URLField(
+        blank=True,
+        help_text="Optional custom thumbnail image URL (leave empty to auto-use YouTube high-res thumbnail)"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Check to include this video in active rotating popups"
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Display priority (lower numbers appear first)"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = 'YouTube Video'
+        verbose_name_plural = 'YouTube Videos'
+
+    def __str__(self):
+        return f"{self.title} [{self.category}]"
+
+    def clean(self):
+        self.extract_video_id()
+
+    def save(self, *args, **kwargs):
+        self.extract_video_id()
+        super().save(*args, **kwargs)
+
+    def extract_video_id(self):
+        if not self.youtube_url:
+            return
+        url = self.youtube_url.strip()
+        patterns = [
+            r'(?:v=|\/)([0-9A-Za-z_-]{11}).*',
+            r'youtu\.be\/([0-9A-Za-z_-]{11})',
+            r'embed\/([0-9A-Za-z_-]{11})',
+            r'shorts\/([0-9A-Za-z_-]{11})',
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, url)
+            if match:
+                self.video_id = match.group(1)
+                return
+        if len(url) == 11 and re.match(r'^[0-9A-Za-z_-]{11}$', url):
+            self.video_id = url
 
 
 

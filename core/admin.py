@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber
+from .models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber, YouTubeVideo
 
 admin.site.site_header = "Tulasi Nepali - Admin Console"
 admin.site.site_title = "Tulasi Nepali Admin"
@@ -117,4 +117,23 @@ class SubscriberAdmin(admin.ModelAdmin):
     def deactivate_subscribers(self, request, queryset):
         queryset.update(is_active=False)
     deactivate_subscribers.short_description = "Mark selected subscribers as inactive"
+
+
+@admin.register(YouTubeVideo)
+class YouTubeVideoAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'channel_name', 'video_id', 'is_active', 'order', 'created_at']
+    list_filter = ['is_active', 'category', 'channel_name']
+    list_editable = ['is_active', 'order']
+    search_fields = ['title', 'video_id', 'channel_name', 'category']
+    fieldsets = (
+        ('Video Details', {
+            'fields': ('title', 'youtube_url', 'video_id', 'category', 'custom_thumbnail')
+        }),
+        ('Channel Attribution', {
+            'fields': ('channel_name', 'channel_url')
+        }),
+        ('Display Settings', {
+            'fields': ('is_active', 'order')
+        }),
+    )
 
