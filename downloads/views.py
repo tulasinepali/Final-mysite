@@ -1,5 +1,8 @@
+import os
+import mimetypes
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
+from django.http import FileResponse, Http404
 from .models import Download
 from core.models import Category
 
@@ -49,4 +52,21 @@ def download_file(request, slug):
     download = get_object_or_404(Download, slug=slug, is_published=True)
     download.download_count += 1
     download.save(update_fields=['download_count'])
-    return redirect(download.file.url)
+    
+    if download.file:
+        try:
+            file_path = download.file.path
+            if os.path.exists(file_path):
+                filename = os.path.basename(file_path)
+                content_type, _ = mimetypes.guess_type(file_path)
+                response = FileResponse(
+                    open(file_path, 'rb'),
+                    as_attachment=True,
+                    filename=filename,
+                    content_type=content_type or 'application/octet-stream'
+                )
+                return response
+        except (AttributeError, ValueError, NotImplementedError):
+            pass
+        return redirect(download.file.url)
+    raise Http404("File not found")

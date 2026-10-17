@@ -684,14 +684,31 @@
         return;
     }
 
-    // 2. If on Downloads page: trigger when user clicks the Download button!
-    var downloadBtn = document.getElementById('downloadBtn') || document.querySelector('a[href*="/downloads/file/"]');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', function() {
+    // 2. If on Downloads: trigger when user clicks ANY Download / Get File button!
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('#downloadBtn, a[href*="/download/"]');
+        if (btn) {
+            e.preventDefault();
+            e.stopPropagation();
+            var downloadUrl = btn.href;
+
+            // Trigger silent background download on the SAME page without navigating away
+            var hiddenFrame = document.getElementById('silentDownloadFrame');
+            if (!hiddenFrame) {
+                hiddenFrame = document.createElement('iframe');
+                hiddenFrame.id = 'silentDownloadFrame';
+                hiddenFrame.style.display = 'none';
+                document.body.appendChild(hiddenFrame);
+            }
+            hiddenFrame.src = downloadUrl;
+
+            // Open the video modal popup immediately on the same page
             bannerTitle.textContent = '📥 फाइल डाउनलोड हुँदैछ! (Watch & Relax)';
-            setTimeout(showWidget, 1200);
-        });
-    }
+            modalBadge.textContent = '📥 File Downloading...';
+            modalBadge.style.background = '#0559b7';
+            openModal();
+        }
+    });
 
     // 3. For Notes & Blog: Trigger when user reaches the end of reading content
     var contentEl = document.getElementById('note-content') || document.getElementById('post-content');
