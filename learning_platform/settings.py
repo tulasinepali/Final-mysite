@@ -13,17 +13,21 @@ SECRET_KEY = 'django-insecure-&k%7q=c&w%isyo&9_r2+=oasik=b-9v*z+$7962nju3)$d39y3
 import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
+DEBUG = False
 
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS = [
-        'localhost',
-        '127.0.0.1',
-        'tulasinepali.com.np',
-        'www.tulasinepali.com.np',
-    ]
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'tulasinepali.com.np',
+    'www.tulasinepali.com.np',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://tulasinepali.com.np',
+    'https://www.tulasinepali.com.np',
+    'http://localhost',
+    'http://127.0.0.1',
+]
 
 # Application definition
 
@@ -329,6 +333,8 @@ CONTENT_SECURITY_POLICY = {
             'https://www.google-analytics.com',
             'https://translate.google.com',
             'https://translate.googleapis.com',
+            'https://img.youtube.com',
+            'https://i.ytimg.com',
         ),
         'frame-src': (
             "'self'",
@@ -337,6 +343,9 @@ CONTENT_SECURITY_POLICY = {
             'https://www.google.com',
             'https://ep2.adtrafficquality.google',
             'https://translate.google.com',
+            'https://www.youtube.com',
+            'https://www.youtube-nocookie.com',
+            'https://youtube.com',
         ),
         'connect-src': (
             "'self'",
