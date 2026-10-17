@@ -497,7 +497,7 @@
         </div>
 
         <div class="sb-iframe-container">
-            <iframe id="sb-modal-iframe" src="" title="YouTube Video Player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe id="sb-modal-iframe" src="" title="YouTube Video Player" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
 
         <div class="sb-modal-footer">
@@ -699,10 +699,15 @@
         bannerTitle.textContent = '🎉 Lesson Completed! (Study Break)';
     }
 
+    function getEmbedUrl(videoId) {
+        var origin = encodeURIComponent(window.location.origin);
+        return 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=' + origin;
+    }
+
     // Modal Handlers
     function openModal() {
         trackEngagement('click');
-        modalIframe.src = 'https://www.youtube-nocookie.com/embed/' + currentVideo.id + '?autoplay=1&rel=0&modestbranding=1';
+        modalIframe.src = getEmbedUrl(currentVideo.id);
         modalBackdrop.classList.add('is-open');
         document.body.style.overflow = 'hidden';
     }
@@ -735,7 +740,7 @@
         currentIndex = nextIndex;
         renderVideo(YOUTUBE_VIDEOS[currentIndex]);
         trackEngagement('click');
-        modalIframe.src = 'https://www.youtube-nocookie.com/embed/' + currentVideo.id + '?autoplay=1&rel=0&modestbranding=1';
+        modalIframe.src = getEmbedUrl(currentVideo.id);
     });
 
     // Close widget permanently for this tab session

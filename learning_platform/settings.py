@@ -271,6 +271,7 @@ CSRF_COOKIE_HTTPONLY = True
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 X_FRAME_OPTIONS = "SAMEORIGIN"

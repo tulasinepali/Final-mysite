@@ -226,8 +226,6 @@ class SecurityHeadersMiddleware:
             "payment=(), "
             "usb=(), "
             "display-capture=(), "
-            "accelerometer=(), "
-            "gyroscope=(), "
             "magnetometer=()"
         )
         return response
