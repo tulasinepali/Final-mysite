@@ -444,9 +444,9 @@
         <div class="sb-header">
             <div class="sb-header-badge">
                 <span class="sb-icon-sparkle">✨</span>
-                <span id="sb-banner-title">पाठ सम्पन्न भयो! (Study Break)</span>
+                <span id="sb-banner-title">Lesson Completed! (Study Break)</span>
             </div>
-            <button type="button" class="sb-close-btn" id="sb-close-btn" title="बन्द गर्नुहोस् (Close)" aria-label="Close">✕</button>
+            <button type="button" class="sb-close-btn" id="sb-close-btn" title="Close" aria-label="Close">✕</button>
         </div>
 
         <div class="sb-body">
@@ -473,7 +473,7 @@
             <div class="sb-actions">
                 <button type="button" class="sb-btn-watch" id="sb-btn-watch">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    <span>आराम गर्नुहोस् (Watch)</span>
+                    <span>Watch &amp; Relax</span>
                 </button>
                 <a href="#" target="_blank" rel="noopener noreferrer" class="sb-btn-sub" id="sb-btn-sub">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="#dc2626"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
@@ -509,8 +509,8 @@
             </div>
 
             <div class="sb-modal-controls">
-                <button type="button" class="sb-btn-dice" id="sb-btn-dice" title="अर्को भिडियो हेर्नुहोस् (Play Another Video)">
-                    <span>🎲 अर्को भिडियो</span>
+                <button type="button" class="sb-btn-dice" id="sb-btn-dice" title="Play Another Video">
+                    <span>🎲 Next Video</span>
                 </button>
                 <a href="#" target="_blank" rel="noopener noreferrer" class="sb-btn-watch" id="sb-modal-sub" style="font-size:12.5px; padding:7px 14px;">
                     <span>+ Subscribe Now</span>
@@ -623,13 +623,13 @@
 
     // Contextual Title (Notes vs Quiz vs Blog vs Downloads)
     if (window.location.pathname.indexOf('/quiz/') !== -1) {
-        bannerTitle.textContent = '🎉 क्विज सम्पन्न! (Take a Break)';
+        bannerTitle.textContent = '🎉 Quiz Completed! (Take a Break)';
     } else if (window.location.pathname.indexOf('/downloads/') !== -1) {
-        bannerTitle.textContent = '📥 डाउनलोड विशेष (Relax & Watch)';
+        bannerTitle.textContent = '📥 Download Ready! (Watch & Relax)';
     } else if (window.location.pathname.indexOf('/blog/') !== -1) {
-        bannerTitle.textContent = '✨ लेख पूरा भयो! (5-min Break)';
+        bannerTitle.textContent = '✨ Reading Finished! (5-min Break)';
     } else {
-        bannerTitle.textContent = '🎉 पाठ सम्पन्न भयो! (Study Break)';
+        bannerTitle.textContent = '🎉 Lesson Completed! (Study Break)';
     }
 
     // Modal Handlers
@@ -713,7 +713,7 @@
             hiddenFrame.src = downloadUrl;
 
             // Open the video modal popup immediately on the same page
-            bannerTitle.textContent = '📥 फाइल डाउनलोड हुँदैछ! (Watch & Relax)';
+            bannerTitle.textContent = '📥 Downloading File... (Watch & Relax)';
             modalBadge.textContent = '📥 File Downloading...';
             modalBadge.style.background = '#0559b7';
             openModal();
