@@ -611,9 +611,11 @@
 
     renderVideo(currentVideo);
 
-    // Contextual Title (Notes vs Quiz vs Blog)
+    // Contextual Title (Notes vs Quiz vs Blog vs Downloads)
     if (window.location.pathname.indexOf('/quiz/') !== -1) {
         bannerTitle.textContent = '🎉 क्विज सम्पन्न! (Take a Break)';
+    } else if (window.location.pathname.indexOf('/downloads/') !== -1) {
+        bannerTitle.textContent = '📥 डाउनलोड विशेष (Relax & Watch)';
     } else if (window.location.pathname.indexOf('/blog/') !== -1) {
         bannerTitle.textContent = '✨ लेख पूरा भयो! (5-min Break)';
     } else {
@@ -676,13 +678,22 @@
         }, 800);
     }
 
-    // 1. If on Quiz Result page: trigger after a short delay
+    // 1. If on Quiz Result page: trigger after a short celebratory delay
     if (window.location.pathname.indexOf('/quiz/') !== -1 && window.location.pathname.indexOf('/result') !== -1) {
         setTimeout(showWidget, 1500);
         return;
     }
 
-    // 2. For Notes & Blog: Trigger when user reaches the end of reading content
+    // 2. If on Downloads page: trigger when user clicks the Download button!
+    var downloadBtn = document.getElementById('downloadBtn') || document.querySelector('a[href*="/downloads/file/"]');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            bannerTitle.textContent = '📥 फाइल डाउनलोड हुँदैछ! (Watch & Relax)';
+            setTimeout(showWidget, 1200);
+        });
+    }
+
+    // 3. For Notes & Blog: Trigger when user reaches the end of reading content
     var contentEl = document.getElementById('note-content') || document.getElementById('post-content');
     if (contentEl && 'IntersectionObserver' in window) {
         // Create a sentinel at the end of content
@@ -703,12 +714,12 @@
 
         observer.observe(sentinel);
     } else {
-        // Fallback: Scroll depth check (>= 80% of page)
+        // Fallback: Scroll depth check (>= 75% of page)
         window.addEventListener('scroll', function onScroll() {
             var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
             if (scrollHeight <= 0) return;
             var scrolled = window.scrollY / scrollHeight;
-            if (scrolled >= 0.82) {
+            if (scrolled >= 0.75) {
                 showWidget();
                 window.removeEventListener('scroll', onScroll);
             }
