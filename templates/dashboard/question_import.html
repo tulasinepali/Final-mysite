@@ -1,256 +1,236 @@
 {% extends 'dashboard/base.html' %}
 
-{% block title %}Import Questions from Excel - {{ quiz.title }} - Dashboard{% endblock %}
-{% block page_header %}Import Questions from Excel{% endblock %}
+{% block title %}Import Questions - {{ quiz.title }} - Dashboard{% endblock %}
+{% block page_header %}Import Questions{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
 <li class="breadcrumb-item"><a href="{% url 'dashboard:quizzes' %}">Quizzes</a></li>
 <li class="breadcrumb-item"><a href="{% url 'dashboard:quiz_questions' quiz.pk %}">{{ quiz.title }}</a></li>
-<li class="breadcrumb-item active">Import Excel</li>
+<li class="breadcrumb-item active">Import Questions</li>
 {% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-lg-8">
-        <!-- Upload Card -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-file-excel mr-1 text-primary"></i> Import Questions
-                </h3>
-                <div class="card-tools">
-                    <span class="badge badge-info badge-lg">
-                        <i class="fas fa-brain mr-1"></i> Quiz: {{ quiz.title }}
-                    </span>
-                </div>
+        <!-- Main Tabs Card -->
+        <div class="card card-primary card-outline card-outline-tabs shadow-sm">
+            <div class="card-header p-0 border-bottom-0">
+                <ul class="nav nav-tabs" id="importTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active font-weight-bold" id="text-tab" data-toggle="pill" href="#text-pane" role="tab" aria-controls="text-pane" aria-selected="true">
+                            <i class="fas fa-magic text-primary mr-1"></i> Smart Text / AI Paste
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link font-weight-bold" id="excel-tab" data-toggle="pill" href="#excel-pane" role="tab" aria-controls="excel-pane" aria-selected="false">
+                            <i class="fas fa-file-excel text-success mr-1"></i> Upload Excel (.xlsx)
+                        </a>
+                    </li>
+                </ul>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data" novalidate>
-                    {% csrf_token %}
-
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                        {{ form.non_field_errors }}
-                    </div>
-                    {% endif %}
-
-                    {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <div>{{ error }}</div>
-                            {% endfor %}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
-                    <!-- File Upload -->
-                    <div class="form-group">
-                        <label for="{{ form.excel_file.id_for_label }}">
-                            <i class="fas fa-upload mr-1"></i> {{ form.excel_file.label }} <span class="text-danger">*</span>
-                        </label>
-                        <div class="custom-file">
-                            {{ form.excel_file }}
-                            <label class="custom-file-label" for="{{ form.excel_file.id_for_label }}" data-browse="Browse">Choose Excel file...</label>
+                <div class="tab-content" id="importTabsContent">
+                    <!-- ========================================== -->
+                    <!-- TAB 1: SMART TEXT / AI PASTE               -->
+                    <!-- ========================================== -->
+                    <div class="tab-pane fade show active" id="text-pane" role="tabpanel" aria-labelledby="text-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">
+                                <i class="fas fa-info-circle mr-1 text-info"></i> Paste questions directly from <strong>ChatGPT</strong>, <strong>Word</strong>, or <strong>Notes</strong>.
+                            </span>
+                            <div>
+                                <button type="button" class="btn btn-xs btn-outline-primary mr-1" id="btnSampleText">
+                                    <i class="fas fa-paste mr-1"></i> Paste Sample
+                                </button>
+                                <button type="button" class="btn btn-xs btn-outline-info" id="btnCopyPrompt" title="Copy prompt template to paste in ChatGPT">
+                                    <i class="fas fa-robot mr-1"></i> Copy ChatGPT Prompt
+                                </button>
+                            </div>
                         </div>
-                        {% if form.excel_file.help_text %}
-                        <small class="form-text text-muted">{{ form.excel_file.help_text }}</small>
-                        {% endif %}
-                        {% if form.excel_file.errors %}
-                        {% for error in form.excel_file.errors %}
-                        <span class="text-danger d-block mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</span>
-                        {% endfor %}
-                        {% endif %}
+
+                        <form method="post" id="textImportForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="import_mode" value="text">
+
+                            <div class="form-group mb-2">
+                                <textarea name="raw_text" id="raw_text" rows="12" class="form-control font-monospace" style="font-size: 13px; line-height: 1.5;" placeholder="1. What is the capital of Nepal?
+A) Pokhara
+B) Kathmandu
+C) Biratnagar
+D) Lalitpur
+Answer: B
+Explanation: Kathmandu is the federal capital of Nepal.
+
+2. Which protocol is used for secure web browsing?
+A. HTTP
+B. FTP
+C. HTTPS
+D. SMTP
+Ans: C
+Explanation: HTTPS encrypts traffic via TLS."></textarea>
+                            </div>
+
+                            <!-- Live Parser Feedback Box -->
+                            <div id="parseFeedback" class="alert alert-secondary py-2 px-3 d-flex align-items-center justify-content-between" style="display: none !important;">
+                                <div>
+                                    <span id="parsedCountBadge" class="badge badge-success px-2 py-1 mr-2" style="font-size: 12px;">0 Questions Detected</span>
+                                    <small id="parseSummaryText" class="text-muted">Ready to import</small>
+                                </div>
+                                <button type="button" class="btn btn-xs btn-outline-secondary" id="btnTogglePreview">
+                                    <i class="fas fa-eye mr-1"></i> Toggle Preview
+                                </button>
+                            </div>
+
+                            <!-- Parsed Preview Table -->
+                            <div id="previewTableContainer" class="table-responsive border rounded mb-3" style="display: none; max-height: 280px; overflow-y: auto;">
+                                <table class="table table-sm table-striped mb-0 small">
+                                    <thead class="thead-light sticky-top">
+                                        <tr>
+                                            <th style="width: 35px;">#</th>
+                                            <th>Question</th>
+                                            <th>Options</th>
+                                            <th style="width: 60px;">Ans</th>
+                                            <th>Explanation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="previewTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                                <button type="submit" class="btn btn-primary" id="btnSubmitText">
+                                    <i class="fas fa-cloud-upload-alt mr-1"></i> Import Parsed Questions
+                                </button>
+                                <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-default">
+                                    <i class="fas fa-times mr-1"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
                     </div>
 
-                    <hr>
+                    <!-- ========================================== -->
+                    <!-- TAB 2: EXCEL FILE UPLOAD                   -->
+                    <!-- ========================================== -->
+                    <div class="tab-pane fade" id="excel-pane" role="tabpanel" aria-labelledby="excel-tab">
+                        <form method="post" enctype="multipart/form-data" novalidate id="excelImportForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="import_mode" value="excel">
 
-                    <!-- Action Buttons -->
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload mr-1"></i> Import Questions
-                        </button>
-                        <a href="{% url 'dashboard:question_sample_excel' quiz.pk %}" class="btn btn-outline-info ml-2">
-                            <i class="fas fa-download mr-1"></i> Download Sample Excel
-                        </a>
-                        <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-default ml-2">
-                            <i class="fas fa-times mr-1"></i> Cancel
-                        </a>
+                            <div class="form-group">
+                                <label for="{{ form.excel_file.id_for_label }}">
+                                    <i class="fas fa-upload mr-1"></i> Choose Excel Spreadsheet (.xlsx) <span class="text-danger">*</span>
+                                </label>
+                                <div class="custom-file">
+                                    {{ form.excel_file }}
+                                    <label class="custom-file-label" for="{{ form.excel_file.id_for_label }}" data-browse="Browse">Choose Excel file...</label>
+                                </div>
+                                <small class="form-text text-muted">Upload an .xlsx file with columns: <code>question_text</code>, <code>option_a</code>, <code>option_b</code>, <code>option_c</code>, <code>option_d</code>, <code>correct_answer</code>, <code>explanation</code>.</small>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                                <div>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel mr-1"></i> Import from Excel
+                                    </button>
+                                    <a href="{% url 'dashboard:question_sample_excel' quiz.pk %}" class="btn btn-outline-info ml-2">
+                                        <i class="fas fa-download mr-1"></i> Download Sample Excel
+                                    </a>
+                                </div>
+                                <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-default">
+                                    <i class="fas fa-times mr-1"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+
+                        <div class="border rounded p-3 bg-light mt-3">
+                            <h6 class="font-weight-bold mb-2"><i class="fas fa-table mr-1 text-success"></i> Expected Excel Columns (Row 1)</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm mb-0 bg-white small">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <th><code>question_text</code></th>
+                                            <th><code>option_a</code></th>
+                                            <th><code>option_b</code></th>
+                                            <th><code>option_c</code></th>
+                                            <th><code>option_d</code></th>
+                                            <th><code>correct_answer</code></th>
+                                            <th><code>explanation</code></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>What is CPU?</td>
+                                            <td>Central Processing Unit</td>
+                                            <td>Computer Power Unit</td>
+                                            <td>Control Protocol</td>
+                                            <td>Core Program</td>
+                                            <td><span class="badge badge-success">A</span></td>
+                                            <td>Hardware component</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Format Instructions -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-info-circle mr-1 text-info"></i> Excel Format Instructions
-                </h3>
-            </div>
-            <div class="card-body">
-                <p>The Excel file must have the following column headers in <strong>Row 1</strong>:</p>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Column</th>
-                                <th>Header Name</th>
-                                <th>Required?</th>
-                                <th>Description</th>
-                                <th>Example</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>A</td>
-                                <td><code>question_text</code></td>
-                                <td><span class="badge badge-danger">Yes</span></td>
-                                <td>The question text</td>
-                                <td>What is the capital of Nepal?</td>
-                            </tr>
-                            <tr>
-                                <td>B</td>
-                                <td><code>option_a</code></td>
-                                <td><span class="badge badge-danger">Yes</span></td>
-                                <td>Option A text</td>
-                                <td>Kathmandu</td>
-                            </tr>
-                            <tr>
-                                <td>C</td>
-                                <td><code>option_b</code></td>
-                                <td><span class="badge badge-danger">Yes</span></td>
-                                <td>Option B text</td>
-                                <td>Pokhara</td>
-                            </tr>
-                            <tr>
-                                <td>D</td>
-                                <td><code>option_c</code></td>
-                                <td><span class="badge badge-danger">Yes</span></td>
-                                <td>Option C text</td>
-                                <td>Biratnagar</td>
-                            </tr>
-                            <tr>
-                                <td>E</td>
-                                <td><code>option_d</code></td>
-                                <td><span class="badge badge-danger">Yes</span></td>
-                                <td>Option D text</td>
-                                <td>Lalitpur</td>
-                            </tr>
-                            <tr>
-                                <td>F</td>
-                                <td><code>correct_answer</code></td>
-                                <td><span class="badge badge-danger">Yes</span></td>
-                                <td>Correct option: A, B, C, or D</td>
-                                <td>A</td>
-                            </tr>
-                            <tr>
-                                <td>G</td>
-                                <td><code>explanation</code></td>
-                                <td><span class="badge badge-secondary">No</span></td>
-                                <td>Explanation shown after answering</td>
-                                <td>Kathmandu is the capital city.</td>
-                            </tr>
-                            <tr>
-                                <td>H</td>
-                                <td><code>order</code></td>
-                                <td><span class="badge badge-secondary">No</span></td>
-                                <td>Question order number (auto-assigned if empty)</td>
-                                <td>1</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="alert alert-warning mt-3">
-                    <i class="fas fa-exclamation-triangle mr-1"></i>
-                    <strong>Important Notes:</strong>
-                    <ul class="mb-0 mt-1">
-                        <li>Row 1 must contain the exact column headers as shown above.</li>
-                        <li>Headers are case-insensitive but must match the names exactly.</li>
-                        <li>The <code>correct_answer</code> column must contain only <strong>A</strong>, <strong>B</strong>, <strong>C</strong>, or <strong>D</strong>.</li>
-                        <li>Empty rows will be skipped automatically.</li>
-                        <li>Rows with missing required fields will be skipped with an error message.</li>
-                        <li>Maximum file size: 5MB.</li>
-                        <li>Supported formats: <code>.xlsx</code></li>
-                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Right Sidebar -->
     <div class="col-lg-4">
         <!-- Quiz Info Card -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-brain mr-1"></i> Quiz Info</h3>
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h3 class="card-title font-weight-bold"><i class="fas fa-brain mr-1 text-info"></i> Quiz Target</h3>
             </div>
             <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Title</dt>
-                    <dd class="col-sm-8">{{ quiz.title }}</dd>
-                    {% if quiz.category %}
-                    <dt class="col-sm-4">Category</dt>
-                    <dd class="col-sm-8">{{ quiz.category.name }}</dd>
-                    {% endif %}
-                    {% if quiz.difficulty %}
-                    <dt class="col-sm-4">Difficulty</dt>
-                    <dd class="col-sm-8">
-                        {% if quiz.difficulty == 'easy' %}
-                        <span class="badge badge-primary">Easy</span>
-                        {% elif quiz.difficulty == 'medium' %}
-                        <span class="badge badge-warning">Medium</span>
-                        {% elif quiz.difficulty == 'hard' %}
-                        <span class="badge badge-danger">Hard</span>
-                        {% else %}
-                        <span class="badge badge-secondary">{{ quiz.difficulty }}</span>
-                        {% endif %}
+                <h5 class="font-weight-bold mb-2">{{ quiz.title }}</h5>
+                <dl class="row mb-0 small">
+                    <dt class="col-4 text-muted">Category:</dt>
+                    <dd class="col-8 font-weight-bold">{{ quiz.category.name|default:"Uncategorized" }}</dd>
+
+                    <dt class="col-4 text-muted">Difficulty:</dt>
+                    <dd class="col-8">
+                        {% if quiz.difficulty == 'easy' %}<span class="badge badge-primary">Easy</span>
+                        {% elif quiz.difficulty == 'medium' %}<span class="badge badge-warning">Medium</span>
+                        {% elif quiz.difficulty == 'hard' %}<span class="badge badge-danger">Hard</span>
+                        {% else %}<span class="badge badge-secondary">{{ quiz.difficulty }}</span>{% endif %}
                     </dd>
-                    {% endif %}
-                    <dt class="col-sm-4">Questions</dt>
-                    <dd class="col-sm-8">{{ quiz.questions.count|default:"0" }}</dd>
+
+                    <dt class="col-4 text-muted">Existing:</dt>
+                    <dd class="col-8"><span class="badge badge-info">{{ quiz.questions.count|default:"0" }} questions</span></dd>
                 </dl>
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-bolt mr-1"></i> Quick Actions</h3>
+        <!-- Quick Tips Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h3 class="card-title font-weight-bold"><i class="fas fa-lightbulb mr-1 text-warning"></i> Supported Text Formats</h3>
             </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{% url 'dashboard:question_sample_excel' quiz.pk %}" class="btn btn-outline-info btn-block">
-                        <i class="fas fa-download mr-1"></i> Download Sample Excel
-                    </a>
-                    <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-outline-primary btn-block">
-                        <i class="fas fa-plus mr-1"></i> Add Question Manually
-                    </a>
-                    <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-outline-secondary btn-block">
-                        <i class="fas fa-list mr-1"></i> View All Questions
-                    </a>
-                </div>
+            <div class="card-body small">
+                <p class="mb-2">The smart parser effortlessly handles any of these option formats:</p>
+                <ul class="pl-3 mb-3 text-muted">
+                    <li><code>A)</code>, <code>B)</code>, <code>C)</code>, <code>D)</code></li>
+                    <li><code>A.</code>, <code>B.</code>, <code>C.</code>, <code>D.</code></li>
+                    <li><code>(A)</code>, <code>(B)</code>, <code>(C)</code>, <code>(D)</code></li>
+                </ul>
+                <p class="mb-1 font-weight-bold">Answers can be written as:</p>
+                <ul class="pl-3 mb-0 text-muted">
+                    <li><code>Answer: B</code> or <code>Ans: B</code></li>
+                    <li><code>Correct Answer: B</code> or <code>Correct: B</code></li>
+                </ul>
             </div>
         </div>
 
-        <!-- Tips -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-lightbulb mr-1"></i> Tips</h3>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled mb-0">
-                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Download the sample Excel first to see the correct format.</li>
-                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> You can prepare questions in bulk and import them all at once.</li>
-                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> The order column is optional; questions are auto-numbered.</li>
-                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Explanation is optional but recommended for learners.</li>
-                    <li><i class="fas fa-check text-primary mr-1"></i> Keep option text under 500 characters.</li>
-                </ul>
+        <div class="card shadow-sm">
+            <div class="card-body p-2 text-center">
+                <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-sm btn-outline-secondary btn-block">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Questions List
+                </a>
             </div>
         </div>
     </div>
@@ -262,10 +242,172 @@
 (function() {
     'use strict';
 
-    // Show selected file name in the custom file input
+    // File input label update
     $('.custom-file-input').on('change', function() {
         var fileName = $(this).val().split('\\').pop();
         $(this).next('.custom-file-label').html(fileName || 'Choose Excel file...');
+    });
+
+    var rawTextArea = document.getElementById('raw_text');
+    var feedbackBox = document.getElementById('parseFeedback');
+    var countBadge = document.getElementById('parsedCountBadge');
+    var summaryText = document.getElementById('parseSummaryText');
+    var previewContainer = document.getElementById('previewTableContainer');
+    var previewBody = document.getElementById('previewTableBody');
+    var btnTogglePreview = document.getElementById('btnTogglePreview');
+
+    // Parse Text Function
+    function parseQuestions(text) {
+        if (!text || !text.trim()) return [];
+        var blocks = text.trim().split(/\n\s*(?=(?:(?:Q(?:uestion)?\s*)?\d+[\.\:\)]))\s*/);
+        if (blocks.length <= 1) {
+            blocks = text.trim().split(/\n\s*\n+/);
+        }
+
+        var results = [];
+        for (var i = 0; i < blocks.length; i++) {
+            var b = blocks[i].trim();
+            if (!b) continue;
+            var lines = b.split('\n');
+            var qText = '';
+            var opts = {};
+            var ans = '';
+            var exp = '';
+
+            for (var j = 0; j < lines.length; j++) {
+                var line = lines[j].trim();
+                if (!line) continue;
+
+                var optMatch = line.match(/^(?:\(?([A-Da-d])\)|\b([A-Da-d])[\.\:\-\)])\s*(.+)$/);
+                var ansMatch = line.match(/^(?:Answer|Ans|Correct(?:\s*Answer)?)\s*[\:\-\=]?\s*\(?([A-Da-d])\)?.*$/i);
+                var expMatch = line.match(/^(?:Explanation|Explain|Exp|Note)\s*[\:\-\=]?\s*(.+)$/i);
+
+                if (ansMatch) {
+                    ans = ansMatch[1].toUpperCase();
+                } else if (expMatch) {
+                    exp = expMatch[1].trim();
+                } else if (optMatch) {
+                    var letter = (optMatch[1] || optMatch[2]).toUpperCase();
+                    opts[letter] = optMatch[3].trim();
+                } else if (!opts['A'] && !ans && !exp) {
+                    var cleanQ = line.replace(/^(?:(?:Q(?:uestion)?\s*)?\d+[\.\:\)]\s*)/, '');
+                    qText = qText ? (qText + ' ' + cleanQ) : cleanQ;
+                } else if (exp) {
+                    exp += ' ' + line;
+                }
+            }
+
+            if (qText && opts['A'] && opts['B'] && opts['C'] && opts['D'] && ['A','B','C','D'].indexOf(ans) !== -1) {
+                results.push({
+                    q: qText,
+                    a: opts['A'],
+                    b: opts['B'],
+                    c: opts['C'],
+                    d: opts['D'],
+                    ans: ans,
+                    exp: exp
+                });
+            }
+        }
+        return results;
+    }
+
+    // Live update preview
+    function updateLivePreview() {
+        var text = rawTextArea.value;
+        var parsed = parseQuestions(text);
+
+        if (parsed.length > 0) {
+            feedbackBox.style.setProperty('display', 'flex', 'important');
+            countBadge.textContent = parsed.length + ' Question(s) Detected';
+            countBadge.className = 'badge badge-success px-2 py-1 mr-2';
+            summaryText.textContent = 'Ready to import into quiz';
+
+            // Populate table
+            var html = '';
+            for (var k = 0; k < parsed.length; k++) {
+                var item = parsed[k];
+                html += '<tr>' +
+                    '<td><strong>' + (k + 1) + '</strong></td>' +
+                    '<td>' + $('<div>').text(item.q).html() + '</td>' +
+                    '<td><span class="d-block text-muted">A: ' + $('<div>').text(item.a).html() + '</span>' +
+                    '<span class="d-block text-muted">B: ' + $('<div>').text(item.b).html() + '</span>' +
+                    '<span class="d-block text-muted">C: ' + $('<div>').text(item.c).html() + '</span>' +
+                    '<span class="d-block text-muted">D: ' + $('<div>').text(item.d).html() + '</span></td>' +
+                    '<td><span class="badge badge-success font-weight-bold">' + item.ans + '</span></td>' +
+                    '<td>' + (item.exp ? $('<div>').text(item.exp).html() : '<span class="text-muted">-</span>') + '</td>' +
+                    '</tr>';
+            }
+            previewBody.innerHTML = html;
+        } else if (text.trim().length > 20) {
+            feedbackBox.style.setProperty('display', 'flex', 'important');
+            countBadge.textContent = '0 Questions Detected';
+            countBadge.className = 'badge badge-warning px-2 py-1 mr-2';
+            summaryText.textContent = 'Check format: need Question text, Options A-D, and Answer: X';
+            previewContainer.style.display = 'none';
+        } else {
+            feedbackBox.style.setProperty('display', 'none', 'important');
+            previewContainer.style.display = 'none';
+        }
+    }
+
+    rawTextArea.addEventListener('input', updateLivePreview);
+
+    btnTogglePreview.addEventListener('click', function() {
+        if (previewContainer.style.display === 'none') {
+            previewContainer.style.display = 'block';
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    });
+
+    // Sample Text Button
+    document.getElementById('btnSampleText').addEventListener('click', function() {
+        rawTextArea.value = '1. What does CPU stand for in computer hardware?\n' +
+            'A) Central Processing Unit\n' +
+            'B) Central Programming Unit\n' +
+            'C) Computer Processing Unit\n' +
+            'D) Control Power Unit\n' +
+            'Answer: A\n' +
+            'Explanation: The CPU is often called the brain of the computer.\n\n' +
+            '2. Which layer of the OSI model does the HTTP protocol operate on?\n' +
+            'A. Network Layer\n' +
+            'B. Transport Layer\n' +
+            'C. Application Layer\n' +
+            'D. Data Link Layer\n' +
+            'Ans: C\n' +
+            'Explanation: HTTP, FTP, and SMTP all operate at the Application Layer (Layer 7).\n\n' +
+            '3. What is the standard port for HTTPS connections?\n' +
+            'A) 21\n' +
+            'B) 80\n' +
+            'C) 443\n' +
+            'D) 8080\n' +
+            'Answer: C\n' +
+            'Explanation: Port 443 is used for secure encrypted HTTPS web traffic.';
+        updateLivePreview();
+        previewContainer.style.display = 'block';
+    });
+
+    // Copy ChatGPT Prompt Button
+    document.getElementById('btnCopyPrompt').addEventListener('click', function() {
+        var promptText = 'Please generate 10 multiple choice practice questions on [ENTER TOPIC HERE] formatted exactly like this:\n\n' +
+            '1. Question text here?\n' +
+            'A) Option 1\n' +
+            'B) Option 2\n' +
+            'C) Option 3\n' +
+            'D) Option 4\n' +
+            'Answer: A\n' +
+            'Explanation: Brief explanation of why this answer is correct.\n\n' +
+            'Make sure all 4 options (A, B, C, D) are plausible, and clearly indicate the Answer and Explanation.';
+
+        navigator.clipboard.writeText(promptText).then(function() {
+            var btn = document.getElementById('btnCopyPrompt');
+            var origText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check text-success mr-1"></i> Prompt Copied!';
+            setTimeout(function() {
+                btn.innerHTML = origText;
+            }, 2500);
+        });
     });
 })();
 </script>

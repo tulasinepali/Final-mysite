@@ -6,6 +6,55 @@
 
 {% block extra_head %}
 {{ form.media }}
+<style>
+.opt-input-card {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+}
+.opt-input-card.is-correct {
+    border: 2px solid #28a745 !important;
+    background-color: rgba(40, 167, 69, 0.04);
+}
+.live-preview-box {
+    background: #fdfdfd;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px;
+}
+.live-opt-pill {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+.live-opt-pill.active-correct {
+    border-color: #28a745;
+    background: #e8f5e9;
+    color: #1b5e20;
+    font-weight: 600;
+}
+.live-opt-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+.active-correct .live-opt-circle {
+    background: #28a745;
+    color: #fff;
+}
+</style>
 {% endblock %}
 
 {% block breadcrumb %}
@@ -18,25 +67,25 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h3 class="card-title font-weight-bold">
                     {% if action == 'Create' %}
-                    <i class="fas fa-plus-circle mr-1"></i>
+                    <i class="fas fa-plus-circle text-primary mr-1"></i>
                     {% else %}
-                    <i class="fas fa-edit mr-1"></i>
+                    <i class="fas fa-edit text-info mr-1"></i>
                     {% endif %}
                     {{ action }} Question
                 </h3>
                 <div class="card-tools">
-                    <span class="badge badge-info badge-lg">
-                        <i class="fas fa-brain mr-1"></i> Quiz: {{ quiz.title }}
+                    <span class="badge badge-info">
+                        <i class="fas fa-brain mr-1"></i> {{ quiz.title|truncatechars:35 }}
                     </span>
                 </div>
             </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data" novalidate>
+                <form method="post" enctype="multipart/form-data" novalidate id="questionForm">
                     {% csrf_token %}
 
                     {% if form.non_field_errors %}
@@ -46,10 +95,12 @@
                     </div>
                     {% endif %}
 
-                    <!-- Question Text - Full width -->
+                    <!-- Question Text -->
                     <div class="form-group {% if form.question_text.errors %}has-error{% endif %}">
-                        <label for="{{ form.question_text.id_for_label }}">Question Text <span class="text-danger">*</span></label>
-                        {{ form.question_text|add_class:'form-control'|add_error_class:'is-invalid' }}
+                        <label for="{{ form.question_text.id_for_label }}" class="font-weight-bold">
+                            Question Text <span class="text-danger">*</span>
+                        </label>
+                        {{ form.question_text|add_class:'form-control'|add_error_class:'is-invalid'|attr:'id:id_question_text'|attr:'rows:3' }}
                         {% if form.question_text.errors %}
                         {% for error in form.question_text.errors %}
                         <span class="error invalid-feedback d-block">{{ error }}</span>
@@ -59,12 +110,17 @@
 
                     <!-- Option A + Option B -->
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group {% if form.option_a.errors %}has-error{% endif %}">
-                                <label for="{{ form.option_a.id_for_label }}">
-                                    <span class="badge badge-primary mr-1">A</span> Option A <span class="text-danger">*</span>
-                                </label>
-                                {{ form.option_a|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option A' }}
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-2 border opt-input-card" id="card_opt_a">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <label for="{{ form.option_a.id_for_label }}" class="mb-0 font-weight-bold">
+                                        <span class="badge badge-primary mr-1">A</span> Option A <span class="text-danger">*</span>
+                                    </label>
+                                    <button type="button" class="btn btn-xs btn-outline-success btn-mark-correct" data-answer="A">
+                                        <i class="far fa-circle mr-1"></i> Mark Correct
+                                    </button>
+                                </div>
+                                {{ form.option_a|add_class:'form-control'|add_error_class:'is-invalid'|attr:'id:id_option_a'|attr:'placeholder:Enter option A' }}
                                 {% if form.option_a.errors %}
                                 {% for error in form.option_a.errors %}
                                 <span class="error invalid-feedback d-block">{{ error }}</span>
@@ -72,12 +128,18 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group {% if form.option_b.errors %}has-error{% endif %}">
-                                <label for="{{ form.option_b.id_for_label }}">
-                                    <span class="badge badge-primary mr-1">B</span> Option B <span class="text-danger">*</span>
-                                </label>
-                                {{ form.option_b|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option B' }}
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-2 border opt-input-card" id="card_opt_b">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <label for="{{ form.option_b.id_for_label }}" class="mb-0 font-weight-bold">
+                                        <span class="badge badge-primary mr-1">B</span> Option B <span class="text-danger">*</span>
+                                    </label>
+                                    <button type="button" class="btn btn-xs btn-outline-success btn-mark-correct" data-answer="B">
+                                        <i class="far fa-circle mr-1"></i> Mark Correct
+                                    </button>
+                                </div>
+                                {{ form.option_b|add_class:'form-control'|add_error_class:'is-invalid'|attr:'id:id_option_b'|attr:'placeholder:Enter option B' }}
                                 {% if form.option_b.errors %}
                                 {% for error in form.option_b.errors %}
                                 <span class="error invalid-feedback d-block">{{ error }}</span>
@@ -89,12 +151,17 @@
 
                     <!-- Option C + Option D -->
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group {% if form.option_c.errors %}has-error{% endif %}">
-                                <label for="{{ form.option_c.id_for_label }}">
-                                    <span class="badge badge-primary mr-1">C</span> Option C <span class="text-danger">*</span>
-                                </label>
-                                {{ form.option_c|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option C' }}
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-2 border opt-input-card" id="card_opt_c">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <label for="{{ form.option_c.id_for_label }}" class="mb-0 font-weight-bold">
+                                        <span class="badge badge-primary mr-1">C</span> Option C <span class="text-danger">*</span>
+                                    </label>
+                                    <button type="button" class="btn btn-xs btn-outline-success btn-mark-correct" data-answer="C">
+                                        <i class="far fa-circle mr-1"></i> Mark Correct
+                                    </button>
+                                </div>
+                                {{ form.option_c|add_class:'form-control'|add_error_class:'is-invalid'|attr:'id:id_option_c'|attr:'placeholder:Enter option C' }}
                                 {% if form.option_c.errors %}
                                 {% for error in form.option_c.errors %}
                                 <span class="error invalid-feedback d-block">{{ error }}</span>
@@ -102,12 +169,18 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group {% if form.option_d.errors %}has-error{% endif %}">
-                                <label for="{{ form.option_d.id_for_label }}">
-                                    <span class="badge badge-primary mr-1">D</span> Option D <span class="text-danger">*</span>
-                                </label>
-                                {{ form.option_d|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:Enter option D' }}
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card p-2 border opt-input-card" id="card_opt_d">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <label for="{{ form.option_d.id_for_label }}" class="mb-0 font-weight-bold">
+                                        <span class="badge badge-primary mr-1">D</span> Option D <span class="text-danger">*</span>
+                                    </label>
+                                    <button type="button" class="btn btn-xs btn-outline-success btn-mark-correct" data-answer="D">
+                                        <i class="far fa-circle mr-1"></i> Mark Correct
+                                    </button>
+                                </div>
+                                {{ form.option_d|add_class:'form-control'|add_error_class:'is-invalid'|attr:'id:id_option_d'|attr:'placeholder:Enter option D' }}
                                 {% if form.option_d.errors %}
                                 {% for error in form.option_d.errors %}
                                 <span class="error invalid-feedback d-block">{{ error }}</span>
@@ -121,8 +194,11 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group {% if form.correct_answer.errors %}has-error{% endif %}">
-                                <label for="{{ form.correct_answer.id_for_label }}">Correct Answer <span class="text-danger">*</span></label>
-                                {{ form.correct_answer|add_class:'form-control custom-select'|add_error_class:'is-invalid' }}
+                                <label for="{{ form.correct_answer.id_for_label }}" class="font-weight-bold">
+                                    Correct Answer <span class="text-danger">*</span>
+                                </label>
+                                {{ form.correct_answer|add_class:'form-control custom-select'|add_error_class:'is-invalid'|attr:'id:id_correct_answer' }}
+                                <small class="form-text text-muted">Click any <strong>"Mark Correct"</strong> button above or select here.</small>
                                 {% if form.correct_answer.errors %}
                                 {% for error in form.correct_answer.errors %}
                                 <span class="error invalid-feedback d-block">{{ error }}</span>
@@ -130,68 +206,56 @@
                                 {% endif %}
                             </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-group {% if form.order.errors %}has-error{% endif %}">
-                                <label for="{{ form.order.id_for_label }}">Order</label>
+                                <label for="{{ form.order.id_for_label }}" class="font-weight-bold">Question Order</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-sort-numeric-down"></i></span>
                                     </div>
-                                    {{ form.order|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:1' }}
+                                    {{ form.order|add_class:'form-control'|add_error_class:'is-invalid' }}
                                 </div>
+                                <small class="form-text text-muted">Sequence number in this quiz.</small>
                                 {% if form.order.errors %}
                                 {% for error in form.order.errors %}
                                 <span class="error invalid-feedback d-block">{{ error }}</span>
                                 {% endfor %}
                                 {% endif %}
-                                <small class="form-text text-muted">Order in which this question appears in the quiz.</small>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Explanation - Full width -->
+                    <!-- Explanation -->
                     <div class="form-group {% if form.explanation.errors %}has-error{% endif %}">
-                        <label for="{{ form.explanation.id_for_label }}">Explanation</label>
-                        {{ form.explanation|add_class:'form-control'|add_error_class:'is-invalid' }}
+                        <label for="{{ form.explanation.id_for_label }}" class="font-weight-bold">
+                            Explanation <span class="text-muted font-weight-normal">(Optional)</span>
+                        </label>
+                        {{ form.explanation|add_class:'form-control'|add_error_class:'is-invalid'|attr:'id:id_explanation'|attr:'rows:2' }}
+                        <small class="form-text text-muted">Learners see this helpful note after completing the quiz.</small>
                         {% if form.explanation.errors %}
                         {% for error in form.explanation.errors %}
                         <span class="error invalid-feedback d-block">{{ error }}</span>
                         {% endfor %}
                         {% endif %}
-                        <small class="form-text text-muted">Optional explanation shown after answering the question.</small>
                     </div>
 
-                    <!-- Any extra fields from the form -->
-                    {% for field in form %}
-                        {% if field.name not in 'question_text,option_a,option_b,option_c,option_d,correct_answer,order,explanation' %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
-                            {{ field|add_class:'form-control'|add_error_class:'is-invalid' }}
-                            {% for error in field.errors %}
-                            <span class="invalid-feedback d-block">{{ error }}</span>
-                            {% endfor %}
-                            {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                    <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                        <div>
+                            {% if action == 'Create' %}
+                            <button type="submit" class="btn btn-primary mr-1" name="_save">
+                                <i class="fas fa-save mr-1"></i> Save Question
+                            </button>
+                            <button type="submit" class="btn btn-outline-success" name="_addanother">
+                                <i class="fas fa-plus-circle mr-1"></i> Save &amp; Add Another
+                            </button>
+                            {% else %}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-1"></i> Save Changes
+                            </button>
                             {% endif %}
                         </div>
-                        {% endif %}
-                    {% endfor %}
-
-                    <hr>
-                    <div class="form-group">
-                        {% if action == 'Create' %}
-                        <button type="submit" class="btn btn-primary" name="_save">
-                            <i class="fas fa-plus mr-1"></i> Create Question
-                        </button>
-                        <button type="submit" class="btn btn-outline-primary" name="_addanother">
-                            <i class="fas fa-plus-circle mr-1"></i> Save & Add Another
-                        </button>
-                        {% else %}
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-1"></i> Save Changes
-                        </button>
-                        {% endif %}
-                        <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-default ml-2">
+                        <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-default">
                             <i class="fas fa-times mr-1"></i> Cancel
                         </a>
                     </div>
@@ -200,51 +264,58 @@
         </div>
     </div>
 
-    <!-- Sidebar Info -->
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-brain mr-1"></i> Quiz Info</h3>
+    <!-- Live Preview & Info Sidebar -->
+    <div class="col-lg-5">
+        <!-- Live Learner Preview -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-light d-flex align-items-center justify-content-between py-2">
+                <span class="font-weight-bold text-dark"><i class="fas fa-mobile-alt mr-1 text-primary"></i> Live Student Preview</span>
+                <span class="badge badge-success px-2">Interactive</span>
             </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Title</dt>
-                    <dd class="col-sm-8">{{ quiz.title }}</dd>
-                    {% if quiz.category %}
-                    <dt class="col-sm-4">Category</dt>
-                    <dd class="col-sm-8">{{ quiz.category.name }}</dd>
-                    {% endif %}
-                    {% if quiz.difficulty %}
-                    <dt class="col-sm-4">Difficulty</dt>
-                    <dd class="col-sm-8">
-                        {% if quiz.difficulty == 'easy' %}
-                        <span class="badge badge-primary">Easy</span>
-                        {% elif quiz.difficulty == 'medium' %}
-                        <span class="badge badge-warning">Medium</span>
-                        {% elif quiz.difficulty == 'hard' %}
-                        <span class="badge badge-danger">Hard</span>
-                        {% else %}
-                        <span class="badge badge-secondary">{{ quiz.difficulty }}</span>
-                        {% endif %}
-                    </dd>
-                    {% endif %}
-                    <dt class="col-sm-4">Questions</dt>
-                    <dd class="col-sm-8">{{ quiz.questions.count|default:"0" }}</dd>
-                </dl>
+            <div class="card-body p-3">
+                <div class="live-preview-box">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <small class="text-muted font-weight-bold">QUESTION PREVIEW</small>
+                        <span class="badge badge-light border">2.0 Marks</span>
+                    </div>
+
+                    <h6 class="font-weight-bold text-dark mb-3" id="prev_q_text" style="line-height: 1.4;">
+                        Enter question text on the left...
+                    </h6>
+
+                    <div class="live-opt-pill" id="prev_opt_pill_a">
+                        <div class="live-opt-circle">A</div>
+                        <span id="prev_opt_a" class="text-muted">Option A text...</span>
+                    </div>
+                    <div class="live-opt-pill" id="prev_opt_pill_b">
+                        <div class="live-opt-circle">B</div>
+                        <span id="prev_opt_b" class="text-muted">Option B text...</span>
+                    </div>
+                    <div class="live-opt-pill" id="prev_opt_pill_c">
+                        <div class="live-opt-circle">C</div>
+                        <span id="prev_opt_c" class="text-muted">Option C text...</span>
+                    </div>
+                    <div class="live-opt-pill" id="prev_opt_pill_d">
+                        <div class="live-opt-circle">D</div>
+                        <span id="prev_opt_d" class="text-muted">Option D text...</span>
+                    </div>
+
+                    <div id="prev_exp_box" class="mt-3 p-2 rounded bg-light border" style="display: none;">
+                        <small class="d-block font-weight-bold text-primary mb-1"><i class="fas fa-lightbulb text-warning mr-1"></i> Explanation:</small>
+                        <small id="prev_exp_text" class="text-muted"></small>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-lightbulb mr-1"></i> Tips</h3>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled mb-0">
-                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Make all four options plausible.</li>
-                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Add an explanation to help learners.</li>
-                    <li class="mb-2"><i class="fas fa-check text-primary mr-1"></i> Use the order field to sequence questions.</li>
-                    <li><i class="fas fa-check text-primary mr-1"></i> Keep question text clear and concise.</li>
-                </ul>
+        <!-- Target Quiz Summary -->
+        <div class="card shadow-sm">
+            <div class="card-body p-3">
+                <h6 class="font-weight-bold mb-2"><i class="fas fa-brain text-info mr-1"></i> {{ quiz.title }}</h6>
+                <div class="d-flex align-items-center justify-content-between text-muted small">
+                    <span>Category: <strong>{{ quiz.category.name|default:"General" }}</strong></span>
+                    <span>Total: <strong>{{ quiz.questions.count|default:"0" }} questions</strong></span>
+                </div>
             </div>
         </div>
     </div>
@@ -256,11 +327,104 @@
 (function() {
     'use strict';
 
-    // Initialize iCheck for checkboxes
-    $('input[type="checkbox"]').iCheck({
-        checkboxClass: 'icheckbox_flat-blue',
-        radioClass: 'iradio_flat-blue'
+    var selectCorrect = document.getElementById('id_correct_answer');
+    var markButtons = document.querySelectorAll('.btn-mark-correct');
+
+    var inputQ = document.getElementById('id_question_text');
+    var inputA = document.getElementById('id_option_a');
+    var inputB = document.getElementById('id_option_b');
+    var inputC = document.getElementById('id_option_c');
+    var inputD = document.getElementById('id_option_d');
+    var inputExp = document.getElementById('id_explanation');
+
+    var prevQ = document.getElementById('prev_q_text');
+    var prevA = document.getElementById('prev_opt_a');
+    var prevB = document.getElementById('prev_opt_b');
+    var prevC = document.getElementById('prev_opt_c');
+    var prevD = document.getElementById('prev_opt_d');
+    var prevExpBox = document.getElementById('prev_exp_box');
+    var prevExpText = document.getElementById('prev_exp_text');
+
+    function syncCorrectAnswer(letter) {
+        if (!letter) return;
+        letter = letter.toUpperCase();
+        if (selectCorrect) selectCorrect.value = letter;
+
+        ['A', 'B', 'C', 'D'].forEach(function(l) {
+            var card = document.getElementById('card_opt_' + l.toLowerCase());
+            var pill = document.getElementById('prev_opt_pill_' + l.toLowerCase());
+            var btn = document.querySelector('.btn-mark-correct[data-answer="' + l + '"]');
+
+            if (l === letter) {
+                if (card) card.classList.add('is-correct');
+                if (pill) pill.classList.add('active-correct');
+                if (btn) {
+                    btn.className = 'btn btn-xs btn-success btn-mark-correct';
+                    btn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Correct Answer';
+                }
+            } else {
+                if (card) card.classList.remove('is-correct');
+                if (pill) pill.classList.remove('active-correct');
+                if (btn) {
+                    btn.className = 'btn btn-xs btn-outline-success btn-mark-correct';
+                    btn.innerHTML = '<i class="far fa-circle mr-1"></i> Mark Correct';
+                }
+            }
+        });
+    }
+
+    markButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var answer = this.getAttribute('data-answer');
+            syncCorrectAnswer(answer);
+        });
     });
+
+    if (selectCorrect) {
+        selectCorrect.addEventListener('change', function() {
+            syncCorrectAnswer(this.value);
+        });
+        if (selectCorrect.value) {
+            syncCorrectAnswer(selectCorrect.value);
+        }
+    }
+
+    // Live preview update
+    function updatePreview() {
+        if (inputQ && prevQ) {
+            prevQ.textContent = inputQ.value.trim() || 'Enter question text on the left...';
+        }
+        if (inputA && prevA) {
+            prevA.textContent = inputA.value.trim() || 'Option A text...';
+            prevA.className = inputA.value.trim() ? 'text-dark font-weight-500' : 'text-muted';
+        }
+        if (inputB && prevB) {
+            prevB.textContent = inputB.value.trim() || 'Option B text...';
+            prevB.className = inputB.value.trim() ? 'text-dark font-weight-500' : 'text-muted';
+        }
+        if (inputC && prevC) {
+            prevC.textContent = inputC.value.trim() || 'Option C text...';
+            prevC.className = inputC.value.trim() ? 'text-dark font-weight-500' : 'text-muted';
+        }
+        if (inputD && prevD) {
+            prevD.textContent = inputD.value.trim() || 'Option D text...';
+            prevD.className = inputD.value.trim() ? 'text-dark font-weight-500' : 'text-muted';
+        }
+        if (inputExp && prevExpBox && prevExpText) {
+            if (inputExp.value.trim()) {
+                prevExpBox.style.display = 'block';
+                prevExpText.textContent = inputExp.value.trim();
+            } else {
+                prevExpBox.style.display = 'none';
+            }
+        }
+    }
+
+    [inputQ, inputA, inputB, inputC, inputD, inputExp].forEach(function(el) {
+        if (el) el.addEventListener('input', updatePreview);
+    });
+
+    updatePreview();
 })();
 </script>
 {% endblock %}

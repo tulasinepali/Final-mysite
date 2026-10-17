@@ -350,7 +350,14 @@ def download_toggle_featured(request, pk):
 
 @staff_member_required
 def dashboard_quizzes(request):
-    quizzes = Quiz.objects.select_related('category').annotate(question_count=Count('questions'))
+    base_quizzes = Quiz.objects.all()
+    total_quizzes = base_quizzes.count()
+    published_quizzes = base_quizzes.filter(is_published=True).count()
+    total_questions = Question.objects.count()
+    total_attempts = base_quizzes.aggregate(total=Sum('attempts'))['total'] or 0
+    pending_feedbacks = QuizFeedback.objects.filter(is_reviewed=False).count()
+
+    quizzes = base_quizzes.select_related('category').annotate(question_count=Count('questions'))
     category_filter = request.GET.get('category')
     if category_filter:
         quizzes = quizzes.filter(category__slug=category_filter)
@@ -369,8 +376,15 @@ def dashboard_quizzes(request):
     page_obj = paginator.get_page(request.GET.get('page'))
     categories = Category.objects.filter(module='quiz')
     context = {
-        'page_obj': page_obj, 'categories': categories,
-        'active_page': 'quizzes', 'total': quizzes.count(),
+        'page_obj': page_obj,
+        'categories': categories,
+        'active_page': 'quizzes',
+        'total': quizzes.count(),
+        'total_quizzes': total_quizzes,
+        'published_quizzes': published_quizzes,
+        'total_questions': total_questions,
+        'total_attempts': total_attempts,
+        'pending_feedbacks': pending_feedbacks,
     }
     return render(request, 'dashboard/quizzes.html', context)
 
@@ -495,13 +509,115 @@ def question_delete(request, pk):
     return redirect('dashboard:quiz_questions', pk=quiz_pk)
 
 
-# ========== QUESTION IMPORT FROM EXCEL ==========
+# ========== QUESTION IMPORT FROM EXCEL & TEXT/AI ==========
+
+def parse_bulk_questions_text(text):
+    """
+    Parses questions formatted from ChatGPT, Word, past exam papers, or plain text:
+    Example format:
+    1. What is the capital of Nepal?
+    A) Pokhara
+    B) Kathmandu
+    C) Biratnagar
+    D) Lalitpur
+    Answer: B
+    Explanation: Kathmandu is the federal capital.
+    """
+    text = (text or '').strip()
+    if not text:
+        return []
+
+    # First attempt: Split by numbered question headers (1., 1), Q1:, Q.1, etc.)
+    blocks = re.split(r'\n\s*(?=(?:(?:Q(?:uestion)?\s*)?\d+[\.\:\)]))\s*', text)
+    if len(blocks) <= 1:
+        # Fallback: Split by blank lines
+        blocks = re.split(r'\n\s*\n+', text)
+
+    parsed = []
+    for block in blocks:
+        if not block.strip():
+            continue
+        lines = [line.strip() for line in block.strip().split('\n') if line.strip()]
+        q_text = ''
+        opts = {}
+        ans = ''
+        exp = ''
+
+        for line in lines:
+            opt_m = re.match(r'^(?:\(?([A-Da-d])\)|\b([A-Da-d])[\.\:\-\)])\s*(.+)$', line)
+            ans_m = re.match(r'^(?:Answer|Ans|Correct(?:\s*Answer)?)\s*[\:\-\=]?\s*\(?([A-Da-d])\)?.*$', line, re.IGNORECASE)
+            exp_m = re.match(r'^(?:Explanation|Explain|Exp|Note)\s*[\:\-\=]?\s*(.+)$', line, re.IGNORECASE)
+
+            if ans_m:
+                ans = ans_m.group(1).upper()
+            elif exp_m:
+                exp = exp_m.group(1).strip()
+            elif opt_m:
+                letter = (opt_m.group(1) or opt_m.group(2)).upper()
+                opts[letter] = opt_m.group(3).strip()
+            elif not opts and not ans and not exp:
+                clean_line = re.sub(r'^(?:(?:Q(?:uestion)?\s*)?\d+[\.\:\)]\s*)', '', line)
+                q_text = (q_text + ' ' + clean_line).strip() if q_text else clean_line
+            elif exp:
+                exp += ' ' + line
+
+        if q_text and 'A' in opts and 'B' in opts and 'C' in opts and 'D' in opts and ans in ['A', 'B', 'C', 'D']:
+            parsed.append({
+                'question_text': q_text,
+                'option_a': opts['A'],
+                'option_b': opts['B'],
+                'option_c': opts['C'],
+                'option_d': opts['D'],
+                'correct_answer': ans,
+                'explanation': exp,
+            })
+
+    return parsed
+
 
 @staff_member_required
 def question_import_excel(request, quiz_pk):
     quiz = get_object_or_404(Quiz, pk=quiz_pk)
 
     if request.method == 'POST':
+        import_mode = request.POST.get('import_mode', 'excel')
+
+        # Mode 1: Smart Text / AI / Word Paste
+        if import_mode == 'text':
+            raw_text = request.POST.get('raw_text', '').strip()
+            if not raw_text:
+                messages.error(request, 'Please paste questions text before clicking import.')
+                return redirect('dashboard:question_import', quiz_pk=quiz.pk)
+
+            parsed_questions = parse_bulk_questions_text(raw_text)
+            if not parsed_questions:
+                messages.error(
+                    request,
+                    'Could not detect valid questions. Please ensure each question includes question text, options A to D, and an answer (e.g. "Answer: B").'
+                )
+                return redirect('dashboard:question_import', quiz_pk=quiz.pk)
+
+            next_order = quiz.questions.count() + 1
+            created_count = 0
+            for item in parsed_questions:
+                Question.objects.create(
+                    quiz=quiz,
+                    question_text=item['question_text'],
+                    option_a=item['option_a'],
+                    option_b=item['option_b'],
+                    option_c=item['option_c'],
+                    option_d=item['option_d'],
+                    correct_answer=item['correct_answer'],
+                    explanation=item.get('explanation', ''),
+                    order=next_order,
+                )
+                created_count += 1
+                next_order += 1
+
+            messages.success(request, f'🎉 Successfully imported {created_count} question(s) from text into "{quiz.title}"!')
+            return redirect('dashboard:quiz_questions', pk=quiz.pk)
+
+        # Mode 2: Excel File (.xlsx) Upload
         form = QuestionImportForm(request.POST, request.FILES)
         if form.is_valid():
             excel_file = form.cleaned_data['excel_file']

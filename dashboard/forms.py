@@ -169,7 +169,7 @@ class DownloadForm(forms.ModelForm):
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
-        fields = '__all__'
+        exclude = ['attempts']
         widgets = {
             'description': CKEditor5Widget(config_name='default'),
         }
@@ -179,7 +179,6 @@ class QuizForm(forms.ModelForm):
         self.fields['category'].queryset = Category.objects.filter(module='quiz')
         self.fields['slug'].widget.attrs.update({'data-slug-from': 'title'})
         self.fields['slug'].required = False
-        self.fields['attempts'].required = False
         self.fields['meta_title'].required = False
         self.fields['meta_description'].required = False
         self.fields['description'].required = False

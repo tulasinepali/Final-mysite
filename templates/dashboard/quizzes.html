@@ -3,32 +3,110 @@
 
 {% block title %}Quiz Management - Dashboard{% endblock %}
 {% block page_header %}Quiz Management{% endblock %}
+{% block page_subtitle %}Manage interactive practice exams, question banks, and student attempts{% endblock %}
+
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
 <li class="breadcrumb-item active">Quizzes</li>
 {% endblock %}
 
 {% block content %}
+<!-- Top KPI Summary Cards -->
+<div class="row mb-3">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid #0559b7 !important;">
+            <div class="card-body py-3 d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: rgba(5, 89, 183, 0.1); color: #0559b7;">
+                    <i class="fas fa-brain fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Total Quizzes</h6>
+                    <h3 class="mb-0 font-weight-bold">{{ total_quizzes }}</h3>
+                    <small class="text-muted"><strong>{{ published_quizzes }}</strong> active in rotation</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid #17a2b8 !important;">
+            <div class="card-body py-3 d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: rgba(23, 162, 184, 0.12); color: #17a2b8;">
+                    <i class="fas fa-question-circle fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Question Bank</h6>
+                    <h3 class="mb-0 font-weight-bold text-info">{{ total_questions }}</h3>
+                    <small class="text-muted">Total practice questions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid #28a745 !important;">
+            <div class="card-body py-3 d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: rgba(40, 167, 69, 0.12); color: #28a745;">
+                    <i class="fas fa-user-graduate fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Student Attempts</h6>
+                    <h3 class="mb-0 font-weight-bold text-success">{{ total_attempts }}</h3>
+                    <small class="text-muted">Completed practice sessions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0" style="border-left: 4px solid {% if pending_feedbacks > 0 %}#dc3545{% else %}#ffc107{% endif %} !important;">
+            <div class="card-body py-3 d-flex align-items-center">
+                <div class="rounded-circle p-3 mr-3" style="background: {% if pending_feedbacks > 0 %}rgba(220, 53, 69, 0.12){% else %}rgba(255, 193, 7, 0.15){% endif %}; color: {% if pending_feedbacks > 0 %}#dc3545{% else %}#d39e00{% endif %};">
+                    <i class="fas fa-flag fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Student Feedback</h6>
+                    <h3 class="mb-0 font-weight-bold {% if pending_feedbacks > 0 %}text-danger{% else %}text-warning{% endif %}">
+                        {{ pending_feedbacks }}
+                    </h3>
+                    <small class="text-muted">
+                        {% if pending_feedbacks > 0 %}
+                        <a href="{% url 'dashboard:quiz_feedbacks' %}" class="text-danger font-weight-bold">Reports need review &raquo;</a>
+                        {% else %}
+                        All issues resolved
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Action buttons row -->
 <div class="row mb-3">
-    <div class="col-12">
-        <a href="{% url 'dashboard:quiz_create' %}" class="btn btn-primary">
-            <i class="fas fa-plus mr-1"></i> Create Quiz
-        </a>
-        <span class="ml-2 text-muted align-middle">Total: <strong>{{ total }}</strong> quizzes</span>
+    <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <a href="{% url 'dashboard:quiz_create' %}" class="btn btn-primary mr-2 shadow-sm">
+                <i class="fas fa-plus mr-1"></i> Create New Quiz
+            </a>
+            <a href="{% url 'dashboard:quiz_feedbacks' %}" class="btn btn-outline-secondary shadow-sm">
+                <i class="fas fa-comments mr-1"></i> Student Feedbacks &amp; Reports
+                {% if pending_feedbacks > 0 %}
+                <span class="badge badge-danger ml-1">{{ pending_feedbacks }}</span>
+                {% endif %}
+            </a>
+        </div>
+        <span class="text-muted small">Showing <strong>{{ total }}</strong> matching quizzes</span>
     </div>
 </div>
 
 <!-- Card with table -->
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-brain mr-1"></i> Quizzes List</h3>
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <h3 class="card-title font-weight-bold"><i class="fas fa-list mr-1 text-primary"></i> Quizzes List</h3>
     </div>
     <div class="card-body">
         <!-- Filter Bar -->
         <form method="get" class="form-inline mb-3">
-            <div class="form-group mr-2">
-                <label class="mr-1">Category:</label>
+            <div class="form-group mr-2 mb-2">
+                <label class="mr-1 small font-weight-bold">Category:</label>
                 <select name="category" class="form-control form-control-sm">
                     <option value="">All Categories</option>
                     {% for cat in categories %}
@@ -36,8 +114,8 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group mr-2">
-                <label class="mr-1">Difficulty:</label>
+            <div class="form-group mr-2 mb-2">
+                <label class="mr-1 small font-weight-bold">Difficulty:</label>
                 <select name="difficulty" class="form-control form-control-sm">
                     <option value="">All</option>
                     <option value="easy" {% if request.GET.difficulty == 'easy' %}selected{% endif %}>Easy</option>
@@ -45,28 +123,28 @@
                     <option value="hard" {% if request.GET.difficulty == 'hard' %}selected{% endif %}>Hard</option>
                 </select>
             </div>
-            <div class="form-group mr-2">
-                <label class="mr-1">Published:</label>
+            <div class="form-group mr-2 mb-2">
+                <label class="mr-1 small font-weight-bold">Status:</label>
                 <select name="published" class="form-control form-control-sm">
                     <option value="">All</option>
                     <option value="yes" {% if request.GET.published == 'yes' %}selected{% endif %}>Published</option>
                     <option value="no" {% if request.GET.published == 'no' %}selected{% endif %}>Draft</option>
                 </select>
             </div>
-            <div class="form-group mr-2">
+            <div class="form-group mr-2 mb-2">
                 <input type="text" name="q" class="form-control form-control-sm" placeholder="Search quizzes..." value="{{ request.GET.q|default:'' }}">
             </div>
-            <button type="submit" class="btn btn-sm btn-outline-primary mr-1"><i class="fas fa-search"></i></button>
-            <a href="{% url 'dashboard:quizzes' %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-times"></i></a>
+            <button type="submit" class="btn btn-sm btn-outline-primary mr-1 mb-2"><i class="fas fa-search"></i> Search</button>
+            <a href="{% url 'dashboard:quizzes' %}" class="btn btn-sm btn-outline-secondary mb-2" title="Reset Filters"><i class="fas fa-times"></i></a>
         </form>
 
         <!-- Table -->
         <div class="table-responsive p-0">
-            <table class="table table-hover text-nowrap">
-                <thead>
+            <table class="table table-hover align-middle mb-0">
+                <thead class="thead-light">
                     <tr>
-                        <th style="width: 50px;">#</th>
-                        <th>Title</th>
+                        <th style="width: 45px;">#</th>
+                        <th>Quiz Title &amp; Details</th>
                         <th>Category</th>
                         <th>Difficulty</th>
                         <th>Questions</th>
@@ -74,18 +152,30 @@
                         <th>Negative Marking</th>
                         <th>Published</th>
                         <th>Featured</th>
-                        <th style="width: 280px;">Actions</th>
+                        <th style="width: 250px;" class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for quiz in page_obj %}
                     <tr>
                         <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-                        <td>{{ quiz.title|truncatechars:45 }}</td>
-                        <td><span class="badge badge-purple" style="background-color: #6f42c1;">{{ quiz.category.name }}</span></td>
+                        <td>
+                            <div>
+                                <a href="{{ quiz.get_absolute_url }}" target="_blank" class="font-weight-bold text-dark text-decoration-none" title="Click to view live quiz on website">
+                                    {{ quiz.title|truncatechars:42 }}
+                                    <i class="fas fa-external-link-alt fa-xs text-muted ml-1"></i>
+                                </a>
+                                <small class="text-muted d-block mt-1">
+                                    <i class="fas fa-clock mr-1"></i>{% if quiz.time_limit %}{{ quiz.time_limit }} mins{% else %}No time limit{% endif %}
+                                </small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-primary">{{ quiz.category.name|default:"Uncategorized" }}</span>
+                        </td>
                         <td>
                             {% if quiz.difficulty == 'easy' %}
-                            <span class="badge badge-primary"><i class="fas fa-seedling mr-1"></i>Easy</span>
+                            <span class="badge badge-success"><i class="fas fa-seedling mr-1"></i>Easy</span>
                             {% elif quiz.difficulty == 'medium' %}
                             <span class="badge badge-warning"><i class="fas fa-fire mr-1"></i>Medium</span>
                             {% elif quiz.difficulty == 'hard' %}
@@ -94,28 +184,36 @@
                             <span class="badge badge-secondary">{{ quiz.difficulty }}</span>
                             {% endif %}
                         </td>
-                        <td><span class="badge badge-info">{{ quiz.question_count }}</span></td>
-                        <td>{{ quiz.attempts }}</td>
+                        <td>
+                            {% if quiz.question_count > 0 %}
+                            <span class="badge badge-info px-2 py-1">{{ quiz.question_count }} Qs</span>
+                            {% else %}
+                            <a href="{% url 'dashboard:question_create' quiz.pk %}" class="badge badge-warning px-2 py-1 text-decoration-none" title="Click to add first question">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>0 Questions
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ quiz.attempts }}</strong></td>
                         <td>
                             <a href="{% url 'dashboard:quiz_toggle_negative_marking' quiz.pk %}" class="text-decoration-none" title="Click to toggle negative marking">
                                 {% if quiz.negative_marking %}
-                                <span class="badge badge-danger"><i class="fas fa-minus-circle mr-1"></i>{{ quiz.negative_marking_value }}/wrong</span>
+                                <span class="badge badge-danger"><i class="fas fa-minus-circle mr-1"></i>-{{ quiz.negative_marking_value }}%/wrong</span>
                                 {% else %}
                                 <span class="badge badge-secondary">Off</span>
                                 {% endif %}
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'dashboard:quiz_toggle_publish' quiz.pk %}" class="text-decoration-none" title="Click to toggle">
+                            <a href="{% url 'dashboard:quiz_toggle_publish' quiz.pk %}" class="text-decoration-none" title="Click to toggle publish">
                                 {% if quiz.is_published %}
-                                <span class="badge badge-soft-primary">Published</span>
+                                <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Published</span>
                                 {% else %}
                                 <span class="badge badge-danger">Draft</span>
                                 {% endif %}
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'dashboard:quiz_toggle_featured' quiz.pk %}" class="text-decoration-none" title="Click to toggle">
+                            <a href="{% url 'dashboard:quiz_toggle_featured' quiz.pk %}" class="text-decoration-none" title="Click to toggle featured">
                                 {% if quiz.is_featured %}
                                 <span class="badge badge-warning"><i class="fas fa-star"></i> Featured</span>
                                 {% else %}
@@ -123,26 +221,41 @@
                                 {% endif %}
                             </a>
                         </td>
-                        <td>
-                            <a href="{% url 'dashboard:quiz_edit' quiz.pk %}" class="btn btn-sm btn-info" title="Edit Quiz">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-sm btn-primary" title="Manage Questions">
-                                <i class="fas fa-question-circle mr-1"></i> Questions <span class="badge badge-light">{{ quiz.question_count }}</span>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-danger" title="Delete"
-                                data-toggle="modal" data-target="#deleteModal"
-                                data-delete-url="{% url 'dashboard:quiz_delete' quiz.pk %}"
-                                data-item-name="{{ quiz.title }}">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <td class="text-right">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'dashboard:quiz_questions' quiz.pk %}" class="btn btn-primary" title="Manage Questions Bank">
+                                    <i class="fas fa-list-ol mr-1"></i> Questions
+                                </a>
+                                <a href="{% url 'dashboard:question_create' quiz.pk %}" class="btn btn-outline-success" title="Add Question Manually">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                                <a href="{% url 'dashboard:question_import' quiz.pk %}" class="btn btn-outline-primary" title="Smart Text / Excel Import">
+                                    <i class="fas fa-file-import"></i>
+                                </a>
+                                <a href="{% url 'dashboard:quiz_edit' quiz.pk %}" class="btn btn-outline-info" title="Edit Quiz Settings">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ quiz.get_absolute_url }}" target="_blank" class="btn btn-outline-secondary" title="View Live Quiz on Website">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" title="Delete Quiz"
+                                    data-toggle="modal" data-target="#deleteModal"
+                                    data-delete-url="{% url 'dashboard:quiz_delete' quiz.pk %}"
+                                    data-item-name="{{ quiz.title }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="10" class="text-center text-muted py-4">
-                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                            No quizzes found
+                        <td colspan="10" class="text-center text-muted py-5">
+                            <i class="fas fa-inbox fa-3x mb-3 text-muted d-block"></i>
+                            <h5 class="text-muted">No Quizzes Found</h5>
+                            <p class="text-muted mb-3 small">Create your first quiz to start engaging students with interactive MCQs.</p>
+                            <a href="{% url 'dashboard:quiz_create' %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus mr-1"></i> Create First Quiz
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -150,9 +263,10 @@
             </table>
         </div>
     </div>
+
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}
-    <div class="card-footer clearfix">
+    <div class="card-footer clearfix bg-light">
         <ul class="pagination pagination-sm m-0 float-right">
             {% if page_obj.has_previous %}
             <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.difficulty %}&difficulty={{ request.GET.difficulty }}{% endif %}{% if request.GET.published %}&published={{ request.GET.published }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo;</a></li>
@@ -172,7 +286,7 @@
             <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
             {% endif %}
         </ul>
-        <span class="float-left text-muted">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total }}</span>
+        <span class="float-left text-muted small pt-1">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total }} quizzes</span>
     </div>
     {% endif %}
 </div>
@@ -182,20 +296,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <h5 class="modal-title font-weight-bold" id="deleteModalLabel"><i class="fas fa-exclamation-triangle text-danger mr-1"></i> Confirm Delete</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this item?</p>
-                <p class="text-muted small" id="deleteItemName"></p>
+                <p>Are you sure you want to delete this quiz?</p>
+                <div class="alert alert-light border p-2">
+                    <strong id="deleteItemName" class="text-danger"></strong>
+                </div>
+                <small class="text-muted">All associated questions and student attempt records will also be removed.</small>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <form id="deleteForm" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger">Delete Quiz</button>
                 </form>
             </div>
         </div>
