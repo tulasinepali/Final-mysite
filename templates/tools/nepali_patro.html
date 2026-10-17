@@ -212,6 +212,11 @@
         transform: rotate(180deg);
         display: inline-block;
     }
+    #btnFestivalsToggle:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+        box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35) !important;
+        transform: translateY(-1px);
+    }
 
     /* Hover / Click Day Popover Tooltip */
     .patro-tooltip {
@@ -354,10 +359,10 @@
                             <select class="form-select form-select-sm rounded-pill border-secondary-subtle" id="selectMonth" style="width: auto;"></select>
 
                             <div class="festivals-dropdown-wrap position-relative">
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-semibold d-inline-flex align-items-center gap-1 px-3" id="btnFestivalsToggle" onclick="toggleFestivalsDropdown(event)" title="यस महिनाका बिदाहरू हेर्नुहोस्">
+                                <button type="button" class="btn btn-sm btn-danger rounded-pill fw-bold shadow-sm d-inline-flex align-items-center gap-2 px-3 py-1" id="btnFestivalsToggle" onclick="toggleFestivalsDropdown(event)" title="यस महिनाका बिदाहरू हेर्नुहोस्" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border: 1px solid #dc2626; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25); color: #ffffff; transition: all 0.2s ease;">
                                     <span>बिदाहरु</span>
-                                    <span class="badge bg-danger text-white rounded-pill" id="festivalsCountBadge">०</span>
-                                    <span class="fest-arrow" style="font-size: 10px;">▾</span>
+                                    <span class="badge bg-white text-danger fw-bold rounded-pill" id="festivalsCountBadge" style="box-shadow: 0 1px 2px rgba(0,0,0,0.15);">०</span>
+                                    <span class="fest-arrow" style="font-size: 10px; color: #ffffff;">▾</span>
                                 </button>
                                 <div class="festivals-dropdown-menu" id="festivalsDropdownMenu">
                                     <div class="fest-menu-header">
