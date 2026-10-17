@@ -14,38 +14,82 @@
     box-sizing: border-box;
 }
 
+/* Mobile Backdrop Overlay */
+.sb-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1045;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.sb-overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@media (min-width: 769px) {
+    .sb-overlay {
+        display: none !important;
+    }
+}
+
+/* Floating Card Widget */
 #study-break-widget {
     position: fixed;
-    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, 130%) scale(0.95);
-    width: calc(100% - 24px);
-    max-width: 360px;
-    z-index: 1045;
+    bottom: auto;
+    right: auto;
+    transform: translate(-50%, -50%) scale(0.92);
+    width: calc(100% - 32px);
+    max-width: 350px;
+    z-index: 1050;
     font-family: inherit;
     pointer-events: none;
     opacity: 0;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    margin: 0;
 }
 
 #study-break-widget.is-visible {
-    transform: translate(-50%, 0) scale(1) !important;
+    transform: translate(-50%, -50%) scale(1) !important;
     opacity: 1 !important;
     pointer-events: auto !important;
 }
 
 @media (min-width: 769px) {
     #study-break-widget {
+        top: auto;
         left: auto;
         right: 24px;
         bottom: 24px;
         width: 360px;
         max-width: 360px;
-        transform: translateY(130%) scale(0.95);
+        transform: translateY(120%) scale(0.95);
     }
 
     #study-break-widget.is-visible {
         transform: translateY(0) scale(1) !important;
+    }
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+    #study-break-widget {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        max-height: 96vh;
+    }
+    #study-break-widget.is-visible {
+        transform: translate(-50%, -50%) scale(0.85) !important;
     }
 }
 
@@ -610,7 +654,10 @@
 }
 </style>
 
-<!-- Floating Card Widget -->
+<!-- Mobile Backdrop Overlay -->
+<div id="sb-overlay" class="sb-overlay"></div>
+
+<!-- Floating Card Widget (Centered in Middle on Mobile, Bottom-Right on Desktop) -->
 <div id="study-break-widget" role="complementary" aria-label="Study Break Video Recommendation">
     <div class="sb-card">
         <div class="sb-header">
@@ -820,6 +867,7 @@
 
     // Elements
     var widget = document.getElementById('study-break-widget');
+    var overlay = document.getElementById('sb-overlay');
     var closeBtn = document.getElementById('sb-close-btn');
     var thumbTrigger = document.getElementById('sb-thumb-trigger');
     var btnWatch = document.getElementById('sb-btn-watch');
@@ -878,6 +926,8 @@
     // Modal Handlers
     function openModal() {
         trackEngagement('click');
+        widget.classList.remove('is-visible');
+        if (overlay) overlay.classList.remove('is-visible');
         modalIframe.src = getEmbedUrl(currentVideo.id);
         modalBackdrop.classList.add('is-open');
         document.body.style.overflow = 'hidden';
@@ -915,12 +965,18 @@
     });
 
     // Close widget permanently for this tab session
-    closeBtn.addEventListener('click', function() {
+    function dismissWidget() {
         widget.classList.remove('is-visible');
+        if (overlay) overlay.classList.remove('is-visible');
         try {
             sessionStorage.setItem('sb_dismissed_' + window.location.pathname, 'true');
         } catch(e) {}
-    });
+    }
+
+    closeBtn.addEventListener('click', dismissWidget);
+    if (overlay) {
+        overlay.addEventListener('click', dismissWidget);
+    }
 
     var isDismissed = false;
     try {
@@ -940,6 +996,9 @@
         triggered = true;
         setTimeout(function() {
             widget.classList.add('is-visible');
+            if (overlay && window.innerWidth <= 768) {
+                overlay.classList.add('is-visible');
+            }
             if (!viewTracked) {
                 viewTracked = true;
                 trackEngagement('view');
