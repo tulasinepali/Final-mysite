@@ -13,20 +13,20 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-9 col-xl-8">
-        <div class="card shadow-sm border-0" style="border-radius: 14px;">
+        <div class="card shadow-sm border" style="border-radius: 14px; background: #ffffff;">
             <div class="card-header bg-white py-3 border-bottom">
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 44px; height: 44px; background: rgba(255, 0, 0, 0.1); color: #ff0000; font-size: 1.4rem;">
-                            <i class="bi bi-youtube"></i>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 46px; height: 46px; min-width: 46px; background: #fee2e2; color: #ef4444; font-size: 1.4rem;">
+                            <i class="fab fa-youtube"></i>
                         </div>
                         <div>
-                            <h5 class="mb-0 font-weight-bold">{{ action }} YouTube Video</h5>
+                            <h5 class="mb-0 font-weight-bold" style="color: #0f172a;">{{ action }} YouTube Video</h5>
                             <small class="text-muted">Just paste the YouTube link — Title, Channel, and Thumbnail are extracted automatically!</small>
                         </div>
                     </div>
                     <a href="{% url 'dashboard:videos' %}" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-arrow-left mr-1"></i> Back to Videos
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Videos
                     </a>
                 </div>
             </div>
@@ -37,26 +37,26 @@
 
                     {% if form.non_field_errors %}
                     <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle-fill mr-1"></i>
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
                         {{ form.non_field_errors }}
                     </div>
                     {% endif %}
 
                     <!-- 1. The Main Input: YouTube URL -->
                     <div class="form-group mb-4">
-                        <label for="{{ form.youtube_url.id_for_label }}" class="font-weight-bold" style="font-size: 1.05rem;">
-                            <i class="bi bi-link-45deg text-danger mr-1"></i> YouTube Video URL or Short Link <span class="text-danger">*</span>
+                        <label for="{{ form.youtube_url.id_for_label }}" class="font-weight-bold" style="font-size: 1.05rem; color: #0f172a;">
+                            <i class="fab fa-youtube text-danger mr-1"></i> YouTube Video URL or Short Link <span class="text-danger">*</span>
                         </label>
-                        <div class="input-group">
+                        <div class="input-group input-group-lg">
                             {{ form.youtube_url }}
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-secondary" id="btnExtractMeta" onclick="triggerMetadataExtraction()" title="Re-fetch details from YouTube">
-                                    <i class="bi bi-magic mr-1"></i> Extract
+                                <button type="button" class="btn btn-outline-secondary font-weight-bold" id="btnExtractMeta" onclick="triggerMetadataExtraction()" title="Re-fetch details from YouTube">
+                                    <i class="fas fa-magic mr-1"></i> Extract
                                 </button>
                             </div>
                         </div>
                         <small class="form-text text-muted mt-1">
-                            Accepts any link: <code>https://www.youtube.com/watch?v=...</code>, <code>https://youtu.be/...</code>, Shorts, or 11-char Video ID.
+                            Paste any link: <code>https://www.youtube.com/watch?v=...</code>, <code>https://youtu.be/...</code>, Shorts, or 11-char Video ID.
                         </small>
                         {% for error in form.youtube_url.errors %}
                         <span class="invalid-feedback d-block">{{ error }}</span>
@@ -64,28 +64,28 @@
                     </div>
 
                     <!-- Live Auto-Extraction Preview Card -->
-                    <div id="livePreviewContainer" class="card mb-4 border" style="border-radius: 12px; display: none; background: #fafbff;">
+                    <div id="livePreviewContainer" class="card mb-4 border" style="border-radius: 12px; display: none; background: #f8fafc; border-color: #cbd5e1 !important;">
                         <div class="card-body p-3">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="badge badge-success px-2 py-1"><i class="bi bi-check-circle-fill mr-1"></i> Extracted from YouTube</span>
-                                <span id="previewVideoIdBadge" class="small text-muted font-monospace font-weight-bold"></span>
+                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> Extracted from YouTube</span>
+                                <span id="previewVideoIdBadge" class="small text-muted font-weight-bold" style="font-family: monospace;"></span>
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-sm-4 mb-2 mb-sm-0">
-                                    <div class="position-relative rounded overflow-hidden shadow-sm" style="height: 100px; background: #000;">
+                                    <div class="position-relative rounded overflow-hidden shadow-sm" style="height: 105px; background: #000;">
                                         <img id="previewThumbnail" src="" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
                                         <div class="position-absolute d-flex align-items-center justify-content-center" style="top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.25);">
-                                            <i class="bi bi-play-circle-fill text-white" style="font-size: 2rem;"></i>
+                                            <i class="fas fa-play-circle text-white" style="font-size: 2rem;"></i>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-8">
-                                    <h6 id="previewTitle" class="font-weight-bold text-dark mb-1 text-truncate" style="font-size: 0.96rem;"></h6>
+                                    <h6 id="previewTitle" class="font-weight-bold text-dark mb-1 text-truncate" style="font-size: 0.96rem; color: #0f172a !important;"></h6>
                                     <div class="d-flex align-items-center text-muted small mb-2">
-                                        <i class="bi bi-person-fill text-danger mr-1"></i>
+                                        <i class="fas fa-user text-danger mr-1"></i>
                                         <strong id="previewChannel" class="text-dark"></strong>
                                     </div>
-                                    <span class="badge badge-soft-primary" id="previewCategoryBadge">Category: 🎧 Anime ASMR</span>
+                                    <span class="badge badge-primary px-2 py-1" id="previewCategoryBadge" style="background-color: #0559b7;">Category: 🎧 Anime ASMR</span>
                                 </div>
                             </div>
                         </div>
@@ -93,8 +93,8 @@
 
                     <!-- 2. Category Selection with Quick Pills -->
                     <div class="form-group mb-4">
-                        <label for="{{ form.category.id_for_label }}" class="font-weight-bold">
-                            <i class="bi bi-tag-fill text-primary mr-1"></i> Category / Mood
+                        <label for="{{ form.category.id_for_label }}" class="font-weight-bold" style="color: #0f172a;">
+                            <i class="fas fa-tag text-primary mr-1"></i> Category / Mood
                         </label>
                         {{ form.category }}
                         <div class="d-flex flex-wrap gap-2 mt-2" style="gap: 6px;">
@@ -114,9 +114,9 @@
                         <div class="card-header bg-light py-2 px-3" style="cursor: pointer;" data-toggle="collapse" data-target="#advancedOptions" aria-expanded="false">
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="font-weight-bold small text-muted">
-                                    <i class="bi bi-sliders mr-1"></i> Optional Metadata Overrides (Leave blank to keep auto-extracted)
+                                    <i class="fas fa-sliders-h mr-1"></i> Optional Metadata Overrides (Leave blank to keep auto-extracted)
                                 </span>
-                                <i class="bi bi-chevron-down text-muted" style="font-size: 0.8rem;"></i>
+                                <i class="fas fa-chevron-down text-muted" style="font-size: 0.8rem;"></i>
                             </div>
                         </div>
                         <div id="advancedOptions" class="collapse">
@@ -156,20 +156,24 @@
                         </div>
                     </div>
 
-                    <!-- 4. Active Checkbox -->
-                    <div class="custom-control custom-switch mb-4">
-                        {{ form.is_active }}
-                        <label class="custom-control-label font-weight-bold" for="id_is_active">
-                            Active in Study Break &amp; Download Completion Rotation
-                        </label>
-                        <small class="text-muted d-block pl-4">When active, this video is eligible to appear randomly in reward popups.</small>
+                    <!-- 4. Active Checkbox with Proper Custom Switch (Single Icon, Fully Clickable) -->
+                    <div class="p-3 rounded border bg-light mb-4">
+                        <div class="custom-control custom-switch">
+                            {{ form.is_active|add_class:'custom-control-input'|attr:'id:id_is_active' }}
+                            <label class="custom-control-label font-weight-bold" for="id_is_active" style="cursor: pointer; user-select: none; font-size: 0.95rem; color: #0f172a;">
+                                Active in Study Break &amp; Download Completion Rotation
+                            </label>
+                        </div>
+                        <small class="text-muted d-block" style="margin-left: 2.25rem;">
+                            When active, this video is eligible to appear randomly in reward popups on Notes, Blogs, Quizzes, and Downloads.
+                        </small>
                     </div>
 
                     <!-- Submit Buttons -->
                     <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                         <a href="{% url 'dashboard:videos' %}" class="btn btn-light px-4">Cancel</a>
                         <button type="submit" class="btn btn-danger font-weight-bold px-4 py-2 shadow-sm" style="border-radius: 8px;">
-                            <i class="bi bi-check2-circle mr-1"></i> Save Video to Rotation
+                            <i class="fas fa-check mr-1"></i> Save Video to Rotation
                         </button>
                     </div>
                 </form>

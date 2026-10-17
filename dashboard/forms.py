@@ -456,7 +456,7 @@ class YouTubeVideoForm(forms.ModelForm):
                 'id': 'id_custom_thumbnail'
             }),
             'order': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'id_is_active'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'custom-control-input', 'id': 'id_is_active'}),
         }
 
     def __init__(self, *args, **kwargs):
