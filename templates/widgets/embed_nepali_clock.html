@@ -46,7 +46,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
         }
         .flag-col {
             flex-shrink: 0;
@@ -55,11 +55,11 @@
             justify-content: center;
         }
         .nepal-flag-img {
-            width: 58px;
+            width: 56px;
             height: auto;
-            max-height: 74px;
+            max-height: 72px;
             object-fit: contain;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.18));
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.18));
             display: block;
         }
         .clock-details-col {
@@ -162,7 +162,7 @@
     <div class="clock-container">
         <div class="clock-content-wrap">
             <div class="flag-col">
-                <img src="{% static 'images/nepal-flag.gif' %}" alt="National Flag of Nepal" class="nepal-flag-img">
+                <img src="{% static 'images/nepal-flag.gif' %}?v=kingdom_nepal" alt="National Flag of Nepal" class="nepal-flag-img">
             </div>
             <div class="clock-details-col">
                 <div class="live-badge">
