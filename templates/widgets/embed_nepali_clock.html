@@ -10,11 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: {% if theme == 'dark' %}#121824{% else %}#ffffff{% endif %};
-            --card-bg: {% if theme == 'dark' %}#1a2234{% else %}#f8fafc{% endif %};
-            --text-color: {% if theme == 'dark' %}#e2e8f0{% else %}#1e293b{% endif %};
+            --bg-color: {% if theme == 'dark' %}#0f172a{% else %}#ffffff{% endif %};
+            --card-bg: {% if theme == 'dark' %}#1e293b{% else %}#ffffff{% endif %};
+            --text-color: {% if theme == 'dark' %}#f1f5f9{% else %}#0f172a{% endif %};
             --muted-color: {% if theme == 'dark' %}#94a3b8{% else %}#64748b{% endif %};
-            --border-color: {% if theme == 'dark' %}#2d3748{% else %}#e2e8f0{% endif %};
+            --border-color: {% if theme == 'dark' %}#334155{% else %}#e2e8f0{% endif %};
             --primary-color: #0559b7;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -162,7 +162,7 @@
     <div class="clock-container">
         <div class="clock-content-wrap">
             <div class="flag-col">
-                <img src="{% static 'images/nepal-flag.gif' %}?v=kingdom_nepal" alt="National Flag of Nepal" class="nepal-flag-img">
+                <img src="{% static 'images/nepal-flag.gif' %}?v=trans_v3" alt="National Flag of Nepal" class="nepal-flag-img">
             </div>
             <div class="clock-details-col">
                 <div class="live-badge">
