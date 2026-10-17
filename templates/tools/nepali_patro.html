@@ -21,7 +21,8 @@
     #liveDateBs,
     #liveClock,
     #mainMonthTitle,
-    #selectedDateNe,
+    .patro-tooltip,
+    #eventsDropdownContainer,
     #sideEventsList,
     .patro-nav-btn {
         font-family: 'Mukta', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -29,6 +30,7 @@
     .patro-main-card {
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        position: relative;
     }
     .patro-nav-btn {
         width: 36px;
@@ -164,6 +166,116 @@
         outline-offset: -1px;
     }
 
+    /* Festivals Dropdown */
+    .festivals-dropdown-wrap {
+        position: relative;
+    }
+    .festivals-dropdown-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 310px;
+        max-width: 90vw;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        overflow: hidden;
+    }
+    .festivals-dropdown-wrap.open .festivals-dropdown-menu {
+        display: block;
+    }
+    .fest-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 13px;
+    }
+    .btn-fest-close {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        color: #64748b;
+        padding: 0 4px;
+    }
+    .btn-fest-close:hover {
+        color: #dc2626;
+    }
+    .festivals-dropdown-wrap.open .fest-arrow {
+        transform: rotate(180deg);
+        display: inline-block;
+    }
+
+    /* Hover / Click Day Popover Tooltip */
+    .patro-tooltip {
+        position: absolute;
+        z-index: 999;
+        background: #0f172a;
+        color: #f8fafc;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        padding: 10px 14px;
+        box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+        font-size: 13px;
+        line-height: 1.4;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(3px);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        width: max-content;
+        max-width: 270px;
+        text-align: left;
+        visibility: hidden;
+    }
+    .patro-tooltip.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .tooltip-bs {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 3px;
+    }
+    .tooltip-weekday {
+        font-size: 12.5px;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+    .tooltip-ad {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-bottom: 5px;
+    }
+    .tooltip-event {
+        font-size: 12px;
+        font-weight: 600;
+        color: #fca5a5;
+        background: rgba(220, 38, 38, 0.2);
+        border: 1px solid rgba(220, 38, 38, 0.4);
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-top: 5px;
+        display: inline-block;
+    }
+    .tooltip-event.saturday-tag {
+        color: #fed7aa;
+        background: rgba(234, 88, 12, 0.2);
+        border-color: rgba(234, 88, 12, 0.4);
+    }
+    .tooltip-holiday-tag {
+        color: #f87171;
+        font-weight: 700;
+    }
+
     @media (max-width: 576px) {
         .cal-day-cell {
             min-height: 52px;
@@ -236,10 +348,26 @@
                             <small class="text-muted fw-semibold" id="labelAdRange">Loading Gregorian range...</small>
                         </div>
 
-                        <!-- Dropdowns Jump -->
-                        <div class="d-flex align-items-center gap-2">
+                        <!-- Dropdowns Jump & Festivals Menu -->
+                        <div class="d-flex align-items-center flex-wrap gap-2">
                             <select class="form-select form-select-sm rounded-pill border-secondary-subtle" id="selectYear" style="width: auto;"></select>
                             <select class="form-select form-select-sm rounded-pill border-secondary-subtle" id="selectMonth" style="width: auto;"></select>
+
+                            <div class="festivals-dropdown-wrap position-relative">
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-semibold d-inline-flex align-items-center gap-1 px-3" id="btnFestivalsToggle" onclick="toggleFestivalsDropdown(event)" title="यस महिनाका चाडपर्वहरू हेर्नुहोस्">
+                                    <span>🎉 चाडपर्व</span>
+                                    <span class="badge bg-danger text-white rounded-pill" id="festivalsCountBadge">०</span>
+                                    <span class="fest-arrow" style="font-size: 10px;">▾</span>
+                                </button>
+                                <div class="festivals-dropdown-menu" id="festivalsDropdownMenu">
+                                    <div class="fest-menu-header">
+                                        <span class="fw-bold text-primary">यस महिनाका चाडपर्व तथा बिदाहरू</span>
+                                        <button type="button" class="btn-fest-close" onclick="closeFestivalsDropdown(event)" aria-label="Close">&times;</button>
+                                    </div>
+                                    <div class="fest-menu-content p-2" id="eventsDropdownContainer" style="max-height: 260px; overflow-y: auto;"></div>
+                                </div>
+                            </div>
+
                             <div class="d-inline-flex gap-1 ms-1">
                                 <button type="button" class="patro-nav-btn" id="btnPrev" title="अघिल्लो महिना">&#8249;</button>
                                 <button type="button" class="patro-nav-btn" id="btnNext" title="पछिल्लो महिना">&#8250;</button>
@@ -261,6 +389,9 @@
                     <!-- Days Grid -->
                     <div class="cal-grid-days" id="mainCalendarGrid"></div>
 
+                    <!-- Day Hover Popover / Tooltip -->
+                    <div class="patro-tooltip" id="patroTooltip"></div>
+
                     <!-- Quick Legend -->
                     <div class="d-flex flex-wrap align-items-center gap-3 mt-3 pt-3 border-top small text-muted">
                         <span class="d-flex align-items-center gap-1">
@@ -272,20 +403,6 @@
                         <span class="d-flex align-items-center gap-1">
                             <span class="d-inline-block rounded-circle" style="width: 10px; height: 10px; background: #ea580c;"></span> आइतबार (साप्ताहिक बिदा)
                         </span>
-                    </div>
-                </div>
-
-                <!-- Selected Day Detail Card -->
-                <div class="card border rounded-4 shadow-sm p-4 bg-light mb-4">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                        <div>
-                            <span class="badge bg-primary bg-opacity-10 text-primary mb-1">छानिएको मिति</span>
-                            <h4 class="fw-bold mb-1 text-dark" id="selectedDateNe">--</h4>
-                            <div class="text-muted small" id="selectedDateAd">--</div>
-                        </div>
-                        <div id="selectedEventBadge" class="p-2 px-3 rounded-3 bg-danger bg-opacity-10 text-danger fw-bold border border-danger-subtle fs-6" style="display: none;">
-                            --
-                        </div>
                     </div>
                 </div>
             </div>
@@ -644,11 +761,20 @@
                 cell.appendChild(evText);
             }
 
-            (function (dNum, adData, evData) {
-                cell.addEventListener("click", function () {
-                    selectDay(dNum, adData, evData);
+            // Hover & Click interaction on day cell
+            (function (dNum, adData, evData, cellElem) {
+                cellElem.addEventListener("mouseenter", function () {
+                    showDayTooltip(dNum, adData, evData, cellElem);
                 });
-            })(d, currentAd, eventInfo);
+                cellElem.addEventListener("mouseleave", function () {
+                    hideDayTooltip();
+                });
+                cellElem.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    selectDay(dNum);
+                    showDayTooltip(dNum, adData, evData, cellElem);
+                });
+            })(d, currentAd, eventInfo, cell);
 
             grid.appendChild(cell);
         }
@@ -660,14 +786,20 @@
         } else {
             selectDay(1);
         }
+        hideDayTooltip();
     }
 
-    function selectDay(dayNum, adData, evData) {
+    function selectDay(dayNum) {
         var prev = document.querySelector(".cal-day-cell.active-selected");
         if (prev) prev.classList.remove("active-selected");
 
         var cell = document.getElementById("cal-cell-" + dayNum);
         if (cell) cell.classList.add("active-selected");
+    }
+
+    function showDayTooltip(dayNum, adData, evData, cellEl) {
+        var tooltip = document.getElementById("patroTooltip");
+        if (!tooltip || !cellEl) return;
 
         if (!adData) {
             adData = NepaliCalendar.bsToAd(currentViewYear, currentViewMonth, dayNum);
@@ -688,63 +820,156 @@
 
         var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         var weekdayEn = NepaliCalendar.DAYS_EN[adData.dayOfWeek];
-        var adText = "अंग्रेजी मिति (A.D.): " + weekdayEn + ", " + adMonths[adData.adMonth - 1] + " " + adData.adDay + ", " + adData.adYear;
+        var adDateText = weekdayEn + ", " + adMonths[adData.adMonth - 1] + " " + adData.adDay + ", " + adData.adYear;
 
-        document.getElementById("selectedDateNe").textContent = bsMonthName + " " + bsDayNe + ", " + bsYearNe + " (" + weekdayNe + ")";
-        document.getElementById("selectedDateAd").textContent = adText;
+        var html = '<div class="tooltip-bs">' + bsMonthName + ' ' + bsDayNe + ', ' + bsYearNe + ' <span class="tooltip-weekday">(' + weekdayNe + ')</span></div>' +
+                   '<div class="tooltip-ad">' + adDateText + '</div>';
 
-        var badge = document.getElementById("selectedEventBadge");
         if (evData) {
-            badge.textContent = evData.title + (evData.is_holiday ? " (सार्वजनिक बिदा)" : "");
-            badge.style.display = "inline-block";
-        } else {
-            badge.style.display = "none";
+            var holidayTag = evData.is_holiday ? ' <span class="tooltip-holiday-tag">● सार्वजनिक बिदा</span>' : '';
+            html += '<div class="tooltip-event">🎉 ' + evData.title + holidayTag + '</div>';
+        } else if (adData.dayOfWeek === 6) {
+            html += '<div class="tooltip-event saturday-tag">शनिबार (साप्ताहिक बिदा)</div>';
+        }
+
+        tooltip.innerHTML = html;
+        tooltip.classList.add("visible");
+
+        // Positioning relative to .patro-main-card
+        var wrapper = cellEl.closest(".patro-main-card");
+        var wrapperRect = wrapper.getBoundingClientRect();
+        var cellRect = cellEl.getBoundingClientRect();
+        var tooltipWidth = tooltip.offsetWidth;
+        var tooltipHeight = tooltip.offsetHeight;
+
+        var left = (cellRect.left - wrapperRect.left) + (cellRect.width / 2) - (tooltipWidth / 2);
+        if (left < 10) left = 10;
+        if (left + tooltipWidth > wrapperRect.width - 10) {
+            left = wrapperRect.width - tooltipWidth - 10;
+        }
+
+        // Prefer placing above cell; if not enough room, place below
+        var top = (cellRect.top - wrapperRect.top) - tooltipHeight - 10;
+        if (top < 10) {
+            top = (cellRect.bottom - wrapperRect.top) + 10;
+        }
+
+        tooltip.style.left = left + "px";
+        tooltip.style.top = top + "px";
+    }
+
+    function hideDayTooltip() {
+        var tooltip = document.getElementById("patroTooltip");
+        if (tooltip) {
+            tooltip.classList.remove("visible");
         }
     }
 
+    function toggleFestivalsDropdown(e) {
+        if (e) e.stopPropagation();
+        var wrap = document.querySelector(".festivals-dropdown-wrap");
+        if (wrap) wrap.classList.toggle("open");
+    }
+
+    function closeFestivalsDropdown(e) {
+        if (e) e.stopPropagation();
+        var wrap = document.querySelector(".festivals-dropdown-wrap");
+        if (wrap) wrap.classList.remove("open");
+    }
+
+    // Global dismiss for tooltip & dropdown when clicking outside
+    document.addEventListener("click", function (e) {
+        var wrap = document.querySelector(".festivals-dropdown-wrap");
+        if (wrap && !wrap.contains(e.target)) {
+            wrap.classList.remove("open");
+        }
+        if (!e.target.closest(".cal-day-cell") && !e.target.closest(".patro-tooltip")) {
+            hideDayTooltip();
+        }
+    });
+
     function renderSideEvents(eventsList) {
-        var container = document.getElementById("sideEventsList");
-        var badge = document.getElementById("badgeEventsCount");
-        container.innerHTML = "";
+        var sideContainer = document.getElementById("sideEventsList");
+        var sideBadge = document.getElementById("badgeEventsCount");
+        var dropContainer = document.getElementById("eventsDropdownContainer");
+        var dropBadge = document.getElementById("festivalsCountBadge");
+
+        var countText = (!eventsList || eventsList.length === 0) ? "०" : NepaliCalendar.toNepaliDigits(eventsList.length);
+        if (sideBadge) sideBadge.textContent = countText;
+        if (dropBadge) dropBadge.textContent = countText;
+
+        if (sideContainer) sideContainer.innerHTML = "";
+        if (dropContainer) dropContainer.innerHTML = "";
 
         if (!eventsList || eventsList.length === 0) {
-            badge.textContent = "०";
-            container.innerHTML = '<div class="text-muted small py-2">यस महिनामा कुनै चाडपर्व वा बिदा दर्ता छैन।</div>';
+            var emptyHtml = '<div class="text-muted small py-3 text-center">यस महिनामा कुनै चाडपर्व वा बिदा दर्ता छैन।</div>';
+            if (sideContainer) sideContainer.innerHTML = emptyHtml;
+            if (dropContainer) dropContainer.innerHTML = emptyHtml;
             return;
         }
 
-        badge.textContent = NepaliCalendar.toNepaliDigits(eventsList.length);
-
         eventsList.forEach(function (ev) {
-            var item = document.createElement("div");
-            item.className = "d-flex align-items-center justify-content-between p-2 mb-2 rounded-3 border " + (ev.is_holiday ? "bg-danger bg-opacity-10 border-danger-subtle" : "bg-light");
+            // Side container item
+            if (sideContainer) {
+                var item = document.createElement("div");
+                item.className = "d-flex align-items-center justify-content-between p-2 mb-2 rounded-3 border " + (ev.is_holiday ? "bg-danger bg-opacity-10 border-danger-subtle" : "bg-light");
 
-            var left = document.createElement("div");
-            left.className = "d-flex align-items-baseline gap-2";
+                var left = document.createElement("div");
+                left.className = "d-flex align-items-baseline gap-2";
 
-            var dayBadge = document.createElement("span");
-            dayBadge.className = "fw-bold " + (ev.is_holiday ? "text-danger" : "text-primary");
-            dayBadge.style.minWidth = "45px";
-            dayBadge.textContent = NepaliCalendar.toNepaliDigits(ev.day) + " गते";
+                var dayBadge = document.createElement("span");
+                dayBadge.className = "fw-bold " + (ev.is_holiday ? "text-danger" : "text-primary");
+                dayBadge.style.minWidth = "45px";
+                dayBadge.textContent = NepaliCalendar.toNepaliDigits(ev.day) + " गते";
 
-            var titleSpan = document.createElement("span");
-            titleSpan.className = "small text-dark fw-semibold";
-            titleSpan.textContent = ev.title;
+                var titleSpan = document.createElement("span");
+                titleSpan.className = "small text-dark fw-semibold";
+                titleSpan.textContent = ev.title;
 
-            left.appendChild(dayBadge);
-            left.appendChild(titleSpan);
+                left.appendChild(dayBadge);
+                left.appendChild(titleSpan);
+                item.appendChild(left);
 
-            item.appendChild(left);
-
-            if (ev.is_holiday) {
-                var hBadge = document.createElement("span");
-                hBadge.className = "badge bg-danger rounded-pill";
-                hBadge.style.fontSize = "9px";
-                hBadge.textContent = "बिदा";
-                item.appendChild(hBadge);
+                if (ev.is_holiday) {
+                    var hBadge = document.createElement("span");
+                    hBadge.className = "badge bg-danger rounded-pill";
+                    hBadge.style.fontSize = "9px";
+                    hBadge.textContent = "बिदा";
+                    item.appendChild(hBadge);
+                }
+                sideContainer.appendChild(item);
             }
 
-            container.appendChild(item);
+            // Dropdown menu item
+            if (dropContainer) {
+                var dropItem = document.createElement("div");
+                dropItem.className = "d-flex align-items-center justify-content-between p-2 mb-1 rounded-2 border-bottom small";
+
+                var dLeft = document.createElement("div");
+                dLeft.className = "d-flex align-items-baseline gap-2";
+
+                var dDay = document.createElement("span");
+                dDay.className = "fw-bold " + (ev.is_holiday ? "text-danger" : "text-primary");
+                dDay.style.minWidth = "40px";
+                dDay.textContent = NepaliCalendar.toNepaliDigits(ev.day) + " गते";
+
+                var dTitle = document.createElement("span");
+                dTitle.className = "text-dark fw-medium";
+                dTitle.textContent = ev.title;
+
+                dLeft.appendChild(dDay);
+                dLeft.appendChild(dTitle);
+                dropItem.appendChild(dLeft);
+
+                if (ev.is_holiday) {
+                    var dHBadge = document.createElement("span");
+                    dHBadge.className = "badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill";
+                    dHBadge.style.fontSize = "10px";
+                    dHBadge.textContent = "बिदा";
+                    dropItem.appendChild(dHBadge);
+                }
+                dropContainer.appendChild(dropItem);
+            }
         });
     }
 </script>
