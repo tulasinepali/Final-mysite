@@ -56,6 +56,7 @@
     padding: 12px 16px 10px;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border-bottom: 1px solid #e2e8f0;
+    gap: 8px;
 }
 
 .sb-header-badge {
@@ -66,6 +67,16 @@
     font-weight: 700;
     color: #0f172a;
     letter-spacing: -0.2px;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+}
+
+#sb-banner-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .sb-header-badge .sb-icon-sparkle {
@@ -74,18 +85,21 @@
     justify-content: center;
     width: 24px;
     height: 24px;
+    min-width: 24px;
     border-radius: 6px;
     background: linear-gradient(135deg, #ffedd5 0%, #fef3c7 100%);
     color: #ea580c;
     font-size: 13px;
+    flex-shrink: 0;
 }
 
 .sb-close-btn {
     background: transparent;
     border: none;
     color: #64748b;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -95,6 +109,8 @@
     transition: all 0.2s ease;
     padding: 0;
     line-height: 1;
+    flex-shrink: 0;
+    touch-action: manipulation;
 }
 
 .sb-close-btn:hover {
@@ -316,6 +332,7 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 12px;
 }
 
 .sb-modal-title {
@@ -326,18 +343,30 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+}
+
+#sb-modal-badge {
+    flex-shrink: 0;
+}
+
+#sb-modal-video-title {
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 12px;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
 }
 
 .sb-modal-close {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: #94a3b8;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -345,6 +374,8 @@
     cursor: pointer;
     font-size: 16px;
     transition: all 0.2s ease;
+    flex-shrink: 0;
+    touch-action: manipulation;
 }
 
 .sb-modal-close:hover {
@@ -421,20 +452,238 @@
     color: #ffffff;
 }
 
+.sb-media-row {
+    display: block;
+}
+
 @media (max-width: 576px) {
     #study-break-widget {
-        bottom: 14px;
-        right: 14px;
-        left: 14px;
+        bottom: max(12px, env(safe-area-inset-bottom, 12px));
+        right: 12px;
+        left: 12px;
         width: auto;
-        max-width: none;
+        max-width: 440px;
+        margin: 0 auto;
     }
+
+    .sb-card {
+        border-radius: 14px;
+        box-shadow: 0 12px 36px -6px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(226, 232, 240, 0.95);
+    }
+
+    .sb-header {
+        padding: 9px 12px 8px;
+        gap: 8px;
+    }
+
+    .sb-header-badge {
+        font-size: 12px;
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    #sb-banner-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+
+    .sb-header-badge .sb-icon-sparkle {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        font-size: 11px;
+    }
+
+    .sb-close-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        font-size: 16px;
+    }
+
+    .sb-body {
+        padding: 10px 12px 12px;
+    }
+
+    /* Modern compact horizontal media row on mobile */
+    .sb-media-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .sb-thumb-wrap {
+        width: 108px;
+        min-width: 108px;
+        height: 61px;
+        aspect-ratio: 16 / 9;
+        border-radius: 8px;
+        margin-bottom: 0;
+    }
+
+    .sb-category-tag {
+        display: none;
+    }
+
+    .sb-play-btn {
+        width: 28px;
+        height: 28px;
+        box-shadow: 0 3px 10px rgba(220, 38, 38, 0.5);
+    }
+
+    .sb-play-btn svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .sb-video-meta {
+        margin-top: 0;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sb-video-title {
+        font-size: 12px;
+        line-height: 1.3;
+        margin: 0 0 3px;
+        -webkit-line-clamp: 2;
+    }
+
+    .sb-channel-name {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sb-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 9px;
+    }
+
+    .sb-btn-watch,
+    .sb-btn-sub {
+        padding: 7px 10px;
+        font-size: 12px;
+        justify-content: center;
+        border-radius: 8px;
+        touch-action: manipulation;
+    }
+
+    /* Video Player Modal on mobile */
+    .sb-modal-backdrop {
+        padding: 8px;
+        align-items: center;
+    }
+
+    .sb-modal-dialog {
+        border-radius: 14px;
+        max-height: calc(100vh - 16px);
+        max-height: calc(100dvh - 16px);
+        width: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sb-modal-header {
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .sb-modal-title {
+        font-size: 12.5px;
+        gap: 6px;
+    }
+
+    #sb-modal-badge {
+        font-size: 10px !important;
+        padding: 2px 6px !important;
+    }
+
+    .sb-modal-close {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        margin-left: 4px;
+    }
+
     .sb-modal-footer {
+        padding: 10px 14px;
         flex-direction: column;
         align-items: stretch;
+        gap: 10px;
+    }
+
+    .sb-modal-channel {
+        gap: 8px;
+    }
+
+    .sb-modal-channel svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sb-modal-channel-name {
+        font-size: 12.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sb-modal-channel-sub {
+        font-size: 10.5px;
+    }
+
+    .sb-modal-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .sb-btn-dice,
+    #sb-modal-sub {
+        justify-content: center;
+        text-align: center;
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+        width: 100%;
+        border-radius: 8px;
+        touch-action: manipulation;
+    }
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+    .sb-modal-backdrop {
+        padding: 4px;
+    }
+    .sb-modal-dialog {
+        max-height: calc(100vh - 8px);
+        max-height: calc(100dvh - 8px);
+        border-radius: 10px;
+    }
+    .sb-modal-header {
+        padding: 6px 12px;
+    }
+    .sb-modal-footer {
+        padding: 6px 12px;
+        flex-direction: row;
+        align-items: center;
     }
     .sb-modal-controls {
-        justify-content: space-between;
+        display: flex;
+        width: auto;
+    }
+    #study-break-widget {
+        bottom: 8px;
+        right: 8px;
+        left: auto;
+        max-width: 320px;
     }
 }
 </style>
@@ -451,23 +700,25 @@
         </div>
 
         <div class="sb-body">
-            <div class="sb-thumb-wrap" id="sb-thumb-trigger">
-                <img src="" alt="Video Preview" id="sb-thumb-img" class="sb-thumb-img" loading="lazy">
-                <div class="sb-category-tag" id="sb-category-tag">🎧 Anime ASMR</div>
-                <div class="sb-play-btn" aria-label="Play Video">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M8 5v14l11-7z"/>
-                    </svg>
+            <div class="sb-media-row">
+                <div class="sb-thumb-wrap" id="sb-thumb-trigger">
+                    <img src="" alt="Video Preview" id="sb-thumb-img" class="sb-thumb-img" loading="lazy">
+                    <div class="sb-category-tag" id="sb-category-tag">🎧 Anime ASMR</div>
+                    <div class="sb-play-btn" aria-label="Play Video">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
                 </div>
-            </div>
 
-            <div class="sb-video-meta">
-                <h4 class="sb-video-title" id="sb-video-title">Anime ASMR Relaxation Ambience</h4>
-                <div class="sb-channel-name">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                    <span id="sb-channel-name">SkillUp with Tulasi Nepali</span>
+                <div class="sb-video-meta">
+                    <h4 class="sb-video-title" id="sb-video-title">Anime ASMR Relaxation Ambience</h4>
+                    <div class="sb-channel-name">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        <span id="sb-channel-name">SkillUp with Tulasi Nepali</span>
+                    </div>
                 </div>
             </div>
 
