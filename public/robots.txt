@@ -4,21 +4,24 @@ Allow: /notes/
 Allow: /quiz/
 Allow: /blog/
 Allow: /downloads/
+Allow: /tools/
 Allow: /about/
 Allow: /contact/
-Allow: /search/
 Allow: /privacy-policy/
 Allow: /terms-conditions/
+Allow: /disclaimer/
 Allow: /sitemap.html
+Allow: /ads.txt
 
-# Block admin, login, and internal pages from crawlers
+# Block admin, login, internal pages, and search queries from crawlers
+Disallow: /search/
 Disallow: /admin/
 Disallow: /login/
 Disallow: /logout/
 Disallow: /dashboard/
 Disallow: /ckeditor5/
+Disallow: /widgets/embed/
 Disallow: /media/site/
-Disallow: /static/
 
 # Sitemaps
 Sitemap: https://tulasinepali.com.np/sitemap.xml

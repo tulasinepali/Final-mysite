@@ -166,14 +166,14 @@ Allow: /downloads/
 Allow: /tools/
 Allow: /about/
 Allow: /contact/
-Allow: /search/
 Allow: /privacy-policy/
 Allow: /terms-conditions/
 Allow: /disclaimer/
 Allow: /sitemap.html
 Allow: /ads.txt
 
-# Block internal, server scripts, and embed widgets from search index
+# Block internal, server scripts, embed widgets, and search queries from index
+Disallow: /search/
 Disallow: /admin/
 Disallow: /rishav/
 Disallow: /cgi-bin/

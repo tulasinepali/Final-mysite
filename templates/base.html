@@ -28,7 +28,9 @@
     <meta name="keywords" content="education, study notes, MCQ practice, exam preparation, learning platform">
     <meta name="author" content="{{ site_settings.owner_name|default:'Learning Platform' }}">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    {% block canonical %}
+    <link rel="canonical" href="https://tulasinepali.com.np{{ request.path }}">
+    {% endblock %}
     {% if site_settings.site_favicon %}<link rel="icon" href="{{ site_settings.site_favicon.url }}" type="image/x-icon">{% else %}<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">{% endif %}
 
     <!-- PWA (Progressive Web App) Manifest & Mobile App Meta Tags -->
@@ -48,7 +50,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="{% block og_title %}{{ meta_title }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ meta_description }}{% endblock %}">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:url" content="https://tulasinepali.com.np{{ request.path }}">
     <meta property="og:site_name" content="{{ site_settings.site_name|default:'Learning Platform' }}">
     {% block og_image %}
     <meta property="og:image" content="{% static 'images/og-default.png' %}">

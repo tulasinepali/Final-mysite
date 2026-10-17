@@ -3,99 +3,99 @@
 
     <!-- Main Pages -->
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:home' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'core:home' %}</loc>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:about' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'core:about' %}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:contact' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'core:contact' %}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:privacy' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'core:privacy' %}</loc>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:terms' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'core:terms' %}</loc>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'core:disclaimer' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'core:disclaimer' %}</loc>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
 
     <!-- Section List Pages -->
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'notes:list' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'notes:list' %}</loc>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'blog:list' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'blog:list' %}</loc>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'downloads:list' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'downloads:list' %}</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'quiz:list' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'quiz:list' %}</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <!-- Interactive Tools & Utilities -->
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'tools:tools_index' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'tools:tools_index' %}</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'tools:nepali_patro' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'tools:nepali_patro' %}</loc>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'tools:date_converter' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'tools:date_converter' %}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'tools:age_calculator' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'tools:age_calculator' %}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'tools:unicode_converter' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'tools:unicode_converter' %}</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{% url 'tools:widgets_index' %}</loc>
+        <loc>https://tulasinepali.com.np{% url 'tools:widgets_index' %}</loc>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -103,7 +103,7 @@
     <!-- Notes -->
     {% for note in all_notes %}
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{{ note.get_absolute_url }}</loc>
+        <loc>https://tulasinepali.com.np{{ note.get_absolute_url }}</loc>
         <lastmod>{{ note.updated_at|date:"Y-m-d" }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -113,7 +113,7 @@
     <!-- Blog Posts -->
     {% for post in all_blogs %}
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{{ post.get_absolute_url }}</loc>
+        <loc>https://tulasinepali.com.np{{ post.get_absolute_url }}</loc>
         <lastmod>{{ post.updated_at|date:"Y-m-d" }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
@@ -123,7 +123,7 @@
     <!-- Downloads -->
     {% for download in all_downloads %}
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{{ download.get_absolute_url }}</loc>
+        <loc>https://tulasinepali.com.np{{ download.get_absolute_url }}</loc>
         <lastmod>{{ download.updated_at|date:"Y-m-d" }}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
@@ -133,7 +133,7 @@
     <!-- Quizzes -->
     {% for quiz in all_quizzes %}
     <url>
-        <loc>{{ request.scheme }}://{{ request.get_host }}{{ quiz.get_absolute_url }}</loc>
+        <loc>https://tulasinepali.com.np{{ quiz.get_absolute_url }}</loc>
         <lastmod>{{ quiz.updated_at|date:"Y-m-d" }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
