@@ -1,5 +1,6 @@
 import json
-from .models import SiteSettings, Category, AdPlacement, VisitorCount, Subscriber, YouTubeVideo
+from django.apps import apps
+from .models import SiteSettings, Category, AdPlacement, VisitorCount, Subscriber
 
 
 def site_settings(request):
@@ -13,9 +14,13 @@ def site_settings(request):
             sub_count = 0
 
     try:
-        promoted_videos = list(YouTubeVideo.objects.filter(is_active=True).values(
-            'id', 'video_id', 'title', 'category', 'channel_name', 'channel_url', 'custom_thumbnail'
-        ))
+        YouTubeVideo = apps.get_model('core', 'YouTubeVideo', require_ready=False)
+        if YouTubeVideo:
+            promoted_videos = list(YouTubeVideo.objects.filter(is_active=True).values(
+                'id', 'video_id', 'title', 'category', 'channel_name', 'channel_url', 'custom_thumbnail'
+            ))
+        else:
+            promoted_videos = []
     except Exception:
         promoted_videos = []
 
