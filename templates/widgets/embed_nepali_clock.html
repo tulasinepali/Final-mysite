@@ -76,6 +76,49 @@
             font-size: 11px;
             color: var(--muted-color);
         }
+        .clock-content-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .flag-col {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nepal-flag-img {
+            width: 78px;
+            height: auto;
+            max-height: 88px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+            display: block;
+        }
+        .clock-details-col {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        @media (max-width: 360px) {
+            .clock-content-wrap {
+                gap: 12px;
+            }
+            .nepal-flag-img {
+                width: 60px;
+            }
+            .time-display {
+                font-size: 22px;
+            }
+            .date-bs {
+                font-size: 12.5px;
+            }
+            .date-ad {
+                font-size: 10.5px;
+            }
+        }
         .widget-footer {
             margin-top: 10px;
             text-align: center;
@@ -91,12 +134,19 @@
 </head>
 <body>
     <div class="clock-container">
-        <div class="live-badge">
-            <span class="pulse-dot"></span> LIVE NEPAL TIME
+        <div class="clock-content-wrap">
+            <div class="flag-col">
+                <img src="{% static 'images/nepal-flag.gif' %}" alt="National Flag of Nepal" class="nepal-flag-img">
+            </div>
+            <div class="clock-details-col">
+                <div class="live-badge">
+                    <span class="pulse-dot"></span> LIVE NEPAL TIME
+                </div>
+                <div class="time-display" id="nepalTime">--:--:-- --</div>
+                <div class="date-bs" id="nepalDateBs">लोड हुँदैछ...</div>
+                <div class="date-ad" id="nepalDateAd">Loading Gregorian date...</div>
+            </div>
         </div>
-        <div class="time-display" id="nepalTime">--:--:-- --</div>
-        <div class="date-bs" id="nepalDateBs">लोड हुँदैछ...</div>
-        <div class="date-ad" id="nepalDateAd">Loading Gregorian date...</div>
     </div>
 
     <div class="widget-footer">
