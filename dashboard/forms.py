@@ -29,6 +29,7 @@ class SiteSettingsForm(forms.ModelForm):
     class Meta:
         model = SiteSettings
         fields = '__all__'
+        exclude = ['enable_video_break_rewards', 'video_break_popup_delay', 'video_break_scroll_threshold']
         widgets = {
             'site_description': CKEditor5Widget(config_name='default'),
             'owner_bio': CKEditor5Widget(config_name='default'),

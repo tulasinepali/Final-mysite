@@ -69,6 +69,70 @@
     </div>
 </div>
 
+<!-- Site-Wide YouTube Study Break & Rewards Popup Configuration -->
+<div class="card shadow-sm border mb-4" style="border-radius: 12px; background: #ffffff;">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="font-weight-bold mb-0" style="color: #0f172a;">
+                <i class="fas fa-sliders-h text-danger mr-2"></i>Study Break &amp; Download Rewards Configuration
+            </h6>
+            <small class="text-muted">Control when and how floating study break video cards appear across your website.</small>
+        </div>
+        <span class="badge {% if site_settings.enable_video_break_rewards %}badge-success{% else %}badge-secondary{% endif %} px-3 py-2 font-weight-bold" style="border-radius: 20px; font-size: 0.82rem;">
+            <i class="fas {% if site_settings.enable_video_break_rewards %}fa-check-circle{% else %}fa-pause-circle{% endif %} mr-1"></i>
+            {% if site_settings.enable_video_break_rewards %}Active Site-wide{% else %}Paused Site-wide{% endif %}
+        </span>
+    </div>
+    <div class="card-body bg-light">
+        <form method="post" action="{% url 'dashboard:videos' %}" class="row align-items-center g-3">
+            {% csrf_token %}
+            <input type="hidden" name="save_video_settings" value="1">
+            
+            <div class="col-lg-5 mb-3 mb-lg-0">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" name="enable_video_break_rewards" class="custom-control-input" id="enableVideoBreakRewardsToggle" {% if site_settings.enable_video_break_rewards %}checked{% endif %}>
+                    <label class="custom-control-label font-weight-bold text-dark" for="enableVideoBreakRewardsToggle" style="cursor: pointer;">
+                        Enable Video Popups Site-wide
+                    </label>
+                </div>
+                <small class="text-muted d-block pl-4">Master switch for Notes, Blog Articles, Quiz Results &amp; Downloads.</small>
+            </div>
+
+            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
+                <label class="small font-weight-bold text-dark mb-1">
+                    <i class="fas fa-clock text-info mr-1"></i> Reading Delay
+                </label>
+                <div class="input-group input-group-sm">
+                    <input type="number" name="video_break_popup_delay" value="{{ site_settings.video_break_popup_delay|default:18 }}" min="5" max="300" class="form-control" required>
+                    <div class="input-group-append">
+                        <span class="input-group-text">sec</span>
+                    </div>
+                </div>
+                <small class="text-muted">Seconds on page before trigger</small>
+            </div>
+
+            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
+                <label class="small font-weight-bold text-dark mb-1">
+                    <i class="fas fa-arrows-alt-v text-primary mr-1"></i> Scroll Threshold
+                </label>
+                <div class="input-group input-group-sm">
+                    <input type="number" name="video_break_scroll_threshold" value="{{ site_settings.video_break_scroll_threshold|default:65 }}" min="10" max="100" class="form-control" required>
+                    <div class="input-group-append">
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+                <small class="text-muted">Scroll depth % to trigger</small>
+            </div>
+
+            <div class="col-lg-1 text-lg-right">
+                <button type="submit" class="btn btn-primary btn-sm btn-block font-weight-bold shadow-sm" style="height: 34px; margin-top: 4px;">
+                    <i class="fas fa-save mr-1"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Main Videos Card -->
 <div class="row">
     <div class="col-12">

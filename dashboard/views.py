@@ -2131,6 +2131,26 @@ def ai_test_api_key(request):
 
 @staff_member_required
 def dashboard_videos(request):
+    settings_obj, _ = SiteSettings.objects.get_or_create(pk=1)
+
+    if request.method == 'POST' and 'save_video_settings' in request.POST:
+        enable_rewards = request.POST.get('enable_video_break_rewards') == 'on'
+        try:
+            delay = int(request.POST.get('video_break_popup_delay', 18))
+        except (ValueError, TypeError):
+            delay = 18
+        try:
+            threshold = int(request.POST.get('video_break_scroll_threshold', 65))
+        except (ValueError, TypeError):
+            threshold = 65
+
+        settings_obj.enable_video_break_rewards = enable_rewards
+        settings_obj.video_break_popup_delay = max(5, min(delay, 300))
+        settings_obj.video_break_scroll_threshold = max(10, min(threshold, 100))
+        settings_obj.save()
+        messages.success(request, "YouTube Video Rewards & popup configuration updated successfully!")
+        return redirect('dashboard:videos')
+
     try:
         videos_qs = YouTubeVideo.objects.all().order_by('order', '-created_at')
     except Exception:
@@ -2190,6 +2210,7 @@ def dashboard_videos(request):
         'status_filter': status_filter,
         'category_filter': category_filter,
         'search': search or '',
+        'site_settings': settings_obj,
         'active_page': 'videos',
     }
     return render(request, 'dashboard/videos.html', context)
