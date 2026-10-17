@@ -3,7 +3,7 @@ import uuid
 from django import forms
 from django.utils.text import slugify
 from django_ckeditor_5.widgets import CKEditor5Widget
-from core.models import SiteSettings, Category, Tag, AdPlacement
+from core.models import SiteSettings, Category, Tag, AdPlacement, YouTubeVideo
 from notes.models import Note
 from blog.models import BlogPost
 from downloads.models import Download
@@ -417,6 +417,23 @@ class PatroEventImportForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         help_text="Overwrite/replace any existing events for this year"
     )
+
+
+class YouTubeVideoForm(forms.ModelForm):
+    class Meta:
+        model = YouTubeVideo
+        fields = ['title', 'youtube_url', 'category', 'channel_name', 'channel_url', 'custom_thumbnail', 'order', 'is_active']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Cozy Anime Classroom Ambience | Rain & Lofi Beats'}),
+            'youtube_url': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/watch?v=... or https://youtu.be/...'}),
+            'category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '🎧 Anime ASMR, 🌸 Cozy Ambience, 💡 Tech & Learning, ☕ Vlogs'}),
+            'channel_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. SkillUp with Tulasi Nepali'}),
+            'channel_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/@channel?sub_confirmation=1'}),
+            'custom_thumbnail': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Optional: leave blank to auto-use YouTube high-res thumbnail'}),
+            'order': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
 
 
 

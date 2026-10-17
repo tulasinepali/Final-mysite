@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, Q
 from django.db.models.functions import TruncDate
 from django.core.paginator import Paginator
 from django.http import HttpResponse
@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 import openpyxl
 from openpyxl import Workbook
 
-from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber, VisitorLog, AITopicQueue, AIGenerationLog
+from core.models import SiteSettings, Category, Tag, ContactMessage, AdPlacement, Subscriber, VisitorLog, AITopicQueue, AIGenerationLog, YouTubeVideo
 from core.ai_blogger import generate_content_for_topic, suggest_topics_with_gemini
 from core.emails import send_broadcast_to_subscribers
 from notes.models import Note
@@ -28,7 +28,7 @@ from .forms import (
     SiteSettingsForm, CategoryForm, TagForm, NoteForm, BlogPostForm,
     DownloadForm, QuizForm, QuestionForm, AdPlacementForm, QuestionImportForm,
     BroadcastEmailForm, ToolForm, WidgetForm, WidgetSettingForm,
-    PatroEventForm, PatroEventImportForm,
+    PatroEventForm, PatroEventImportForm, YouTubeVideoForm,
 )
 
 
@@ -47,6 +47,12 @@ def dashboard_home(request):
     total_views = Note.objects.aggregate(total=Sum('views'))['total'] or 0
     total_blog_views = BlogPost.objects.aggregate(total=Sum('views'))['total'] or 0
     total_download_count = Download.objects.aggregate(total=Sum('download_count'))['total'] or 0
+    try:
+        total_youtube_videos = YouTubeVideo.objects.count()
+        active_youtube_videos = YouTubeVideo.objects.filter(is_active=True).count()
+    except Exception:
+        total_youtube_videos = 0
+        active_youtube_videos = 0
 
     recent_notes = Note.objects.order_by('-created_at')[:3]
     recent_blogs = BlogPost.objects.order_by('-created_at')[:3]
@@ -77,6 +83,8 @@ def dashboard_home(request):
         'total_downloads': total_downloads, 'total_quizzes': total_quizzes,
         'total_questions': total_questions, 'total_quiz_attempts': total_quiz_attempts,
         'total_subscribers': total_subscribers,
+        'total_youtube_videos': total_youtube_videos,
+        'active_youtube_videos': active_youtube_videos,
         'unread_messages': unread_messages, 'total_views': total_views,
         'total_blog_views': total_blog_views, 'total_download_count': total_download_count,
         'recent_notes': recent_notes, 'recent_blogs': recent_blogs,
@@ -2117,6 +2125,115 @@ def ai_test_api_key(request):
             'status': 'error',
             'message': str(e)
         }, status=400)
+
+
+# ========== YOUTUBE VIDEOS & STUDY BREAK REWARDS ==========
+
+@staff_member_required
+def dashboard_videos(request):
+    try:
+        videos_qs = YouTubeVideo.objects.all().order_by('order', '-created_at')
+    except Exception:
+        videos_qs = YouTubeVideo.objects.none()
+
+    status_filter = request.GET.get('status')
+    if status_filter == 'active':
+        videos_qs = videos_qs.filter(is_active=True)
+    elif status_filter == 'inactive':
+        videos_qs = videos_qs.filter(is_active=False)
+
+    category_filter = request.GET.get('category')
+    if category_filter:
+        videos_qs = videos_qs.filter(category=category_filter)
+
+    search = request.GET.get('q')
+    if search:
+        search = search.strip()
+        videos_qs = videos_qs.filter(
+            Q(title__icontains=search) |
+            Q(channel_name__icontains=search) |
+            Q(category__icontains=search) |
+            Q(video_id__icontains=search)
+        )
+
+    categories = list(YouTubeVideo.objects.values_list('category', flat=True).distinct())
+    total_count = YouTubeVideo.objects.count()
+    active_count = YouTubeVideo.objects.filter(is_active=True).count()
+    inactive_count = total_count - active_count
+
+    paginator = Paginator(videos_qs, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'videos': page_obj,
+        'page_obj': page_obj,
+        'categories': categories,
+        'total_count': total_count,
+        'active_count': active_count,
+        'inactive_count': inactive_count,
+        'status_filter': status_filter,
+        'category_filter': category_filter,
+        'search': search or '',
+        'active_page': 'videos',
+    }
+    return render(request, 'dashboard/videos.html', context)
+
+
+@staff_member_required
+def video_create(request):
+    if request.method == 'POST':
+        form = YouTubeVideoForm(request.POST)
+        if form.is_valid():
+            video = form.save()
+            messages.success(request, f'YouTube video "{video.title}" added to active reward rotation!')
+            return redirect('dashboard:videos')
+    else:
+        form = YouTubeVideoForm(initial={
+            'category': '🎧 Anime ASMR',
+            'channel_name': 'SkillUp with Tulasi Nepali',
+            'channel_url': 'https://www.youtube.com/@SkillUpwithTulasiNepali?sub_confirmation=1',
+            'is_active': True,
+            'order': 0,
+        })
+    context = {'form': form, 'active_page': 'videos', 'action': 'Add', 'model_name': 'YouTube Video'}
+    return render(request, 'dashboard/form.html', context)
+
+
+@staff_member_required
+def video_edit(request, pk):
+    video = get_object_or_404(YouTubeVideo, pk=pk)
+    if request.method == 'POST':
+        form = YouTubeVideoForm(request.POST, instance=video)
+        if form.is_valid():
+            video = form.save()
+            messages.success(request, f'YouTube video "{video.title}" updated successfully!')
+            return redirect('dashboard:videos')
+    else:
+        form = YouTubeVideoForm(instance=video)
+    context = {'form': form, 'active_page': 'videos', 'action': 'Edit', 'model_name': 'YouTube Video', 'object': video}
+    return render(request, 'dashboard/form.html', context)
+
+
+@staff_member_required
+def video_delete(request, pk):
+    video = get_object_or_404(YouTubeVideo, pk=pk)
+    if request.method == 'POST':
+        title = video.title
+        video.delete()
+        messages.success(request, f'YouTube video "{title}" was removed.')
+    return redirect('dashboard:videos')
+
+
+@staff_member_required
+def video_toggle_active(request, pk):
+    video = get_object_or_404(YouTubeVideo, pk=pk)
+    video.is_active = not video.is_active
+    video.save(update_fields=['is_active'])
+    status_str = "activated for reward popups" if video.is_active else "paused/deactivated"
+    messages.success(request, f'"{video.title}" is now {status_str}!')
+    return redirect('dashboard:videos')
+
 
 
 

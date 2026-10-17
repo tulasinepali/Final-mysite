@@ -547,10 +547,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'admin:core_youtubevideo_changelist' %}" class="nav-link" target="_blank" rel="noopener noreferrer">
+                        <a href="{% url 'dashboard:videos' %}" class="nav-link {% if active_page == 'videos' %}active{% endif %}">
                             <span class="nav-icon" style="color: #ff0000 !important;"><i class="bi bi-youtube"></i></span>
                             <p>YouTube Videos</p>
-                            <i class="bi bi-box-arrow-up-right ml-auto text-muted" style="font-size: 0.65rem;"></i>
+                            {% if total_youtube_videos_count %}
+                            <span class="badge badge-danger ml-auto">{{ total_youtube_videos_count }}</span>
+                            {% endif %}
                         </a>
                     </li>
 

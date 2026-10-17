@@ -85,6 +85,13 @@ urlpatterns = [
     path('ads/<int:pk>/delete/', views.ad_delete, name='ad_delete'),
     path('ads/<int:pk>/toggle/', views.ad_toggle, name='ad_toggle'),
 
+    # YouTube Videos & Study Break Rewards
+    path('videos/', views.dashboard_videos, name='videos'),
+    path('videos/create/', views.video_create, name='video_create'),
+    path('videos/<int:pk>/edit/', views.video_edit, name='video_edit'),
+    path('videos/<int:pk>/delete/', views.video_delete, name='video_delete'),
+    path('videos/<int:pk>/toggle-active/', views.video_toggle_active, name='video_toggle_active'),
+
     # Analytics
     path('analytics/', views.dashboard_analytics, name='analytics'),
 

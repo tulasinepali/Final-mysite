@@ -13,12 +13,14 @@ def site_settings(request):
         except Exception:
             sub_count = 0
 
+    total_videos_count = 0
     try:
         YouTubeVideo = apps.get_model('core', 'YouTubeVideo', require_ready=False)
         if YouTubeVideo:
             promoted_videos = list(YouTubeVideo.objects.filter(is_active=True).values(
                 'id', 'video_id', 'title', 'category', 'channel_name', 'channel_url', 'custom_thumbnail'
             ))
+            total_videos_count = YouTubeVideo.objects.count()
         else:
             promoted_videos = []
     except Exception:
@@ -29,6 +31,7 @@ def site_settings(request):
         'total_subscribers': sub_count,
         'promoted_youtube_videos': promoted_videos,
         'promoted_youtube_videos_json': json.dumps(promoted_videos),
+        'total_youtube_videos_count': total_videos_count,
     }
 
 

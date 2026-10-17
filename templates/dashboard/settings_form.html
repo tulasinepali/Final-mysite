@@ -73,6 +73,11 @@
                                 <i class="fas fa-envelope-open-text mr-1 text-primary"></i> Email &amp; Alerts
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="youtube-tab" data-toggle="tab" href="#youtube-settings" role="tab" aria-controls="youtube-settings" aria-selected="false">
+                                <i class="fab fa-youtube mr-1 text-danger"></i> YouTube &amp; Rewards
+                            </a>
+                        </li>
                     </ul>
 
                     <!-- Tab Content -->
@@ -875,6 +880,64 @@
                                     </div>
                                     <small class="text-muted d-block pl-4">Dispatches an email alert with the resource file title and download link.</small>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- YouTube & Video Rewards Tab -->
+                        <div class="tab-pane fade" id="youtube-settings" role="tabpanel" aria-labelledby="youtube-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-muted mb-0"><i class="fab fa-youtube text-danger mr-1"></i> YouTube Video Rewards &amp; Channel Promotion</h5>
+                                <a href="{% url 'dashboard:videos' %}" class="btn btn-danger btn-sm font-weight-bold">
+                                    <i class="fas fa-external-link-alt mr-1"></i> Open Video Manager
+                                </a>
+                            </div>
+
+                            <div class="card border-0 shadow-sm mb-4" style="border-radius: 10px; background: linear-gradient(135deg, #fff5f5 0%, #fff 100%); border-left: 4px solid #ff0000 !important; border: 1px solid #ffd0d0;">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold text-dark mb-1">Study Break &amp; Download Rewards System</h6>
+                                    <p class="small text-muted mb-3">
+                                        When visitors study notes, complete quizzes, or download PDFs on your site, our interactive video player randomly serves active videos from your channels (Anime ASMR, Lofi Ambience, Tech guides).
+                                    </p>
+                                    <div class="row g-2">
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="p-2 border rounded bg-white small">
+                                                <strong>Total Videos:</strong> {{ total_youtube_videos_count }}
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="p-2 border rounded bg-white small">
+                                                <strong>Serving Mode:</strong> Random &amp; Next Shuffle
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-4">
+                                            <a href="{% url 'dashboard:video_create' %}" class="btn btn-outline-danger btn-sm btn-block font-weight-bold">
+                                                <i class="fas fa-plus mr-1"></i> Add New Video
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group {% if form.youtube_url.errors %}has-error{% endif %}">
+                                <label for="{{ form.youtube_url.id_for_label }}"><i class="fab fa-youtube mr-1 text-danger"></i> Main Public YouTube Channel URL</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fab fa-youtube text-danger"></i></span>
+                                    </div>
+                                    {{ form.youtube_url|add_class:'form-control'|add_error_class:'is-invalid'|attr:'placeholder:https://youtube.com/@channel?sub_confirmation=1' }}
+                                </div>
+                                {% if form.youtube_url.errors %}
+                                {% for error in form.youtube_url.errors %}
+                                <span class="error invalid-feedback d-block">{{ error }}</span>
+                                {% endfor %}
+                                {% endif %}
+                                <small class="form-text text-muted">Displayed in your website header, footer, and owner profile card.</small>
+                            </div>
+
+                            <div class="mt-3">
+                                <a href="{% url 'dashboard:videos' %}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-collection-play-fill mr-1"></i> Manage All Rotating YouTube Videos &amp; Channels
+                                </a>
                             </div>
                         </div>
 
