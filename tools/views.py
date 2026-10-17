@@ -99,13 +99,20 @@ def widget_embed(request, slug):
         return render(request, 'widgets/embed_disabled.html')
 
     widget = get_object_or_404(Widget, slug=slug, is_active=True)
-    theme = request.GET.get('theme', 'light')
+    theme = request.GET.get('theme', 'light').lower()
+    view_type = request.GET.get('view', 'full').lower()
+    if view_type not in ['full', 'compact', 'today']:
+        view_type = 'full'
+    if theme not in ['light', 'dark', 'crimson', 'blue']:
+        theme = 'light'
+
     template_name = f'widgets/embed_{slug.replace("-", "_")}.html'
 
     context = {
         'widget': widget,
         'widget_settings': settings,
         'theme': theme,
+        'view_type': view_type,
     }
 
     if slug == 'nepali-patro':

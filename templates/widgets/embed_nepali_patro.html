@@ -10,19 +10,116 @@
     <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: {% if theme == 'dark' %}#0f172a{% else %}#ffffff{% endif %};
-            --card-bg: {% if theme == 'dark' %}#1e293b{% else %}#f8fafc{% endif %};
+            --bg-color: {% if theme == 'dark' %}#0f172a{% elif theme == 'crimson' %}#fff5f5{% elif theme == 'blue' %}#f0f7ff{% else %}#ffffff{% endif %};
+            --card-bg: {% if theme == 'dark' %}#1e293b{% elif theme == 'crimson' %}#ffffff{% elif theme == 'blue' %}#ffffff{% else %}#f8fafc{% endif %};
             --cell-bg: {% if theme == 'dark' %}#1e293b{% else %}#ffffff{% endif %};
             --text-color: {% if theme == 'dark' %}#f1f5f9{% else %}#0f172a{% endif %};
             --muted-color: {% if theme == 'dark' %}#94a3b8{% else %}#64748b{% endif %};
-            --border-color: {% if theme == 'dark' %}#334155{% else %}#e2e8f0{% endif %};
-            --primary-color: #0559b7;
-            --primary-light: {% if theme == 'dark' %}#1e3a8a{% else %}#eff6ff{% endif %};
+            --border-color: {% if theme == 'dark' %}#334155{% elif theme == 'crimson' %}#fecaca{% elif theme == 'blue' %}#bfdbfe{% else %}#e2e8f0{% endif %};
+            --primary-color: {% if theme == 'crimson' %}#dc2626{% elif theme == 'dark' %}#38bdf8{% elif theme == 'blue' %}#0559b7{% else %}#0559b7{% endif %};
+            --primary-light: {% if theme == 'dark' %}#1e3a8a{% elif theme == 'crimson' %}#fee2e2{% elif theme == 'blue' %}#eff6ff{% else %}#eff6ff{% endif %};
             --holiday-color: #dc2626;
-            --holiday-bg: {% if theme == 'dark' %}rgba(220, 38, 38, 0.15){% else %}#fef2f2{% endif %};
-            --today-border: #2563eb;
-            --today-bg: {% if theme == 'dark' %}#1d4ed8{% else %}#0559b7{% endif %};
+            --holiday-bg: {% if theme == 'dark' %}rgba(220, 38, 38, 0.2){% else %}#fef2f2{% endif %};
+            --today-border: {% if theme == 'crimson' %}#dc2626{% elif theme == 'dark' %}#38bdf8{% else %}#2563eb{% endif %};
+            --today-bg: {% if theme == 'crimson' %}#dc2626{% elif theme == 'dark' %}#0284c7{% else %}#0559b7{% endif %};
         }
+
+        {% if view_type == 'compact' %}
+        body { padding: 4px; font-size: 12px; }
+        .patro-wrapper { padding: 6px; border-radius: 10px; }
+        .patro-header { margin-bottom: 6px; padding-bottom: 6px; }
+        .month-year-title { font-size: 15px; }
+        .days-grid { gap: 3px; }
+        .day-cell { min-height: 44px; padding: 3px 4px; border-radius: 6px; }
+        .bs-day-num { font-size: 13px; }
+        .ad-day-num { font-size: 7.5px; }
+        .day-event-text { display: none; }
+        .selected-detail-card { padding: 6px 8px; margin-top: 6px; }
+        .detail-bs { font-size: 13px; }
+        .month-events-box { max-height: 70px; padding: 4px 8px; }
+        .jump-bar { margin-bottom: 6px; }
+        .jump-select { padding: 3px 6px; font-size: 11px; }
+        {% endif %}
+
+        {% if view_type == 'today' %}
+        body { padding: 4px; background: transparent; }
+        .today-banner-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            min-height: 120px;
+            box-sizing: border-box;
+        }
+        .today-banner-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .today-badge {
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--primary-light);
+            color: var(--primary-color);
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse-dot 1.5s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+        .today-clock-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted-color);
+            font-variant-numeric: tabular-nums;
+        }
+        .today-bs-main {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin: 2px 0;
+        }
+        .today-sub-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+        .today-ad-text {
+            font-size: 12px;
+            color: var(--muted-color);
+            font-weight: 500;
+        }
+        .today-event-pill {
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--holiday-bg);
+            color: var(--holiday-color);
+            padding: 2px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+        {% endif %}
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body, select, button, input {
@@ -353,6 +450,22 @@
 </head>
 <body>
 
+{% if view_type == 'today' %}
+    <div class="today-banner-card">
+        <div class="today-banner-top">
+            <span class="today-badge"><span class="live-dot"></span> आजको मिति</span>
+            <span class="today-clock-text" id="todayClockText">--:--:--</span>
+        </div>
+        <div class="today-bs-main" id="todayBsDateMain">लोड हुँदैछ...</div>
+        <div class="today-sub-row">
+            <span class="today-ad-text" id="todayAdDateText">--</span>
+            <span class="today-event-pill" id="todayEventPill" style="display:none;"></span>
+        </div>
+        <div class="widget-footer" style="margin-top: 6px; text-align: right; font-size: 11px;">
+            Powered by <a href="https://tulasinepali.com.np/tools/nepali-patro/" target="_blank" rel="noopener">Nepali Patro — नेपाली पात्रो</a>
+        </div>
+    </div>
+{% else %}
     <div class="patro-wrapper">
         
         <!-- Header -->
@@ -410,9 +523,10 @@
 
         <!-- Branding Footer -->
         <div class="widget-footer">
-            Powered by <a href="{{ widget_settings.branding_url|default:'https://tulasinepali.com.np' }}" target="_blank" rel="noopener">{{ widget_settings.branding_text|default:'Tulasi Nepali' }}</a>
+            Powered by <a href="https://tulasinepali.com.np/tools/nepali-patro/" target="_blank" rel="noopener">Nepali Patro — नेपाली पात्रो</a>
         </div>
     </div>
+{% endif %}
 
     <!-- Scripts -->
     <script src="{% static 'js/nepali-calendar.js' %}"></script>
@@ -440,13 +554,56 @@
                 });
         }
 
-        var currentViewYear;
-        var currentViewMonth;
-        var todayBs;
+        function initTodayBanner() {
+            var todayAd = NepaliCalendar.bsToAd(todayBs.bsYear, todayBs.bsMonth, todayBs.bsDay);
+            var bsMonthName = NepaliCalendar.BS_MONTHS_NE[todayBs.bsMonth - 1];
+            var bsDayNe = NepaliCalendar.toNepaliDigits(todayBs.bsDay);
+            var bsYearNe = NepaliCalendar.toNepaliDigits(todayBs.bsYear);
+            var weekdayNe = NepaliCalendar.DAYS_NE[todayAd.dayOfWeek];
+
+            var adMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            var weekdayEn = NepaliCalendar.DAYS_EN[todayAd.dayOfWeek];
+
+            var bsMainEl = document.getElementById("todayBsDateMain");
+            if (bsMainEl) {
+                bsMainEl.textContent = bsMonthName + " " + bsDayNe + " गते, " + bsYearNe + " (" + weekdayNe + ")";
+            }
+
+            var adEl = document.getElementById("todayAdDateText");
+            if (adEl) {
+                adEl.textContent = "A.D. " + weekdayEn + ", " + adMonths[todayAd.adMonth - 1] + " " + todayAd.adDay + ", " + todayAd.adYear;
+            }
+
+            var mKey = (todayBs.bsMonth < 10 ? "0" + todayBs.bsMonth : todayBs.bsMonth);
+            var dKey = (todayBs.bsDay < 10 ? "0" + todayBs.bsDay : todayBs.bsDay);
+            var dateKey = todayBs.bsYear + "-" + mKey + "-" + dKey;
+            var ev = NEPALI_EVENTS[dateKey];
+            var pill = document.getElementById("todayEventPill");
+            if (pill && ev) {
+                pill.textContent = ev.title + (ev.is_holiday ? " (सार्वजनिक बिदा)" : "");
+                pill.style.display = "inline-block";
+            }
+
+            function tickClock() {
+                var now = new Date();
+                var clockEl = document.getElementById("todayClockText");
+                if (clockEl) {
+                    clockEl.textContent = now.toLocaleTimeString();
+                }
+            }
+            tickClock();
+            setInterval(tickClock, 1000);
+        }
 
         document.addEventListener("DOMContentLoaded", function () {
             todayBs = NepaliCalendar.getTodayBs();
             
+            var viewType = "{{ view_type|default:'full' }}";
+            if (viewType === 'today') {
+                initTodayBanner();
+                return;
+            }
+
             // Check hash #YYYY-MM
             var hash = window.location.hash.replace('#', '');
             var hashMatch = hash.match(/^(\d{4})-(\d{1,2})$/);
