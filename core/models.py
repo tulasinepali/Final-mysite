@@ -515,7 +515,12 @@ class AIGenerationLog(models.Model):
 
 class YouTubeVideo(models.Model):
     """Promoted YouTube videos and channels for popups, study breaks, and showcases"""
-    title = models.CharField(max_length=255, help_text="Video title displayed in popup and cards")
+    title = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text="Video title (auto-extracted from YouTube if left blank)"
+    )
     youtube_url = models.CharField(
         max_length=350,
         help_text="Paste YouTube URL (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...) or 11-char Video ID"
@@ -532,16 +537,18 @@ class YouTubeVideo(models.Model):
     )
     channel_name = models.CharField(
         max_length=150,
-        default="SkillUp with Tulasi Nepali",
-        help_text="Channel name shown with this video"
+        blank=True,
+        default='',
+        help_text="Channel name (auto-extracted from YouTube if left blank)"
     )
     channel_url = models.URLField(
-        default="https://www.youtube.com/@SkillUpwithTulasiNepali?sub_confirmation=1",
-        help_text="Channel link (recommended with ?sub_confirmation=1 for instant subscribe modal)"
+        blank=True,
+        default='',
+        help_text="Channel link (auto-extracted with ?sub_confirmation=1 if left blank)"
     )
     custom_thumbnail = models.URLField(
         blank=True,
-        help_text="Optional custom thumbnail image URL (leave empty to auto-use YouTube high-res thumbnail)"
+        help_text="Optional custom thumbnail image URL (auto-uses YouTube thumbnail if left empty)"
     )
     is_active = models.BooleanField(
         default=True,
@@ -560,13 +567,13 @@ class YouTubeVideo(models.Model):
         verbose_name_plural = 'YouTube Videos'
 
     def __str__(self):
-        return f"{self.title} [{self.category}]"
+        return f"{self.title or self.video_id} [{self.category}]"
 
     def clean(self):
-        self.extract_video_id()
+        self.fetch_youtube_metadata()
 
     def save(self, *args, **kwargs):
-        self.extract_video_id()
+        self.fetch_youtube_metadata()
         super().save(*args, **kwargs)
 
     def extract_video_id(self):
@@ -586,6 +593,44 @@ class YouTubeVideo(models.Model):
                 return
         if len(url) == 11 and re.match(r'^[0-9A-Za-z_-]{11}$', url):
             self.video_id = url
+
+    def fetch_youtube_metadata(self):
+        self.extract_video_id()
+        if not self.video_id:
+            return
+
+        # Auto-fetch title, channel name, channel URL, and thumbnail from YouTube oEmbed if missing
+        if not self.title or not self.channel_name or not self.channel_url:
+            try:
+                import urllib.request
+                import json
+                oembed_url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={self.video_id}&format=json"
+                req = urllib.request.Request(
+                    oembed_url,
+                    headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+                )
+                with urllib.request.urlopen(req, timeout=4) as response:
+                    data = json.loads(response.read().decode('utf-8'))
+                    if not self.title and data.get('title'):
+                        self.title = str(data.get('title'))[:250]
+                    if not self.channel_name and data.get('author_name'):
+                        self.channel_name = str(data.get('author_name'))[:145]
+                    if not self.channel_url and data.get('author_url'):
+                        c_url = data.get('author_url')
+                        if '?sub_confirmation=1' not in c_url:
+                            c_url = f"{c_url}?sub_confirmation=1"
+                        self.channel_url = c_url
+                    if not self.custom_thumbnail and data.get('thumbnail_url'):
+                        self.custom_thumbnail = data.get('thumbnail_url')
+            except Exception:
+                pass
+
+        if not self.title:
+            self.title = f"YouTube Video ({self.video_id})"
+        if not self.channel_name:
+            self.channel_name = "Featured Channel"
+        if not self.channel_url:
+            self.channel_url = f"https://www.youtube.com/watch?v={self.video_id}"
 
 
 

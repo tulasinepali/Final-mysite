@@ -2186,18 +2186,16 @@ def video_create(request):
         form = YouTubeVideoForm(request.POST)
         if form.is_valid():
             video = form.save()
-            messages.success(request, f'YouTube video "{video.title}" added to active reward rotation!')
+            messages.success(request, f'YouTube video "{video.title}" from {video.channel_name} added to rotation!')
             return redirect('dashboard:videos')
     else:
         form = YouTubeVideoForm(initial={
             'category': '🎧 Anime ASMR',
-            'channel_name': 'SkillUp with Tulasi Nepali',
-            'channel_url': 'https://www.youtube.com/@SkillUpwithTulasiNepali?sub_confirmation=1',
             'is_active': True,
             'order': 0,
         })
     context = {'form': form, 'active_page': 'videos', 'action': 'Add', 'model_name': 'YouTube Video'}
-    return render(request, 'dashboard/form.html', context)
+    return render(request, 'dashboard/video_form.html', context)
 
 
 @staff_member_required
@@ -2212,7 +2210,7 @@ def video_edit(request, pk):
     else:
         form = YouTubeVideoForm(instance=video)
     context = {'form': form, 'active_page': 'videos', 'action': 'Edit', 'model_name': 'YouTube Video', 'object': video}
-    return render(request, 'dashboard/form.html', context)
+    return render(request, 'dashboard/video_form.html', context)
 
 
 @staff_member_required

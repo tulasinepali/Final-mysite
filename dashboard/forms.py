@@ -422,17 +422,54 @@ class PatroEventImportForm(forms.Form):
 class YouTubeVideoForm(forms.ModelForm):
     class Meta:
         model = YouTubeVideo
-        fields = ['title', 'youtube_url', 'category', 'channel_name', 'channel_url', 'custom_thumbnail', 'order', 'is_active']
+        fields = ['youtube_url', 'category', 'title', 'channel_name', 'channel_url', 'custom_thumbnail', 'order', 'is_active']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Cozy Anime Classroom Ambience | Rain & Lofi Beats'}),
-            'youtube_url': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/watch?v=... or https://youtu.be/...'}),
-            'category': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '🎧 Anime ASMR, 🌸 Cozy Ambience, 💡 Tech & Learning, ☕ Vlogs'}),
-            'channel_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. SkillUp with Tulasi Nepali'}),
-            'channel_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/@channel?sub_confirmation=1'}),
-            'custom_thumbnail': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Optional: leave blank to auto-use YouTube high-res thumbnail'}),
+            'youtube_url': forms.TextInput(attrs={
+                'class': 'form-control form-control-lg font-weight-bold',
+                'placeholder': 'Paste YouTube link (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...)',
+                'id': 'id_youtube_url',
+                'autofocus': 'autofocus'
+            }),
+            'category': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. 🎧 Anime ASMR, 🌸 Cozy Ambience, 💡 Tech & Learning, ☕ Vlogs',
+                'id': 'id_category'
+            }),
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '✨ Auto-extracted from YouTube (or type custom title to override)',
+                'id': 'id_title'
+            }),
+            'channel_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '✨ Auto-extracted channel name',
+                'id': 'id_channel_name'
+            }),
+            'channel_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': '✨ Auto-extracted channel link with ?sub_confirmation=1',
+                'id': 'id_channel_url'
+            }),
+            'custom_thumbnail': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': '✨ Auto-extracted YouTube thumbnail (or custom image URL)',
+                'id': 'id_custom_thumbnail'
+            }),
             'order': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'id_is_active'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['title'].required = False
+        self.fields['channel_name'].required = False
+        self.fields['channel_url'].required = False
+        self.fields['custom_thumbnail'].required = False
+        self.fields['youtube_url'].required = True
+        self.fields['category'].required = False
+        self.fields['category'].initial = '🎧 Anime ASMR'
+        self.fields['is_active'].initial = True
+
 
 
 
