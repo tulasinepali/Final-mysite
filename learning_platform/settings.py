@@ -318,6 +318,7 @@ CONTENT_SECURITY_POLICY = {
             'https://fonts.googleapis.com',
             'https://translate.googleapis.com',
             'https://translate.google.com',
+            'https://www.gstatic.com',
         ),
         'font-src': (
             "'self'",
@@ -359,6 +360,8 @@ CONTENT_SECURITY_POLICY = {
             'https://ep2.adtrafficquality.google',
             'https://translate.googleapis.com',
             'https://translate.google.com',
+            'https://translate-pa.googleapis.com',
+            'https://www.gstatic.com',
         ),
         'object-src': ("'none'",),
         'base-uri': ("'self'",),
