@@ -310,6 +310,8 @@ CONTENT_SECURITY_POLICY = {
             'https://www.google.com',
             'https://translate.google.com',
             'https://translate.googleapis.com',
+            'https://translate-pa.googleapis.com',
+            'https://www.gstatic.com',
         ),
         'style-src': (
             "'self'", "'unsafe-inline'",
