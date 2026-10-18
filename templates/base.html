@@ -161,6 +161,30 @@
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark-mode');
             }
+
+            // Early language sync: forces Google Translate AutoTranslation engine before DOM paints
+            var siteLang = localStorage.getItem('site_lang');
+            if (siteLang === 'ne') {
+                var host = window.location.hostname;
+                var parts = host.split('.');
+                var rootDomain = parts.length > 2 ? '.' + parts.slice(-2).join('.') : '';
+                document.cookie = 'googtrans=/en/ne; path=/;';
+                document.cookie = 'googtrans=/en/ne; path=/; domain=' + host + ';';
+                if (rootDomain) {
+                    document.cookie = 'googtrans=/en/ne; path=/; domain=' + rootDomain + ';';
+                }
+                if (!window.location.hash || window.location.hash.indexOf('googtrans') === -1) {
+                    window.location.hash = '#googtrans(en|ne)';
+                }
+            } else if (siteLang === 'en') {
+                if (window.location.hash && window.location.hash.indexOf('googtrans') !== -1) {
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                    } else {
+                        window.location.hash = '';
+                    }
+                }
+            }
         })();
     </script>
 </head>
@@ -679,23 +703,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         })();
     </script>
 
-    <!-- Google Translate Hidden Container -->
-    <div id="google_translate_element" style="position:fixed; bottom:-200px; left:0; width:1px; height:1px; opacity:0.01; pointer-events:none; z-index:-999;"></div>
+    <!-- Google Translate Container (Offscreen but naturally sized so Google engine executes fully) -->
+    <div id="google_translate_element" style="position: absolute; left: -9999px; top: -9999px;"></div>
 
     <!-- Full-Page Translation Engine (Translates 100% of entire page: notes, blogs, quizzes, UI) -->
     <script>
         function triggerComboChange(selectEl) {
             if (!selectEl) return;
-            if (document.createEvent) {
-                var evt = document.createEvent('HTMLEvents');
-                evt.initEvent('change', true, true);
-                selectEl.dispatchEvent(evt);
-            } else if (document.createEventObject) {
-                var evt = document.createEventObject();
-                selectEl.fireEvent('onchange', evt);
-            }
+            try {
+                selectEl.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+            } catch (e) {}
+            try {
+                if (document.createEvent) {
+                    var evt = document.createEvent('HTMLEvents');
+                    evt.initEvent('change', true, true);
+                    selectEl.dispatchEvent(evt);
+                } else if (document.createEventObject) {
+                    var evt = document.createEventObject();
+                    selectEl.fireEvent('onchange', evt);
+                }
+            } catch (e) {}
             if (typeof selectEl.onchange === 'function') {
-                selectEl.onchange();
+                try { selectEl.onchange(); } catch (e) {}
             }
         }
 
@@ -708,13 +737,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             var domains = ['', host, '.' + host];
             if (rootDomain) domains.push(rootDomain);
-            var paths = ['/', ''];
 
             domains.forEach(function(d) {
-                paths.forEach(function(p) {
-                    var str = 'googtrans=' + val + '; path=' + (p || '/') + (d ? '; domain=' + d : '') + expires;
-                    document.cookie = str;
-                });
+                var str = 'googtrans=' + val + '; path=/' + (d ? '; domain=' + d : '') + expires;
+                document.cookie = str;
             });
 
             if (lang === 'ne') {
@@ -733,15 +759,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 badge.textContent = (lang === 'ne') ? 'नेपाली' : 'EN';
             }
 
+            if (lang === 'ne') {
+                if (!window.location.hash || window.location.hash.indexOf('googtrans') === -1) {
+                    window.location.hash = '#googtrans(en|ne)';
+                }
+            } else {
+                if (window.location.hash && window.location.hash.indexOf('googtrans') !== -1) {
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                    } else {
+                        window.location.hash = '';
+                    }
+                }
+            }
+
             var combo = document.querySelector('.goog-te-combo');
             if (combo) {
-                combo.value = lang;
+                combo.value = (lang === 'ne') ? 'ne' : '';
                 triggerComboChange(combo);
             }
 
             setTimeout(function() {
                 window.location.reload();
-            }, 120);
+            }, 100);
         }
 
         function googleTranslateElementInit() {
@@ -768,7 +808,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         }
 
-        // Initialize language badge and cookie on load
+        // Initialize language badge, cookie, and auto-append hash on internal links
         (function() {
             var currentLang = localStorage.getItem('site_lang') || 'en';
             var badge = document.getElementById('currentLangBadge');
@@ -778,6 +818,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (currentLang === 'ne') {
                 setGoogleTransCookie('ne');
             }
+
+            // Keep hash across internal navigation when browsing in Nepali so target pages auto-translate
+            document.addEventListener('click', function(e) {
+                if (localStorage.getItem('site_lang') !== 'ne') return;
+                var a = e.target.closest('a');
+                if (!a || !a.href) return;
+                if (a.getAttribute('target') === '_blank') return;
+                if (a.href.startsWith('mailto:') || a.href.startsWith('tel:') || a.href.startsWith('javascript:')) return;
+                try {
+                    var u = new URL(a.href, window.location.origin);
+                    if (u.origin === window.location.origin && (!u.hash || u.hash === '#')) {
+                        u.hash = '#googtrans(en|ne)';
+                        a.href = u.toString();
+                    }
+                } catch(err) {}
+            }, true);
         })();
     </script>
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
