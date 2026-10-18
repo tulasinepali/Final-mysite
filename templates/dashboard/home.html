@@ -473,10 +473,19 @@
             var data = [];
             var avgScores = [];
 
-            for (var i = 0; i < rawData.length; i++) {
-                labels.push(rawData[i].date);
-                data.push(rawData[i].count);
-                avgScores.push(rawData[i].avg_score);
+            if (Array.isArray(rawData)) {
+                for (var i = 0; i < rawData.length; i++) {
+                    var item = rawData[i];
+                    if (typeof item === 'object' && item !== null) {
+                        labels.push(item.date || ('Day ' + (i + 1)));
+                        data.push(item.count !== undefined ? item.count : 0);
+                        avgScores.push(item.avg_score !== undefined ? item.avg_score : 0);
+                    } else {
+                        labels.push('Day ' + (i + 1));
+                        data.push(Number(item) || 0);
+                        avgScores.push(0);
+                    }
+                }
             }
 
             var gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
@@ -548,6 +557,7 @@
                             title: { display: true, text: 'Attempts', font: { family: 'Manrope', size: 11 } },
                             ticks: { stepSize: 1, font: { family: 'JetBrains Mono', size: 11 } },
                             beginAtZero: true,
+                            suggestedMax: 5,
                             grid: { color: '#f1f5f9' }
                         },
                         y1: {
@@ -557,6 +567,7 @@
                             title: { display: true, text: 'Avg Score', font: { family: 'Manrope', size: 11 } },
                             ticks: { font: { family: 'JetBrains Mono', size: 11 } },
                             beginAtZero: true,
+                            suggestedMax: 100,
                             grid: { drawOnChartArea: false },
                         }
                     }

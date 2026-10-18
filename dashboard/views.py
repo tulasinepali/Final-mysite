@@ -63,16 +63,36 @@ def dashboard_home(request):
 
     from django.utils import timezone
     from datetime import timedelta
-    seven_days_ago = timezone.now() - timedelta(days=7)
-    attempts_by_day = QuizAttempt.objects.filter(
-        completed_at__gte=seven_days_ago
-    ).annotate(date=TruncDate('completed_at')).values('date').annotate(
-        count=Count('id'), avg_score=Avg('final_score')
-    ).order_by('date')
+    
+    # Build complete 7-day continuous timeline (today and preceding 6 days)
+    today = timezone.localdate() if hasattr(timezone, 'localdate') else timezone.now().date()
+    days_dict = {}
+    for i in range(6, -1, -1):
+        day_date = today - timedelta(days=i)
+        days_dict[day_date] = {
+            'date': day_date.strftime('%b %d'),
+            'count': 0,
+            'avg_score': 0.0,
+        }
 
-    quiz_chart_labels = [item['date'].strftime('%Y-%m-%d') if item['date'] else '' for item in attempts_by_day]
-    quiz_chart_data = [item['count'] for item in attempts_by_day]
-    quiz_avg_scores = [float(item['avg_score']) if item['avg_score'] else 0 for item in attempts_by_day]
+    seven_days_ago = timezone.now() - timedelta(days=7)
+    attempts_qs = QuizAttempt.objects.filter(
+        completed_at__gte=seven_days_ago
+    ).annotate(d=TruncDate('completed_at')).values('d').annotate(
+        count=Count('id'), avg_score=Avg('final_score')
+    )
+
+    for item in attempts_qs:
+        d = item['d']
+        if d in days_dict:
+            days_dict[d]['count'] = int(item['count'])
+            days_dict[d]['avg_score'] = round(float(item['avg_score'] or 0), 1)
+
+    quiz_chart_timeline = list(days_dict.values())
+    quiz_chart_labels = [entry['date'] for entry in quiz_chart_timeline]
+    quiz_chart_data = quiz_chart_timeline
+    quiz_chart_counts = [entry['count'] for entry in quiz_chart_timeline]
+    quiz_avg_scores = [entry['avg_score'] for entry in quiz_chart_timeline]
 
     notes_by_category = Category.objects.filter(module='notes').annotate(count=Count('notes')).order_by('-count')
     blog_by_category = Category.objects.filter(module='blog').annotate(count=Count('blog_posts')).order_by('-count')
@@ -91,7 +111,7 @@ def dashboard_home(request):
         'recent_attempts': recent_attempts, 'recent_messages': recent_messages,
         'popular_notes': popular_notes, 'popular_downloads': popular_downloads,
         'quiz_chart_labels': quiz_chart_labels, 'quiz_chart_data': quiz_chart_data,
-        'quiz_avg_scores': quiz_avg_scores,
+        'quiz_chart_counts': quiz_chart_counts, 'quiz_avg_scores': quiz_avg_scores,
         'notes_by_category': notes_by_category, 'blog_by_category': blog_by_category,
         'quiz_difficulty': quiz_difficulty,
         'active_page': 'home',
