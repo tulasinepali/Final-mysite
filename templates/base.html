@@ -291,8 +291,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li><a href="{% url 'notes:list' %}" class="{% if 'notes' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-journal-text me-1"></i> Study Notes</a></li>
                         <li><a href="{% url 'quiz:list' %}" class="{% if 'quiz' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-check2-circle me-1"></i> MCQ Practice</a></li>
                         <li><a href="{% url 'downloads:list' %}" class="{% if 'downloads' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-download me-1"></i> Downloads</a></li>
-                        <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blog &amp; Guides</a></li>
-                        <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About {{ site_settings.owner_title|default:"Mentor" }}</a></li>
+                        <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blogs</a></li>
+                        <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About</a></li>
                         <li><a href="{% url 'core:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><i class="bi bi-envelope me-1"></i> Contact</a></li>
                     </ul>
                 </nav>
@@ -392,8 +392,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <li><a href="{% url 'tools:tools_index' %}"><i class="bi bi-chevron-right me-1"></i>Student Tools</a></li>
                             <li><a href="{% url 'tools:widgets_index' %}"><i class="bi bi-chevron-right me-1"></i>Web Widgets</a></li>
                             <li><a href="{% url 'downloads:list' %}"><i class="bi bi-chevron-right me-1"></i>Downloads</a></li>
-                            <li><a href="{% url 'blog:list' %}"><i class="bi bi-chevron-right me-1"></i>Exam Blog</a></li>
-                            <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right me-1"></i>About {{ site_settings.owner_title|default:"Mentor" }}</a></li>
+                            <li><a href="{% url 'blog:list' %}"><i class="bi bi-chevron-right me-1"></i>Blogs</a></li>
+                            <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right me-1"></i>About</a></li>
                         </ul>
                     </div>
 
