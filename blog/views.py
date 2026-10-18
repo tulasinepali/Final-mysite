@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import BlogPost, Comment
 from .forms import CommentForm
 from core.models import Category, Tag
+from core.middleware import is_admin_or_staff
 
 def blog_list(request):
     # Fix malformed URLs crawled with literal &tag= instead of ?tag=
@@ -52,9 +53,10 @@ def blog_list(request):
 def blog_detail(request, slug):
     post = get_object_or_404(BlogPost, slug=slug, is_published=True)
     
-    # Increment view count
-    post.views += 1
-    post.save(update_fields=['views'])
+    # Increment view count (bypass for admin/staff visits)
+    if not is_admin_or_staff(request):
+        post.views += 1
+        post.save(update_fields=['views'])
     
     # Related posts
     related_posts = BlogPost.objects.filter(

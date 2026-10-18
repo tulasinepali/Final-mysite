@@ -371,6 +371,7 @@ def offline_view(request):
 
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F
+from core.middleware import is_admin_or_staff
 
 @csrf_exempt
 def track_video_engagement(request, video_id, action_type):
@@ -378,12 +379,14 @@ def track_video_engagement(request, video_id, action_type):
     if request.method in ('POST', 'GET'):
         try:
             from core.models import YouTubeVideo
-            if action_type == 'view':
-                YouTubeVideo.objects.filter(pk=video_id).update(views_count=F('views_count') + 1)
-            elif action_type == 'click':
-                YouTubeVideo.objects.filter(pk=video_id).update(clicks_count=F('clicks_count') + 1)
-            elif action_type == 'sub':
-                YouTubeVideo.objects.filter(pk=video_id).update(sub_clicks_count=F('sub_clicks_count') + 1)
+            # Bypass counters for admin / staff testing
+            if not is_admin_or_staff(request):
+                if action_type == 'view':
+                    YouTubeVideo.objects.filter(pk=video_id).update(views_count=F('views_count') + 1)
+                elif action_type == 'click':
+                    YouTubeVideo.objects.filter(pk=video_id).update(clicks_count=F('clicks_count') + 1)
+                elif action_type == 'sub':
+                    YouTubeVideo.objects.filter(pk=video_id).update(sub_clicks_count=F('sub_clicks_count') + 1)
             return JsonResponse({'status': 'ok'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

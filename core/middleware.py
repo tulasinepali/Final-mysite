@@ -73,10 +73,28 @@ def get_client_ip(request):
     return request.META.get('REMOTE_ADDR', '')
 
 
+def is_admin_or_staff(request):
+    """
+    Check if the current request is from an admin, superuser, or staff member.
+    Checks:
+    1. Active authenticated session with is_staff or is_superuser.
+    2. Persistent 'admin_do_not_track' cookie set on admin browser/device (1-year lifespan).
+    """
+    if not request:
+        return False
+    user = getattr(request, 'user', None)
+    if user and user.is_authenticated and (user.is_staff or user.is_superuser):
+        return True
+    if request.COOKIES.get('admin_do_not_track') == '1':
+        return True
+    return False
+
+
 class VisitorCountMiddleware:
     """Count unique visits and log detailed visitor analytics.
     Same visitor is counted only once per day for total counter.
     Detailed visitor logs recorded for analytics dashboard.
+    Excludes admin/staff visits and devices marked with admin_do_not_track cookie.
     """
 
     SKIP_PREFIXES = (
@@ -85,6 +103,7 @@ class VisitorCountMiddleware:
         '/sitemap.xml', '/ads.txt',
     )
     COOKIE_NAME = 'vc_counted'
+    ADMIN_DNT_COOKIE = 'admin_do_not_track'
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -97,7 +116,10 @@ class VisitorCountMiddleware:
         today_str = timezone.now().strftime('%Y%m%d')
         should_set_cookie = False
 
-        if not self._should_skip(path):
+        # Untrack visits if current user is admin/staff or has the admin DNT cookie
+        is_untracked = is_admin_or_staff(request)
+
+        if not self._should_skip(path) and not is_untracked:
             # 1. Total Daily Visitor Counter
             if request.COOKIES.get(self.COOKIE_NAME) != today_str:
                 updated = VisitorCount.objects.filter(pk=1).update(count=F('count') + 1)
@@ -138,7 +160,7 @@ class VisitorCountMiddleware:
 
         response = self.get_response(request)
 
-        # Set the daily cookie so the same visitor isn't counted again today
+        # Set the daily cookie so the same regular visitor isn't counted again today
         if should_set_cookie:
             response.set_cookie(
                 self.COOKIE_NAME,
@@ -147,6 +169,18 @@ class VisitorCountMiddleware:
                 httponly=True,
                 samesite='Lax',
             )
+
+        # Ensure admin_do_not_track cookie is set on staff browser (checked post-response to detect fresh logins)
+        current_user = getattr(request, 'user', None)
+        if current_user and current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
+            if request.COOKIES.get(self.ADMIN_DNT_COOKIE) != '1':
+                response.set_cookie(
+                    self.ADMIN_DNT_COOKIE,
+                    '1',
+                    max_age=31536000,   # 1 year persistent untracked marker
+                    httponly=True,
+                    samesite='Lax',
+                )
 
         return response
 

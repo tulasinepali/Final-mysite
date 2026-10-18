@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.http import FileResponse, Http404
 from .models import Download
 from core.models import Category
+from core.middleware import is_admin_or_staff
 
 def download_list(request):
     downloads = Download.objects.filter(is_published=True)
@@ -50,8 +51,9 @@ def download_detail(request, slug):
 
 def download_file(request, slug):
     download = get_object_or_404(Download, slug=slug, is_published=True)
-    download.download_count += 1
-    download.save(update_fields=['download_count'])
+    if not is_admin_or_staff(request):
+        download.download_count += 1
+        download.save(update_fields=['download_count'])
     
     if download.file:
         try:

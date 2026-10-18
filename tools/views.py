@@ -7,6 +7,7 @@ import json
 from urllib.parse import urlparse
 from django.utils import timezone
 from .models import Tool, Widget, WidgetSetting, PatroEvent, WidgetUsage
+from core.middleware import is_admin_or_staff
 
 def tools_index(request):
     tools = Tool.objects.filter(is_active=True).order_by('order', 'name')
@@ -18,7 +19,7 @@ def tools_index(request):
 
 def date_converter(request):
     tool = Tool.objects.filter(slug='date-converter', is_active=True).first()
-    if tool:
+    if tool and not is_admin_or_staff(request):
         Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
     return render(request, 'tools/date_converter.html', {
         'tool': tool,
@@ -28,7 +29,7 @@ def date_converter(request):
 
 def age_calculator(request):
     tool = Tool.objects.filter(slug='age-calculator', is_active=True).first()
-    if tool:
+    if tool and not is_admin_or_staff(request):
         Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
     return render(request, 'tools/age_calculator.html', {
         'tool': tool,
@@ -38,7 +39,7 @@ def age_calculator(request):
 
 def unicode_converter(request):
     tool = Tool.objects.filter(slug='unicode-converter', is_active=True).first()
-    if tool:
+    if tool and not is_admin_or_staff(request):
         Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
     return render(request, 'tools/unicode_converter.html', {
         'tool': tool,
@@ -48,7 +49,7 @@ def unicode_converter(request):
 
 def nepali_patro(request):
     tool = Tool.objects.filter(slug='nepali-patro', is_active=True).first()
-    if tool:
+    if tool and not is_admin_or_staff(request):
         Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
     
     events_qs = PatroEvent.objects.all()
@@ -79,7 +80,8 @@ def tool_detail(request, slug):
     elif slug == 'nepali-patro':
         return nepali_patro(request)
     tool = get_object_or_404(Tool, slug=slug, is_active=True)
-    Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
+    if not is_admin_or_staff(request):
+        Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
     return render(request, 'tools/tool_detail.html', {'tool': tool})
 
 def widgets_index(request):

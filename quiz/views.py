@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 from .models import Quiz, Question, QuizAttempt, QuizFeedback
 from core.models import Category
+from core.middleware import is_admin_or_staff
 
 def quiz_list(request):
     quizzes = Quiz.objects.filter(is_published=True)
@@ -115,9 +116,10 @@ def quiz_result(request, slug):
             answers=answers,
         )
         
-        # Increment quiz attempts
-        quiz.attempts += 1
-        quiz.save(update_fields=['attempts'])
+        # Increment quiz attempts (bypass for admin/staff testing)
+        if not is_admin_or_staff(request):
+            quiz.attempts += 1
+            quiz.save(update_fields=['attempts'])
         
         percentage = round((float(final_score) / total_marks) * 100, 1) if total_marks > 0 else 0
         

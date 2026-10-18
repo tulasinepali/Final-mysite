@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from .models import Note
 from core.models import Category
+from core.middleware import is_admin_or_staff
 
 def note_list(request):
     notes = Note.objects.filter(is_published=True)
@@ -36,9 +37,10 @@ def note_list(request):
 def note_detail(request, slug):
     note = get_object_or_404(Note, slug=slug, is_published=True)
     
-    # Increment view count
-    note.views += 1
-    note.save(update_fields=['views'])
+    # Increment view count (bypass for admin/staff visits)
+    if not is_admin_or_staff(request):
+        note.views += 1
+        note.save(update_fields=['views'])
     
     # Related notes
     related_notes = Note.objects.filter(

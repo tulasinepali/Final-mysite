@@ -1,10 +1,11 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from blog.models import BlogPost, Comment
 from core.models import Category, VisitorLog
 
 
+@override_settings(SECURE_SSL_REDIRECT=False)
 class CommentAndVisitorLogTests(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name='Tech', slug='tech', module='blog')

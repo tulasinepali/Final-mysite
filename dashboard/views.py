@@ -1885,6 +1885,22 @@ def visitor_logs_clear_old(request):
     return redirect('dashboard:visitor_logs')
 
 
+@staff_member_required
+def toggle_admin_tracking(request):
+    """Allow admin to refresh or toggle untracked protection on their current device."""
+    from django.urls import reverse
+    next_url = request.META.get('HTTP_REFERER') or reverse('dashboard:visitor_logs')
+    response = redirect(next_url)
+    current = request.COOKIES.get('admin_do_not_track')
+    if current == '1':
+        response.delete_cookie('admin_do_not_track')
+        messages.warning(request, "Admin untracked cookie removed for this browser. (Note: Authenticated staff sessions are still untracked while logged in).")
+    else:
+        response.set_cookie('admin_do_not_track', '1', max_age=31536000, httponly=True, samesite='Lax')
+        messages.success(request, "Admin untracked protection active for 1 year on this browser!")
+    return response
+
+
 # ========== QUIZ FEEDBACKS & ISSUE REPORTS ==========
 
 @staff_member_required

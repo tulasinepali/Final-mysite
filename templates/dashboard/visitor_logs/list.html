@@ -10,6 +10,31 @@
 {% endblock %}
 
 {% block content %}
+<!-- Admin Untracked Visits Status Banner -->
+<div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #f0f7ff 0%, #e6f0fa 100%); border-left: 5px solid #0559b7 !important; border-radius: 10px;">
+    <div class="card-body py-3 d-flex flex-wrap align-items-center justify-content-between">
+        <div class="d-flex align-items-center mb-2 mb-md-0">
+            <div class="rounded-circle mr-3 text-center" style="width: 44px; height: 44px; background: rgba(5, 89, 183, 0.12); color: #0559b7; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-shield fa-lg"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center flex-wrap">
+                    <span class="font-weight-bold text-dark mr-2" style="font-size: 0.98rem;">Admin Traffic Protection</span>
+                    <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i>Active & Untracked</span>
+                </div>
+                <small class="text-muted d-block mt-1">
+                    Your visits from this browser are untracked. All views, visitor logs, and daily counters across public notes, blog posts, downloads, tools, and quizzes are automatically ignored for admin and staff.
+                </small>
+            </div>
+        </div>
+        <div class="d-flex align-items-center">
+            <a href="{% url 'dashboard:visitor_logs_toggle_admin' %}" class="btn btn-sm btn-outline-primary shadow-sm" title="Refresh 1-Year Untracked Cookie on this device">
+                <i class="fas fa-cookie-bite mr-1 text-warning"></i> Refresh Protection Cookie
+            </a>
+        </div>
+    </div>
+</div>
+
 <!-- Top KPI Cards -->
 <div class="row mb-4">
     <div class="col-xl-3 col-md-6 mb-3">

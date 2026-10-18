@@ -129,6 +129,7 @@ urlpatterns = [
     # Visitor Logs
     path('visitors/', views.dashboard_visitor_logs, name='visitor_logs'),
     path('visitors/clear-old/', views.visitor_logs_clear_old, name='visitor_logs_clear_old'),
+    path('visitors/toggle-protection/', views.toggle_admin_tracking, name='visitor_logs_toggle_admin'),
 
     # AI Auto-Blogger & Notes Generator
     path('ai-blogger/', views.dashboard_ai_blogger, name='ai_blogger'),
