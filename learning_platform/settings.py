@@ -293,7 +293,7 @@ CONTENT_SECURITY_POLICY = {
     'DIRECTIVES': {
         'default-src': ("'self'",),
         'script-src': (
-            "'self'", "'unsafe-inline'",
+            "'self'", "'unsafe-inline'", "'unsafe-eval'",
             'https://cdn.jsdelivr.net',
             'https://cdnjs.cloudflare.com',
             'https://pagead2.googlesyndication.com',
@@ -317,6 +317,7 @@ CONTENT_SECURITY_POLICY = {
             'https://cdnjs.cloudflare.com',
             'https://fonts.googleapis.com',
             'https://translate.googleapis.com',
+            'https://translate.google.com',
         ),
         'font-src': (
             "'self'",
@@ -344,6 +345,7 @@ CONTENT_SECURITY_POLICY = {
             'https://www.google.com',
             'https://ep2.adtrafficquality.google',
             'https://translate.google.com',
+            'https://translate.googleapis.com',
             'https://www.youtube.com',
             'https://www.youtube-nocookie.com',
             'https://youtube.com',
@@ -356,6 +358,7 @@ CONTENT_SECURITY_POLICY = {
             'https://ep1.adtrafficquality.google',
             'https://ep2.adtrafficquality.google',
             'https://translate.googleapis.com',
+            'https://translate.google.com',
         ),
         'object-src': ("'none'",),
         'base-uri': ("'self'",),

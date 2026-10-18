@@ -97,11 +97,14 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261001-mcq2">
     <style>
         /* Immediately eliminate all Google Translate injected banners, tooltips, frames & 96px bottom spinner */
-        [class*="VIpgJd"],
         .goog-te-banner-frame,
         iframe.goog-te-banner-frame,
+        .goog-te-banner-frame.skiptranslate,
         #goog-gt-tt,
         .goog-te-balloon-frame,
+        .VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+        .VIpgJd-ZVi9od-aZ2wEe-OiiCO,
+        .VIpgJd-ZVi9od-aZ2wEe,
         .skiptranslate iframe {
             display: none !important;
             visibility: hidden !important;
@@ -543,20 +546,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         document.addEventListener('DOMContentLoaded', ensureFooterBottom);
         ensureFooterBottom();
 
-        // Aggressively suppress Google Translate injected spinner and elements
-        function purgeTranslateArtifacts() {
-            var artifacts = document.querySelectorAll('[class*="VIpgJd"], .goog-te-banner-frame');
-            for (var i = 0; i < artifacts.length; i++) {
-                var el = artifacts[i];
-                el.style.setProperty('display', 'none', 'important');
-                el.style.setProperty('height', '0px', 'important');
-                el.style.setProperty('max-height', '0px', 'important');
-                el.style.setProperty('position', 'absolute', 'important');
-                el.style.setProperty('top', '-9999px', 'important');
-            }
-        }
-        setInterval(purgeTranslateArtifacts, 500);
-        document.addEventListener('DOMContentLoaded', purgeTranslateArtifacts);
     </script>
     {% block extra_js %}{% endblock %}
     {% if popup_ad %}
@@ -693,120 +682,51 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Google Translate Hidden Container -->
     <div id="google_translate_element" style="position:fixed; bottom:-200px; left:0; width:1px; height:1px; opacity:0.01; pointer-events:none; z-index:-999;"></div>
 
-    <!-- Translation Engine: Instant Dictionary + Google Translate Full Page -->
+    <!-- Full-Page Translation Engine (Translates 100% of entire page: notes, blogs, quizzes, UI) -->
     <script>
-        var nepaliDictionary = {
-            "Home": "गृहपृष्ठ",
-            "Study Notes": "अध्ययन नोटहरू",
-            "MCQ Practice": "MCQ अभ्यास",
-            "Tools": "उपकरणहरू",
-            "Widgets": "विजेटहरू",
-            "Student Tools": "विद्यार्थी उपकरणहरू",
-            "Web Widgets": "वेब विजेटहरू",
-            "Downloads": "डाउनलोडहरू",
-            "Blog & Guides": "ब्लग तथा जानकारी",
-            "About": "हाम्रो बारेमा",
-            "Contact": "सम्पर्क",
-            "Search": "खोज्नुहोस्",
-            "Search notes, MCQs, syllabus PDFs...": "नोटहरू, MCQs, पाठ्यक्रम खोज्नुहोस्...",
-            "Help": "सहयोग",
-            "Admin": "प्रशासक",
-            "Hot": "नयाँ",
-            "PDFs": "पीडीएफ",
-            "Live Question": "प्रत्यक्ष प्रश्न",
-            "Interactive": "अन्तरक्रियात्मक",
-            "Explore": "हेर्नुहोस्",
-            "Start MCQ Practice": "MCQ अभ्यास सुरु गर्नुहोस्",
-            "Browse Study Notes": "अध्ययन नोटहरू हेर्नुहोस्",
-            "Free Downloads": "निःशुल्क डाउनलोडहरू",
-            "Study Hub": "अध्ययन केन्द्र",
-            "Categories": "विषयगत वर्गहरू",
-            "Contact & Support": "सम्पर्क तथा सहयोग",
-            "Connect With Us": "हामीसँग जोडिनुहोस्",
-            "Send a Direct Message": "सिधा सन्देश पठाउनुहोस्",
-            "Privacy": "गोपनीयता नीति",
-            "Terms": "नियम तथा सर्तहरू",
-            "Disclaimer": "अस्वीकरण",
-            "Sitemap": "साइटम्याप",
-            "Copyright": "प्रतिलिपि अधिकार",
-            "All Rights Reserved": "सबै अधिकार सुरक्षित",
-            "Technology & IT": "प्रविधि तथा सूचना प्रविधि",
-            "General Knowledge (GK)": "सामान्य ज्ञान (GK)",
-            "General Knowledge": "सामान्य ज्ञान",
-            "Computer Applications": "कम्प्युटर एप्लिकेसन्स",
-            "Competitive Exams": "प्रतिस्पर्धात्मक परीक्षा",
-            "Response Guarantee: Prompt replies within 24 hours.": "प्रतिक्रिया ग्यारेन्टी: २४ घण्टा भित्र तुरुन्त जवाफ दिइनेछ。"
-        };
+        function setGoogleTransCookie(lang) {
+            var val = (lang === 'ne') ? '/en/ne' : '';
+            var expires = (lang === 'ne') ? '; expires=Fri, 31 Dec 9999 23:59:59 GMT' : '; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            var host = window.location.hostname;
+            var parts = host.split('.');
+            var rootDomain = parts.length > 2 ? '.' + parts.slice(-2).join('.') : '';
 
-        function applyNepaliDictionary() {
-            var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-            var node;
-            while (node = walker.nextNode()) {
-                var text = node.nodeValue.trim();
-                if (nepaliDictionary[text]) {
-                    node.nodeValue = node.nodeValue.replace(text, nepaliDictionary[text]);
-                }
-            }
-            var searchInput = document.getElementById('globalSearchInput');
-            if (searchInput) {
-                searchInput.placeholder = "नोटहरू, MCQs, पाठ्यक्रम खोज्नुहोस्...";
-            }
-        }
+            var domains = ['', host, '.' + host];
+            if (rootDomain) domains.push(rootDomain);
+            var paths = ['/', ''];
 
-        function setGoogleTransCookies(lang) {
-            var hostname = window.location.hostname;
-            var parts = hostname.split('.');
-            var rootDomain = parts.length > 2 ? parts.slice(-2).join('.') : hostname;
-            var val = (lang === 'ne') ? '/en/ne' : '/en/en';
-            var expire = (lang === 'en') ? '; expires=Thu, 01 Jan 1970 00:00:00 UTC;' : ';';
-
-            var cookies = [
-                'googtrans=' + val + '; path=/;' + expire,
-                'googtrans=' + val + '; path=/; domain=' + hostname + ';' + expire,
-                'googtrans=' + val + '; path=/; domain=.' + hostname + ';' + expire,
-                'googtrans=' + val + '; path=/; domain=' + rootDomain + ';' + expire,
-                'googtrans=' + val + '; path=/; domain=.' + rootDomain + ';' + expire
-            ];
-            if (lang === 'ne') {
-                cookies.push(
-                    'googtrans=/auto/ne; path=/;',
-                    'googtrans=/auto/ne; path=/; domain=' + hostname + ';',
-                    'googtrans=/auto/ne; path=/; domain=.' + hostname + ';'
-                );
-            }
-            cookies.forEach(function(c) {
-                document.cookie = c;
+            domains.forEach(function(d) {
+                paths.forEach(function(p) {
+                    var str = 'googtrans=' + val + '; path=' + (p || '/') + (d ? '; domain=' + d : '') + expires;
+                    document.cookie = str;
+                });
             });
+
+            if (lang === 'ne') {
+                document.cookie = 'googtrans=/en/ne; path=/;';
+                document.cookie = 'googtrans=/auto/ne; path=/;';
+            }
         }
 
         function setSiteLanguage(lang) {
             localStorage.setItem('site_lang', lang);
-            setGoogleTransCookies(lang);
+            setGoogleTransCookie(lang);
 
             var badge = document.getElementById('currentLangBadge');
             if (badge) {
                 badge.textContent = (lang === 'ne') ? 'नेपाली' : 'EN';
             }
 
-            if (lang === 'ne') {
-                applyNepaliDictionary();
-                var attempts = 0;
-                var interval = setInterval(function() {
-                    attempts++;
-                    var combo = document.querySelector('.goog-te-combo');
-                    if (combo) {
-                        combo.value = 'ne';
-                        combo.dispatchEvent(new Event('change'));
-                        clearInterval(interval);
-                    }
-                    if (attempts > 12) {
-                        clearInterval(interval);
-                        window.location.reload();
-                    }
-                }, 200);
-            } else {
-                window.location.reload();
+            var combo = document.querySelector('.goog-te-combo');
+            if (combo) {
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
             }
+
+            // Reload ensures 100% of the entire page DOM is translated from top to bottom
+            setTimeout(function() {
+                window.location.reload();
+            }, 100);
         }
 
         function googleTranslateElementInit() {
@@ -816,7 +736,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 autoDisplay: false
             }, 'google_translate_element');
 
-            if (localStorage.getItem('site_lang') === 'ne') {
+            var currentLang = localStorage.getItem('site_lang') || 'en';
+            if (currentLang === 'ne') {
                 var attempts = 0;
                 var poll = setInterval(function() {
                     attempts++;
@@ -828,12 +749,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
                         clearInterval(poll);
                     }
-                    if (attempts > 15) clearInterval(poll);
-                }, 250);
+                    if (attempts > 30) clearInterval(poll);
+                }, 150);
             }
         }
 
-        // Run on load
+        // Initialize language badge and cookie on load
         (function() {
             var currentLang = localStorage.getItem('site_lang') || 'en';
             var badge = document.getElementById('currentLangBadge');
@@ -841,14 +762,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 badge.textContent = (currentLang === 'ne') ? 'नेपाली' : 'EN';
             }
             if (currentLang === 'ne') {
-                setGoogleTransCookies('ne');
-                document.addEventListener('DOMContentLoaded', function() {
-                    applyNepaliDictionary();
-                });
+                setGoogleTransCookie('ne');
             }
         })();
     </script>
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer></script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <!-- PWA Service Worker Registration -->
     <script>
