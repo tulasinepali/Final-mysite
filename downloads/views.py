@@ -10,10 +10,13 @@ from core.middleware import is_admin_or_staff
 def download_list(request):
     downloads = Download.objects.filter(is_published=True).select_related('category')
     
-    # Filter by resource type (e.g., syllabus, model_question, solution, notes, software)
+    # Filter by resource type (e.g., syllabus, past_question, model_question, solution, notes, software)
     resource_type = request.GET.get('type') or request.GET.get('resource_type')
     if resource_type:
-        downloads = downloads.filter(resource_type=resource_type)
+        if resource_type in ['question', 'questions']:
+            downloads = downloads.filter(resource_type__in=['past_question', 'model_question'])
+        else:
+            downloads = downloads.filter(resource_type=resource_type)
     
     # Filter by exam/education sector (e.g., psc, tsc, banking, school, pradesh, sansthan, security, university, ctevt, entrance)
     target_sector = request.GET.get('sector') or request.GET.get('target_sector')
@@ -41,7 +44,8 @@ def download_list(request):
 
     # Human readable active filter names for SEO / breadcrumb
     type_name_map = dict(Download.RESOURCE_TYPE_CHOICES)
-    sector_name_map = dict(Download.TARGET_SECTOR_CHOICES)
+    type_name_map['questions'] = 'Questions'
+    type_name_map['question'] = 'Questions'
     active_type_name = type_name_map.get(resource_type, '')
     active_sector_name = sector_name_map.get(target_sector, '')
 

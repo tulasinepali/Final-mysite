@@ -26,14 +26,18 @@
                 <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">
                     {% if resource_type == 'syllabus' %}
                     Syllabus
+                    {% elif resource_type == 'questions' or resource_type == 'question' %}
+                    Questions
+                    {% elif resource_type == 'past_question' %}
+                    Past Questions
                     {% elif resource_type == 'model_question' %}
-                    Past &amp; Model Question
+                    Model Questions
                     {% elif resource_type == 'solution' %}
                     Solutions
-                    {% elif resource_type == 'notes' %}
-                    Handwritten Notes
                     {% elif resource_type == 'software' %}
                     Softwares
+                    {% elif resource_type == 'notes' %}
+                    Handwritten Notes
                     {% else %}
                     Downloads
                     {% endif %}
@@ -290,20 +294,24 @@
                                 <span>Syllabus</span>
                                 <span class="small">&rarr;</span>
                             </a>
+                            <a href="{% url 'downloads:list' %}?type=past_question" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'past_question' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
+                                <span>Past Questions</span>
+                                <span class="small">&rarr;</span>
+                            </a>
                             <a href="{% url 'downloads:list' %}?type=model_question" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'model_question' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
-                                <span>Past &amp; Model Questions</span>
+                                <span>Model Questions</span>
                                 <span class="small">&rarr;</span>
                             </a>
                             <a href="{% url 'downloads:list' %}?type=solution" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'solution' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
                                 <span>Solutions</span>
                                 <span class="small">&rarr;</span>
                             </a>
-                            <a href="{% url 'downloads:list' %}?type=notes" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'notes' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
-                                <span>Handwritten Notes</span>
-                                <span class="small">&rarr;</span>
-                            </a>
                             <a href="{% url 'downloads:list' %}?type=software" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'software' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
                                 <span>Softwares</span>
+                                <span class="small">&rarr;</span>
+                            </a>
+                            <a href="{% url 'downloads:list' %}?type=notes" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'notes' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
+                                <span>Handwritten Notes</span>
                                 <span class="small">&rarr;</span>
                             </a>
                         </div>

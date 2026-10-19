@@ -324,23 +324,55 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     </ul>
                                 </li>
 
-                                <!-- 2. Past & Model Question -->
+                                <!-- 2. Questions -->
                                 <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question" role="button">
-                                        <span>Past &amp; Model Question</span>
+                                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=questions" role="button">
+                                        <span>Questions</span>
                                         <span class="submenu-arrow">&rsaquo;</span>
                                     </a>
                                     <ul class="dropdown-menu shadow border-0">
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=psc">PSC</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=tsc">TSC</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=banking">Banking</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=school">School</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=sansthan">Sansthan</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=pradesh">Pradesh</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=security">Police &amp; Army</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=university">University</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=model_question">All Questions &rarr;</a></li>
+                                        <!-- 2a. Past Questions -->
+                                        <li class="dropdown-submenu">
+                                            <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question" role="button">
+                                                <span>Past Questions</span>
+                                                <span class="submenu-arrow">&rsaquo;</span>
+                                            </a>
+                                            <ul class="dropdown-menu shadow border-0">
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=psc">PSC</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=tsc">TSC</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=banking">Banking</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=school">School</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=sansthan">Sansthan</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=pradesh">Pradesh</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=security">Police &amp; Army</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=university">University</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=past_question">All Past Questions &rarr;</a></li>
+                                            </ul>
+                                        </li>
+
+                                        <!-- 2b. Model Questions -->
+                                        <li class="dropdown-submenu">
+                                            <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question" role="button">
+                                                <span>Model Questions</span>
+                                                <span class="submenu-arrow">&rsaquo;</span>
+                                            </a>
+                                            <ul class="dropdown-menu shadow border-0">
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=psc">PSC</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=tsc">TSC</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=banking">Banking</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=school">School</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=sansthan">Sansthan</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=pradesh">Pradesh</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=security">Police &amp; Army</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=university">University</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=model_question">All Model Questions &rarr;</a></li>
+                                            </ul>
+                                        </li>
+
+                                        <li><hr class="dropdown-divider my-1"></li>
+                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=questions">All Questions &rarr;</a></li>
                                     </ul>
                                 </li>
 

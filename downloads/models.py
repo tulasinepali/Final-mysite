@@ -18,10 +18,11 @@ class Download(models.Model):
 
     RESOURCE_TYPE_CHOICES = [
         ('syllabus', 'Syllabus'),
-        ('model_question', 'Past & Model Questions'),
+        ('past_question', 'Past Questions'),
+        ('model_question', 'Model Questions'),
         ('solution', 'Solutions'),
-        ('notes', 'Handwritten Notes'),
         ('software', 'Softwares'),
+        ('notes', 'Handwritten Notes'),
         ('other', 'General Resources'),
     ]
 
