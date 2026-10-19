@@ -666,4 +666,105 @@ class YouTubeVideo(models.Model):
             self.channel_url = f"https://www.youtube.com/watch?v={self.video_id}"
 
 
+class ContentReaction(models.Model):
+    """Stores user emoji reactions (love, happy, haha, sad, angry) on blog posts and notes."""
+    CONTENT_TYPE_CHOICES = [
+        ('blog', 'Blog Post'),
+        ('note', 'Study Note'),
+    ]
+    REACTION_CHOICES = [
+        ('love', 'Love'),
+        ('happy', 'Happy'),
+        ('haha', 'Haha'),
+        ('sad', 'Sad'),
+        ('angry', 'Angry'),
+    ]
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPE_CHOICES)
+    object_id = models.PositiveIntegerField()
+    reaction = models.CharField(max_length=20, choices=REACTION_CHOICES)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    session_key = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=['content_type', 'object_id', 'ip_address']),
+            models.Index(fields=['content_type', 'object_id', 'session_key']),
+        ]
+        verbose_name = 'Content Reaction'
+        verbose_name_plural = 'Content Reactions'
+
+    def __str__(self):
+        return f"{self.reaction.title()} on {self.content_type} #{self.object_id}"
+
+    @classmethod
+    def get_stats_for(cls, content_type, object_id, session_key=None, ip_address=None):
+        from django.db.models import Count
+        valid_reactions = ['love', 'happy', 'haha', 'sad', 'angry']
+        qs = cls.objects.filter(content_type=content_type, object_id=object_id)
+
+        counts = {r: 0 for r in valid_reactions}
+        for row in qs.values('reaction').annotate(c=Count('id')):
+            if row['reaction'] in counts:
+                counts[row['reaction']] = row['c']
+
+        total = sum(counts.values())
+        percentages = {}
+        for r in valid_reactions:
+            percentages[r] = round((counts[r] / total) * 100) if total > 0 else 0
+
+        user_reaction = None
+        if session_key:
+            user_react_obj = qs.filter(session_key=session_key).first()
+            if user_react_obj:
+                user_reaction = user_react_obj.reaction
+        if not user_reaction and ip_address:
+            user_react_obj = qs.filter(ip_address=ip_address).first()
+            if user_react_obj:
+                user_reaction = user_react_obj.reaction
+
+        return {
+            'total': total,
+            'counts': counts,
+            'percentages': percentages,
+            'user_reaction': user_reaction,
+        }
+
+    @classmethod
+    def record_reaction(cls, content_type, object_id, reaction, session_key=None, ip_address=None):
+        valid_reactions = ['love', 'happy', 'haha', 'sad', 'angry']
+        if reaction not in valid_reactions:
+            return None
+
+        existing = None
+        if session_key:
+            existing = cls.objects.filter(
+                content_type=content_type, object_id=object_id, session_key=session_key
+            ).first()
+        if not existing and ip_address:
+            existing = cls.objects.filter(
+                content_type=content_type, object_id=object_id, ip_address=ip_address
+            ).first()
+
+        if existing:
+            existing.reaction = reaction
+            if session_key:
+                existing.session_key = session_key
+            if ip_address:
+                existing.ip_address = ip_address
+            existing.save()
+        else:
+            cls.objects.create(
+                content_type=content_type,
+                object_id=object_id,
+                reaction=reaction,
+                session_key=session_key or '',
+                ip_address=ip_address or None,
+            )
+
+        return cls.get_stats_for(content_type, object_id, session_key, ip_address)
+
+
 

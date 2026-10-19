@@ -1,0 +1,343 @@
+{% load static %}
+<!-- ==========================================================
+     Post Reaction Widget: "What do you feel about this post?"
+     Reactions: Love, Happy, Haha, Sad, Angry (No thumb)
+     ========================================================== -->
+<div class="post-reaction-widget p-4 p-md-4 my-4 rounded-4 border text-center shadow-sm" 
+     id="contentReactionWidget" 
+     data-content-type="{{ content_type }}" 
+     data-object-id="{{ object_id }}">
+
+    <h3 class="reaction-widget-heading fw-bold mb-4" style="font-family: 'Montserrat', sans-serif; font-size: 1.15rem;">
+        {% if content_type == 'note' %}What do you feel about this note?{% else %}What do you feel about this post?{% endif %}
+    </h3>
+
+    <div class="reaction-list d-flex justify-content-center align-items-end flex-wrap">
+        <!-- 1. Love -->
+        <div class="reaction-item text-center {% if reactions_data.user_reaction == 'love' %}active{% endif %}" data-reaction="love">
+            <div class="reaction-bubble-wrapper">
+                <span class="reaction-bubble" id="percent-love">{{ reactions_data.percentages.love|default:0 }}%</span>
+            </div>
+            <button type="button" class="reaction-btn border-0 bg-transparent p-0" aria-label="Love this post" title="Love">
+                <span class="reaction-emoji">❤️</span>
+            </button>
+            <span class="reaction-label">Love</span>
+        </div>
+
+        <!-- 2. Happy -->
+        <div class="reaction-item text-center {% if reactions_data.user_reaction == 'happy' %}active{% endif %}" data-reaction="happy">
+            <div class="reaction-bubble-wrapper">
+                <span class="reaction-bubble" id="percent-happy">{{ reactions_data.percentages.happy|default:0 }}%</span>
+            </div>
+            <button type="button" class="reaction-btn border-0 bg-transparent p-0" aria-label="Happy about this post" title="Happy">
+                <span class="reaction-emoji">😊</span>
+            </button>
+            <span class="reaction-label">Happy</span>
+        </div>
+
+        <!-- 3. Haha -->
+        <div class="reaction-item text-center {% if reactions_data.user_reaction == 'haha' %}active{% endif %}" data-reaction="haha">
+            <div class="reaction-bubble-wrapper">
+                <span class="reaction-bubble" id="percent-haha">{{ reactions_data.percentages.haha|default:0 }}%</span>
+            </div>
+            <button type="button" class="reaction-btn border-0 bg-transparent p-0" aria-label="Haha about this post" title="Haha">
+                <span class="reaction-emoji">😆</span>
+            </button>
+            <span class="reaction-label">Haha</span>
+        </div>
+
+        <!-- 4. Sad -->
+        <div class="reaction-item text-center {% if reactions_data.user_reaction == 'sad' %}active{% endif %}" data-reaction="sad">
+            <div class="reaction-bubble-wrapper">
+                <span class="reaction-bubble" id="percent-sad">{{ reactions_data.percentages.sad|default:0 }}%</span>
+            </div>
+            <button type="button" class="reaction-btn border-0 bg-transparent p-0" aria-label="Sad about this post" title="Sad">
+                <span class="reaction-emoji">😢</span>
+            </button>
+            <span class="reaction-label">Sad</span>
+        </div>
+
+        <!-- 5. Angry -->
+        <div class="reaction-item text-center {% if reactions_data.user_reaction == 'angry' %}active{% endif %}" data-reaction="angry">
+            <div class="reaction-bubble-wrapper">
+                <span class="reaction-bubble" id="percent-angry">{{ reactions_data.percentages.angry|default:0 }}%</span>
+            </div>
+            <button type="button" class="reaction-btn border-0 bg-transparent p-0" aria-label="Angry about this post" title="Angry">
+                <span class="reaction-emoji">😡</span>
+            </button>
+            <span class="reaction-label">Angry</span>
+        </div>
+    </div>
+
+    <!-- Live Toast / Feedback text -->
+    <div class="reaction-feedback-msg mt-3 text-muted small" id="reactionFeedbackMsg" style="min-height: 20px; font-family: 'Poppins', sans-serif;">
+        {% if reactions_data.total > 0 %}
+            <span class="text-secondary"><span id="reactionTotalCount">{{ reactions_data.total }}</span> response{{ reactions_data.total|pluralize }}</span>
+        {% else %}
+            <span class="text-secondary">Be the first to react!</span>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* ==========================================================
+   Post Reaction Widget Styles (Light & Dark Theme)
+   ========================================================== */
+.post-reaction-widget {
+    background: #ffffff;
+    border-color: #e2e8f0 !important;
+    transition: all 0.25s ease;
+}
+
+.reaction-widget-heading {
+    color: #1e293b;
+    letter-spacing: -0.2px;
+}
+
+.reaction-list {
+    gap: 24px;
+}
+
+@media (max-width: 576px) {
+    .reaction-list {
+        gap: 14px;
+    }
+}
+
+.reaction-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    min-width: 52px;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.reaction-bubble-wrapper {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+/* Green Speech Bubble with Downward Arrow */
+.reaction-bubble {
+    position: relative;
+    background-color: #00a86b;
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    padding: 2px 8px;
+    border-radius: 12px;
+    line-height: 1.25;
+    display: inline-block;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    min-width: 36px;
+    text-align: center;
+}
+
+.reaction-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px 4px 0 4px;
+    border-style: solid;
+    border-color: #00a86b transparent transparent transparent;
+}
+
+.reaction-btn {
+    outline: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 2px;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reaction-emoji {
+    font-size: 2.35rem;
+    line-height: 1;
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reaction-item:hover .reaction-btn,
+.reaction-item:hover .reaction-emoji {
+    transform: translateY(-5px) scale(1.18);
+}
+
+.reaction-item:hover .reaction-bubble {
+    background-color: #008f5a;
+    transform: translateY(-2px);
+}
+
+.reaction-item:hover .reaction-bubble::after {
+    border-color: #008f5a transparent transparent transparent;
+}
+
+.reaction-label {
+    margin-top: 6px;
+    font-size: 0.82rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    color: #475569;
+    transition: color 0.2s ease;
+}
+
+.reaction-item:hover .reaction-label {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+/* Active / Voted State */
+.reaction-item.active .reaction-emoji {
+    transform: scale(1.15);
+    filter: drop-shadow(0 4px 10px rgba(0, 168, 107, 0.35));
+}
+
+.reaction-item.active .reaction-bubble {
+    background-color: #0559b7;
+}
+
+.reaction-item.active .reaction-bubble::after {
+    border-color: #0559b7 transparent transparent transparent;
+}
+
+.reaction-item.active .reaction-label {
+    color: #0559b7;
+    font-weight: 700;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode .post-reaction-widget,
+[data-bs-theme="dark"] .post-reaction-widget,
+html.dark-mode .post-reaction-widget {
+    background: #111827 !important;
+    border-color: #1f2937 !important;
+}
+
+body.dark-mode .reaction-widget-heading,
+[data-bs-theme="dark"] .reaction-widget-heading,
+html.dark-mode .reaction-widget-heading {
+    color: #ffffff !important;
+}
+
+body.dark-mode .reaction-label,
+[data-bs-theme="dark"] .reaction-label,
+html.dark-mode .reaction-label {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .reaction-item:hover .reaction-label,
+[data-bs-theme="dark"] .reaction-item:hover .reaction-label,
+html.dark-mode .reaction-item:hover .reaction-label {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .reaction-item.active .reaction-label,
+[data-bs-theme="dark"] .reaction-item.active .reaction-label,
+html.dark-mode .reaction-item.active .reaction-label {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .reaction-item.active .reaction-bubble,
+[data-bs-theme="dark"] .reaction-item.active .reaction-bubble,
+html.dark-mode .reaction-item.active .reaction-bubble {
+    background-color: #2563eb !important;
+}
+
+body.dark-mode .reaction-item.active .reaction-bubble::after,
+[data-bs-theme="dark"] .reaction-item.active .reaction-bubble::after,
+html.dark-mode .reaction-item.active .reaction-bubble::after {
+    border-color: #2563eb transparent transparent transparent !important;
+}
+</style>
+
+<script>
+(function() {
+    var widget = document.getElementById('contentReactionWidget');
+    if (!widget) return;
+
+    var contentType = widget.getAttribute('data-content-type');
+    var objectId = widget.getAttribute('data-object-id');
+    var storageKey = 'tn_reaction_' + contentType + '_' + objectId;
+    var feedbackMsg = document.getElementById('reactionFeedbackMsg');
+    var totalCountEl = document.getElementById('reactionTotalCount');
+
+    // Restore local vote if server doesn't already reflect it
+    try {
+        var localVote = localStorage.getItem(storageKey);
+        if (localVote) {
+            var activeItem = widget.querySelector('.reaction-item[data-reaction="' + localVote + '"]');
+            if (activeItem && !widget.querySelector('.reaction-item.active')) {
+                activeItem.classList.add('active');
+            }
+        }
+    } catch(e) {}
+
+    // Attach click handlers
+    var items = widget.querySelectorAll('.reaction-item');
+    items.forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            var reaction = item.getAttribute('data-reaction');
+            if (!reaction) return;
+
+            // Optimistic UI update
+            items.forEach(function(i) { i.classList.remove('active'); });
+            item.classList.add('active');
+
+            try {
+                localStorage.setItem(storageKey, reaction);
+            } catch(e) {}
+
+            if (feedbackMsg) {
+                feedbackMsg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Thanks for your reaction!</span>';
+            }
+
+            // AJAX request to backend
+            fetch("{% url 'core:submit_reaction' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    content_type: contentType,
+                    object_id: objectId,
+                    reaction: reaction
+                })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data && data.status === 'ok' && data.stats) {
+                    var stats = data.stats;
+                    // Update percentages smoothly
+                    var p = stats.percentages || {};
+                    for (var rKey in p) {
+                        var el = document.getElementById('percent-' + rKey);
+                        if (el) {
+                            el.textContent = p[rKey] + '%';
+                        }
+                    }
+                    if (feedbackMsg && stats.total > 0) {
+                        feedbackMsg.innerHTML = '<span class="text-success fw-medium"><i class="bi bi-check-circle-fill me-1"></i>Thanks for your reaction!</span> <span class="text-muted ms-1">(' + stats.total + ' response' + (stats.total === 1 ? '' : 's') + ')</span>';
+                    }
+                }
+            })
+            .catch(function(err) {
+                console.warn('Reaction submission error:', err);
+            });
+        });
+    });
+})();
+</script>

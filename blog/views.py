@@ -107,12 +107,19 @@ def blog_detail(request, slug):
     
     total_comments_count = post.comments.filter(is_approved=True).count()
     
+    # Emoji Reactions Data
+    from core.models import ContentReaction
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    client_ip = x_forwarded_for.split(',')[0].strip() if x_forwarded_for else request.META.get('REMOTE_ADDR')
+    reactions_data = ContentReaction.get_stats_for('blog', post.id, request.session.session_key, client_ip)
+
     context = {
         'post': post,
         'related_posts': related_posts,
         'approved_comments': approved_comments,
         'total_comments_count': total_comments_count,
         'comment_form': comment_form,
+        'reactions_data': reactions_data,
         'meta_title': post.get_meta_title(),
         'meta_description': post.get_meta_description(),
         'og_image': post.featured_image.url if post.featured_image else None,

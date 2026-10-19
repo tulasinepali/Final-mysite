@@ -47,9 +47,16 @@ def note_detail(request, slug):
         category=note.category, is_published=True
     ).exclude(pk=note.pk)[:4]
     
+    # Emoji Reactions Data
+    from core.models import ContentReaction
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    client_ip = x_forwarded_for.split(',')[0].strip() if x_forwarded_for else request.META.get('REMOTE_ADDR')
+    reactions_data = ContentReaction.get_stats_for('note', note.id, request.session.session_key, client_ip)
+
     context = {
         'note': note,
         'related_notes': related_notes,
+        'reactions_data': reactions_data,
         'meta_title': note.get_meta_title(),
         'meta_description': note.get_meta_description(),
         'og_image': note.featured_image.url if note.featured_image else None,

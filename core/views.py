@@ -393,4 +393,66 @@ def track_video_engagement(request, video_id, action_type):
     return JsonResponse({'status': 'method_not_allowed'}, status=405)
 
 
+@csrf_exempt
+def submit_reaction(request):
+    """
+    Handle visitor emoji reaction submission on blog posts and study notes.
+    Accepts JSON or standard POST parameters:
+    - content_type: 'blog' or 'note'
+    - object_id: ID of the blog post or note
+    - reaction: 'love', 'happy', 'haha', 'sad', 'angry'
+    """
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'POST method required'}, status=405)
+
+    import json
+    data = {}
+    if request.content_type == 'application/json':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            data = {}
+    else:
+        data = request.POST
+
+    content_type = str(data.get('content_type', '')).strip().lower()
+    try:
+        object_id = int(data.get('object_id', 0))
+    except (ValueError, TypeError):
+        object_id = 0
+    reaction = str(data.get('reaction', '')).strip().lower()
+
+    if content_type not in ('blog', 'note') or object_id <= 0:
+        return JsonResponse({'status': 'error', 'message': 'Invalid target content'}, status=400)
+
+    if reaction not in ('love', 'happy', 'haha', 'sad', 'angry'):
+        return JsonResponse({'status': 'error', 'message': 'Invalid reaction choice'}, status=400)
+
+    # Session key tracking
+    if not request.session.session_key:
+        request.session.save()
+    session_key = request.session.session_key
+
+    # Client IP address
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip_address = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip_address = request.META.get('REMOTE_ADDR')
+
+    from core.models import ContentReaction
+    stats = ContentReaction.record_reaction(
+        content_type=content_type,
+        object_id=object_id,
+        reaction=reaction,
+        session_key=session_key,
+        ip_address=ip_address,
+    )
+
+    return JsonResponse({
+        'status': 'ok',
+        'stats': stats,
+    })
+
+
 

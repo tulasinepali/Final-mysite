@@ -153,6 +153,9 @@
                         {{ note.content|safe }}
                     </div>
 
+                    <!-- Post Reaction Widget -->
+                    {% include "includes/post_reactions.html" with content_type="note" object_id=note.id reactions_data=reactions_data %}
+
                     <!-- AdSense: Notes Middle Banner -->
                     {% if ads.notes_middle %}
                     <div class="ad-container text-center my-4 py-3">

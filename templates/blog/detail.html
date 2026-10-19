@@ -143,6 +143,9 @@
                         {{ post.content|safe }}
                     </div>
 
+                    <!-- Post Reaction Widget -->
+                    {% include "includes/post_reactions.html" with content_type="blog" object_id=post.id reactions_data=reactions_data %}
+
                     <!-- AdSense: Blog Middle -->
                     {% if ads.blog_middle %}
                     <div class="ad-container text-center my-4 py-3">
