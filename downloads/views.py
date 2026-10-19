@@ -17,6 +17,8 @@ def download_list(request):
             downloads = downloads.filter(resource_type__in=['past_question', 'model_question'])
         elif resource_type in ['law', 'laws', 'legislation', 'legislations']:
             downloads = downloads.filter(resource_type='law')
+        elif resource_type in ['other', 'others']:
+            downloads = downloads.filter(resource_type='other')
         else:
             downloads = downloads.filter(resource_type=resource_type)
     
@@ -51,6 +53,7 @@ def download_list(request):
     type_name_map['laws'] = 'Legislations & Laws'
     type_name_map['legislation'] = 'Legislations & Laws'
     type_name_map['legislations'] = 'Legislations & Laws'
+    type_name_map['others'] = 'Others'
     sector_name_map = dict(Download.TARGET_SECTOR_CHOICES)
     active_type_name = type_name_map.get(resource_type, '')
     active_sector_name = sector_name_map.get(target_sector, '')

@@ -40,6 +40,8 @@
                     Handwritten Notes
                     {% elif resource_type == 'law' or resource_type == 'legislation' or resource_type == 'laws' %}
                     Legislations &amp; Laws
+                    {% elif resource_type == 'other' or resource_type == 'others' %}
+                    Others
                     {% else %}
                     Downloads
                     {% endif %}
@@ -318,6 +320,10 @@
                             </a>
                             <a href="{% url 'downloads:list' %}?type=law" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'law' or resource_type == 'legislation' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
                                 <span>Legislations &amp; Laws</span>
+                                <span class="small">&rarr;</span>
+                            </a>
+                            <a href="{% url 'downloads:list' %}?type=other" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'other' or resource_type == 'others' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
+                                <span>Others</span>
                                 <span class="small">&rarr;</span>
                             </a>
                         </div>

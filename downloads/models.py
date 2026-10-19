@@ -24,7 +24,7 @@ class Download(models.Model):
         ('software', 'Softwares'),
         ('notes', 'Handwritten Notes'),
         ('law', 'Legislations & Laws'),
-        ('other', 'General Resources'),
+        ('other', 'Others'),
     ]
 
     TARGET_SECTOR_CHOICES = [
