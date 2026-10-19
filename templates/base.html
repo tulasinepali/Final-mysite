@@ -397,15 +397,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 </li>
 
                                 <!-- 4. Softwares -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=software" role="button">
-                                        <span>Softwares</span>
-                                        <span class="submenu-arrow">&rsaquo;</span>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'downloads:list' %}?type=software">
+                                        Softwares
                                     </a>
-                                    <ul class="dropdown-menu shadow border-0">
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=software">All Softwares</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=notes">Handwritten Notes</a></li>
-                                    </ul>
+                                </li>
+
+                                <!-- 5. Handwritten Notes -->
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'downloads:list' %}?type=notes">
+                                        Handwritten Notes
+                                    </a>
                                 </li>
 
                                 <li><hr class="dropdown-divider my-1"></li>
