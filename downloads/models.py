@@ -23,6 +23,7 @@ class Download(models.Model):
         ('solution', 'Solutions'),
         ('software', 'Softwares'),
         ('notes', 'Handwritten Notes'),
+        ('law', 'Legislations & Laws'),
         ('other', 'General Resources'),
     ]
 

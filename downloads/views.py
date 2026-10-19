@@ -10,11 +10,13 @@ from core.middleware import is_admin_or_staff
 def download_list(request):
     downloads = Download.objects.filter(is_published=True).select_related('category')
     
-    # Filter by resource type (e.g., syllabus, past_question, model_question, solution, notes, software)
+    # Filter by resource type (e.g., syllabus, past_question, model_question, solution, notes, software, law)
     resource_type = request.GET.get('type') or request.GET.get('resource_type')
     if resource_type:
         if resource_type in ['question', 'questions']:
             downloads = downloads.filter(resource_type__in=['past_question', 'model_question'])
+        elif resource_type in ['law', 'laws', 'legislation', 'legislations']:
+            downloads = downloads.filter(resource_type='law')
         else:
             downloads = downloads.filter(resource_type=resource_type)
     
@@ -46,6 +48,9 @@ def download_list(request):
     type_name_map = dict(Download.RESOURCE_TYPE_CHOICES)
     type_name_map['questions'] = 'Questions'
     type_name_map['question'] = 'Questions'
+    type_name_map['laws'] = 'Legislations & Laws'
+    type_name_map['legislation'] = 'Legislations & Laws'
+    type_name_map['legislations'] = 'Legislations & Laws'
     active_type_name = type_name_map.get(resource_type, '')
     active_sector_name = sector_name_map.get(target_sector, '')
 
