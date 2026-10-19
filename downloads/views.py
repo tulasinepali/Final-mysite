@@ -51,6 +51,7 @@ def download_list(request):
     type_name_map['laws'] = 'Legislations & Laws'
     type_name_map['legislation'] = 'Legislations & Laws'
     type_name_map['legislations'] = 'Legislations & Laws'
+    sector_name_map = dict(Download.TARGET_SECTOR_CHOICES)
     active_type_name = type_name_map.get(resource_type, '')
     active_sector_name = sector_name_map.get(target_sector, '')
 
