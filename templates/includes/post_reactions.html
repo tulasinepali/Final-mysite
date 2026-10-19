@@ -69,6 +69,8 @@
         </div>
     </div>
 
+    <form style="display:none;" id="reactionCsrfForm">{% csrf_token %}</form>
+
     <!-- Live Toast / Feedback text -->
     <div class="reaction-feedback-msg mt-3 text-muted small" id="reactionFeedbackMsg" style="min-height: 20px; font-family: 'Poppins', sans-serif;">
         {% if reactions_data.total > 0 %}
@@ -304,12 +306,16 @@ html.dark-mode .reaction-item.active .reaction-bubble::after {
                 feedbackMsg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Thanks for your reaction!</span>';
             }
 
+            // Retrieve CSRF token
+            var csrfInput = document.querySelector('#reactionCsrfForm [name=csrfmiddlewaretoken]');
+            var token = csrfInput ? csrfInput.value : '{{ csrf_token }}';
+
             // AJAX request to backend
             fetch("{% url 'core:submit_reaction' %}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-CSRFToken': token,
                 },
                 body: JSON.stringify({
                     content_type: contentType,

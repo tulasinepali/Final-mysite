@@ -142,3 +142,18 @@ try:
 except (ImportError, Exception):
     pass
 
+
+try:
+    from .models import ContentReaction
+
+    @admin.register(ContentReaction)
+    class ContentReactionAdmin(admin.ModelAdmin):
+        list_display = ['reaction', 'content_type', 'object_id', 'ip_address', 'created_at']
+        list_filter = ['reaction', 'content_type', 'created_at']
+        search_fields = ['ip_address', 'session_key']
+        readonly_fields = ['content_type', 'object_id', 'reaction', 'ip_address', 'session_key', 'created_at', 'updated_at']
+        ordering = ['-created_at']
+except (ImportError, Exception):
+    pass
+
+
