@@ -17,26 +17,26 @@ class Download(models.Model):
     ]
 
     RESOURCE_TYPE_CHOICES = [
-        ('syllabus', '📋 Syllabus (पाठ्यक्रम)'),
-        ('model_question', '❓ Past & Model Question (नमुना तथा विगतका प्रश्न)'),
-        ('solution', '💡 Solution & Answer Key (समाधान तथा उत्तरकुञ्जिका)'),
-        ('notes', '✍️ Handwritten / Study Note (हस्तलिखित तथा अध्ययन सामग्री)'),
-        ('software', '💻 Software & Tool (सफ्टवेयर तथा टुल्स)'),
-        ('other', '📁 General Resource (अन्य शैक्षिक सामग्री)'),
+        ('syllabus', 'Syllabus'),
+        ('model_question', 'Past & Model Questions'),
+        ('solution', 'Solutions'),
+        ('notes', 'Handwritten Notes'),
+        ('software', 'Softwares'),
+        ('other', 'General Resources'),
     ]
 
     TARGET_SECTOR_CHOICES = [
-        ('psc', '🏛️ PSC / Loksewa (संघीय लोक सेवा)'),
-        ('pradesh', '🗺️ Pradesh Loksewa (प्रदेश १ देखि ७)'),
-        ('tsc', '👩‍🏫 TSC (शिक्षक सेवा आयोग)'),
-        ('banking', '🏦 Banking (राष्ट्र बैंक, वाणिज्य, नेपाल बैंक, कृषि)'),
-        ('sansthan', '⚡ Sansthan (विद्युत, टेलिकम, CAAN, आयल निगम)'),
-        ('security', '👮 Security Forces (नेपाल प्रहरी, सेना, APF, NID)'),
-        ('school', '🏫 School Level (कक्षा ८, ९, १० SEE, ११, १२ NEB)'),
-        ('university', '🎓 University (TU, PU, Pokhara - BCA, CSIT, BBS)'),
-        ('ctevt', '🛠️ CTEVT (Diploma Engineering, Health, Entrance)'),
-        ('entrance', '🎯 Entrance Exams (CEE Medical, IOE Pulchowk, CMAT)'),
-        ('general', '🌐 General & Multi-Purpose'),
+        ('psc', 'PSC'),
+        ('tsc', 'TSC'),
+        ('banking', 'Banking'),
+        ('school', 'School Level'),
+        ('sansthan', 'Sansthan'),
+        ('pradesh', 'Pradesh Loksewa'),
+        ('security', 'Nepal Police & Army'),
+        ('university', 'University'),
+        ('ctevt', 'CTEVT'),
+        ('entrance', 'Entrance Exams'),
+        ('general', 'General'),
     ]
 
     title = models.CharField(max_length=300)

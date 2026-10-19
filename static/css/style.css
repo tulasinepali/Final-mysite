@@ -609,6 +609,78 @@ a:hover {
     }
 }
 
+/* Plain-text Megamenu Styling for Downloads */
+.header-nav .container-fluid,
+.header-nav .container-xl {
+    position: relative;
+}
+
+.navmenu .dropdown-menu.megamenu-content {
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 0;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12) !important;
+    width: auto;
+    min-width: 680px;
+}
+
+.navmenu .megamenu-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0f172a;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.navmenu .megamenu-title a {
+    color: #0f172a !important;
+    text-transform: uppercase !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    font-weight: 700 !important;
+}
+
+.navmenu .megamenu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navmenu .megamenu-list li {
+    margin-bottom: 3px;
+}
+
+.navmenu .megamenu-list a {
+    color: #475569 !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    padding: 5px 8px !important;
+    border-radius: 6px;
+    display: block !important;
+    transition: all 0.15s ease;
+}
+
+.navmenu .megamenu-list a:hover {
+    color: #0559b7 !important;
+    background-color: #f1f5f9 !important;
+    padding-left: 12px !important;
+}
+
+.navmenu .megamenu-list .all-link {
+    color: #0559b7 !important;
+    font-weight: 600 !important;
+    margin-top: 6px;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 6px !important;
+}
+
 /* ----------------------------------------------------------
    SmartStore Hero Section
    ---------------------------------------------------------- */

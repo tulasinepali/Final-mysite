@@ -7,12 +7,12 @@
 {% block og_description %}{{ meta_description }}{% endblock %}
 
 {% block content %}
-<!-- SmartStore Page Header -->
+<!-- Page Header -->
 <div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
     <div class="container">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-2 small" style="font-family: 'Poppins', sans-serif;">
-                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #0559b7;"><i class="bi bi-house me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #0559b7;">Home</a></li>
                 <li class="breadcrumb-item"><a href="{% url 'downloads:list' %}" class="text-decoration-none" style="color: #0559b7;">Downloads</a></li>
                 {% if active_type_name %}
                 <li class="breadcrumb-item active text-muted" aria-current="page">{{ active_type_name }}</li>
@@ -25,58 +25,54 @@
             <div>
                 <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">
                     {% if resource_type == 'syllabus' %}
-                    <i class="bi bi-journal-check me-2" style="color: #0559b7;"></i>Official Syllabi &amp; Curricula
+                    Syllabus
                     {% elif resource_type == 'model_question' %}
-                    <i class="bi bi-question-diamond-fill me-2" style="color: #0559b7;"></i>Past &amp; Model Question Papers
+                    Past &amp; Model Question
                     {% elif resource_type == 'solution' %}
-                    <i class="bi bi-lightbulb-fill me-2" style="color: #0559b7;"></i>Solutions &amp; Answer Keys
+                    Solutions
                     {% elif resource_type == 'notes' %}
-                    <i class="bi bi-pen-fill me-2" style="color: #0559b7;"></i>Handwritten Notes &amp; Formula Sheets
+                    Handwritten Notes
                     {% elif resource_type == 'software' %}
-                    <i class="bi bi-laptop-fill me-2" style="color: #0559b7;"></i>Softwares &amp; Learning Tools
+                    Softwares
                     {% else %}
-                    <i class="bi bi-cloud-arrow-down-fill me-2" style="color: #0559b7;"></i>Download Center &amp; Library
+                    Downloads
                     {% endif %}
                 </h1>
                 <p class="text-muted mb-0 small" style="font-family: 'Roboto', sans-serif;">
                     {% if active_sector_name %}
-                    Showing verified resources for <strong>{{ active_sector_name }}</strong>. Download free PDFs, question banks, and utilities.
+                    Resources for <strong>{{ active_sector_name }}</strong>.
                     {% else %}
-                    Download official syllabi, past board &amp; competitive questions, solutions, handwritten notes, and typing tutors.
+                    Official syllabi, past and model questions, solutions, notes, and educational softwares.
                     {% endif %}
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge rounded-pill px-3 py-2" style="background: rgba(25, 135, 84, 0.1); color: #198754; font-family: 'Poppins', sans-serif; font-weight: 600;">
-                    <i class="bi bi-shield-check me-1"></i>Verified &amp; Clean
-                </span>
                 <span class="badge rounded-pill px-3 py-2 bg-white text-dark border" style="font-family: 'Poppins', sans-serif;">
-                    <i class="bi bi-files me-1" style="color: #0559b7;"></i>{{ total_count|default:"Fresh" }} Files
+                    Total: {{ total_count|default:"0" }} Files
                 </span>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Main Downloads Content -->
+<!-- Main Content -->
 <section class="py-4 py-lg-5" style="background: #ffffff;">
     <div class="container">
         <div class="row g-4">
             <!-- Main Content Area -->
             <div class="col-lg-8">
                 <!-- Search & Filters Card -->
-                <div class="p-3 p-md-4 mb-4 rounded-4 border bg-white shadow-sm" style="border-color: #e1e7f0 !important;">
+                <div class="p-3 p-md-4 mb-4 rounded-3 border bg-white shadow-sm" style="border-color: #e1e7f0 !important;">
                     <!-- Search Input -->
                     <form method="get" class="mb-3" role="search">
                         {% if resource_type %}<input type="hidden" name="type" value="{{ resource_type }}">{% endif %}
                         {% if target_sector %}<input type="hidden" name="sector" value="{{ target_sector }}">{% endif %}
                         {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}">{% endif %}
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                            <input type="text" name="q" class="form-control border-start-0" placeholder="Search by paper title, class, level, or subject..." value="{{ search_query }}" aria-label="Search downloads">
-                            <button class="btn btn-explore" type="submit">Search</button>
+                            <input type="text" name="q" class="form-control" placeholder="Search by title, subject, or class..." value="{{ search_query }}" aria-label="Search downloads">
+                            <button class="btn btn-primary" type="submit" style="background: #0559b7; border-color: #0559b7;">Search</button>
                             {% if search_query %}
-                            <a href="{% url 'downloads:list' %}{% if resource_type %}?type={{ resource_type }}{% endif %}{% if target_sector %}&sector={{ target_sector }}{% endif %}" class="btn btn-outline-secondary" title="Clear search"><i class="bi bi-x-lg"></i></a>
+                            <a href="{% url 'downloads:list' %}{% if resource_type %}?type={{ resource_type }}{% endif %}{% if target_sector %}&sector={{ target_sector }}{% endif %}" class="btn btn-outline-secondary" title="Clear search">Clear</a>
                             {% endif %}
                         </div>
                     </form>
@@ -85,7 +81,7 @@
                     <div class="mb-3">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <span class="small fw-bold text-dark" style="font-family: 'Montserrat', sans-serif; font-size: 0.8rem;">
-                                <i class="bi bi-collection me-1 text-primary"></i>MATERIAL TYPE:
+                                MATERIAL TYPE:
                             </span>
                             {% if resource_type %}
                             <a href="{% url 'downloads:list' %}{% if target_sector %}?sector={{ target_sector }}{% endif %}" class="text-decoration-none small text-danger" style="font-size: 0.76rem;">Clear Type</a>
@@ -93,23 +89,23 @@
                         </div>
                         <div class="d-flex flex-wrap gap-2">
                             <a href="{% url 'downloads:list' %}{% if target_sector %}?sector={{ target_sector }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-                               class="btn btn-sm rounded-pill px-3 {% if not resource_type %}btn-explore{% else %}btn-outline-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                               class="btn btn-sm rounded-pill px-3 {% if not resource_type %}btn-primary{% else %}btn-outline-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
                                 All Materials
                             </a>
                             {% for val, label in resource_type_choices %}
                             <a href="{% url 'downloads:list' %}?type={{ val }}{% if target_sector %}&sector={{ target_sector }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-                               class="btn btn-sm rounded-pill px-3 {% if resource_type == val %}btn-explore{% else %}btn-outline-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                               class="btn btn-sm rounded-pill px-3 {% if resource_type == val %}btn-primary{% else %}btn-outline-secondary{% endif %}" style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
                                 {{ label }}
                             </a>
                             {% endfor %}
                         </div>
                     </div>
 
-                    <!-- Row 2: Target Sector / Exam Pills (Horizontal Scroll on Mobile) -->
+                    <!-- Row 2: Target Sector / Exam Pills -->
                     <div>
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <span class="small fw-bold text-dark" style="font-family: 'Montserrat', sans-serif; font-size: 0.8rem;">
-                                <i class="bi bi-mortarboard me-1 text-primary"></i>EXAM &amp; EDUCATION SECTOR:
+                                SECTOR:
                             </span>
                             {% if target_sector %}
                             <a href="{% url 'downloads:list' %}{% if resource_type %}?type={{ resource_type }}{% endif %}" class="text-decoration-none small text-danger" style="font-size: 0.76rem;">Clear Sector</a>
@@ -134,7 +130,7 @@
                 {% if search_query or resource_type or target_sector or current_category %}
                 <div class="alert alert-light border rounded-3 d-flex justify-content-between align-items-center mb-4 p-3" style="border-color: #e1e7f0 !important; background: #edf2f8;">
                     <span class="small text-dark" style="font-family: 'Roboto', sans-serif;">
-                        <i class="bi bi-info-circle-fill me-1" style="color: #0559b7;"></i>Showing:
+                        Showing:
                         {% if active_type_name %}<strong>{{ active_type_name }}</strong>{% endif %}
                         {% if active_sector_name %}for <strong>{{ active_sector_name }}</strong>{% endif %}
                         {% if current_category %}in <strong>{{ current_category }}</strong>{% endif %}
@@ -142,7 +138,7 @@
                         ({{ total_count }} files)
                     </span>
                     <a href="{% url 'downloads:list' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="font-size: 0.78rem;">
-                        <i class="bi bi-x me-1"></i>Reset All
+                        Reset All
                     </a>
                 </div>
                 {% endif %}
@@ -159,37 +155,18 @@
                 <div class="row g-4">
                     {% for download in page_obj %}
                     <div class="col-md-6">
-                        <article class="card h-100 catalog-card d-flex flex-column shadow-sm rounded-4 border" style="border-color: #e1e7f0 !important;">
+                        <article class="card h-100 catalog-card d-flex flex-column shadow-sm rounded-3 border" style="border-color: #e1e7f0 !important;">
                             <div class="card-body d-flex flex-column p-4 flex-grow-1">
-                                <!-- Sector & Resource Badges -->
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div class="rounded-3 d-flex align-items-center justify-content-center {% if download.file_type == 'pdf' %}bg-danger bg-opacity-10 text-danger{% elif download.file_type == 'docx' %}bg-primary bg-opacity-10 text-primary{% elif download.file_type == 'ppt' %}bg-warning bg-opacity-10 text-warning{% elif download.file_type == 'zip' %}bg-success bg-opacity-10 text-success{% else %}bg-secondary bg-opacity-10 text-secondary{% endif %}" style="width:48px;height:48px;min-width:48px;">
-                                        {% if download.file_type == 'pdf' %}
-                                        <i class="bi bi-file-earmark-pdf-fill fs-3"></i>
-                                        {% elif download.file_type == 'docx' %}
-                                        <i class="bi bi-file-earmark-word-fill fs-3"></i>
-                                        {% elif download.file_type == 'ppt' %}
-                                        <i class="bi bi-file-earmark-ppt-fill fs-3"></i>
-                                        {% elif download.file_type == 'zip' %}
-                                        <i class="bi bi-file-earmark-zip-fill fs-3"></i>
-                                        {% else %}
-                                        <i class="bi bi-file-earmark-text-fill fs-3"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="badge rounded-pill px-3 py-1 mb-1 d-inline-block" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif; font-size: 0.72rem;">
-                                            {{ download.get_resource_type_display }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Target Sector & Sub-sector Tag -->
-                                <div class="d-flex flex-wrap gap-1 mb-2">
-                                    <span class="badge bg-light text-dark border rounded-pill" style="font-size: 0.7rem; font-family: 'Poppins', sans-serif;">
+                                <!-- Sector & Resource Badges (Plain Text) -->
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge rounded-pill px-3 py-1" style="background: rgba(5, 89, 183, 0.1); color: #0559b7; font-family: 'Poppins', sans-serif; font-size: 0.75rem;">
+                                        {{ download.get_resource_type_display }}
+                                    </span>
+                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-1" style="font-size: 0.72rem; font-family: 'Poppins', sans-serif;">
                                         {{ download.get_target_sector_display }}
                                     </span>
                                     {% if download.sub_sector %}
-                                    <span class="badge rounded-pill text-white" style="background: #0559b7; font-size: 0.7rem; font-family: 'Poppins', sans-serif;">
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1" style="font-size: 0.72rem; font-family: 'Poppins', sans-serif;">
                                         {{ download.sub_sector }}
                                     </span>
                                     {% endif %}
@@ -207,28 +184,28 @@
                                     {{ download.summary|default:download.description|truncatewords:14|striptags }}
                                 </p>
 
-                                <!-- File Metadata Pills -->
+                                <!-- File Metadata (Plain Text) -->
                                 <div class="d-flex flex-wrap gap-2 mb-2 pt-2 border-top" style="border-color: #f1f5f9 !important;">
-                                    <span class="badge {% if download.file_type == 'pdf' %}bg-danger{% elif download.file_type == 'docx' %}bg-primary{% elif download.file_type == 'ppt' %}bg-warning text-dark{% elif download.file_type == 'zip' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill" style="font-family: 'Poppins', sans-serif; font-size: 0.72rem;">
+                                    <span class="badge bg-light text-dark border rounded-pill" style="font-family: 'Poppins', sans-serif; font-size: 0.72rem;">
                                         {{ download.get_file_type_display }}
                                     </span>
                                     {% if download.file_size %}
                                     <span class="badge bg-light text-dark border rounded-pill" style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">
-                                        <i class="bi bi-hdd me-1"></i>{{ download.file_size }}
+                                        {{ download.file_size }}
                                     </span>
                                     {% endif %}
                                     <span class="badge bg-light text-muted border rounded-pill" style="font-family: 'Poppins', sans-serif; font-size: 0.72rem;">
-                                        <i class="bi bi-shield-check text-success me-1"></i>Verified Clean
+                                        Verified
                                     </span>
                                 </div>
                             </div>
 
                             <div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center p-3" style="border-color: #e1e7f0 !important;">
                                 <small class="text-muted" style="font-family: 'Poppins', sans-serif; font-size: 0.78rem;">
-                                    <i class="bi bi-cloud-download me-1" style="color: #0559b7;"></i>{{ download.download_count }} downloads
+                                    {{ download.download_count }} downloads
                                 </small>
-                                <a href="{% url 'downloads:download_file' download.slug %}" class="btn btn-sm btn-explore rounded-pill px-3 fw-semibold" onclick="event.stopPropagation();" style="font-family: 'Poppins', sans-serif;">
-                                    <i class="bi bi-arrow-down-circle me-1"></i>Download
+                                <a href="{% url 'downloads:download_file' download.slug %}" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold" onclick="event.stopPropagation();" style="background: #0559b7; border-color: #0559b7; font-family: 'Poppins', sans-serif;">
+                                    Download
                                 </a>
                             </div>
                         </article>
@@ -236,14 +213,14 @@
                     {% endfor %}
                 </div>
 
-                <!-- SmartStore Pagination -->
+                <!-- Pagination -->
                 {% if page_obj.has_other_pages %}
                 <nav aria-label="Downloads pagination" class="mt-5">
                     <ul class="pagination justify-content-center gap-1">
                         {% if page_obj.has_previous %}
                         <li class="page-item">
                             <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; border-color: #e1e7f0; color: #0559b7;" href="?page={{ page_obj.previous_page_number }}{% if resource_type %}&type={{ resource_type }}{% endif %}{% if target_sector %}&sector={{ target_sector }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Previous">
-                                <i class="bi bi-chevron-left"></i>
+                                &laquo;
                             </a>
                         </li>
                         {% endif %}
@@ -263,7 +240,7 @@
                         {% if page_obj.has_next %}
                         <li class="page-item">
                             <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; border-color: #e1e7f0; color: #0559b7;" href="?page={{ page_obj.next_page_number }}{% if resource_type %}&type={{ resource_type }}{% endif %}{% if target_sector %}&sector={{ target_sector }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Next">
-                                <i class="bi bi-chevron-right"></i>
+                                &raquo;
                             </a>
                         </li>
                         {% endif %}
@@ -273,30 +250,25 @@
 
                 {% else %}
                 <!-- Empty State -->
-                <div class="card border-0 shadow-sm rounded-4 p-5 text-center" style="background: #edf2f8;">
-                    <div class="mb-3">
-                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-white shadow-sm" style="width: 64px; height: 64px;">
-                            <i class="bi bi-cloud-slash text-muted" style="font-size: 2rem;"></i>
-                        </div>
-                    </div>
+                <div class="card border-0 shadow-sm rounded-3 p-5 text-center" style="background: #edf2f8;">
                     <h3 class="h5 fw-bold mb-2 text-dark" style="font-family: 'Montserrat', sans-serif;">No Files Found</h3>
                     <p class="text-muted small mb-4" style="max-width: 480px; margin: 0 auto; font-family: 'Roboto', sans-serif;">
                         {% if search_query %}
-                        No files matched "<strong>{{ search_query }}</strong>". Try searching for general terms like "syllabus", "computer", or "math".
+                        No files matched "{{ search_query }}". Try searching for general terms like syllabus or model question.
                         {% else %}
-                        No files currently uploaded for this sector or material type. New resources are added weekly!
+                        No files currently uploaded for this sector. New materials are added regularly.
                         {% endif %}
                     </p>
                     <div>
-                        <a href="{% url 'downloads:list' %}" class="btn btn-explore rounded-pill px-4">
-                            <i class="bi bi-arrow-left me-2"></i>Browse All Downloads
+                        <a href="{% url 'downloads:list' %}" class="btn btn-primary rounded-pill px-4" style="background: #0559b7; border-color: #0559b7;">
+                            Browse All Downloads
                         </a>
                     </div>
                 </div>
                 {% endif %}
             </div>
 
-            <!-- SmartStore Sidebar -->
+            <!-- Sidebar (Plain Text) -->
             <aside class="col-lg-4">
                 <!-- AdSense: Downloads Sidebar -->
                 {% if ads.sidebar %}
@@ -305,44 +277,44 @@
                 </div>
                 {% endif %}
 
-                <!-- Resource Types Quick Card -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4" style="border: 1px solid #e1e7f0 !important;">
+                <!-- Resource Types Plain List -->
+                <div class="card border-0 shadow-sm rounded-3 mb-4" style="border: 1px solid #e1e7f0 !important;">
                     <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
                         <h2 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            <i class="bi bi-folder-fill me-2 text-primary"></i>Resource Hub
+                            Resource Types
                         </h2>
                     </div>
                     <div class="card-body px-4 pt-1 pb-4">
                         <div class="list-group list-group-flush">
                             <a href="{% url 'downloads:list' %}?type=syllabus" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'syllabus' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
-                                <span><i class="bi bi-journal-check me-2 text-primary"></i>📋 Syllabus (पाठ्यक्रम)</span>
-                                <i class="bi bi-chevron-right small text-muted"></i>
+                                <span>Syllabus</span>
+                                <span class="small">&rarr;</span>
                             </a>
                             <a href="{% url 'downloads:list' %}?type=model_question" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'model_question' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
-                                <span><i class="bi bi-question-diamond me-2 text-danger"></i>❓ Model Questions (नमुना प्रश्न)</span>
-                                <i class="bi bi-chevron-right small text-muted"></i>
+                                <span>Past &amp; Model Questions</span>
+                                <span class="small">&rarr;</span>
                             </a>
                             <a href="{% url 'downloads:list' %}?type=solution" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'solution' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
-                                <span><i class="bi bi-lightbulb me-2 text-success"></i>💡 Solutions (समाधानहरू)</span>
-                                <i class="bi bi-chevron-right small text-muted"></i>
+                                <span>Solutions</span>
+                                <span class="small">&rarr;</span>
                             </a>
                             <a href="{% url 'downloads:list' %}?type=notes" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'notes' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
-                                <span><i class="bi bi-pen me-2 text-warning"></i>✍️ Handwritten Notes</span>
-                                <i class="bi bi-chevron-right small text-muted"></i>
+                                <span>Handwritten Notes</span>
+                                <span class="small">&rarr;</span>
                             </a>
                             <a href="{% url 'downloads:list' %}?type=software" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom {% if resource_type == 'software' %}fw-bold text-primary{% else %}text-secondary{% endif %}" style="font-size: 0.88rem;">
-                                <span><i class="bi bi-laptop me-2 text-info"></i>💻 Softwares &amp; Tools</span>
-                                <i class="bi bi-chevron-right small text-muted"></i>
+                                <span>Softwares</span>
+                                <span class="small">&rarr;</span>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sectors Quick Navigation Card -->
-                <div class="card border-0 shadow-sm rounded-4 mb-4" style="border: 1px solid #e1e7f0 !important;">
+                <!-- Sectors Plain List -->
+                <div class="card border-0 shadow-sm rounded-3 mb-4" style="border: 1px solid #e1e7f0 !important;">
                     <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
                         <h2 class="h6 fw-bold mb-0 text-dark" style="font-family: 'Montserrat', sans-serif;">
-                            <i class="bi bi-mortarboard-fill me-2 text-primary"></i>Exam &amp; Study Sectors
+                            Sectors
                         </h2>
                     </div>
                     <div class="card-body px-4 pt-1 pb-4">
@@ -364,21 +336,18 @@
                 </div>
                 {% endif %}
 
-                <!-- Quick Resource Navigation -->
-                <div class="card border-0 shadow-sm rounded-4 p-4 text-center" style="background: #edf2f8; border: 1px solid #e1e7f0 !important;">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-white shadow-sm mb-3" style="width: 52px; height: 52px;">
-                        <i class="bi bi-journal-text" style="color: #0559b7; font-size: 1.5rem;"></i>
-                    </div>
-                    <h3 class="h6 fw-bold text-dark mb-1" style="font-family: 'Montserrat', sans-serif;">Practice Live Online Tests</h3>
+                <!-- Quick Links -->
+                <div class="card border-0 shadow-sm rounded-3 p-4 text-center" style="background: #edf2f8; border: 1px solid #e1e7f0 !important;">
+                    <h3 class="h6 fw-bold text-dark mb-2" style="font-family: 'Montserrat', sans-serif;">MCQ Practice Tests</h3>
                     <p class="text-muted small mb-3" style="font-family: 'Roboto', sans-serif;">
-                        Test your preparation with real timed MCQ quizzes for Loksewa, TSC, and competitive exams.
+                        Take timed online tests for Loksewa, TSC, and competitive exams.
                     </p>
                     <div class="d-grid gap-2">
-                        <a href="{% url 'quiz:list' %}" class="btn btn-primary rounded-pill py-2 fw-semibold">
-                            <i class="bi bi-check2-circle me-1"></i>Take MCQ Practice Test
+                        <a href="{% url 'quiz:list' %}" class="btn btn-primary rounded-pill py-2 fw-semibold" style="background: #0559b7; border-color: #0559b7;">
+                            MCQ Practice
                         </a>
                         <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary rounded-pill py-2">
-                            <i class="bi bi-book me-1"></i>Read Study Notes
+                            Study Notes
                         </a>
                     </div>
                 </div>
