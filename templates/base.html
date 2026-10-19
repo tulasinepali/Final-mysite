@@ -315,16 +315,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         </span>
                                     </a>
                                     <ul class="dropdown-menu shadow border-0">
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=psc">PSC</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=tsc">TSC</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=banking">Banking</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=school">School</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=sansthan">Sansthan</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=pradesh">Pradesh</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=security">Police &amp; Army</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=university">University</a></li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=psc">
+                                                <span>PSC</span>
+                                                {% if downloads_sub_counts.syllabus_psc %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_psc }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=tsc">
+                                                <span>TSC</span>
+                                                {% if downloads_sub_counts.syllabus_tsc %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_tsc }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=banking">
+                                                <span>Banking</span>
+                                                {% if downloads_sub_counts.syllabus_banking %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_banking }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=school">
+                                                <span>School</span>
+                                                {% if downloads_sub_counts.syllabus_school %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_school }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=sansthan">
+                                                <span>Sansthan</span>
+                                                {% if downloads_sub_counts.syllabus_sansthan %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_sansthan }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=pradesh">
+                                                <span>Pradesh</span>
+                                                {% if downloads_sub_counts.syllabus_pradesh %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_pradesh }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=security">
+                                                <span>Police &amp; Army</span>
+                                                {% if downloads_sub_counts.syllabus_security %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_security }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus&sector=university">
+                                                <span>University</span>
+                                                {% if downloads_sub_counts.syllabus_university %}<span class="nav-count-badge">{{ downloads_sub_counts.syllabus_university }}+</span>{% endif %}
+                                            </a>
+                                        </li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=syllabus">All Syllabus &rarr;</a></li>
+                                        <li>
+                                            <a class="dropdown-item text-primary font-weight-bold d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus">
+                                                <span>All Syllabus &rarr;</span>
+                                                {% if downloads_counts.syllabus %}<span class="nav-count-badge">{{ downloads_counts.syllabus }}+</span>{% endif %}
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
 
@@ -350,16 +395,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                                 </span>
                                             </a>
                                             <ul class="dropdown-menu shadow border-0">
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=psc">PSC</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=tsc">TSC</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=banking">Banking</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=school">School</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=sansthan">Sansthan</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=pradesh">Pradesh</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=security">Police &amp; Army</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=university">University</a></li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=psc">
+                                                        <span>PSC</span>
+                                                        {% if downloads_sub_counts.past_question_psc %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_psc }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=tsc">
+                                                        <span>TSC</span>
+                                                        {% if downloads_sub_counts.past_question_tsc %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_tsc }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=banking">
+                                                        <span>Banking</span>
+                                                        {% if downloads_sub_counts.past_question_banking %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_banking }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=school">
+                                                        <span>School</span>
+                                                        {% if downloads_sub_counts.past_question_school %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_school }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=sansthan">
+                                                        <span>Sansthan</span>
+                                                        {% if downloads_sub_counts.past_question_sansthan %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_sansthan }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=pradesh">
+                                                        <span>Pradesh</span>
+                                                        {% if downloads_sub_counts.past_question_pradesh %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_pradesh }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=security">
+                                                        <span>Police &amp; Army</span>
+                                                        {% if downloads_sub_counts.past_question_security %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_security }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question&sector=university">
+                                                        <span>University</span>
+                                                        {% if downloads_sub_counts.past_question_university %}<span class="nav-count-badge">{{ downloads_sub_counts.past_question_university }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
                                                 <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=past_question">All Past Questions &rarr;</a></li>
+                                                <li>
+                                                    <a class="dropdown-item text-primary font-weight-bold d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question">
+                                                        <span>All Past Questions &rarr;</span>
+                                                        {% if downloads_counts.past_question %}<span class="nav-count-badge">{{ downloads_counts.past_question }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 
@@ -374,21 +464,71 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                                 </span>
                                             </a>
                                             <ul class="dropdown-menu shadow border-0">
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=psc">PSC</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=tsc">TSC</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=banking">Banking</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=school">School</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=sansthan">Sansthan</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=pradesh">Pradesh</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=security">Police &amp; Army</a></li>
-                                                <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=university">University</a></li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=psc">
+                                                        <span>PSC</span>
+                                                        {% if downloads_sub_counts.model_question_psc %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_psc }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=tsc">
+                                                        <span>TSC</span>
+                                                        {% if downloads_sub_counts.model_question_tsc %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_tsc }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=banking">
+                                                        <span>Banking</span>
+                                                        {% if downloads_sub_counts.model_question_banking %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_banking }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=school">
+                                                        <span>School</span>
+                                                        {% if downloads_sub_counts.model_question_school %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_school }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=sansthan">
+                                                        <span>Sansthan</span>
+                                                        {% if downloads_sub_counts.model_question_sansthan %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_sansthan }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=pradesh">
+                                                        <span>Pradesh</span>
+                                                        {% if downloads_sub_counts.model_question_pradesh %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_pradesh }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=security">
+                                                        <span>Police &amp; Army</span>
+                                                        {% if downloads_sub_counts.model_question_security %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_security }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question&sector=university">
+                                                        <span>University</span>
+                                                        {% if downloads_sub_counts.model_question_university %}<span class="nav-count-badge">{{ downloads_sub_counts.model_question_university }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
                                                 <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=model_question">All Model Questions &rarr;</a></li>
+                                                <li>
+                                                    <a class="dropdown-item text-primary font-weight-bold d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question">
+                                                        <span>All Model Questions &rarr;</span>
+                                                        {% if downloads_counts.model_question %}<span class="nav-count-badge">{{ downloads_counts.model_question }}+</span>{% endif %}
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 
                                         <li><hr class="dropdown-divider my-1"></li>
-                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=questions">All Questions &rarr;</a></li>
+                                        <li>
+                                            <a class="dropdown-item text-primary font-weight-bold d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=questions">
+                                                <span>All Questions &rarr;</span>
+                                                {% if downloads_counts.questions %}<span class="nav-count-badge">{{ downloads_counts.questions }}+</span>{% endif %}
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
 
@@ -403,16 +543,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         </span>
                                     </a>
                                     <ul class="dropdown-menu shadow border-0">
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=psc">PSC</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=tsc">TSC</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=banking">Banking</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=school">School</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=sansthan">Sansthan</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=pradesh">Pradesh</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=security">Police &amp; Army</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=university">University</a></li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=psc">
+                                                <span>PSC</span>
+                                                {% if downloads_sub_counts.solution_psc %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_psc }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=tsc">
+                                                <span>TSC</span>
+                                                {% if downloads_sub_counts.solution_tsc %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_tsc }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=banking">
+                                                <span>Banking</span>
+                                                {% if downloads_sub_counts.solution_banking %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_banking }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=school">
+                                                <span>School</span>
+                                                {% if downloads_sub_counts.solution_school %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_school }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=sansthan">
+                                                <span>Sansthan</span>
+                                                {% if downloads_sub_counts.solution_sansthan %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_sansthan }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=pradesh">
+                                                <span>Pradesh</span>
+                                                {% if downloads_sub_counts.solution_pradesh %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_pradesh }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=security">
+                                                <span>Police &amp; Army</span>
+                                                {% if downloads_sub_counts.solution_security %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_security }}+</span>{% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution&sector=university">
+                                                <span>University</span>
+                                                {% if downloads_sub_counts.solution_university %}<span class="nav-count-badge">{{ downloads_sub_counts.solution_university }}+</span>{% endif %}
+                                            </a>
+                                        </li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=solution">All Solutions &rarr;</a></li>
+                                        <li>
+                                            <a class="dropdown-item text-primary font-weight-bold d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution">
+                                                <span>All Solutions &rarr;</span>
+                                                {% if downloads_counts.solution %}<span class="nav-count-badge">{{ downloads_counts.solution }}+</span>{% endif %}
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
 

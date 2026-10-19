@@ -43,6 +43,7 @@ def global_categories(request):
     quiz_categories = Category.objects.filter(module='quiz', is_active=True)
 
     downloads_counts = {}
+    downloads_sub_counts = {}
     try:
         Download = apps.get_model('downloads', 'Download', require_ready=False)
         if Download:
@@ -55,8 +56,15 @@ def global_categories(request):
                 downloads_counts.get('model_question', 0)
             )
             downloads_counts['total'] = sum(row['c'] for row in qs)
+
+            # Sub-counts grouped by resource_type and target_sector
+            qs_sub = Download.objects.filter(is_published=True).values('resource_type', 'target_sector').annotate(c=Count('id'))
+            for row in qs_sub:
+                key = f"{row['resource_type']}_{row['target_sector']}"
+                downloads_sub_counts[key] = row['c']
     except Exception:
         downloads_counts = {}
+        downloads_sub_counts = {}
 
     return {
         'notes_categories': notes_categories,
@@ -64,6 +72,7 @@ def global_categories(request):
         'blog_categories': blog_categories,
         'quiz_categories': quiz_categories,
         'downloads_counts': downloads_counts,
+        'downloads_sub_counts': downloads_sub_counts,
     }
 
 
