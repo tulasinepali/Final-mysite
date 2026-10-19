@@ -766,6 +766,133 @@ a:hover {
 }
 
 /* ----------------------------------------------------------
+   Downloads Multi-Level Dropdown — Dark Mode Overrides
+   ---------------------------------------------------------- */
+body.dark-mode .navmenu .dropdown-menu,
+[data-bs-theme="dark"] .navmenu .dropdown-menu,
+html.dark-mode .navmenu .dropdown-menu,
+body.dark-mode .navmenu .dropdown-menu.downloads-dropdown-menu,
+[data-bs-theme="dark"] .navmenu .dropdown-menu.downloads-dropdown-menu,
+html.dark-mode .navmenu .dropdown-menu.downloads-dropdown-menu,
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-submenu > .dropdown-menu,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-submenu > .dropdown-menu,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-submenu > .dropdown-menu {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    border: 1px solid #1f2937 !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item {
+    color: #f1f5f9 !important;
+    background: transparent !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item span,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item span,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item span {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:hover,
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:focus,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item:hover,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item:focus,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:hover,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:focus {
+    background-color: #1f2937 !important;
+    color: #60a5fa !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:hover span,
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:focus span,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item:hover span,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item:focus span,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:hover span,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:focus span {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-toggle::after,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-toggle::after,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-toggle::after {
+    border-top-color: #94a3b8 !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-submenu:hover > .dropdown-item.dropdown-toggle::after,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-submenu:hover > .dropdown-item.dropdown-toggle::after,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-submenu:hover > .dropdown-item.dropdown-toggle::after {
+    border-top-color: #60a5fa !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-divider,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-divider,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-divider {
+    border-color: #1f2937 !important;
+}
+
+/* Nav Count Badges in Dark Mode */
+body.dark-mode .navmenu .downloads-dropdown-menu .nav-count-badge,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .nav-count-badge,
+html.dark-mode .navmenu .downloads-dropdown-menu .nav-count-badge {
+    background-color: #1f2937 !important;
+    color: #93c5fd !important;
+    border: 1px solid #374151 !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:hover .nav-count-badge,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item:hover .nav-count-badge,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item:hover .nav-count-badge {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+}
+
+/* Primary links in Dark Mode (e.g., "Browse All Downloads ->", "All Syllabus ->") */
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item.text-primary,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary,
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary span,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item.text-primary span,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary span {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary:hover,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item.text-primary:hover,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary:hover,
+body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary:hover span,
+[data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-item.text-primary:hover span,
+html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-item.text-primary:hover span {
+    background-color: #1f2937 !important;
+    color: #93c5fd !important;
+}
+
+/* Mobile & Tablet in Dark Mode (< 1200px) */
+@media (max-width: 1199.98px) {
+    body.dark-mode .navmenu .downloads-dropdown-menu,
+    [data-bs-theme="dark"] .navmenu .downloads-dropdown-menu,
+    html.dark-mode .navmenu .downloads-dropdown-menu {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    body.dark-mode .navmenu .downloads-dropdown-menu .dropdown-submenu > .dropdown-menu,
+    [data-bs-theme="dark"] .navmenu .downloads-dropdown-menu .dropdown-submenu > .dropdown-menu,
+    html.dark-mode .navmenu .downloads-dropdown-menu .dropdown-submenu > .dropdown-menu {
+        background: transparent !important;
+        border-left: 2px solid #3b82f6 !important;
+        border-top: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* ----------------------------------------------------------
    SmartStore Hero Section
    ---------------------------------------------------------- */
 .hero.section {
