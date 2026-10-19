@@ -140,4 +140,8 @@ urlpatterns = [
     path('ai-blogger/settings/save/', views.ai_save_settings, name='ai_save_settings'),
     path('ai-blogger/suggest-topics/', views.ai_suggest_topics_ajax, name='ai_suggest_topics_ajax'),
     path('ai-blogger/test-api-key/', views.ai_test_api_key, name='ai_test_api_key'),
+
+    # Post Reactions
+    path('reactions/', views.dashboard_reactions, name='reactions'),
+    path('reactions/<int:pk>/delete/', views.reaction_delete, name='reaction_delete'),
 ]

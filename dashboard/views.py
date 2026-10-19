@@ -2429,6 +2429,80 @@ def video_toggle_active(request, pk):
     return redirect('dashboard:videos')
 
 
+# ========== POST & NOTE REACTIONS ==========
+
+@staff_member_required
+def dashboard_reactions(request):
+    """Manage visitor emoji reactions across Blog Posts and Study Notes."""
+    from core.models import ContentReaction
+    from blog.models import BlogPost
+    from notes.models import Note
+
+    type_filter = request.GET.get('type', 'all')
+    reaction_filter = request.GET.get('reaction', 'all')
+    q = request.GET.get('q', '').strip()
+
+    qs = ContentReaction.objects.order_by('-created_at')
+
+    if type_filter in ('blog', 'note'):
+        qs = qs.filter(content_type=type_filter)
+    if reaction_filter in ('love', 'happy', 'haha', 'sad', 'angry'):
+        qs = qs.filter(reaction=reaction_filter)
+    if q:
+        from django.db.models import Q
+        qs = qs.filter(Q(ip_address__icontains=q) | Q(session_key__icontains=q))
+
+    # KPIs
+    from django.db.models import Count
+    raw_counts = ContentReaction.objects.values('reaction').annotate(c=Count('id'))
+    counts_by_reaction = {r: 0 for r in ['love', 'happy', 'haha', 'sad', 'angry']}
+    for row in raw_counts:
+        if row['reaction'] in counts_by_reaction:
+            counts_by_reaction[row['reaction']] = row['c']
+    total_count = sum(counts_by_reaction.values())
+
+    paginator = Paginator(qs, 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    # Pre-fetch blog and note titles for current page items
+    blog_ids = [r.object_id for r in page_obj.object_list if r.content_type == 'blog']
+    note_ids = [r.object_id for r in page_obj.object_list if r.content_type == 'note']
+    blog_map = {b.id: b for b in BlogPost.objects.filter(id__in=blog_ids)}
+    note_map = {n.id: n for n in Note.objects.filter(id__in=note_ids)}
+
+    for r in page_obj.object_list:
+        if r.content_type == 'blog':
+            item_obj = blog_map.get(r.object_id)
+            r.item_title = item_obj.title if item_obj else f"Blog #{r.object_id} (Deleted)"
+            r.item_url = item_obj.get_absolute_url() if item_obj else None
+        else:
+            item_obj = note_map.get(r.object_id)
+            r.item_title = item_obj.title if item_obj else f"Note #{r.object_id} (Deleted)"
+            r.item_url = item_obj.get_absolute_url() if item_obj else None
+
+    context = {
+        'page_obj': page_obj,
+        'type_filter': type_filter,
+        'reaction_filter': reaction_filter,
+        'q': q,
+        'total_count': total_count,
+        'counts_by_reaction': counts_by_reaction,
+        'active_page': 'reactions',
+    }
+    return render(request, 'dashboard/reactions.html', context)
+
+
+@staff_member_required
+def reaction_delete(request, pk):
+    """Delete a specific visitor reaction."""
+    from core.models import ContentReaction
+    r = get_object_or_404(ContentReaction, pk=pk)
+    if request.method == 'POST':
+        r.delete()
+        messages.success(request, "Reaction was deleted.")
+    return redirect('dashboard:reactions')
+
+
 
 
 
