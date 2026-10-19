@@ -5,7 +5,7 @@ from django.urls import reverse
 
 class SiteSettings(models.Model):
     """Singleton model for site-wide settings"""
-    site_name = models.CharField(max_length=200, default='Learning Platform')
+    site_name = models.CharField(max_length=200, default='Tulasi Nepali')
     site_tagline = models.CharField(max_length=300, default='Learn Technology, General Knowledge & Exam Preparation')
     site_description = models.TextField(default='An open educational platform for technology, computing, general knowledge, and competitive exam preparation.')
     site_logo = models.ImageField(upload_to='site/', blank=True, null=True)
