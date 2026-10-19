@@ -36,16 +36,34 @@ def site_settings(request):
 
 
 def global_categories(request):
-    """Make categorized navigation available in all templates."""
+    """Make categorized navigation and downloads counts available in all templates."""
     notes_categories = Category.objects.filter(module='notes', is_active=True)
     downloads_categories = Category.objects.filter(module='downloads', is_active=True)
     blog_categories = Category.objects.filter(module='blog', is_active=True)
     quiz_categories = Category.objects.filter(module='quiz', is_active=True)
+
+    downloads_counts = {}
+    try:
+        Download = apps.get_model('downloads', 'Download', require_ready=False)
+        if Download:
+            from django.db.models import Count
+            qs = Download.objects.filter(is_published=True).values('resource_type').annotate(c=Count('id'))
+            for row in qs:
+                downloads_counts[row['resource_type']] = row['c']
+            downloads_counts['questions'] = (
+                downloads_counts.get('past_question', 0) + 
+                downloads_counts.get('model_question', 0)
+            )
+            downloads_counts['total'] = sum(row['c'] for row in qs)
+    except Exception:
+        downloads_counts = {}
+
     return {
         'notes_categories': notes_categories,
         'downloads_categories': downloads_categories,
         'blog_categories': blog_categories,
         'quiz_categories': quiz_categories,
+        'downloads_counts': downloads_counts,
     }
 
 

@@ -307,8 +307,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- 1. Syllabus -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus" role="button">
-                                        <span>Syllabus</span>
-                                        <span class="submenu-arrow">&rsaquo;</span>
+                                        <span class="d-flex align-items-center">
+                                            <span>Syllabus</span>
+                                            {% if downloads_counts.syllabus %}
+                                            <span class="nav-count-badge">{{ downloads_counts.syllabus }}+</span>
+                                            {% endif %}
+                                        </span>
                                     </a>
                                     <ul class="dropdown-menu shadow border-0">
                                         <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=psc">PSC</a></li>
@@ -327,15 +331,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- 2. Questions -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=questions" role="button">
-                                        <span>Questions</span>
-                                        <span class="submenu-arrow">&rsaquo;</span>
+                                        <span class="d-flex align-items-center">
+                                            <span>Questions</span>
+                                            {% if downloads_counts.questions %}
+                                            <span class="nav-count-badge">{{ downloads_counts.questions }}+</span>
+                                            {% endif %}
+                                        </span>
                                     </a>
                                     <ul class="dropdown-menu shadow border-0">
                                         <!-- 2a. Past Questions -->
                                         <li class="dropdown-submenu">
                                             <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=past_question" role="button">
-                                                <span>Past Questions</span>
-                                                <span class="submenu-arrow">&rsaquo;</span>
+                                                <span class="d-flex align-items-center">
+                                                    <span>Past Questions</span>
+                                                    {% if downloads_counts.past_question %}
+                                                    <span class="nav-count-badge">{{ downloads_counts.past_question }}+</span>
+                                                    {% endif %}
+                                                </span>
                                             </a>
                                             <ul class="dropdown-menu shadow border-0">
                                                 <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=past_question&sector=psc">PSC</a></li>
@@ -354,8 +366,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         <!-- 2b. Model Questions -->
                                         <li class="dropdown-submenu">
                                             <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question" role="button">
-                                                <span>Model Questions</span>
-                                                <span class="submenu-arrow">&rsaquo;</span>
+                                                <span class="d-flex align-items-center">
+                                                    <span>Model Questions</span>
+                                                    {% if downloads_counts.model_question %}
+                                                    <span class="nav-count-badge">{{ downloads_counts.model_question }}+</span>
+                                                    {% endif %}
+                                                </span>
                                             </a>
                                             <ul class="dropdown-menu shadow border-0">
                                                 <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=psc">PSC</a></li>
@@ -379,8 +395,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 <!-- 3. Solutions -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution" role="button">
-                                        <span>Solutions</span>
-                                        <span class="submenu-arrow">&rsaquo;</span>
+                                        <span class="d-flex align-items-center">
+                                            <span>Solutions</span>
+                                            {% if downloads_counts.solution %}
+                                            <span class="nav-count-badge">{{ downloads_counts.solution }}+</span>
+                                            {% endif %}
+                                        </span>
                                     </a>
                                     <ul class="dropdown-menu shadow border-0">
                                         <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=psc">PSC</a></li>
@@ -398,34 +418,53 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                                 <!-- 4. Softwares -->
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'downloads:list' %}?type=software">
-                                        Softwares
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=software">
+                                        <span>Softwares</span>
+                                        {% if downloads_counts.software %}
+                                        <span class="nav-count-badge">{{ downloads_counts.software }}+</span>
+                                        {% endif %}
                                     </a>
                                 </li>
 
                                 <!-- 5. Handwritten Notes -->
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'downloads:list' %}?type=notes">
-                                        Handwritten Notes
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=notes">
+                                        <span>Handwritten Notes</span>
+                                        {% if downloads_counts.notes %}
+                                        <span class="nav-count-badge">{{ downloads_counts.notes }}+</span>
+                                        {% endif %}
                                     </a>
                                 </li>
 
                                 <!-- 6. Legislations & Laws -->
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'downloads:list' %}?type=law">
-                                        Legislations &amp; Laws
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=law">
+                                        <span>Legislations &amp; Laws</span>
+                                        {% if downloads_counts.law %}
+                                        <span class="nav-count-badge">{{ downloads_counts.law }}+</span>
+                                        {% endif %}
                                     </a>
                                 </li>
 
                                 <!-- 7. Others -->
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'downloads:list' %}?type=other">
-                                        Others
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=other">
+                                        <span>Others</span>
+                                        {% if downloads_counts.other %}
+                                        <span class="nav-count-badge">{{ downloads_counts.other }}+</span>
+                                        {% endif %}
                                     </a>
                                 </li>
 
                                 <li><hr class="dropdown-divider my-1"></li>
-                                <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}">Browse All Downloads &rarr;</a></li>
+                                <li>
+                                    <a class="dropdown-item text-primary font-weight-bold d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}">
+                                        <span>Browse All Downloads &rarr;</span>
+                                        {% if downloads_counts.total %}
+                                        <span class="nav-count-badge">{{ downloads_counts.total }}+</span>
+                                        {% endif %}
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blogs</a></li>
