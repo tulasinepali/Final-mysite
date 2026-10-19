@@ -27,7 +27,25 @@
     <div class="card-body">
         <!-- Filter Bar -->
         <form method="get" class="form-inline mb-3">
-            <div class="form-group mr-2">
+            <div class="form-group mr-2 mb-2">
+                <label class="mr-1">Type:</label>
+                <select name="resource_type" class="form-control form-control-sm">
+                    <option value="">All Types</option>
+                    {% for val, label in resource_type_choices %}
+                    <option value="{{ val }}" {% if request.GET.resource_type == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mr-2 mb-2">
+                <label class="mr-1">Sector:</label>
+                <select name="target_sector" class="form-control form-control-sm">
+                    <option value="">All Sectors</option>
+                    {% for val, label in target_sector_choices %}
+                    <option value="{{ val }}" {% if request.GET.target_sector == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mr-2 mb-2">
                 <label class="mr-1">Category:</label>
                 <select name="category" class="form-control form-control-sm">
                     <option value="">All Categories</option>
@@ -36,19 +54,19 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group mr-2">
-                <label class="mr-1">Published:</label>
+            <div class="form-group mr-2 mb-2">
+                <label class="mr-1">Status:</label>
                 <select name="published" class="form-control form-control-sm">
                     <option value="">All</option>
                     <option value="yes" {% if request.GET.published == 'yes' %}selected{% endif %}>Published</option>
                     <option value="no" {% if request.GET.published == 'no' %}selected{% endif %}>Draft</option>
                 </select>
             </div>
-            <div class="form-group mr-2">
-                <input type="text" name="q" class="form-control form-control-sm" placeholder="Search downloads..." value="{{ request.GET.q|default:'' }}">
+            <div class="form-group mr-2 mb-2">
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Search title..." value="{{ request.GET.q|default:'' }}">
             </div>
-            <button type="submit" class="btn btn-sm btn-outline-primary mr-1"><i class="fas fa-search"></i></button>
-            <a href="{% url 'dashboard:downloads' %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-times"></i></a>
+            <button type="submit" class="btn btn-sm btn-outline-primary mr-1 mb-2"><i class="fas fa-search"></i> Filter</button>
+            <a href="{% url 'dashboard:downloads' %}" class="btn btn-sm btn-outline-secondary mb-2"><i class="fas fa-times"></i> Reset</a>
         </form>
 
         <!-- Table -->
@@ -58,8 +76,9 @@
                     <tr>
                         <th style="width: 50px;">#</th>
                         <th>Title</th>
+                        <th>Type &amp; Sector</th>
                         <th>Category</th>
-                        <th>File Type</th>
+                        <th>File</th>
                         <th>Downloads</th>
                         <th>Published</th>
                         <th>Featured</th>
@@ -73,10 +92,17 @@
                         <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
                         <td>
                             {% if dl.is_published %}
-                            <a href="{{ dl.get_absolute_url }}" target="_blank">{{ dl.title|truncatechars:45 }}</a>
+                            <a href="{{ dl.get_absolute_url }}" target="_blank" class="font-weight-bold text-dark">{{ dl.title|truncatechars:45 }}</a>
                             {% else %}
-                            {{ dl.title|truncatechars:45 }}
+                            <span class="font-weight-bold text-muted">{{ dl.title|truncatechars:45 }}</span>
                             {% endif %}
+                            {% if dl.sub_sector %}
+                            <br><small class="text-muted"><i class="fas fa-tag mr-1"></i>{{ dl.sub_sector }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-info">{{ dl.get_resource_type_display }}</span><br>
+                            <span class="badge badge-light border mt-1">{{ dl.get_target_sector_display }}</span>
                         </td>
                         <td><span class="badge badge-soft-primary">{{ dl.category.name }}</span></td>
                         <td>

@@ -299,7 +299,66 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <li><a href="{% url 'core:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="bi bi-house me-1"></i> Home</a></li>
                         <li><a href="{% url 'notes:list' %}" class="{% if 'notes' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-journal-text me-1"></i> Study Notes</a></li>
                         <li><a href="{% url 'quiz:list' %}" class="{% if 'quiz' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-check2-circle me-1"></i> MCQ Practice</a></li>
-                        <li><a href="{% url 'downloads:list' %}" class="{% if 'downloads' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-download me-1"></i> Downloads</a></li>
+                        <li class="dropdown">
+                            <a href="{% url 'downloads:list' %}" class="dropdown-toggle d-inline-flex align-items-center {% if 'downloads' in request.resolver_match.app_names %}active{% endif %}" id="downloadsNavDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-download me-1"></i> Downloads <i class="bi bi-chevron-down ms-1" style="font-size: 0.7rem;"></i>
+                            </a>
+                            <ul class="dropdown-menu shadow-lg border-0 py-2" aria-labelledby="downloadsNavDropdown" style="min-width: 290px;">
+                                <li><h6 class="dropdown-header text-uppercase text-muted fw-bold small pb-1"><i class="bi bi-collection me-1"></i> Resource Categories</h6></li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{% url 'downloads:list' %}?type=syllabus">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-2"><i class="bi bi-journal-check"></i></span>
+                                        <div>
+                                            <div class="fw-semibold text-dark">📋 Syllabus (पाठ्यक्रम)</div>
+                                            <small class="text-muted d-block" style="font-size:0.75rem;">PSC, TSC, Banking, School, Sansthan</small>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{% url 'downloads:list' %}?type=model_question">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-circle p-2 me-2"><i class="bi bi-question-diamond"></i></span>
+                                        <div>
+                                            <div class="fw-semibold text-dark">❓ Past &amp; Model Questions</div>
+                                            <small class="text-muted d-block" style="font-size:0.75rem;">Old Board Papers, Model Sets &amp; Questions</small>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{% url 'downloads:list' %}?type=solution">
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-circle p-2 me-2"><i class="bi bi-lightbulb"></i></span>
+                                        <div>
+                                            <div class="fw-semibold text-dark">💡 Solutions &amp; Guides</div>
+                                            <small class="text-muted d-block" style="font-size:0.75rem;">Textbook Exercises &amp; Solved Answers</small>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{% url 'downloads:list' %}?type=notes">
+                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-circle p-2 me-2"><i class="bi bi-pen"></i></span>
+                                        <div>
+                                            <div class="fw-semibold text-dark">✍️ Handwritten Notes</div>
+                                            <small class="text-muted d-block" style="font-size:0.75rem;">Formula Sheets &amp; Revision Summaries</small>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{% url 'downloads:list' %}?type=software">
+                                        <span class="badge bg-info bg-opacity-10 text-info rounded-circle p-2 me-2"><i class="bi bi-laptop"></i></span>
+                                        <div>
+                                            <div class="fw-semibold text-dark">💻 Softwares &amp; Tools</div>
+                                            <small class="text-muted d-block" style="font-size:0.75rem;">Typing Tutors, Fonts, Compilers, Utilities</small>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-2"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 text-primary fw-semibold d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}">
+                                        <span><i class="bi bi-grid me-1"></i> Browse All Downloads</span>
+                                        <i class="bi bi-arrow-right small"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blogs</a></li>
                         <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About</a></li>
                         <li><a href="{% url 'core:contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><i class="bi bi-envelope me-1"></i> Contact</a></li>

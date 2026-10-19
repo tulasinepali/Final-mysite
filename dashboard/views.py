@@ -290,6 +290,12 @@ def dashboard_downloads(request):
         downloads = downloads.filter(is_published=True)
     elif published_filter == 'no':
         downloads = downloads.filter(is_published=False)
+    resource_type_filter = request.GET.get('resource_type')
+    if resource_type_filter:
+        downloads = downloads.filter(resource_type=resource_type_filter)
+    sector_filter = request.GET.get('target_sector')
+    if sector_filter:
+        downloads = downloads.filter(target_sector=sector_filter)
     search = request.GET.get('q')
     if search:
         downloads = downloads.filter(title__icontains=search)
@@ -299,6 +305,8 @@ def dashboard_downloads(request):
     context = {
         'page_obj': page_obj, 'categories': categories,
         'active_page': 'downloads', 'total': downloads.count(),
+        'resource_type_choices': Download.RESOURCE_TYPE_CHOICES,
+        'target_sector_choices': Download.TARGET_SECTOR_CHOICES,
     }
     return render(request, 'dashboard/downloads.html', context)
 

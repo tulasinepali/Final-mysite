@@ -135,10 +135,13 @@ class DownloadForm(forms.ModelForm):
         self.fields['file_type'].required = False
         self.fields['download_count'].required = False
         self.fields['file_size'].required = False
-        self.fields['thumbnail'].required = False
         self.fields['meta_title'].required = False
         self.fields['meta_description'].required = False
         self.fields['tags'].required = False
+        self.fields['sub_sector'].required = False
+        self.fields['sub_sector'].widget.attrs.update({
+            'placeholder': 'e.g. Bagmati Pradesh, Class 10 (SEE), NRB Level 4, Computer Operator'
+        })
 
     def clean_slug(self):
         slug = self.cleaned_data.get('slug')

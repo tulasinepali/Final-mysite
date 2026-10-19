@@ -8,7 +8,22 @@ from core.models import Category
 from core.middleware import is_admin_or_staff
 
 def download_list(request):
-    downloads = Download.objects.filter(is_published=True)
+    downloads = Download.objects.filter(is_published=True).select_related('category')
+    
+    # Filter by resource type (e.g., syllabus, model_question, solution, notes, software)
+    resource_type = request.GET.get('type') or request.GET.get('resource_type')
+    if resource_type:
+        downloads = downloads.filter(resource_type=resource_type)
+    
+    # Filter by exam/education sector (e.g., psc, tsc, banking, school, pradesh, sansthan, security, university, ctevt, entrance)
+    target_sector = request.GET.get('sector') or request.GET.get('target_sector')
+    if target_sector:
+        downloads = downloads.filter(target_sector=target_sector)
+
+    # Filter by specific sub-sector / level keyword
+    sub_sector = request.GET.get('sub_sector')
+    if sub_sector:
+        downloads = downloads.filter(sub_sector__icontains=sub_sector)
     
     category_slug = request.GET.get('category')
     if category_slug:
@@ -23,14 +38,36 @@ def download_list(request):
     page_obj = paginator.get_page(page_number)
     
     categories = Category.objects.filter(module='downloads', is_active=True)
-    
+
+    # Human readable active filter names for SEO / breadcrumb
+    type_name_map = dict(Download.RESOURCE_TYPE_CHOICES)
+    sector_name_map = dict(Download.TARGET_SECTOR_CHOICES)
+    active_type_name = type_name_map.get(resource_type, '')
+    active_sector_name = sector_name_map.get(target_sector, '')
+
+    page_title = 'Downloads Hub'
+    if active_type_name and active_sector_name:
+        page_title = f"{active_type_name} - {active_sector_name}"
+    elif active_type_name:
+        page_title = f"{active_type_name} Downloads"
+    elif active_sector_name:
+        page_title = f"{active_sector_name} Resources"
+
     context = {
         'page_obj': page_obj,
         'categories': categories,
         'current_category': category_slug,
+        'resource_type': resource_type or '',
+        'target_sector': target_sector or '',
+        'sub_sector': sub_sector or '',
+        'active_type_name': active_type_name,
+        'active_sector_name': active_sector_name,
+        'resource_type_choices': Download.RESOURCE_TYPE_CHOICES,
+        'target_sector_choices': Download.TARGET_SECTOR_CHOICES,
         'search_query': search_query or '',
-        'meta_title': 'Downloads - Learning Platform',
-        'meta_description': 'Download study materials, syllabus, question papers, notes PDFs and guides for free.',
+        'total_count': downloads.count(),
+        'meta_title': f"{page_title} - Tulasi Nepali",
+        'meta_description': 'Download official syllabi, past and model questions, textbook solutions, notes PDFs, and educational softwares for free.',
     }
     return render(request, 'downloads/list.html', context)
 

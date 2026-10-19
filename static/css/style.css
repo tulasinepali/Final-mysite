@@ -567,6 +567,48 @@ a:hover {
     background-color: rgba(0, 0, 0, 0.12);
 }
 
+.navmenu .dropdown-menu {
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 2px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+.navmenu .dropdown-menu a {
+    text-transform: none;
+    letter-spacing: normal;
+    color: #1e293b;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.navmenu .dropdown-menu a:hover {
+    background-color: #f1f5f9;
+    color: var(--accent-color);
+}
+
+@media (min-width: 1200px) {
+    .navmenu .dropdown:hover > .dropdown-menu {
+        display: block;
+        animation: navDropdownFade 0.18s ease-out;
+    }
+}
+
+@keyframes navDropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* ----------------------------------------------------------
    SmartStore Hero Section
    ---------------------------------------------------------- */

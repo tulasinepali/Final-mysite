@@ -15,6 +15,30 @@ class Download(models.Model):
         ('zip', 'ZIP'),
         ('other', 'Other'),
     ]
+
+    RESOURCE_TYPE_CHOICES = [
+        ('syllabus', '📋 Syllabus (पाठ्यक्रम)'),
+        ('model_question', '❓ Past & Model Question (नमुना तथा विगतका प्रश्न)'),
+        ('solution', '💡 Solution & Answer Key (समाधान तथा उत्तरकुञ्जिका)'),
+        ('notes', '✍️ Handwritten / Study Note (हस्तलिखित तथा अध्ययन सामग्री)'),
+        ('software', '💻 Software & Tool (सफ्टवेयर तथा टुल्स)'),
+        ('other', '📁 General Resource (अन्य शैक्षिक सामग्री)'),
+    ]
+
+    TARGET_SECTOR_CHOICES = [
+        ('psc', '🏛️ PSC / Loksewa (संघीय लोक सेवा)'),
+        ('pradesh', '🗺️ Pradesh Loksewa (प्रदेश १ देखि ७)'),
+        ('tsc', '👩‍🏫 TSC (शिक्षक सेवा आयोग)'),
+        ('banking', '🏦 Banking (राष्ट्र बैंक, वाणिज्य, नेपाल बैंक, कृषि)'),
+        ('sansthan', '⚡ Sansthan (विद्युत, टेलिकम, CAAN, आयल निगम)'),
+        ('security', '👮 Security Forces (नेपाल प्रहरी, सेना, APF, NID)'),
+        ('school', '🏫 School Level (कक्षा ८, ९, १० SEE, ११, १२ NEB)'),
+        ('university', '🎓 University (TU, PU, Pokhara - BCA, CSIT, BBS)'),
+        ('ctevt', '🛠️ CTEVT (Diploma Engineering, Health, Entrance)'),
+        ('entrance', '🎯 Entrance Exams (CEE Medical, IOE Pulchowk, CMAT)'),
+        ('general', '🌐 General & Multi-Purpose'),
+    ]
+
     title = models.CharField(max_length=300)
     slug = models.SlugField(unique=True, blank=True)
     category = models.ForeignKey(
@@ -22,6 +46,23 @@ class Download(models.Model):
         on_delete=models.CASCADE,
         limit_choices_to={'module': 'downloads'},
         related_name='downloads'
+    )
+    resource_type = models.CharField(
+        max_length=30,
+        choices=RESOURCE_TYPE_CHOICES,
+        default='syllabus',
+        help_text='Primary category: Syllabus, Model Question, Solution, Note, or Software'
+    )
+    target_sector = models.CharField(
+        max_length=30,
+        choices=TARGET_SECTOR_CHOICES,
+        default='psc',
+        help_text='Exam/Education Sector (PSC, TSC, Banking, School, etc.)'
+    )
+    sub_sector = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text='Specific level/sub-category, e.g. "Bagmati Pradesh", "Class 10 (SEE)", "NRB Level 4", "Computer Operator"'
     )
     tags = models.ManyToManyField(Tag, blank=True, related_name='downloads')
     description = models.TextField()
