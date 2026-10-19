@@ -26,6 +26,7 @@
         initQuizOptions();
         initNavbarHighlight();
         initSmoothScroll();
+        initSubmenuToggles();
     });
 
     /* ----------------------------------------------------------
@@ -304,4 +305,24 @@
         });
     }
 
+    /* ----------------------------------------------------------
+       9. Submenu Toggles for Mobile Navigation
+       ---------------------------------------------------------- */
+    function initSubmenuToggles() {
+        var toggles = document.querySelectorAll('.dropdown-submenu > a.dropdown-toggle');
+        toggles.forEach(function (toggle) {
+            toggle.addEventListener('click', function (e) {
+                if (window.innerWidth < 1200) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var submenu = toggle.closest('.dropdown-submenu');
+                    if (submenu) {
+                        submenu.classList.toggle('show');
+                    }
+                }
+            });
+        });
+    }
+
 })();
+

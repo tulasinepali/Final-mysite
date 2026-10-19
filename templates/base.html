@@ -303,77 +303,82 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <a href="{% url 'downloads:list' %}" class="dropdown-toggle d-inline-flex align-items-center {% if 'downloads' in request.resolver_match.app_names %}active{% endif %}" id="downloadsNavDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Downloads
                             </a>
-                            <div class="dropdown-menu megamenu-content shadow-lg border-0" aria-labelledby="downloadsNavDropdown">
-                                <div class="row g-4">
-                                    <!-- Column 1: Syllabus -->
-                                    <div class="col-md-3 megamenu-column">
-                                        <div class="megamenu-heading">
-                                            <a href="{% url 'downloads:list' %}?type=syllabus">Syllabus</a>
-                                        </div>
-                                        <ul class="megamenu-links">
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=psc">PSC</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=tsc">TSC</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=banking">Banking</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=school">School</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=sansthan">Sansthan</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=pradesh">Pradesh</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=security">Police &amp; Army</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus&sector=university">University</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=syllabus" class="all-link">All Syllabus &rarr;</a></li>
-                                        </ul>
-                                    </div>
+                            <ul class="dropdown-menu downloads-dropdown-menu shadow-lg border-0" aria-labelledby="downloadsNavDropdown">
+                                <!-- 1. Syllabus -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=syllabus" role="button">
+                                        <span>Syllabus</span>
+                                        <span class="submenu-arrow">&rsaquo;</span>
+                                    </a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=psc">PSC</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=tsc">TSC</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=banking">Banking</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=school">School</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=sansthan">Sansthan</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=pradesh">Pradesh</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=security">Police &amp; Army</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=syllabus&sector=university">University</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=syllabus">All Syllabus &rarr;</a></li>
+                                    </ul>
+                                </li>
 
-                                    <!-- Column 2: Past & Model Question -->
-                                    <div class="col-md-3 megamenu-column">
-                                        <div class="megamenu-heading">
-                                            <a href="{% url 'downloads:list' %}?type=model_question">Past &amp; Model Question</a>
-                                        </div>
-                                        <ul class="megamenu-links">
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=psc">PSC</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=tsc">TSC</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=banking">Banking</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=school">School</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=sansthan">Sansthan</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=pradesh">Pradesh</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=security">Police &amp; Army</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question&sector=university">University</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=model_question" class="all-link">All Questions &rarr;</a></li>
-                                        </ul>
-                                    </div>
+                                <!-- 2. Past & Model Question -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=model_question" role="button">
+                                        <span>Past &amp; Model Question</span>
+                                        <span class="submenu-arrow">&rsaquo;</span>
+                                    </a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=psc">PSC</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=tsc">TSC</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=banking">Banking</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=school">School</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=sansthan">Sansthan</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=pradesh">Pradesh</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=security">Police &amp; Army</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=model_question&sector=university">University</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=model_question">All Questions &rarr;</a></li>
+                                    </ul>
+                                </li>
 
-                                    <!-- Column 3: Solutions -->
-                                    <div class="col-md-3 megamenu-column">
-                                        <div class="megamenu-heading">
-                                            <a href="{% url 'downloads:list' %}?type=solution">Solutions</a>
-                                        </div>
-                                        <ul class="megamenu-links">
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=psc">PSC</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=tsc">TSC</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=banking">Banking</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=school">School</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=sansthan">Sansthan</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=pradesh">Pradesh</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=security">Police &amp; Army</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution&sector=university">University</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=solution" class="all-link">All Solutions &rarr;</a></li>
-                                        </ul>
-                                    </div>
+                                <!-- 3. Solutions -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=solution" role="button">
+                                        <span>Solutions</span>
+                                        <span class="submenu-arrow">&rsaquo;</span>
+                                    </a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=psc">PSC</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=tsc">TSC</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=banking">Banking</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=school">School</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=sansthan">Sansthan</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=pradesh">Pradesh</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=security">Police &amp; Army</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=solution&sector=university">University</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}?type=solution">All Solutions &rarr;</a></li>
+                                    </ul>
+                                </li>
 
-                                    <!-- Column 4: Softwares & Notes -->
-                                    <div class="col-md-3 megamenu-column">
-                                        <div class="megamenu-heading">
-                                            <a href="{% url 'downloads:list' %}?type=software">Softwares</a>
-                                        </div>
-                                        <ul class="megamenu-links">
-                                            <li><a href="{% url 'downloads:list' %}?type=software">All Softwares</a></li>
-                                            <li><a href="{% url 'downloads:list' %}?type=notes">Handwritten Notes</a></li>
-                                            <li class="mt-3 pt-2 border-top">
-                                                <a href="{% url 'downloads:list' %}" class="all-link font-weight-bold">Browse All Downloads &rarr;</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
+                                <!-- 4. Softwares -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle d-flex justify-content-between align-items-center" href="{% url 'downloads:list' %}?type=software" role="button">
+                                        <span>Softwares</span>
+                                        <span class="submenu-arrow">&rsaquo;</span>
+                                    </a>
+                                    <ul class="dropdown-menu shadow border-0">
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=software">All Softwares</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'downloads:list' %}?type=notes">Handwritten Notes</a></li>
+                                    </ul>
+                                </li>
+
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li><a class="dropdown-item text-primary font-weight-bold" href="{% url 'downloads:list' %}">Browse All Downloads &rarr;</a></li>
+                            </ul>
                         </li>
                         <li><a href="{% url 'blog:list' %}" class="{% if 'blog' in request.resolver_match.app_names %}active{% endif %}"><i class="bi bi-newspaper me-1"></i> Blogs</a></li>
                         <li><a href="{% url 'core:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}"><i class="bi bi-person me-1"></i> About</a></li>
