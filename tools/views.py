@@ -10,6 +10,23 @@ from .models import Tool, Widget, WidgetSetting, PatroEvent, WidgetUsage
 from core.middleware import is_admin_or_staff
 
 def tools_index(request):
+    # Auto-ensure Nepali TTS tool exists so it always shows up immediately
+    if not Tool.objects.filter(slug='nepali-tts').exists():
+        try:
+            Tool.objects.create(
+                name='Nepali Text to Speech (TTS)',
+                slug='nepali-tts',
+                icon='bi-soundwave',
+                category='typing',
+                short_description='Convert Nepali text to natural, lifelike human speech using neural AI voices and download high-quality MP3 audio files.',
+                meta_title='Nepali Text to Speech (TTS) Online | Natural Human MP3 Voice Generator',
+                meta_description='Free online Nepali Text to Speech (TTS) tool. Convert Devanagari text into natural female and male voices (Hemkala & Sagar) and download MP3 audio.',
+                is_active=True,
+                order=4
+            )
+        except Exception:
+            pass
+
     tools = Tool.objects.filter(is_active=True).order_by('order', 'name')
     return render(request, 'tools/index.html', {
         'tools': tools,
