@@ -2778,7 +2778,6 @@ def tts_generate_audio(request):
     })
 
 
-@staff_member_required
 def tts_stream_audio(request, cache_id):
     """
     Stream generated TTS MP3 audio with proper headers and byte-range support.

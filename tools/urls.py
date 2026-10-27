@@ -11,6 +11,9 @@ urlpatterns = [
     path('age-calculator/', views.age_calculator, name='age_calculator'),
     path('unicode-converter/', views.unicode_converter, name='unicode_converter'),
     path('nepali-patro/', views.nepali_patro, name='nepali_patro'),
+    path('nepali-tts/', views.nepali_tts, name='nepali_tts'),
+    path('nepali-tts/generate/', views.nepali_tts_generate, name='nepali_tts_generate'),
+    path('nepali-tts/unlock/', views.nepali_tts_unlock, name='nepali_tts_unlock'),
 
     # Widgets URLs
     path('widgets/', views.widgets_index, name='widgets_index'),

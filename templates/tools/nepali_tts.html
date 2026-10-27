@@ -1,0 +1,805 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ meta_title|default:"Nepali Text to Speech (TTS) Online | Natural Human MP3 Voice Generator" }}{% endblock %}
+{% block meta_description %}{{ meta_description|default:"Free online Nepali Text to Speech (TTS) tool. Convert Devanagari text into natural female and male voices (Hemkala & Sagar) and download MP3 audio." }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-title py-4 py-lg-5" style="background: #edf2f8; border-bottom: 1px solid #e1e7f0;">
+    <div class="container text-center">
+        <div class="d-inline-flex align-items-center gap-2 mb-2">
+            <span class="badge rounded-pill px-3 py-1 bg-primary text-white"><i class="bi bi-soundwave me-1"></i> AI Audio Utility</span>
+            <span class="badge rounded-pill px-3 py-1 bg-white text-dark border">100% Free Access</span>
+        </div>
+        <h1 class="fw-bold mb-2">Nepali Text-to-Speech (TTS) Studio</h1>
+        <p class="text-muted mb-0 mx-auto" style="max-width: 680px;">
+            Convert any Nepali text into natural, lifelike human speech using high-fidelity neural voices. Listen live and download your audio as high-quality MP3 files.
+        </p>
+    </div>
+</div>
+
+<section class="py-5" style="background: #f8fafc; min-height: 75vh;">
+    <div class="container">
+
+        <!-- ==========================================
+             WATCH-TO-UNLOCK VIDEO GATE (For Visitors)
+             ========================================== -->
+        <div id="unlockGateCard" class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5 {% if is_unlocked %}d-none{% endif %}" style="background: #ffffff; border: 2px dashed #cbd5e1 !important;">
+            <div class="card-body p-4 p-md-5">
+                <div class="row align-items-center justify-content-center">
+                    <div class="col-lg-6 col-12 mb-4 mb-lg-0 text-center text-lg-start">
+                        <div class="d-inline-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-danger text-white rounded-pill px-3 py-1">
+                                <i class="bi bi-youtube me-1"></i> Watch to Unlock Free Access
+                            </span>
+                            <span class="badge bg-light text-secondary border rounded-pill px-3 py-1">
+                                One-Time Watch
+                            </span>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-3">Watch Full Video to Unlock Free Audio Generation</h2>
+                        <p class="text-muted mb-4" style="line-height: 1.7;">
+                            This AI voice generation tool is provided <strong>100% free of charge</strong>. To support our educational content and unlock unlimited voiceover generations for your session, please play and watch the featured video on the right until the end.
+                        </p>
+
+                        <!-- Live Watch Progress Container -->
+                        <div class="p-3 rounded-3 border mb-3 text-start" style="background: #f8fafc;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small fw-bold text-dark" id="watchStatusLabel">
+                                    <i class="bi bi-play-circle text-danger me-1"></i> Video Status: Click play to begin
+                                </span>
+                                <span class="small fw-bold text-danger" id="watchPercentBadge">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px; border-radius: 6px; background: #e2e8f0;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" id="videoProgressBar" role="progressbar" style="width: 0%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2 small text-muted">
+                                <span><i class="bi bi-shield-check text-success me-1"></i> Anti-skip verification active</span>
+                                <span id="watchTimeLabel">0:00 / 0:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Channel Subscribe Link -->
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <a href="{{ promo_video.channel_url|default:'https://www.youtube.com/@SkillUpwithTulasiNepali?sub_confirmation=1' }}" target="_blank" rel="noopener" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
+                                <i class="bi bi-youtube me-1"></i> Subscribe to Channel
+                            </a>
+                            <span class="small text-muted">Support Tulasi Nepali on YouTube</span>
+                        </div>
+                    </div>
+
+                    <!-- YouTube Embed Player Column -->
+                    <div class="col-lg-6 col-12">
+                        <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow border position-relative" style="background: #000000;">
+                            <div id="ytUnlockPlayer"></div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Please watch the video to 100% completion to automatically unlock the studio.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unlock Celebration Banner (Shown when video completes) -->
+        <div id="unlockSuccessBanner" class="alert alert-success border-0 rounded-4 shadow-sm p-4 mb-4 text-center" style="display: none; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);">
+            <div class="d-inline-flex p-3 rounded-circle bg-success text-white mb-2 fs-3 shadow-sm">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h4 class="fw-bold text-success mb-1">🎉 Congratulations! Studio Unlocked!</h4>
+            <p class="text-muted mb-3">You now have full free access to generate and download unlimited Nepali voiceovers in this session.</p>
+            <a href="#ttsWorkspace" class="btn btn-success rounded-pill px-4 fw-bold">
+                Start Generating Speech Now <i class="bi bi-arrow-down-circle ms-1"></i>
+            </a>
+        </div>
+
+
+        <!-- ==========================================
+             MAIN NEPALI TEXT-TO-SPEECH STUDIO
+             ========================================== -->
+        <div id="ttsWorkspace" class="row {% if not is_unlocked %}opacity-75 pe-none{% endif %}">
+            
+            <!-- Left Column: Input & Controls -->
+            <div class="col-lg-7 col-12 mb-4">
+                <div class="card shadow-sm border rounded-4 h-100 bg-white">
+                    <div class="card-header bg-white py-3 border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <h5 class="card-title mb-0 fw-bold" style="font-size: 1.05rem;">
+                            <i class="bi bi-fonts me-2" style="color: #7c3aed;"></i>Enter Nepali Text
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-light btn-sm rounded-pill text-secondary" id="btnLoadSample" title="Load sample Nepali text">
+                                <i class="bi bi-magic me-1"></i>Sample Text
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="btnClearText" title="Clear all text">
+                                <i class="bi bi-trash me-1"></i>Clear Text
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body pt-1">
+                        <form id="publicTtsForm">
+                            {% csrf_token %}
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" 
+                                          id="ttsInput" 
+                                          name="text" 
+                                          rows="9" 
+                                          placeholder="Type or paste your Nepali text here...&#10;&#10;Example: नमस्ते! तुलसी नेपालीको खुला सिकाइ प्लेटफर्ममा तपाईंलाई हार्दिक स्वागत छ। यहाँ तपाईंले कम्प्युटर, प्रविधि, लोकसेवा र शिक्षक सेवा परीक्षा तयारीका उपयोगी अध्ययन सामग्रीहरू निःशुल्क प्राप्त गर्न सक्नुहुन्छ।"
+                                          style="font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif; font-size: 1.05rem; line-height: 1.7; border-radius: 12px; resize: vertical;"
+                                          required></textarea>
+                            </div>
+
+                            <!-- Live Character & Word Counters -->
+                            <div class="d-flex justify-content-between align-items-center px-1 mb-3 text-muted small" style="font-family: 'Poppins', sans-serif;">
+                                <div>
+                                    <span id="wordCountBadge" class="fw-bold text-dark">0</span> words &bull; 
+                                    <span id="charCountBadge" class="fw-bold text-dark">0</span> / 10,000 characters
+                                </div>
+                                <div>
+                                    <i class="bi bi-clock me-1"></i>Est. Duration: <span id="estDurationBadge" class="fw-bold text-primary">0 sec</span>
+                                </div>
+                            </div>
+
+                            <!-- Voice, Tone & Speed Settings -->
+                            <div class="p-3 rounded-3 border mb-4" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                                <div class="row g-3">
+                                    <!-- Voice Selector -->
+                                    <div class="col-md-4 col-sm-6 col-12">
+                                        <label class="small fw-bold text-dark mb-1">
+                                            <i class="bi bi-person-bounding-box me-1 text-primary"></i>Voice
+                                        </label>
+                                        <select class="form-select form-select-sm" id="voiceSelect" name="voice" style="border-radius: 8px;">
+                                            <option value="female" selected>👩 Hemkala (Female - Natural Neural)</option>
+                                            <option value="male">👨 Sagar (Male - Natural Neural)</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Speaking Style / Tone -->
+                                    <div class="col-md-4 col-sm-6 col-12">
+                                        <label class="small fw-bold text-dark mb-1">
+                                            <i class="bi bi-mic me-1 text-primary"></i>Speaking Style / Tone
+                                        </label>
+                                        <select class="form-select form-select-sm" id="toneSelect" name="tone" style="border-radius: 8px;">
+                                            <option value="broadcast" selected>🎙️ Natural Broadcast (Recommended)</option>
+                                            <option value="conversational">💬 Conversational &amp; Casual</option>
+                                            <option value="educational">🎓 Educational &amp; Slow Enunciation</option>
+                                            <option value="fast">⚡ Fast Narration</option>
+                                            <option value="normal">⚙️ Normal Baseline</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Speech Rate -->
+                                    <div class="col-md-4 col-sm-12 col-12">
+                                        <label class="small fw-bold text-dark mb-1">
+                                            <i class="bi bi-speedometer2 me-1 text-primary"></i>Speech Speed
+                                        </label>
+                                        <select class="form-select form-select-sm" id="speedSelect" name="speed" style="border-radius: 8px;">
+                                            <option value="0.8">0.8x (Slow)</option>
+                                            <option value="1.0" selected>1.0x (Normal Speed)</option>
+                                            <option value="1.2">1.2x (Fast)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" id="btnConvert" class="btn btn-primary btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); border: none; font-size: 1.05rem; gap: 8px;">
+                                <span id="convertBtnIcon"><i class="bi bi-soundwave fs-5"></i></span>
+                                <span id="convertBtnSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                <span id="convertBtnText">Convert to Speech</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Audio Player & MP3 Download -->
+            <div class="col-lg-5 col-12 mb-4">
+                <div class="card shadow-sm border rounded-4 h-100 bg-white" id="resultCard">
+                    <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 fw-bold" style="font-size: 1.05rem;">
+                            <i class="bi bi-headphones me-2" style="color: #10b981;"></i>Audio Player
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-success text-white" id="resultStatusBadge" style="display: none;">Ready</span>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="btnDeleteCurrentAudioHeader" style="display: none;" title="Delete Audio">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Empty State Placeholder -->
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center p-4 text-center" id="emptyStateContainer">
+                        <div class="rounded-circle p-4 mb-3" style="background: rgba(139, 92, 246, 0.08); color: #8b5cf6; font-size: 3rem;">
+                            <i class="bi bi-mic-fill"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-2">No Audio Generated Yet</h6>
+                        <p class="text-muted small mb-0" style="max-width: 290px;">
+                            Enter or paste your Nepali text on the left and click <strong>"Convert to Speech"</strong> to listen and download your MP3.
+                        </p>
+                    </div>
+
+                    <!-- Active Audio Output Section -->
+                    <div class="card-body p-4" id="audioOutputContainer" style="display: none;">
+                        <!-- Audio Wave Visual Card -->
+                        <div class="p-3 rounded-4 mb-3 text-white text-center shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                            <div class="mb-2" style="font-size: 2.2rem;">
+                                <i class="bi bi-soundwave" id="visualWaveIcon"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1" id="audioVoiceTitle">Hemkala (Natural Neural)</h6>
+                            <div class="small text-white-50" id="audioMetaInfo">0 KB &bull; MP3 Audio Format</div>
+                        </div>
+
+                        <!-- Custom Audio Player Controller -->
+                        <div class="p-3 rounded-3 mb-3 border" style="background: #f8fafc;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="small fw-bold text-muted" id="currentTimeLabel">00:00</span>
+                                <div class="badge bg-light border text-primary px-2 py-1" id="engineBadge">Neural Engine</div>
+                                <span class="small fw-bold text-muted" id="totalDurationLabel">00:00</span>
+                            </div>
+
+                            <!-- Interactive Progress Bar Scrubber -->
+                            <div class="progress mb-3" id="progressContainer" style="height: 8px; cursor: pointer; border-radius: 4px; background: #e2e8f0;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="audioProgressBar" role="progressbar" style="width: 0%;"></div>
+                            </div>
+
+                            <!-- Big Play / Pause Button -->
+                            <button type="button" id="btnCustomPlayPause" class="btn btn-primary w-100 py-2 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center" style="gap: 8px; font-size: 1rem;">
+                                <i class="bi bi-play-circle-fill fs-5" id="customPlayIcon"></i>
+                                <span id="customPlayText">Play Speech</span>
+                            </button>
+
+                            <!-- Native HTML5 Audio Player -->
+                            <div class="mt-2 text-center">
+                                <audio id="audioPlayer" preload="auto" class="w-100" controls style="border-radius: 20px; outline: none; margin-top: 6px;">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+                        </div>
+
+                        <!-- Action Download & Delete Buttons -->
+                        <div class="d-flex flex-column gap-2">
+                            <a href="#" id="btnDownloadMp3" download="nepali-speech.mp3" class="btn btn-success w-100 py-2 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center" style="font-size: 0.95rem; gap: 8px;">
+                                <i class="bi bi-download"></i> Download MP3 Audio
+                            </a>
+                            <button type="button" id="btnDeleteCurrentAudio" class="btn btn-outline-danger w-100 py-2 rounded-pill fw-semibold mt-2 d-flex align-items-center justify-content-center" style="gap: 6px;">
+                                <i class="bi bi-trash"></i> Delete Audio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Audio History Card -->
+        <div class="card shadow-sm border rounded-4 mb-5 bg-white" id="sessionHistoryCard" style="display: none;">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0 fw-bold" style="font-size: 1rem;">
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Recent Audio Recordings (This Session)
+                </h5>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-muted border" id="historyCountBadge">0 files</span>
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="btnClearAllHistory" title="Clear all history">
+                        <i class="bi bi-trash me-1"></i>Clear All
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Text Snippet</th>
+                                <th>Voice &amp; Tone</th>
+                                <th>Size</th>
+                                <th style="width: 250px;" class="text-end">Play / Download / Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessionHistoryTbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEO & Features Section -->
+        <div class="row g-4 mt-2">
+            <div class="col-md-4 col-12">
+                <div class="p-4 rounded-4 bg-white border h-100 shadow-sm">
+                    <div class="d-inline-flex p-3 rounded-3 bg-primary bg-opacity-10 text-primary mb-3 fs-4">
+                        <i class="bi bi-cpu-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Natural Neural AI Voices</h5>
+                    <p class="text-muted small mb-0">
+                        Powered by modern deep learning neural models trained on native Nepali speakers, providing authentic sentence intonation, proper pauses, and clear pronunciation.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="p-4 rounded-4 bg-white border h-100 shadow-sm">
+                    <div class="d-inline-flex p-3 rounded-3 bg-success bg-opacity-10 text-success mb-3 fs-4">
+                        <i class="bi bi-file-earmark-music-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Instant MP3 Export</h5>
+                    <p class="text-muted small mb-0">
+                        Preview generated voiceovers instantly inside your browser and download standard, high-bitrate MP3 audio files ready for videos, podcasts, e-learning, or presentations.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="p-4 rounded-4 bg-white border h-100 shadow-sm">
+                    <div class="d-inline-flex p-3 rounded-3 bg-info bg-opacity-10 text-info mb-3 fs-4">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Free &amp; Unlimited</h5>
+                    <p class="text-muted small mb-0">
+                        Enjoy full free access without costly subscriptions or complicated software installations. Simply paste your Devanagari text and convert in seconds.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- YouTube IFrame API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var isUnlocked = {{ is_unlocked|yesno:"true,false" }};
+    var unlockGateCard = document.getElementById('unlockGateCard');
+    var unlockSuccessBanner = document.getElementById('unlockSuccessBanner');
+    var ttsWorkspace = document.getElementById('ttsWorkspace');
+
+    var form = document.getElementById('publicTtsForm');
+    var input = document.getElementById('ttsInput');
+    var wordCountBadge = document.getElementById('wordCountBadge');
+    var charCountBadge = document.getElementById('charCountBadge');
+    var estDurationBadge = document.getElementById('estDurationBadge');
+
+    var btnConvert = document.getElementById('btnConvert');
+    var convertBtnIcon = document.getElementById('convertBtnIcon');
+    var convertBtnSpinner = document.getElementById('convertBtnSpinner');
+    var convertBtnText = document.getElementById('convertBtnText');
+
+    var emptyStateContainer = document.getElementById('emptyStateContainer');
+    var audioOutputContainer = document.getElementById('audioOutputContainer');
+    var audioPlayer = document.getElementById('audioPlayer');
+    var btnDownloadMp3 = document.getElementById('btnDownloadMp3');
+    var audioVoiceTitle = document.getElementById('audioVoiceTitle');
+    var audioMetaInfo = document.getElementById('audioMetaInfo');
+    var resultStatusBadge = document.getElementById('resultStatusBadge');
+    var engineBadge = document.getElementById('engineBadge');
+
+    var btnDeleteCurrentAudio = document.getElementById('btnDeleteCurrentAudio');
+    var btnDeleteCurrentAudioHeader = document.getElementById('btnDeleteCurrentAudioHeader');
+    var btnClearText = document.getElementById('btnClearText');
+
+    var btnCustomPlayPause = document.getElementById('btnCustomPlayPause');
+    var customPlayIcon = document.getElementById('customPlayIcon');
+    var customPlayText = document.getElementById('customPlayText');
+    var currentTimeLabel = document.getElementById('currentTimeLabel');
+    var totalDurationLabel = document.getElementById('totalDurationLabel');
+    var audioProgressBar = document.getElementById('audioProgressBar');
+    var progressContainer = document.getElementById('progressContainer');
+
+    var sessionHistoryCard = document.getElementById('sessionHistoryCard');
+    var sessionHistoryTbody = document.getElementById('sessionHistoryTbody');
+    var historyCountBadge = document.getElementById('historyCountBadge');
+    var btnClearAllHistory = document.getElementById('btnClearAllHistory');
+
+    var currentBlobUrl = null;
+    var historyItems = [];
+
+    // ==========================================
+    // YOUTUBE WATCH-TO-UNLOCK LOGIC
+    // ==========================================
+    var ytPlayer = null;
+    var progressInterval = null;
+    var maxTimeWatched = 0;
+    var promoVideoId = "{{ promo_video.video_id|default:'jfKfPfyJRdk' }}";
+
+    window.onYouTubeIframeAPIReady = function() {
+        if (isUnlocked) return;
+        var playerEl = document.getElementById('ytUnlockPlayer');
+        if (!playerEl) return;
+
+        ytPlayer = new YT.Player('ytUnlockPlayer', {
+            videoId: promoVideoId,
+            playerVars: {
+                'playsinline': 1,
+                'rel': 0,
+                'modestbranding': 1
+            },
+            events: {
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    };
+
+    function onPlayerStateChange(event) {
+        var statusLabel = document.getElementById('watchStatusLabel');
+        var progressBar = document.getElementById('videoProgressBar');
+        var percentBadge = document.getElementById('watchPercentBadge');
+        var timeLabel = document.getElementById('watchTimeLabel');
+
+        if (event.data === YT.PlayerState.PLAYING) {
+            statusLabel.innerHTML = '<i class="bi bi-play-circle text-danger me-1"></i> Watching video... please watch until the end';
+            
+            if (!progressInterval) {
+                progressInterval = setInterval(function() {
+                    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+                    var currentTime = ytPlayer.getCurrentTime();
+                    var duration = ytPlayer.getDuration();
+
+                    if (currentTime > maxTimeWatched + 3) {
+                        // Anti-skip protection: user dragged slider forward ahead of real watch time
+                        ytPlayer.seekTo(maxTimeWatched, true);
+                        currentTime = maxTimeWatched;
+                    } else if (currentTime > maxTimeWatched) {
+                        maxTimeWatched = currentTime;
+                    }
+
+                    if (duration > 0) {
+                        var pct = Math.min(100, Math.round((maxTimeWatched / duration) * 100));
+                        progressBar.style.width = pct + '%';
+                        percentBadge.textContent = pct + '%';
+                        timeLabel.textContent = formatTime(currentTime) + ' / ' + formatTime(duration);
+
+                        // Unlock threshold: video completed or >= 95%
+                        if (pct >= 95) {
+                            triggerUnlock();
+                        }
+                    }
+                }, 500);
+            }
+        } else if (event.data === YT.PlayerState.ENDED) {
+            triggerUnlock();
+        } else if (event.data === YT.PlayerState.PAUSED) {
+            statusLabel.innerHTML = '<i class="bi bi-pause-circle text-warning me-1"></i> Video paused. Play to resume progress';
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+    }
+
+    function triggerUnlock() {
+        if (isUnlocked) return;
+        isUnlocked = true;
+        if (progressInterval) {
+            clearInterval(progressInterval);
+            progressInterval = null;
+        }
+
+        // Call backend unlock endpoint
+        fetch("{% url 'tools:nepali_tts_unlock' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            // Reveal workspace
+            unlockGateCard.style.display = 'none';
+            unlockSuccessBanner.style.display = 'block';
+            ttsWorkspace.classList.remove('opacity-75', 'pe-none');
+
+            document.getElementById('videoProgressBar').style.width = '100%';
+            document.getElementById('watchPercentBadge').textContent = '100%';
+        })
+        .catch(function(err) {
+            // Still unlock client-side gracefully
+            unlockGateCard.style.display = 'none';
+            unlockSuccessBanner.style.display = 'block';
+            ttsWorkspace.classList.remove('opacity-75', 'pe-none');
+        });
+    }
+
+    // ==========================================
+    // AUDIO GENERATION & CONTROLS
+    // ==========================================
+    function formatTime(secs) {
+        if (isNaN(secs) || secs < 0) return '00:00';
+        var m = Math.floor(secs / 60);
+        var s = Math.floor(secs % 60);
+        return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+    }
+
+    function updateCounters() {
+        var text = input.value.trim();
+        var chars = text.length;
+        var words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+
+        wordCountBadge.textContent = words;
+        charCountBadge.textContent = chars;
+
+        var seconds = Math.round((words / 130) * 60);
+        if (seconds < 60) {
+            estDurationBadge.textContent = seconds + ' sec';
+        } else {
+            var mins = Math.floor(seconds / 60);
+            var remSecs = seconds % 60;
+            estDurationBadge.textContent = mins + 'm ' + remSecs + 's';
+        }
+    }
+
+    input.addEventListener('input', updateCounters);
+
+    // Sample Text
+    document.getElementById('btnLoadSample').addEventListener('click', function() {
+        input.value = "नमस्ते! तुलसी नेपालीको खुला सिकाइ प्लेटफर्ममा तपाईंलाई हार्दिक स्वागत छ। यहाँ तपाईंले कम्प्युटर, प्रविधि, लोकसेवा र शिक्षक सेवा परीक्षा तयारीका सम्पूर्ण पाठ्यक्रम, पुराना प्रश्नहरू र उपयोगी अध्ययन सामग्रीहरू सहजै प्राप्त गर्न सक्नुहुन्छ।";
+        updateCounters();
+        input.focus();
+    });
+
+    // Clear Text
+    btnClearText.addEventListener('click', function() {
+        if (!input.value.trim() || confirm('Are you sure you want to clear the text?')) {
+            input.value = '';
+            updateCounters();
+            input.focus();
+        }
+    });
+
+    // Delete Current Audio
+    function deleteCurrentAudio() {
+        if (!audioPlayer.src && emptyStateContainer.style.display !== 'none') return;
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+        audioPlayer.src = '';
+
+        audioProgressBar.style.width = '0%';
+        currentTimeLabel.textContent = '00:00';
+        totalDurationLabel.textContent = '00:00';
+
+        customPlayIcon.className = 'bi bi-play-circle-fill fs-5';
+        customPlayText.textContent = 'Play Speech';
+        btnCustomPlayPause.classList.remove('btn-success');
+        btnCustomPlayPause.classList.add('btn-primary');
+
+        audioOutputContainer.style.display = 'none';
+        btnDeleteCurrentAudioHeader.style.display = 'none';
+        resultStatusBadge.style.display = 'none';
+        emptyStateContainer.style.display = 'flex';
+    }
+
+    btnDeleteCurrentAudio.addEventListener('click', deleteCurrentAudio);
+    btnDeleteCurrentAudioHeader.addEventListener('click', deleteCurrentAudio);
+
+    // Custom Play / Pause
+    btnCustomPlayPause.addEventListener('click', function() {
+        if (!audioPlayer.src) return;
+        if (audioPlayer.paused) {
+            var p = audioPlayer.play();
+            if (p !== undefined) {
+                p.catch(function(err) {
+                    console.warn('Playback error:', err);
+                });
+            }
+        } else {
+            audioPlayer.pause();
+        }
+    });
+
+    audioPlayer.addEventListener('play', function() {
+        customPlayIcon.className = 'bi bi-pause-circle-fill fs-5';
+        customPlayText.textContent = 'Pause Speech';
+        btnCustomPlayPause.classList.remove('btn-primary');
+        btnCustomPlayPause.classList.add('btn-success');
+    });
+
+    audioPlayer.addEventListener('pause', function() {
+        customPlayIcon.className = 'bi bi-play-circle-fill fs-5';
+        customPlayText.textContent = 'Play Speech';
+        btnCustomPlayPause.classList.remove('btn-success');
+        btnCustomPlayPause.classList.add('btn-primary');
+    });
+
+    audioPlayer.addEventListener('timeupdate', function() {
+        currentTimeLabel.textContent = formatTime(audioPlayer.currentTime);
+        if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+            var pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            audioProgressBar.style.width = pct + '%';
+        }
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', function() {
+        totalDurationLabel.textContent = formatTime(audioPlayer.duration);
+    });
+
+    audioPlayer.addEventListener('ended', function() {
+        customPlayIcon.className = 'bi bi-arrow-repeat fs-5';
+        customPlayText.textContent = 'Replay Speech';
+        btnCustomPlayPause.classList.remove('btn-success');
+        btnCustomPlayPause.classList.add('btn-primary');
+        audioProgressBar.style.width = '100%';
+    });
+
+    progressContainer.addEventListener('click', function(e) {
+        if (!audioPlayer.duration || isNaN(audioPlayer.duration)) return;
+        var rect = progressContainer.getBoundingClientRect();
+        var clickX = e.clientX - rect.left;
+        var newPct = clickX / rect.width;
+        audioPlayer.currentTime = newPct * audioPlayer.duration;
+    });
+
+    // Form Submit (AJAX Generate)
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var text = input.value.trim();
+        if (!text) {
+            alert('Please enter or paste some Nepali text to convert.');
+            return;
+        }
+
+        var voice = document.getElementById('voiceSelect').value;
+        var tone = document.getElementById('toneSelect').value;
+        var speed = document.getElementById('speedSelect').value;
+        var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        btnConvert.disabled = true;
+        convertBtnIcon.style.display = 'none';
+        convertBtnSpinner.style.display = 'inline-block';
+        convertBtnText.textContent = 'Synthesizing Audio...';
+
+        fetch("{% url 'tools:nepali_tts_generate' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                text: text,
+                voice: voice,
+                tone: tone,
+                speed: speed
+            })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            btnConvert.disabled = false;
+            convertBtnIcon.style.display = 'inline-block';
+            convertBtnSpinner.style.display = 'none';
+            convertBtnText.textContent = 'Convert to Speech';
+
+            if (data.status === 'ok') {
+                audioPlayer.src = data.audio_url;
+                audioPlayer.load();
+
+                btnDownloadMp3.href = data.audio_url + '?download=1&filename=' + encodeURIComponent(data.filename);
+                btnDownloadMp3.download = data.filename;
+
+                audioVoiceTitle.textContent = data.voice_label;
+                audioMetaInfo.textContent = data.size_kb + ' KB • MP3 Audio Format • ' + data.word_count + ' words';
+                resultStatusBadge.style.display = 'inline-block';
+                btnDeleteCurrentAudioHeader.style.display = 'inline-block';
+
+                emptyStateContainer.style.display = 'none';
+                audioOutputContainer.style.display = 'block';
+
+                var playPromise = audioPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(function() {
+                        customPlayText.textContent = 'Play Speech';
+                    });
+                }
+
+                addToSessionHistory(text, data);
+            } else if (data.status === 'locked') {
+                alert(data.message || 'Please watch the video to unlock the tool.');
+                if (unlockGateCard) {
+                    unlockGateCard.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                alert(data.message || 'Failed to synthesize speech. Please try again.');
+            }
+        })
+        .catch(function(err) {
+            btnConvert.disabled = false;
+            convertBtnIcon.style.display = 'inline-block';
+            convertBtnSpinner.style.display = 'none';
+            convertBtnText.textContent = 'Convert to Speech';
+            console.error('TTS Error:', err);
+            alert('A server error occurred. Please check your connection and try again.');
+        });
+    });
+
+    // History Table
+    function renderHistory() {
+        if (historyItems.length === 0) {
+            sessionHistoryCard.style.display = 'none';
+            return;
+        }
+
+        sessionHistoryCard.style.display = 'block';
+        historyCountBadge.textContent = historyItems.length + ' file' + (historyItems.length === 1 ? '' : 's');
+        sessionHistoryTbody.innerHTML = '';
+
+        historyItems.forEach(function(item, idx) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="badge bg-light text-dark border">${idx + 1}</span></td>
+                <td>
+                    <span class="fw-semibold text-dark">${escapeHtml(item.text.slice(0, 50))}...</span>
+                    <br><small class="text-muted">${item.time}</small>
+                </td>
+                <td>
+                    <span class="badge rounded-pill bg-info text-dark px-2 py-1">${escapeHtml(item.data.voice_label)}</span>
+                </td>
+                <td><small class="text-muted">${item.data.size_kb} KB</small></td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill play-history-btn me-1" data-index="${idx}" title="Play Audio">
+                        <i class="bi bi-play-fill"></i> Play
+                    </button>
+                    <a href="${item.data.audio_url}?download=1&filename=${encodeURIComponent(item.data.filename)}" download="${item.data.filename}" class="btn btn-sm btn-success rounded-pill me-1" title="Download MP3">
+                        <i class="bi bi-download"></i> MP3
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill delete-history-item-btn" data-index="${idx}" title="Delete this recording">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+            sessionHistoryTbody.appendChild(tr);
+        });
+
+        document.querySelectorAll('.play-history-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(btn.getAttribute('data-index'), 10);
+                if (historyItems[idx]) {
+                    var h = historyItems[idx];
+                    audioPlayer.src = h.data.audio_url;
+                    audioPlayer.load();
+
+                    audioVoiceTitle.textContent = h.data.voice_label;
+                    audioMetaInfo.textContent = h.data.size_kb + ' KB • MP3 Audio Format';
+                    btnDownloadMp3.href = h.data.audio_url + '?download=1&filename=' + encodeURIComponent(h.data.filename);
+                    btnDownloadMp3.download = h.data.filename;
+
+                    emptyStateContainer.style.display = 'none';
+                    audioOutputContainer.style.display = 'block';
+                    btnDeleteCurrentAudioHeader.style.display = 'inline-block';
+                    resultStatusBadge.style.display = 'inline-block';
+
+                    audioPlayer.play().catch(function() {});
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete-history-item-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(btn.getAttribute('data-index'), 10);
+                if (historyItems[idx]) {
+                    historyItems.splice(idx, 1);
+                    renderHistory();
+                }
+            });
+        });
+    }
+
+    function addToSessionHistory(text, data) {
+        historyItems.unshift({
+            text: text,
+            data: data,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+        renderHistory();
+    }
+
+    btnClearAllHistory.addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all recordings from this session?')) {
+            historyItems = [];
+            renderHistory();
+        }
+    });
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+});
+</script>
+{% endblock %}

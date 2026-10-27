@@ -79,6 +79,8 @@ def tool_detail(request, slug):
         return unicode_converter(request)
     elif slug == 'nepali-patro':
         return nepali_patro(request)
+    elif slug == 'nepali-tts':
+        return nepali_tts(request)
     tool = get_object_or_404(Tool, slug=slug, is_active=True)
     if not is_admin_or_staff(request):
         Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
@@ -206,3 +208,130 @@ def api_patro_events(request):
     }
     return JsonResponse(data)
 
+
+
+def nepali_tts(request):
+    tool = Tool.objects.filter(slug='nepali-tts', is_active=True).first()
+    if tool and not is_admin_or_staff(request):
+        Tool.objects.filter(pk=tool.pk).update(view_count=F('view_count') + 1)
+
+    is_unlocked = bool(is_admin_or_staff(request) or request.session.get('tts_unlocked', False))
+
+    from core.models import YouTubeVideo
+    promo_video = YouTubeVideo.objects.filter(is_active=True).order_by('?').first()
+    if not promo_video:
+        promo_video = {
+            'video_id': 'jfKfPfyJRdk',
+            'title': 'SkillUp with Tulasi Nepali',
+            'channel_name': 'Tulasi Nepali',
+            'channel_url': 'https://www.youtube.com/@SkillUpwithTulasiNepali?sub_confirmation=1'
+        }
+
+    return render(request, 'tools/nepali_tts.html', {
+        'tool': tool,
+        'is_unlocked': is_unlocked,
+        'promo_video': promo_video,
+        'meta_title': tool.meta_title if tool and tool.meta_title else 'Nepali Text to Speech (TTS) Online | Natural Human MP3 Voice Generator',
+        'meta_description': tool.meta_description if tool and tool.meta_description else 'Free online Nepali Text to Speech (TTS) tool. Convert Devanagari text into natural female and male voices (Hemkala & Sagar) and download MP3 audio.',
+    })
+
+
+@require_POST
+def nepali_tts_unlock(request):
+    """
+    Unlock the Nepali TTS tool for this visitor session after watching the promoted video.
+    """
+    request.session['tts_unlocked'] = True
+    request.session.modified = True
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'Tool unlocked successfully! You can now generate speech and download MP3.'
+    })
+
+
+@require_POST
+def nepali_tts_generate(request):
+    """
+    Public frontend endpoint for generating Nepali speech.
+    Requires the video to have been watched (or staff access).
+    """
+    from core.middleware import is_admin_or_staff
+    if not is_admin_or_staff(request) and not request.session.get('tts_unlocked', False):
+        return JsonResponse({
+            'status': 'locked',
+            'message': 'Please watch the featured video to unlock free audio generation.'
+        }, status=403)
+
+    import json
+    import base64
+    import uuid
+    import os
+    from django.conf import settings
+    from django.core.cache import cache
+    from django.utils.html import strip_tags
+    from dashboard.views import _generate_nepali_tts_bytes
+
+    data = {}
+    if request.content_type == 'application/json':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            data = {}
+    else:
+        data = request.POST
+
+    raw_text = str(data.get('text', '')).strip()
+    clean_text = strip_tags(raw_text).strip()
+    voice = str(data.get('voice', 'female')).strip().lower()
+    tone = str(data.get('tone', 'broadcast')).strip().lower()
+    speed = str(data.get('speed', '1.0')).strip()
+
+    if not clean_text:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Please enter or paste some Nepali text to convert.'
+        }, status=400)
+
+    # Max length: 10,000 characters for public visitors
+    clean_text = clean_text[:10000]
+
+    audio_bytes, engine_used = _generate_nepali_tts_bytes(clean_text, voice=voice, tone=tone, speed=speed)
+
+    if not audio_bytes:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Unable to synthesize audio. Please try again.'
+        }, status=500)
+
+    cache_id = uuid.uuid4().hex[:16]
+    try:
+        cache.set(f"tts_audio_{cache_id}", audio_bytes, timeout=7200)
+    except Exception:
+        pass
+
+    try:
+        cache_dir = os.path.join(settings.MEDIA_ROOT, 'tts_cache')
+        os.makedirs(cache_dir, exist_ok=True)
+        file_path = os.path.join(cache_dir, f"{cache_id}.mp3")
+        with open(file_path, 'wb') as f:
+            f.write(audio_bytes)
+    except Exception:
+        pass
+
+    audio_url = f"/rishav/tts/stream/{cache_id}/"
+    audio_base64 = "data:audio/mpeg;base64," + base64.b64encode(audio_bytes).decode('utf-8')
+    filename = f"nepali-speech-{voice}.mp3"
+    voice_label = "Hemkala (Female - Natural Neural)" if voice == 'female' else "Sagar (Male - Natural Neural)"
+
+    return JsonResponse({
+        'status': 'ok',
+        'audio_url': audio_url,
+        'cache_id': cache_id,
+        'audio_data': audio_base64,
+        'filename': filename,
+        'voice_label': voice_label,
+        'engine_used': engine_used,
+        'char_count': len(clean_text),
+        'word_count': len(clean_text.split()),
+        'size_kb': round(len(audio_bytes) / 1024, 1),
+    })
