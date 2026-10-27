@@ -58,7 +58,15 @@
 
                         <!-- YouTube Embed Player Container -->
                         <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-sm border mb-3 bg-black position-relative">
-                            <div id="ytUnlockPlayer"></div>
+                            <iframe id="ytUnlockPlayer"
+                                    class="w-100 h-100 position-absolute top-0 start-0"
+                                    src="https://www.youtube.com/embed/{{ promo_video.video_id|default:'jfKfPfyJRdk' }}?enablejsapi=1&rel=0&modestbranding=1&playsinline=1"
+                                    title="Watch to Unlock Free Nepali TTS"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen
+                                    style="width: 100%; height: 100%; border: none;">
+                            </iframe>
                         </div>
 
                         <!-- Live Watch Progress Box -->
@@ -386,7 +394,45 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
+// Global YouTube API Controller
+var ytPlayer = null;
+var ytPlayerInitialized = false;
+
+function initYTPlayer() {
+    if (ytPlayerInitialized) return;
+    var iframe = document.getElementById('ytUnlockPlayer');
+    if (!iframe || !window.YT || !window.YT.Player) return;
+
+    try {
+        ytPlayerInitialized = true;
+        ytPlayer = new YT.Player('ytUnlockPlayer', {
+            events: {
+                'onReady': function() {
+                    try {
+                        iframe.contentWindow.postMessage('{"event":"listening","id":1,"channel":"widget"}', '*');
+                    } catch(err) {}
+                },
+                'onStateChange': function(event) {
+                    if (window.handleYTStateChange) {
+                        window.handleYTStateChange(event.data);
+                    }
+                }
+            }
+        });
+    } catch(e) {
+        console.warn('YT.Player init notice:', e);
+    }
+}
+
+window.onYouTubeIframeAPIReady = function() {
+    initYTPlayer();
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+    if (window.YT && window.YT.Player) {
+        initYTPlayer();
+    }
+
     var isUnlocked = {{ is_unlocked|yesno:"true,false" }};
     var unlockSuccessBanner = document.getElementById('unlockSuccessBanner');
     var ttsWorkspace = document.getElementById('ttsWorkspace');
@@ -434,11 +480,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================
     // YOUTUBE WATCH-TO-UNLOCK POPUP MODAL
     // ==========================================
-    var ytPlayer = null;
     var progressInterval = null;
     var maxTimeWatched = 0;
-    var promoVideoId = "{{ promo_video.video_id|default:'jfKfPfyJRdk' }}";
     var unlockModalInstance = null;
+
+    function formatTime(secs) {
+        if (isNaN(secs) || secs < 0) return '00:00';
+        var m = Math.floor(secs / 60);
+        var s = Math.floor(secs % 60);
+        return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+    }
 
     if (!isUnlocked) {
         var modalEl = document.getElementById('videoUnlockModal');
@@ -447,7 +498,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 backdrop: 'static',
                 keyboard: false
             });
-            // Show modal immediately on load
             unlockModalInstance.show();
 
             var btnReopen = document.getElementById('btnReopenModal');
@@ -459,81 +509,127 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    window.onYouTubeIframeAPIReady = function() {
-        if (isUnlocked) return;
-        var playerEl = document.getElementById('ytUnlockPlayer');
-        if (!playerEl) return;
-
-        ytPlayer = new YT.Player('ytUnlockPlayer', {
-            videoId: promoVideoId,
-            playerVars: {
-                'playsinline': 1,
-                'rel': 0,
-                'modestbranding': 1
-            },
-            events: {
-                'onStateChange': onPlayerStateChange
-            }
-        });
-    };
-
-    function onPlayerStateChange(event) {
+    function handleYTStateChange(state) {
         var statusLabel = document.getElementById('watchStatusLabel');
+
+        if (state === 1) { // PLAYING
+            if (statusLabel) {
+                statusLabel.innerHTML = '<i class="bi bi-play-circle-fill text-danger me-1"></i> Watching video... please watch until the end';
+            }
+            startWatchTicker();
+        } else if (state === 0) { // ENDED
+            triggerUnlock();
+        } else if (state === 2) { // PAUSED
+            if (statusLabel) {
+                statusLabel.innerHTML = '<i class="bi bi-pause-circle-fill text-warning me-1"></i> Video paused. Play to resume progress';
+            }
+            stopWatchTicker();
+        }
+    }
+    window.handleYTStateChange = handleYTStateChange;
+
+    function startWatchTicker() {
+        if (progressInterval) return;
+        progressInterval = setInterval(function() {
+            var currentTime = 0;
+            var duration = 0;
+
+            if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+                try {
+                    currentTime = ytPlayer.getCurrentTime() || 0;
+                    duration = ytPlayer.getDuration() || 0;
+                } catch(e) {}
+            }
+
+            if (currentTime === 0 && duration === 0) {
+                currentTime = maxTimeWatched + 0.5;
+            }
+
+            updateWatchProgress(currentTime, duration);
+        }, 500);
+    }
+
+    function stopWatchTicker() {
+        if (progressInterval) {
+            clearInterval(progressInterval);
+            progressInterval = null;
+        }
+    }
+
+    function updateWatchProgress(currentTime, duration) {
         var progressBar = document.getElementById('videoProgressBar');
         var percentBadge = document.getElementById('watchPercentBadge');
         var timeLabel = document.getElementById('watchTimeLabel');
 
-        if (event.data === YT.PlayerState.PLAYING) {
-            if (statusLabel) {
-                statusLabel.innerHTML = '<i class="bi bi-play-circle-fill text-danger me-1"></i> Watching video... please watch until the end';
+        var dur = duration > 0 ? duration : 30;
+
+        // Anti-skip check (when regular video with duration)
+        if (duration > 0 && currentTime > maxTimeWatched + 3) {
+            if (ytPlayer && typeof ytPlayer.seekTo === 'function') {
+                try {
+                    ytPlayer.seekTo(maxTimeWatched, true);
+                } catch(e) {}
             }
-            
-            if (!progressInterval) {
-                progressInterval = setInterval(function() {
-                    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
-                    var currentTime = ytPlayer.getCurrentTime();
-                    var duration = ytPlayer.getDuration();
+            currentTime = maxTimeWatched;
+        } else if (currentTime > maxTimeWatched) {
+            maxTimeWatched = currentTime;
+        }
 
-                    if (currentTime > maxTimeWatched + 3) {
-                        // Anti-skip protection
-                        ytPlayer.seekTo(maxTimeWatched, true);
-                        currentTime = maxTimeWatched;
-                    } else if (currentTime > maxTimeWatched) {
-                        maxTimeWatched = currentTime;
-                    }
+        var pct = Math.min(100, Math.round((maxTimeWatched / dur) * 100));
+        if (progressBar) progressBar.style.width = pct + '%';
+        if (percentBadge) percentBadge.textContent = pct + '%';
+        if (timeLabel) timeLabel.textContent = formatTime(maxTimeWatched) + ' / ' + formatTime(dur);
 
-                    if (duration > 0) {
-                        var pct = Math.min(100, Math.round((maxTimeWatched / duration) * 100));
-                        if (progressBar) progressBar.style.width = pct + '%';
-                        if (percentBadge) percentBadge.textContent = pct + '%';
-                        if (timeLabel) timeLabel.textContent = formatTime(currentTime) + ' / ' + formatTime(duration);
-
-                        // Unlock threshold: video completed or >= 95%
-                        if (pct >= 95) {
-                            triggerUnlock();
-                        }
-                    }
-                }, 500);
-            }
-        } else if (event.data === YT.PlayerState.ENDED) {
+        if (pct >= 95) {
             triggerUnlock();
-        } else if (event.data === YT.PlayerState.PAUSED) {
-            if (statusLabel) {
-                statusLabel.innerHTML = '<i class="bi bi-pause-circle-fill text-warning me-1"></i> Video paused. Play to resume progress';
-            }
-            if (progressInterval) {
-                clearInterval(progressInterval);
-                progressInterval = null;
+        }
+    }
+
+    // HTML5 postMessage listener for YouTube iframe messages
+    window.addEventListener('message', function(event) {
+        if (!event.data) return;
+        var payload = null;
+        try {
+            payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        } catch(e) {
+            return;
+        }
+        if (!payload) return;
+
+        if (payload.event === 'onStateChange') {
+            handleYTStateChange(payload.info);
+        } else if (payload.event === 'infoDelivery' && payload.info) {
+            if (typeof payload.info.currentTime === 'number') {
+                var dur = payload.info.duration || (ytPlayer && ytPlayer.getDuration ? ytPlayer.getDuration() : 0);
+                updateWatchProgress(payload.info.currentTime, dur);
             }
         }
+    });
+
+    var ytIframe = document.getElementById('ytUnlockPlayer');
+    if (ytIframe) {
+        ytIframe.addEventListener('load', function() {
+            try {
+                ytIframe.contentWindow.postMessage('{"event":"listening","id":1,"channel":"widget"}', '*');
+            } catch(e) {}
+            if (window.YT && window.YT.Player) {
+                initYTPlayer();
+            }
+        });
     }
 
     function triggerUnlock() {
         if (isUnlocked) return;
         isUnlocked = true;
-        if (progressInterval) {
-            clearInterval(progressInterval);
-            progressInterval = null;
+        stopWatchTicker();
+
+        var progressBar = document.getElementById('videoProgressBar');
+        var percentBadge = document.getElementById('watchPercentBadge');
+        var statusLabel = document.getElementById('watchStatusLabel');
+        if (progressBar) progressBar.style.width = '100%';
+        if (percentBadge) percentBadge.textContent = '100%';
+        if (statusLabel) {
+            statusLabel.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> Video Completed! Unlocking...';
         }
 
         var completeMsg = document.getElementById('modalUnlockCompleteMsg');
@@ -549,7 +645,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .finally(function() {
             setTimeout(function() {
-                // Close modal
                 if (unlockModalInstance) {
                     unlockModalInstance.hide();
                 } else {
@@ -560,7 +655,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Remove blur and lock overlay
                 if (lockedWorkspaceOverlay) {
                     lockedWorkspaceOverlay.remove();
                 }
@@ -579,12 +673,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================
     // AUDIO GENERATION & CONTROLS
     // ==========================================
-    function formatTime(secs) {
-        if (isNaN(secs) || secs < 0) return '00:00';
-        var m = Math.floor(secs / 60);
-        var s = Math.floor(secs % 60);
-        return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
-    }
 
     function updateCounters() {
         var text = input.value.trim();
