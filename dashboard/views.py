@@ -2516,7 +2516,7 @@ def reaction_delete(request, pk):
 def _preprocess_nepali_text(text):
     """
     Normalizes Nepali text for natural cadence, phrasing, and pauses.
-    Expands common abbreviations and ensures proper clause endings with '।'
+    Expands common abbreviations, adds natural clause pauses, and ensures proper endings with '।'
     """
     if not text:
         return ''
@@ -2540,6 +2540,15 @@ def _preprocess_nepali_text(text):
     for pattern, repl in abbrev_map:
         cleaned = re.sub(pattern, repl, cleaned)
 
+    # Convert English dot '.' after Devanagari characters to Nepali purna-viram '।'
+    # (prevents voices from rushing through sentences without pitch inflection)
+    cleaned = re.sub(r'([\u0900-\u097F]+)\s*\.\s*', r'\1। ', cleaned)
+
+    # Add natural breathing/pausing commas before major conjunctions if not already punctuated
+    conjunctions = ['तर', 'किनभने', 'यद्यपि', 'त्यसैले', 'तसर्थ', 'साथै', 'तापनि', 'फलस्वरूप']
+    for conj in conjunctions:
+        cleaned = re.sub(r'(?<![,।!?;:\n])\s+' + conj + r'\s+', r', ' + conj + ' ', cleaned)
+
     cleaned = re.sub(r'[ \t]+', ' ', cleaned)
     cleaned = re.sub(r'\n+', '\n', cleaned).strip()
 
@@ -2557,8 +2566,10 @@ def _preprocess_nepali_text(text):
 def _generate_nepali_tts_bytes(text, voice='female', tone='broadcast', speed='1.0'):
     """
     Generate MP3 audio bytes for Nepali text.
-    Primary: Microsoft Edge Neural TTS (Natural Hemkala / Sagar voices) with thread-isolated event loop.
-    Fallback: Google Translate TTS stream.
+    Primary Options:
+      - 'google': Authentic Native Nepali Voice (Fast, native human intonation).
+      - 'female': Microsoft Edge Neural Hemkala (Natural studio cadence).
+      - 'male': Microsoft Edge Neural Sagar (Male studio voice).
     Returns: tuple (audio_bytes, engine_used)
     """
     import re
@@ -2569,35 +2580,36 @@ def _generate_nepali_tts_bytes(text, voice='female', tone='broadcast', speed='1.
     if not clean_text:
         return b'', 'empty'
 
-    # Tone & cadence calculation
-    rate_str = '+0%'
+    # Natural tone & cadence tuning
+    # Relaxed pacing allows authentic Nepali vowels (मात्रा) to resonate without rush
+    rate_str = '-2%'
     pitch_str = '+0Hz'
     if tone == 'broadcast':
-        rate_str = '+5%'
+        rate_str = '-1%'
         pitch_str = '+0Hz'
     elif tone == 'conversational':
-        rate_str = '+8%'
-        pitch_str = '+3Hz'
+        rate_str = '-3%'
+        pitch_str = '-1Hz'
     elif tone == 'educational':
-        rate_str = '-6%'
+        rate_str = '-8%'
         pitch_str = '-1Hz'
     elif tone == 'fast':
-        rate_str = '+20%'
-        pitch_str = '+1Hz'
+        rate_str = '+12%'
+        pitch_str = '+0Hz'
     elif tone == 'normal':
-        rate_str = '+0%'
+        rate_str = '-2%'
         pitch_str = '+0Hz'
 
     # User speed fine-tuning override if modified
     if speed == '0.8':
         rate_str = '-15%'
     elif speed == '1.2':
-        rate_str = '+20%'
+        rate_str = '+15%'
 
     voice_name = 'ne-NP-HemkalaNeural' if voice == 'female' else 'ne-NP-SagarNeural'
 
-    # 1. Primary: Microsoft Edge Neural TTS with dedicated thread and event loop
-    if voice != 'google':
+    # 1. Primary: Microsoft Edge Neural TTS with dedicated thread and event loop (when voice is female or male)
+    if voice in ('female', 'male'):
         try:
             import asyncio
             import concurrent.futures
@@ -2632,7 +2644,7 @@ def _generate_nepali_tts_bytes(text, voice='female', tone='broadcast', speed='1.
         except Exception as e:
             logger.warning("Edge Neural TTS failed: %s, falling back to Google TTS", e)
 
-    # 2. Fallback: Google Translate TTS audio chunking
+    # 2. Google Translate Native TTS (Direct when voice='google', or fallback if Edge failed)
     try:
         import urllib.request, urllib.parse
         sentences = re.split(r'([।?!;\n]+)', clean_text)
@@ -2657,10 +2669,10 @@ def _generate_nepali_tts_bytes(text, voice='female', tone='broadcast', speed='1.
             with urllib.request.urlopen(req, timeout=12) as resp:
                 out += resp.read()
         if out and len(out) > 100:
-            return out, 'google_fallback'
+            return out, 'google_tts' if voice == 'google' else 'google_fallback'
         return b'', 'failed'
     except Exception as e:
-        logger.error("Google TTS fallback also failed: %s", e)
+        logger.error("Google TTS failed: %s", e)
         return b'', 'failed'
 
 
@@ -2756,12 +2768,15 @@ def tts_generate_audio(request):
     audio_url = f"/rishav/tts/stream/{cache_id}/"
     audio_base64 = "data:audio/mpeg;base64," + base64.b64encode(audio_bytes).decode('utf-8')
 
-    if engine_used == 'edge_neural':
-        voice_label = "हेमकला (महिला - Microsoft Natural Neural)" if voice == 'female' else "सागर (पुरुष - Microsoft Natural Neural)"
+    if voice == 'google':
+        voice_label = "मौलिक नेपाली आवाज (Google Authentic Native Accent)"
+        engine_warning = ""
+    elif engine_used == 'edge_neural':
+        voice_label = "हेमकला (महिला - Microsoft Studio Neural)" if voice == 'female' else "सागर (पुरुष - Microsoft Studio Neural)"
         engine_warning = ""
     else:
         voice_label = "गुगल नेपाली (Google Voice - Backup)"
-        engine_warning = "सर्भरमा Edge Neural TTS उपलब्ध नभएकाले गुगल ब्याकअप आवाज प्रयोग भयो। १००% प्राकृतिक नेपाली आवाजको लागि cPanel Terminal मा 'pip install edge-tts' चलाउनुहोस्।"
+        engine_warning = "सर्भरमा Edge Neural उपलब्ध नभएकाले गुगल आवाज प्रयोग भयो।"
 
     return JsonResponse({
         'status': 'ok',

@@ -338,7 +338,12 @@ def nepali_tts_generate(request):
     audio_url = f"/rishav/tts/stream/{cache_id}/"
     audio_base64 = "data:audio/mpeg;base64," + base64.b64encode(audio_bytes).decode('utf-8')
     filename = f"nepali-speech-{voice}.mp3"
-    voice_label = "Hemkala (Female - Natural Neural)" if voice == 'female' else "Sagar (Male - Natural Neural)"
+    if voice == 'google':
+        voice_label = "Native Nepali Voice (Google Authentic Accent)"
+    elif voice == 'male':
+        voice_label = "Sagar (Male - Studio Neural)"
+    else:
+        voice_label = "Hemkala (Female - Studio Neural)"
 
     return JsonResponse({
         'status': 'ok',
