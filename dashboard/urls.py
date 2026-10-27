@@ -144,4 +144,8 @@ urlpatterns = [
     # Post Reactions
     path('reactions/', views.dashboard_reactions, name='reactions'),
     path('reactions/<int:pk>/delete/', views.reaction_delete, name='reaction_delete'),
+
+    # Nepali Text-to-Speech (TTS) Studio
+    path('tts/', views.dashboard_tts, name='tts'),
+    path('tts/generate/', views.tts_generate_audio, name='tts_generate'),
 ]

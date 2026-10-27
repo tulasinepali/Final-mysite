@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db.models import Count, Sum, Avg, Q
 from django.db.models.functions import TruncDate
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import re
 import json
 import csv
@@ -22,7 +22,7 @@ from quiz.models import Quiz, Question, QuizAttempt, QuizFeedback
 import csv
 import io
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from tools.models import Tool, Widget, WidgetSetting, PatroEvent, WidgetUsage
 from .forms import (
     SiteSettingsForm, CategoryForm, TagForm, NoteForm, BlogPostForm,
@@ -2507,4 +2507,157 @@ def reaction_delete(request, pk):
 
 
 
-
+
+
+
+
+# ========== NEPALI TEXT-TO-SPEECH (TTS) STUDIO ==========
+
+def _generate_nepali_tts_bytes(text, voice='female', speed='1.0'):
+    """
+    Generate MP3 audio bytes for Nepali or bilingual text.
+    Primary: Microsoft Edge Neural TTS (Natural Hemkala / Sagar voices)
+    Fallback: Google Translate TTS stream
+    """
+    import re
+    clean_text = re.sub(r'\s+', ' ', text).strip()
+    if not clean_text:
+        return b''
+
+    rate_str = '+0%'
+    if speed == '0.8':
+        rate_str = '-20%'
+    elif speed == '1.2':
+        rate_str = '+20%'
+
+    voice_name = 'ne-NP-HemkalaNeural' if voice == 'female' else 'ne-NP-SagarNeural'
+
+    # 1. Primary: Edge Neural TTS
+    if voice != 'google':
+        try:
+            import edge_tts
+            from asgiref.sync import async_to_sync
+
+            async def _run_edge():
+                communicate = edge_tts.Communicate(clean_text, voice_name, rate=rate_str)
+                out = b''
+                async for chunk in communicate.stream():
+                    if chunk['type'] == 'audio':
+                        out += chunk['data']
+                return out
+
+            audio_data = async_to_sync(_run_edge)()
+            if audio_data and len(audio_data) > 100:
+                return audio_data
+        except Exception:
+            pass
+
+    # 2. Fallback: Google Translate TTS audio chunking
+    try:
+        import urllib.request, urllib.parse
+        sentences = re.split(r'([।?!;\n]+)', clean_text)
+        chunks = []
+        curr = ''
+        for s in sentences:
+            if len(curr) + len(s) < 180:
+                curr += s
+            else:
+                if curr.strip():
+                    chunks.append(curr.strip())
+                curr = s
+        if curr.strip():
+            chunks.append(curr.strip())
+
+        out = b''
+        for c in chunks:
+            if not c.strip():
+                continue
+            url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=ne&client=tw-ob&q=' + urllib.parse.quote(c.strip())
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                out += resp.read()
+        return out
+    except Exception:
+        return b''
+
+
+@staff_member_required
+def dashboard_tts(request):
+    """
+    Nepali Text-to-Speech Studio in /rishav/:
+    Allows pasting text, choosing natural voices (Hemkala / Sagar / Google),
+    converting to speech, listening live, and downloading as MP3.
+    """
+    from blog.models import BlogPost
+    from notes.models import Note
+
+    recent_blogs = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:8]
+    recent_notes = Note.objects.filter(is_published=True).order_by('-created_at')[:8]
+
+    context = {
+        'recent_blogs': recent_blogs,
+        'recent_notes': recent_notes,
+        'active_page': 'tts',
+    }
+    return render(request, 'dashboard/tts.html', context)
+
+
+@staff_member_required
+def tts_generate_audio(request):
+    """
+    Convert pasted text to MP3 audio and return base64 audio stream or direct download.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'POST method required'}, status=405)
+
+    import json
+    import base64
+    from django.utils.html import strip_tags
+
+    data = {}
+    if request.content_type == 'application/json':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            data = {}
+    else:
+        data = request.POST
+
+    raw_text = str(data.get('text', '')).strip()
+    clean_text = strip_tags(raw_text).strip()
+    voice = str(data.get('voice', 'female')).strip().lower()
+    speed = str(data.get('speed', '1.0')).strip()
+    download_direct = request.GET.get('download') == '1' or data.get('download') == '1'
+
+    if not clean_text:
+        return JsonResponse({'status': 'error', 'message': 'कृपया रूपान्तरण गर्न कुनै पाठ प्रविष्ट गर्नुहोस् (Please paste or type some text)'}, status=400)
+
+    # Max length: 15,000 characters for smooth performance
+    clean_text = clean_text[:15000]
+
+    audio_bytes = _generate_nepali_tts_bytes(clean_text, voice=voice, speed=speed)
+
+    if not audio_bytes:
+        return JsonResponse({'status': 'error', 'message': 'आवाज रूपान्तरण गर्न सकिएन, कृपया पुन: प्रयास गर्नुहोस्। (Could not generate audio, please try again)'}, status=500)
+
+    filename = f"nepali-speech-{voice}.mp3"
+
+    # Direct file download response
+    if download_direct:
+        response = HttpResponse(audio_bytes, content_type='audio/mpeg')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['Content-Length'] = len(audio_bytes)
+        return response
+
+    audio_base64 = "data:audio/mpeg;base64," + base64.b64encode(audio_bytes).decode('utf-8')
+    voice_label = "हेमकला (महिला - Natural Neural)" if voice == 'female' else ("सागर (पुरुष - Natural Neural)" if voice == 'male' else "गुगल नेपाली (Google Voice)")
+
+    return JsonResponse({
+        'status': 'ok',
+        'audio_data': audio_base64,
+        'filename': filename,
+        'voice_label': voice_label,
+        'char_count': len(clean_text),
+        'word_count': len(clean_text.split()),
+        'size_kb': round(len(audio_bytes) / 1024, 1),
+    })
