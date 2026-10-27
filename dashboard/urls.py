@@ -148,4 +148,5 @@ urlpatterns = [
     # Nepali Text-to-Speech (TTS) Studio
     path('tts/', views.dashboard_tts, name='tts'),
     path('tts/generate/', views.tts_generate_audio, name='tts_generate'),
+    path('tts/stream/<str:cache_id>/', views.tts_stream_audio, name='tts_stream'),
 ]

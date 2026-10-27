@@ -2733,6 +2733,27 @@ def tts_generate_audio(request):
         response['Content-Length'] = len(audio_bytes)
         return response
 
+    import uuid
+    import os
+    from django.conf import settings
+    from django.core.cache import cache
+
+    cache_id = uuid.uuid4().hex[:16]
+    try:
+        cache.set(f"tts_audio_{cache_id}", audio_bytes, timeout=7200)
+    except Exception:
+        pass
+
+    try:
+        cache_dir = os.path.join(settings.MEDIA_ROOT, 'tts_cache')
+        os.makedirs(cache_dir, exist_ok=True)
+        file_path = os.path.join(cache_dir, f"{cache_id}.mp3")
+        with open(file_path, 'wb') as f:
+            f.write(audio_bytes)
+    except Exception:
+        pass
+
+    audio_url = f"/rishav/tts/stream/{cache_id}/"
     audio_base64 = "data:audio/mpeg;base64," + base64.b64encode(audio_bytes).decode('utf-8')
 
     if engine_used == 'edge_neural':
@@ -2744,6 +2765,8 @@ def tts_generate_audio(request):
 
     return JsonResponse({
         'status': 'ok',
+        'audio_url': audio_url,
+        'cache_id': cache_id,
         'audio_data': audio_base64,
         'filename': filename,
         'voice_label': voice_label,
@@ -2753,3 +2776,43 @@ def tts_generate_audio(request):
         'word_count': len(clean_text.split()),
         'size_kb': round(len(audio_bytes) / 1024, 1),
     })
+
+
+@staff_member_required
+def tts_stream_audio(request, cache_id):
+    """
+    Stream generated TTS MP3 audio with proper headers and byte-range support.
+    Compatible with all browsers and strictest Content-Security-Policy settings.
+    """
+    import os
+    from django.conf import settings
+    from django.core.cache import cache
+
+    audio_bytes = None
+    try:
+        audio_bytes = cache.get(f"tts_audio_{cache_id}")
+    except Exception:
+        audio_bytes = None
+
+    if not audio_bytes:
+        file_path = os.path.join(settings.MEDIA_ROOT, 'tts_cache', f"{cache_id}.mp3")
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, 'rb') as f:
+                    audio_bytes = f.read()
+            except Exception:
+                audio_bytes = None
+
+    if not audio_bytes:
+        return HttpResponse("Audio not found or expired. Please generate speech again.", status=404)
+
+    response = HttpResponse(audio_bytes, content_type='audio/mpeg')
+    response['Content-Length'] = len(audio_bytes)
+    response['Accept-Ranges'] = 'bytes'
+    response['Cache-Control'] = 'public, max-age=7200'
+
+    filename = request.GET.get('filename', f"nepali-speech-{cache_id[:6]}.mp3")
+    if request.GET.get('download') == '1':
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response

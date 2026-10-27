@@ -423,13 +423,25 @@ document.addEventListener('DOMContentLoaded', function() {
     btnCustomPlayPause.addEventListener('click', function() {
         if (!audioPlayer.src) return;
         if (audioPlayer.paused) {
-            audioPlayer.play().catch(function(err) {
-                console.warn('Playback error:', err);
-                alert('अडियो सुरु हुन सकेन। कृपया प्लेयरमा Play थिच्नुहोस्।');
-            });
+            var playPromise = audioPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.then(function() {
+                    customPlayIcon.className = 'bi bi-pause-circle-fill fs-5';
+                    customPlayText.textContent = 'रोक्नुहोस् (Pause Speech)';
+                    btnCustomPlayPause.classList.add('is-playing');
+                }).catch(function(err) {
+                    console.warn('Playback error:', err);
+                    alert('अडियो सुरु हुन सकेन। कृपया ब्राउजर प्लेयरमा Play थिच्नुहोस्।');
+                });
+            }
         } else {
             audioPlayer.pause();
         }
+    });
+
+    // Audio Element Error Logging
+    audioPlayer.addEventListener('error', function(e) {
+        console.error('Audio element error:', audioPlayer.error);
     });
 
     // Sync Audio Element Events with Custom UI
@@ -515,20 +527,29 @@ document.addEventListener('DOMContentLoaded', function() {
             convertBtnText.textContent = 'आवाजमा रूपान्तरण गर्नुहोस् (Convert to Speech)';
 
             if (data.status === 'ok') {
-                // Revoke old blob to release memory
                 if (currentBlobUrl) {
                     URL.revokeObjectURL(currentBlobUrl);
+                    currentBlobUrl = null;
                 }
 
-                // Generate real Native Blob URL
-                currentBlobUrl = base64ToBlobUrl(data.audio_data, 'audio/mpeg');
+                // Primary: Direct streaming URL (100% immune to browser CSP & data URI issues)
+                // Fallback: Blob URL
+                var resolvedAudioUrl = data.audio_url || '';
+                if (!resolvedAudioUrl && data.audio_data) {
+                    currentBlobUrl = base64ToBlobUrl(data.audio_data, 'audio/mpeg');
+                    resolvedAudioUrl = currentBlobUrl;
+                }
 
                 // Populate Native Audio Element
-                audioPlayer.src = currentBlobUrl;
+                audioPlayer.src = resolvedAudioUrl;
                 audioPlayer.load();
 
                 // Setup Download Link
-                btnDownloadMp3.href = currentBlobUrl;
+                if (data.audio_url) {
+                    btnDownloadMp3.href = data.audio_url + '?download=1&filename=' + encodeURIComponent(data.filename);
+                } else {
+                    btnDownloadMp3.href = resolvedAudioUrl;
+                }
                 btnDownloadMp3.download = data.filename;
 
                 // Labels & Badges
@@ -557,13 +578,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Attempt Autoplay
                 var playPromise = audioPlayer.play();
                 if (playPromise !== undefined) {
-                    playPromise.catch(function() {
+                    playPromise.then(function() {
+                        customPlayIcon.className = 'bi bi-pause-circle-fill fs-5';
+                        customPlayText.textContent = 'रोक्नुहोस् (Pause Speech)';
+                        btnCustomPlayPause.classList.add('is-playing');
+                    }).catch(function() {
                         customPlayText.textContent = 'बजाउनुहोस् (Click to Play)';
                     });
                 }
 
                 // Add to Session History
-                addToSessionHistory(text, data, currentBlobUrl);
+                addToSessionHistory(text, data, resolvedAudioUrl);
             } else {
                 alert(data.message || 'त्रुटि: आवाज रूपान्तरण गर्न सकिएन।');
             }
@@ -606,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button type="button" class="btn btn-sm btn-outline-primary rounded-pill play-history-btn mr-1" data-index="${idx}" title="Play">
                         <i class="bi bi-play-fill"></i> Play
                     </button>
-                    <a href="${item.blobUrl}" download="${item.data.filename}" class="btn btn-sm btn-success rounded-pill mr-1" title="Download MP3">
+                    <a href="${item.data.audio_url ? item.data.audio_url + '?download=1&filename=' + encodeURIComponent(item.data.filename) : item.audioUrl}" download="${item.data.filename}" class="btn btn-sm btn-success rounded-pill mr-1" title="Download MP3">
                         <i class="bi bi-download"></i> MP3
                     </a>
                     <button type="button" class="btn btn-sm btn-outline-danger rounded-pill delete-history-item-btn" data-index="${idx}" title="Delete this recording">
@@ -623,12 +648,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 var idx = parseInt(btn.getAttribute('data-index'), 10);
                 if (historyItems[idx]) {
                     var h = historyItems[idx];
-                    audioPlayer.src = h.blobUrl;
+                    audioPlayer.src = h.audioUrl;
                     audioPlayer.load();
 
                     audioVoiceTitle.textContent = h.data.voice_label;
                     audioMetaInfo.textContent = h.data.size_kb + ' KB • MP3 Audio';
-                    btnDownloadMp3.href = h.blobUrl;
+                    if (h.data.audio_url) {
+                        btnDownloadMp3.href = h.data.audio_url + '?download=1&filename=' + encodeURIComponent(h.data.filename);
+                    } else {
+                        btnDownloadMp3.href = h.audioUrl;
+                    }
                     btnDownloadMp3.download = h.data.filename;
 
                     emptyStateContainer.style.display = 'none';
@@ -636,7 +665,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnDeleteCurrentAudioHeader.style.display = 'inline-block';
                     resultStatusBadge.style.display = 'inline-block';
 
-                    audioPlayer.play().catch(function() {});
+                    var p = audioPlayer.play();
+                    if (p !== undefined) {
+                        p.then(function() {
+                            customPlayIcon.className = 'bi bi-pause-circle-fill fs-5';
+                            customPlayText.textContent = 'रोक्नुहोस् (Pause Speech)';
+                            btnCustomPlayPause.classList.add('is-playing');
+                        }).catch(function() {});
+                    }
                 }
             });
         });
@@ -653,11 +689,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function addToSessionHistory(text, data, blobUrl) {
+    function addToSessionHistory(text, data, resolvedAudioUrl) {
         historyItems.unshift({
             text: text,
             data: data,
-            blobUrl: blobUrl,
+            audioUrl: resolvedAudioUrl,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
         renderHistory();

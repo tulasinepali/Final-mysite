@@ -365,6 +365,7 @@ CONTENT_SECURITY_POLICY = {
             'https://translate-pa.googleapis.com',
             'https://www.gstatic.com',
         ),
+        'media-src': ("'self'", 'data:', 'blob:', 'https:'),
         'object-src': ("'none'",),
         'base-uri': ("'self'",),
     }
