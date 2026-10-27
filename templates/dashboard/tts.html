@@ -3,7 +3,7 @@
 
 {% block title %}Nepali Text-to-Speech Studio - Dashboard{% endblock %}
 {% block page_header %}Nepali Text-to-Speech (TTS) Studio{% endblock %}
-{% block page_subtitle %}कुनै पनि नेपाली वा अङ्ग्रेजी पाठ पेस्ट गर्नुहोस्, प्राकृतिक आवाजमा सुन्नुहोस् र MP3 अडियो डाउनलोड गर्नुहोस्।{% endblock %}
+{% block page_subtitle %}कुनै पनि नेपाली वा अङ्ग्रेजी पाठ पेस्ट गर्नुहोस्, प्राकृतिक नेपाली लवजमा सुन्नुहोस् र MP3 अडियो डाउनलोड गर्नुहोस्।{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
@@ -23,7 +23,7 @@
                     <!-- Import from existing content dropdown -->
                     <div class="dropdown d-inline-block">
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-pill" type="button" id="importContentDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="bi bi-box-arrow-in-down mr-1"></i>Import from Post
+                            <i class="bi bi-box-arrow-in-down mr-1"></i>Import Post
                         </button>
                         <div class="dropdown-menu dropdown-menu-right shadow border-0" aria-labelledby="importContentDropdown" style="max-height: 320px; overflow-y: auto; min-width: 260px;">
                             <h6 class="dropdown-header text-uppercase" style="font-size: 0.72rem;">Study Notes</h6>
@@ -49,8 +49,9 @@
                     <button type="button" class="btn btn-light btn-sm rounded-pill text-secondary" id="btnLoadSample" title="Load sample Nepali text">
                         <i class="bi bi-magic mr-1"></i>Sample
                     </button>
-                    <button type="button" class="btn btn-light btn-sm rounded-pill text-danger" id="btnClearText" title="Clear text">
-                        <i class="bi bi-trash"></i>
+                    <!-- Dedicated Clear / Delete Text Button -->
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="btnClearText" title="Clear / Delete all text">
+                        <i class="bi bi-trash mr-1"></i>मेटाउनुहोस् (Clear)
                     </button>
                 </div>
             </div>
@@ -58,12 +59,12 @@
             <div class="card-body pt-1">
                 <form id="ttsForm">
                     {% csrf_token %}
-                    <div class="form-group mb-3">
+                    <div class="form-group mb-3 position-relative">
                         <textarea class="form-control" 
                                   id="ttsInput" 
                                   name="text" 
                                   rows="9" 
-                                  placeholder="यहाँ नेपाली वा कुनै पनि पाठ पेस्ट गर्नुहोस्...&#10;&#10;उदा: नमस्ते, म तुलसी नेपालीको सिकाइ प्लेटफर्ममा तपाईंलाई स्वागत गर्दछु। यहाँ तपाईंले कम्प्युटर, प्रविधि र परीक्षा तयारीका सामग्रीहरू सिक्न सक्नुहुन्छ।"
+                                  placeholder="यहाँ नेपाली वा कुनै पनि पाठ पेस्ट गर्नुहोस्...&#10;&#10;उदा: नमस्ते! तुलसी नेपालीको खुला सिकाइ प्लेटफर्ममा तपाईंलाई हार्दिक स्वागत छ। यहाँ तपाईंले लोकसेवा, शिक्षक सेवा र विभिन्न परीक्षा तयारीका उपयोगी अध्ययन सामग्रीहरू सहजै प्राप्त गर्न सक्नुहुन्छ।"
                                   style="font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif; font-size: 1.05rem; line-height: 1.6; border-radius: 12px; resize: vertical;"
                                   required></textarea>
                     </div>
@@ -75,33 +76,47 @@
                             <span id="charCountBadge" class="font-weight-600 text-dark">0</span> / 15,000 characters
                         </div>
                         <div>
-                            <i class="bi bi-clock mr-1"></i>Est. Listening: <span id="estDurationBadge" class="font-weight-600 text-primary">0 sec</span>
+                            <i class="bi bi-clock mr-1"></i>अनुमानित समय: <span id="estDurationBadge" class="font-weight-600 text-primary">0 sec</span>
                         </div>
                     </div>
 
-                    <!-- Voice & Speed Settings Box -->
+                    <!-- Voice, Tone & Speed Settings Box -->
                     <div class="p-3 rounded-3 border mb-3" style="background: #f8fafc; border-color: #e2e8f0 !important;">
                         <div class="row g-3">
                             <!-- Voice Selector -->
-                            <div class="col-sm-6 col-12">
+                            <div class="col-md-4 col-sm-6 col-12 mb-2 mb-md-0">
                                 <label class="small font-weight-bold text-dark mb-1">
-                                    <i class="bi bi-person-bounding-box mr-1 text-primary"></i>आवाज (Voice Selection)
+                                    <i class="bi bi-person-bounding-box mr-1 text-primary"></i>आवाज (Voice)
                                 </label>
                                 <select class="form-control form-control-sm" id="voiceSelect" name="voice" style="border-radius: 8px;">
-                                    <option value="female" selected>👩 हेमकला (Female - Natural Neural Voice)</option>
-                                    <option value="male">👨 सागर (Male - Natural Neural Voice)</option>
-                                    <option value="google">🌐 गुगल नेपाली (Google Translate Voice)</option>
+                                    <option value="female" selected>👩 हेमकला (महिला - Neural)</option>
+                                    <option value="male">👨 सागर (पुरुष - Neural)</option>
+                                    <option value="google">🌐 गुगल ब्याकअप (Google Voice)</option>
                                 </select>
                             </div>
 
-                            <!-- Speed Selector -->
-                            <div class="col-sm-6 col-12">
+                            <!-- Nepali Tone / Style Selector -->
+                            <div class="col-md-4 col-sm-6 col-12 mb-2 mb-md-0">
                                 <label class="small font-weight-bold text-dark mb-1">
-                                    <i class="bi bi-speedometer2 mr-1 text-primary"></i>बोल्ने गति (Speech Speed)
+                                    <i class="bi bi-mic mr-1 text-primary"></i>बोल्ने शैली / टोन (Nepali Tone)
+                                </label>
+                                <select class="form-control form-control-sm" id="toneSelect" name="tone" style="border-radius: 8px;">
+                                    <option value="broadcast" selected>🎙️ प्राकृतिक वाचन (Broadcast)</option>
+                                    <option value="conversational">💬 कुराकानी शैली (Conversational)</option>
+                                    <option value="educational">🎓 स्पष्ट सिकाइ (Educational / Slow)</option>
+                                    <option value="fast">⚡ द्रुत गति (Fast Narration)</option>
+                                    <option value="normal">⚙️ सामान्य गति (Normal)</option>
+                                </select>
+                            </div>
+
+                            <!-- Speed Fine-Tuning -->
+                            <div class="col-md-4 col-sm-12 col-12">
+                                <label class="small font-weight-bold text-dark mb-1">
+                                    <i class="bi bi-speedometer2 mr-1 text-primary"></i>गति (Speed)
                                 </label>
                                 <select class="form-control form-control-sm" id="speedSelect" name="speed" style="border-radius: 8px;">
-                                    <option value="0.8">0.8x (Slow / स्पष्ट सिकाइ)</option>
-                                    <option value="1.0" selected>1.0x (Normal / सामान्य गति)</option>
+                                    <option value="0.8">0.8x (Slow / धीमा)</option>
+                                    <option value="1.0" selected>1.0x (Normal / सामान्य)</option>
                                     <option value="1.2">1.2x (Fast / छिटो)</option>
                                 </select>
                             </div>
@@ -127,44 +142,77 @@
                 <h5 class="card-title mb-0 font-weight-bold" style="font-size: 1.05rem;">
                     <i class="bi bi-headphones mr-2" style="color: #10b981;"></i>अडियो प्लेयर (Audio Player)
                 </h5>
-                <span class="badge badge-pill badge-success" id="resultStatusBadge" style="display: none;">Ready</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-pill badge-success" id="resultStatusBadge" style="display: none;">Ready</span>
+                    <!-- Delete Audio Button on Header -->
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="btnDeleteCurrentAudioHeader" style="display: none;" title="अडियो हटाउनुहोस् (Delete Audio)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             </div>
 
+            <!-- Empty State Container -->
             <div class="card-body d-flex flex-column justify-content-center align-items-center p-4 text-center" id="emptyStateContainer">
                 <div class="rounded-circle p-4 mb-3" style="background: rgba(139, 92, 246, 0.08); color: #8b5cf6; font-size: 3rem;">
                     <i class="bi bi-mic-fill"></i>
                 </div>
                 <h6 class="font-weight-bold text-dark mb-2">अडियो तयार छैन (No Audio Yet)</h6>
-                <p class="text-muted small mb-0" style="max-width: 280px;">
-                    बायाँ बक्समा नेपाली पाठ पेस्ट गरी <strong>"Convert to Speech"</strong> बटन थिच्नुहोस्। यहाँ तुरुन्तै अडियो बज्नेछ र MP3 डाउनलोड गर्न मिल्नेछ।
+                <p class="text-muted small mb-0" style="max-width: 290px;">
+                    बायाँ बक्समा नेपाली पाठ राखी <strong>"Convert to Speech"</strong> थिच्नुहोस्। यहाँ तुरुन्तै अडियो बज्नेछ र MP3 डाउनलोड गर्न सकिनेछ।
                 </p>
             </div>
 
-            <!-- Active Audio Output Section (Initially Hidden) -->
+            <!-- Active Audio Output Section -->
             <div class="card-body p-4" id="audioOutputContainer" style="display: none;">
+                <!-- Engine Warning Alert (if fallback happened) -->
+                <div class="alert alert-warning py-2 px-3 small rounded-3 mb-3" id="engineWarningAlert" style="display: none; border-left: 4px solid #f59e0b;">
+                    <i class="bi bi-exclamation-triangle-fill mr-1 text-warning"></i>
+                    <span id="engineWarningText"></span>
+                </div>
+
                 <!-- Audio Wave Visual Banner -->
-                <div class="p-3 rounded-4 mb-4 text-white text-center shadow-sm" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                <div class="p-3 rounded-4 mb-3 text-white text-center shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
                     <div class="mb-2" style="font-size: 2.2rem;">
-                        <i class="bi bi-file-earmark-music-fill"></i>
+                        <i class="bi bi-soundwave" id="visualWaveIcon"></i>
                     </div>
-                    <h6 class="font-weight-bold mb-1" id="audioVoiceTitle">हेमकला (Female Natural Neural)</h6>
+                    <h6 class="font-weight-bold mb-1" id="audioVoiceTitle">हेमकला (Natural Neural)</h6>
                     <div class="small text-white-50" id="audioMetaInfo">0 KB &bull; MP3 Format</div>
                 </div>
 
-                <!-- Native HTML5 Audio Player -->
-                <div class="mb-4">
-                    <audio id="audioPlayer" controls class="w-100" style="border-radius: 30px; outline: none;">
-                        Your browser does not support audio element.
-                    </audio>
+                <!-- Custom Interactive Audio Controller -->
+                <div class="p-3 rounded-3 mb-3 border" style="background: #f8fafc;">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small font-weight-bold text-muted" id="currentTimeLabel">00:00</span>
+                        <div class="badge badge-light border text-primary px-2 py-1" id="engineBadge">Neural Engine</div>
+                        <span class="small font-weight-bold text-muted" id="totalDurationLabel">00:00</span>
+                    </div>
+
+                    <!-- Progress Bar Scrubber -->
+                    <div class="progress mb-3" id="progressContainer" style="height: 8px; cursor: pointer; border-radius: 4px; background: #e2e8f0;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="audioProgressBar" role="progressbar" style="width: 0%;"></div>
+                    </div>
+
+                    <!-- Prominent Custom Play / Pause Button -->
+                    <button type="button" id="btnCustomPlayPause" class="btn btn-primary btn-block py-2 rounded-pill font-weight-bold shadow-sm d-flex align-items-center justify-content-center" style="gap: 8px; font-size: 1rem;">
+                        <i class="bi bi-play-circle-fill fs-5" id="customPlayIcon"></i>
+                        <span id="customPlayText">बजाउनुहोस् (Play Speech)</span>
+                    </button>
+
+                    <!-- Hidden/Visible Native Audio Element -->
+                    <div class="mt-2 text-center">
+                        <audio id="audioPlayer" preload="auto" class="w-100" controls style="border-radius: 20px; outline: none; margin-top: 6px;">
+                            Your browser does not support audio element.
+                        </audio>
+                    </div>
                 </div>
 
-                <!-- Action Download MP3 Button -->
+                <!-- Action Download & Delete MP3 Buttons -->
                 <div class="d-flex flex-column gap-2">
                     <a href="#" id="btnDownloadMp3" download="nepali-speech.mp3" class="btn btn-success btn-block py-2 rounded-pill font-weight-bold shadow-sm d-flex align-items-center justify-content-center" style="font-size: 0.95rem; gap: 8px;">
                         <i class="bi bi-download"></i> MP3 अडियो डाउनलोड गर्नुहोस् (Download MP3)
                     </a>
-                    <button type="button" id="btnPlayPause" class="btn btn-outline-secondary btn-block py-2 rounded-pill font-weight-600 mt-2">
-                        <i class="bi bi-play-fill mr-1"></i> पुनः बजाउनुहोस् (Replay)
+                    <button type="button" id="btnDeleteCurrentAudio" class="btn btn-outline-danger btn-block py-2 rounded-pill font-weight-600 mt-2 d-flex align-items-center justify-content-center" style="gap: 6px;">
+                        <i class="bi bi-trash"></i> यो अडियो मेटाउनुहोस् (Delete Audio)
                     </button>
                 </div>
             </div>
@@ -178,7 +226,13 @@
         <h5 class="card-title mb-0 font-weight-bold" style="font-size: 1rem;">
             <i class="bi bi-clock-history mr-2 text-primary"></i>यस सत्रमा बनाइएका अडियोहरू (Session Audio History)
         </h5>
-        <span class="badge badge-light text-muted" id="historyCountBadge">0 files</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge badge-light text-muted" id="historyCountBadge">0 files</span>
+            <!-- Clear All History Button -->
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="btnClearAllHistory" title="Clear all history">
+                <i class="bi bi-trash mr-1"></i>सबै मेटाउनुहोस् (Clear All)
+            </button>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -187,9 +241,9 @@
                     <tr>
                         <th style="width: 50px;">#</th>
                         <th>पाठको अंश (Text Snippet)</th>
-                        <th>आवाज (Voice)</th>
+                        <th>आवाज र टोन (Voice &amp; Tone)</th>
                         <th>साइज</th>
-                        <th style="width: 220px;" class="text-right">सुन्नुहोस् / डाउनलोड</th>
+                        <th style="width: 250px;" class="text-right">सुन्नुहोस् / डाउनलोड / मेटाउनुहोस्</th>
                     </tr>
                 </thead>
                 <tbody id="sessionHistoryTbody">
@@ -216,6 +270,11 @@
     transform: translateY(-1px);
     transition: all 0.2s ease;
 }
+
+#btnCustomPlayPause.is-playing {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+}
 </style>
 
 <script>
@@ -235,15 +294,54 @@ document.addEventListener('DOMContentLoaded', function() {
     var audioOutputContainer = document.getElementById('audioOutputContainer');
     var audioPlayer = document.getElementById('audioPlayer');
     var btnDownloadMp3 = document.getElementById('btnDownloadMp3');
-    var btnPlayPause = document.getElementById('btnPlayPause');
     var audioVoiceTitle = document.getElementById('audioVoiceTitle');
     var audioMetaInfo = document.getElementById('audioMetaInfo');
     var resultStatusBadge = document.getElementById('resultStatusBadge');
+    var engineBadge = document.getElementById('engineBadge');
+    var engineWarningAlert = document.getElementById('engineWarningAlert');
+    var engineWarningText = document.getElementById('engineWarningText');
+
+    var btnDeleteCurrentAudio = document.getElementById('btnDeleteCurrentAudio');
+    var btnDeleteCurrentAudioHeader = document.getElementById('btnDeleteCurrentAudioHeader');
+    var btnClearText = document.getElementById('btnClearText');
+
+    var btnCustomPlayPause = document.getElementById('btnCustomPlayPause');
+    var customPlayIcon = document.getElementById('customPlayIcon');
+    var customPlayText = document.getElementById('customPlayText');
+    var currentTimeLabel = document.getElementById('currentTimeLabel');
+    var totalDurationLabel = document.getElementById('totalDurationLabel');
+    var audioProgressBar = document.getElementById('audioProgressBar');
+    var progressContainer = document.getElementById('progressContainer');
 
     var sessionHistoryCard = document.getElementById('sessionHistoryCard');
     var sessionHistoryTbody = document.getElementById('sessionHistoryTbody');
     var historyCountBadge = document.getElementById('historyCountBadge');
+    var btnClearAllHistory = document.getElementById('btnClearAllHistory');
+
+    var currentBlobUrl = null;
     var historyItems = [];
+
+    // Helper: Convert Base64 string to Native Object URL Blob (Fixes playback across Chrome/Safari/Edge)
+    function base64ToBlobUrl(base64Data, contentType) {
+        contentType = contentType || 'audio/mpeg';
+        var base64Clean = base64Data.replace(/^data:[^;]+;base64,/, '');
+        var binaryStr = atob(base64Clean);
+        var len = binaryStr.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) {
+            bytes[i] = binaryStr.charCodeAt(i);
+        }
+        var blob = new Blob([bytes], { type: contentType });
+        return URL.createObjectURL(blob);
+    }
+
+    // Format Seconds to MM:SS
+    function formatTime(secs) {
+        if (isNaN(secs) || secs < 0) return '00:00';
+        var m = Math.floor(secs / 60);
+        var s = Math.floor(secs % 60);
+        return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+    }
 
     // Live Counter Calculation
     function updateCounters() {
@@ -254,7 +352,6 @@ document.addEventListener('DOMContentLoaded', function() {
         wordCountBadge.textContent = words;
         charCountBadge.textContent = chars;
 
-        // ~130 words per minute for natural spoken Nepali
         var seconds = Math.round((words / 130) * 60);
         if (seconds < 60) {
             estDurationBadge.textContent = seconds + ' sec';
@@ -269,17 +366,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sample Text Button
     document.getElementById('btnLoadSample').addEventListener('click', function() {
-        input.value = "नमस्ते! तुलसी नेपालीको खुला सिकाइ प्लेटफर्ममा तपाईंलाई हार्दिक स्वागत छ। यहाँ तपाईंले लोकसेवा, शिक्षक सेवा, बैंकिङ, सुरक्षा निकाय र विद्यालय तहका सम्पूर्ण पाठ्यक्रम, पुराना प्रश्नहरू र उपयोगी अध्ययन सामग्रीहरू सजिलैसँग निःशुल्क अध्ययन गर्न र डाउनलोड गर्न सक्नुहुन्छ।";
+        input.value = "नमस्ते! तुलसी नेपालीको खुला सिकाइ प्लेटफर्ममा तपाईंलाई हार्दिक स्वागत छ। यहाँ तपाईंले कम्प्युटर, प्रविधि, लोकसेवा र शिक्षक सेवा आयोगका परीक्षा तयारीका लागि आवश्यक पर्ने सम्पूर्ण पाठ्यक्रम, पुराना प्रश्नहरू र उपयोगी अध्ययन सामग्रीहरू सहजै प्राप्त गर्न सक्नुहुन्छ।";
         updateCounters();
         input.focus();
     });
 
-    // Clear Button
-    document.getElementById('btnClearText').addEventListener('click', function() {
-        input.value = '';
-        updateCounters();
-        input.focus();
+    // 1. Delete / Clear Text Button
+    btnClearText.addEventListener('click', function() {
+        if (!input.value.trim() || confirm('के तपाईं पाठ मेटाउन चाहनुहुन्छ? (Clear text?)')) {
+            input.value = '';
+            updateCounters();
+            input.focus();
+        }
     });
+
+    // 2. Delete / Reset Current Audio Handler
+    function deleteCurrentAudio() {
+        if (!audioPlayer.src && emptyStateContainer.style.display !== 'none') return;
+        
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+        if (currentBlobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+            currentBlobUrl = null;
+        }
+        audioPlayer.src = '';
+        audioProgressBar.style.width = '0%';
+        currentTimeLabel.textContent = '00:00';
+        totalDurationLabel.textContent = '00:00';
+
+        customPlayIcon.className = 'bi bi-play-circle-fill fs-5';
+        customPlayText.textContent = 'बजाउनुहोस् (Play Speech)';
+        btnCustomPlayPause.classList.remove('is-playing');
+
+        audioOutputContainer.style.display = 'none';
+        btnDeleteCurrentAudioHeader.style.display = 'none';
+        resultStatusBadge.style.display = 'none';
+        emptyStateContainer.style.display = 'flex';
+    }
+
+    btnDeleteCurrentAudio.addEventListener('click', deleteCurrentAudio);
+    btnDeleteCurrentAudioHeader.addEventListener('click', deleteCurrentAudio);
 
     // Import from Note / Blog dropdown items
     document.querySelectorAll('.import-source-item').forEach(function(item) {
@@ -292,12 +419,59 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Replay Button
-    btnPlayPause.addEventListener('click', function() {
-        if (audioPlayer.src) {
-            audioPlayer.currentTime = 0;
-            audioPlayer.play();
+    // Custom Play / Pause Controller
+    btnCustomPlayPause.addEventListener('click', function() {
+        if (!audioPlayer.src) return;
+        if (audioPlayer.paused) {
+            audioPlayer.play().catch(function(err) {
+                console.warn('Playback error:', err);
+                alert('अडियो सुरु हुन सकेन। कृपया प्लेयरमा Play थिच्नुहोस्।');
+            });
+        } else {
+            audioPlayer.pause();
         }
+    });
+
+    // Sync Audio Element Events with Custom UI
+    audioPlayer.addEventListener('play', function() {
+        customPlayIcon.className = 'bi bi-pause-circle-fill fs-5';
+        customPlayText.textContent = 'रोक्नुहोस् (Pause Speech)';
+        btnCustomPlayPause.classList.add('is-playing');
+    });
+
+    audioPlayer.addEventListener('pause', function() {
+        customPlayIcon.className = 'bi bi-play-circle-fill fs-5';
+        customPlayText.textContent = 'बजाउनुहोस् (Play Speech)';
+        btnCustomPlayPause.classList.remove('is-playing');
+    });
+
+    audioPlayer.addEventListener('timeupdate', function() {
+        currentTimeLabel.textContent = formatTime(audioPlayer.currentTime);
+        if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+            var pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            audioProgressBar.style.width = pct + '%';
+        }
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', function() {
+        totalDurationLabel.textContent = formatTime(audioPlayer.duration);
+    });
+
+    audioPlayer.addEventListener('ended', function() {
+        customPlayIcon.className = 'bi bi-arrow-repeat fs-5';
+        customPlayText.textContent = 'पुनः बजाउनुहोस् (Replay)';
+        btnCustomPlayPause.classList.remove('is-playing');
+        audioProgressBar.style.width = '100%';
+    });
+
+    // Progress Bar Click-to-Scrub
+    progressContainer.addEventListener('click', function(e) {
+        if (!audioPlayer.duration || isNaN(audioPlayer.duration)) return;
+        var rect = progressContainer.getBoundingClientRect();
+        var clickX = e.clientX - rect.left;
+        var width = rect.width;
+        var newPct = clickX / width;
+        audioPlayer.currentTime = newPct * audioPlayer.duration;
     });
 
     // Form Submit (AJAX TTS Generation)
@@ -310,6 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         var voice = document.getElementById('voiceSelect').value;
+        var tone = document.getElementById('toneSelect').value;
         var speed = document.getElementById('speedSelect').value;
         var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -317,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btnConvert.disabled = true;
         convertBtnIcon.style.display = 'none';
         convertBtnSpinner.style.display = 'inline-block';
-        convertBtnText.textContent = 'आवाज बनाउँदैछ... (Generating MP3...)';
+        convertBtnText.textContent = 'प्राकृतिक आवाज बनाउँदैछ... (Synthesizing Speech...)';
 
         fetch("{% url 'dashboard:tts_generate' %}", {
             method: 'POST',
@@ -328,6 +503,7 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({
                 text: text,
                 voice: voice,
+                tone: tone,
                 speed: speed
             })
         })
@@ -339,25 +515,55 @@ document.addEventListener('DOMContentLoaded', function() {
             convertBtnText.textContent = 'आवाजमा रूपान्तरण गर्नुहोस् (Convert to Speech)';
 
             if (data.status === 'ok') {
-                // Populate Audio Player
-                audioPlayer.src = data.audio_data;
-                audioVoiceTitle.textContent = data.voice_label;
-                audioMetaInfo.textContent = data.size_kb + ' KB • MP3 Audio • ' + data.word_count + ' words';
-                resultStatusBadge.style.display = 'inline-block';
+                // Revoke old blob to release memory
+                if (currentBlobUrl) {
+                    URL.revokeObjectURL(currentBlobUrl);
+                }
 
-                // Download Button Setup
-                btnDownloadMp3.href = data.audio_data;
+                // Generate real Native Blob URL
+                currentBlobUrl = base64ToBlobUrl(data.audio_data, 'audio/mpeg');
+
+                // Populate Native Audio Element
+                audioPlayer.src = currentBlobUrl;
+                audioPlayer.load();
+
+                // Setup Download Link
+                btnDownloadMp3.href = currentBlobUrl;
                 btnDownloadMp3.download = data.filename;
+
+                // Labels & Badges
+                audioVoiceTitle.textContent = data.voice_label;
+                audioMetaInfo.textContent = data.size_kb + ' KB • MP3 Format • ' + data.word_count + ' words';
+                resultStatusBadge.style.display = 'inline-block';
+                btnDeleteCurrentAudioHeader.style.display = 'inline-block';
+
+                if (data.engine_used === 'edge_neural') {
+                    engineBadge.className = 'badge badge-success px-2 py-1';
+                    engineBadge.textContent = 'Microsoft Neural AI (प्राकृतिक)';
+                    engineWarningAlert.style.display = 'none';
+                } else {
+                    engineBadge.className = 'badge badge-warning px-2 py-1';
+                    engineBadge.textContent = 'Google Voice (ब्याकअप)';
+                    if (data.engine_warning) {
+                        engineWarningText.textContent = data.engine_warning;
+                        engineWarningAlert.style.display = 'block';
+                    }
+                }
 
                 // Show Player Container
                 emptyStateContainer.style.display = 'none';
                 audioOutputContainer.style.display = 'block';
 
-                // Auto-play generated speech
-                audioPlayer.play().catch(function() {});
+                // Attempt Autoplay
+                var playPromise = audioPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(function() {
+                        customPlayText.textContent = 'बजाउनुहोस् (Click to Play)';
+                    });
+                }
 
                 // Add to Session History
-                addToSessionHistory(text, data);
+                addToSessionHistory(text, data, currentBlobUrl);
             } else {
                 alert(data.message || 'त्रुटि: आवाज रूपान्तरण गर्न सकिएन।');
             }
@@ -372,56 +578,98 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Session History Handler
-    function addToSessionHistory(text, data) {
-        historyItems.unshift({
-            text: text,
-            data: data,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
+    // 3. Session History Handler with Individual & All Delete Buttons
+    function renderHistory() {
+        if (historyItems.length === 0) {
+            sessionHistoryCard.style.display = 'none';
+            return;
+        }
 
         sessionHistoryCard.style.display = 'block';
         historyCountBadge.textContent = historyItems.length + ' file' + (historyItems.length === 1 ? '' : 's');
-
         sessionHistoryTbody.innerHTML = '';
+
         historyItems.forEach(function(item, idx) {
             var tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><span class="badge badge-light">${idx + 1}</span></td>
-                <td><span class="font-weight-600 text-dark">${escapeHtml(item.text.slice(0, 55))}...</span><br><small class="text-muted">${item.time}</small></td>
-                <td><span class="badge badge-pill badge-info px-2 py-1">${escapeHtml(item.data.voice_label)}</span></td>
+                <td>
+                    <span class="font-weight-600 text-dark">${escapeHtml(item.text.slice(0, 50))}...</span>
+                    <br><small class="text-muted">${item.time}</small>
+                </td>
+                <td>
+                    <span class="badge badge-pill badge-info px-2 py-1">${escapeHtml(item.data.voice_label)}</span>
+                    ${item.data.engine_used === 'edge_neural' ? '<span class="badge badge-pill badge-success ml-1">Neural</span>' : '<span class="badge badge-pill badge-warning ml-1">Google</span>'}
+                </td>
                 <td><small class="text-muted">${item.data.size_kb} KB</small></td>
                 <td class="text-right">
-                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill play-history-btn mr-1" data-index="${idx}">
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill play-history-btn mr-1" data-index="${idx}" title="Play">
                         <i class="bi bi-play-fill"></i> Play
                     </button>
-                    <a href="${item.data.audio_data}" download="${item.data.filename}" class="btn btn-sm btn-success rounded-pill" title="Download MP3">
+                    <a href="${item.blobUrl}" download="${item.data.filename}" class="btn btn-sm btn-success rounded-pill mr-1" title="Download MP3">
                         <i class="bi bi-download"></i> MP3
                     </a>
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill delete-history-item-btn" data-index="${idx}" title="Delete this recording">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             `;
             sessionHistoryTbody.appendChild(tr);
         });
 
-        // Attach replay handlers to history items
+        // Attach replay handlers
         document.querySelectorAll('.play-history-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var idx = parseInt(btn.getAttribute('data-index'), 10);
                 if (historyItems[idx]) {
                     var h = historyItems[idx];
-                    audioPlayer.src = h.data.audio_data;
+                    audioPlayer.src = h.blobUrl;
+                    audioPlayer.load();
+
                     audioVoiceTitle.textContent = h.data.voice_label;
                     audioMetaInfo.textContent = h.data.size_kb + ' KB • MP3 Audio';
-                    btnDownloadMp3.href = h.data.audio_data;
+                    btnDownloadMp3.href = h.blobUrl;
                     btnDownloadMp3.download = h.data.filename;
+
                     emptyStateContainer.style.display = 'none';
                     audioOutputContainer.style.display = 'block';
-                    audioPlayer.currentTime = 0;
-                    audioPlayer.play();
+                    btnDeleteCurrentAudioHeader.style.display = 'inline-block';
+                    resultStatusBadge.style.display = 'inline-block';
+
+                    audioPlayer.play().catch(function() {});
+                }
+            });
+        });
+
+        // Attach individual item delete handler
+        document.querySelectorAll('.delete-history-item-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var idx = parseInt(btn.getAttribute('data-index'), 10);
+                if (historyItems[idx]) {
+                    historyItems.splice(idx, 1);
+                    renderHistory();
                 }
             });
         });
     }
+
+    function addToSessionHistory(text, data, blobUrl) {
+        historyItems.unshift({
+            text: text,
+            data: data,
+            blobUrl: blobUrl,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+        renderHistory();
+    }
+
+    // Clear All History Button
+    btnClearAllHistory.addEventListener('click', function() {
+        if (confirm('के तपाईं यस सत्रका सबै अडियो रेकर्डहरू मेटाउन चाहनुहुन्छ? (Clear all session history?)')) {
+            historyItems = [];
+            renderHistory();
+        }
+    });
 
     function escapeHtml(str) {
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

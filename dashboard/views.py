@@ -2513,44 +2513,124 @@ def reaction_delete(request, pk):
 
 # ========== NEPALI TEXT-TO-SPEECH (TTS) STUDIO ==========
 
-def _generate_nepali_tts_bytes(text, voice='female', speed='1.0'):
+def _preprocess_nepali_text(text):
     """
-    Generate MP3 audio bytes for Nepali or bilingual text.
-    Primary: Microsoft Edge Neural TTS (Natural Hemkala / Sagar voices)
-    Fallback: Google Translate TTS stream
+    Normalizes Nepali text for natural cadence, phrasing, and pauses.
+    Expands common abbreviations and ensures proper clause endings with '।'
+    """
+    if not text:
+        return ''
+    import re
+    # Expand common Nepali abbreviations to full spoken words
+    abbrev_map = [
+        (r'\bडा\.\s*', 'डाक्टर '),
+        (r'\bप्रा\.\s*', 'प्राध्यापक '),
+        (r'\bनं\.\s*', 'नम्बर '),
+        (r'\bरु\.\s*', 'रुपैयाँ '),
+        (r'\bवि\.सं\.\s*', 'विक्रम संवत् '),
+        (r'\bई\.सं\.\s*', 'ईस्वी संवत् '),
+        (r'\bकि\.मी\.\s*', 'किलोमिटर '),
+        (r'\bमि\.मी\.\s*', 'मिलिमिटर '),
+        (r'\bसे\.मी\.\s*', 'सेन्टिमिटर '),
+        (r'\bलि\.\s*', 'लिमिटेड '),
+        (r'\bप्रा\.लि\.\s*', 'प्राइभेट लिमिटेड '),
+        (r'\bमु\.अ\.कर\b', 'मूल्य अभिवृद्धि कर'),
+    ]
+    cleaned = text
+    for pattern, repl in abbrev_map:
+        cleaned = re.sub(pattern, repl, cleaned)
+
+    cleaned = re.sub(r'[ \t]+', ' ', cleaned)
+    cleaned = re.sub(r'\n+', '\n', cleaned).strip()
+
+    # Ensure sentence lines without punctuation end with '।' so neural TTS inflects pitch downward
+    lines = []
+    for line in cleaned.split('\n'):
+        line = line.strip()
+        if line and not line.endswith(('।', '?', '!', '.', ':', ';', ',')):
+            line += '।'
+        lines.append(line)
+
+    return ' '.join(lines).strip()
+
+
+def _generate_nepali_tts_bytes(text, voice='female', tone='broadcast', speed='1.0'):
+    """
+    Generate MP3 audio bytes for Nepali text.
+    Primary: Microsoft Edge Neural TTS (Natural Hemkala / Sagar voices) with thread-isolated event loop.
+    Fallback: Google Translate TTS stream.
+    Returns: tuple (audio_bytes, engine_used)
     """
     import re
-    clean_text = re.sub(r'\s+', ' ', text).strip()
-    if not clean_text:
-        return b''
+    import logging
+    logger = logging.getLogger(__name__)
 
+    clean_text = _preprocess_nepali_text(text)
+    if not clean_text:
+        return b'', 'empty'
+
+    # Tone & cadence calculation
     rate_str = '+0%'
+    pitch_str = '+0Hz'
+    if tone == 'broadcast':
+        rate_str = '+5%'
+        pitch_str = '+0Hz'
+    elif tone == 'conversational':
+        rate_str = '+8%'
+        pitch_str = '+3Hz'
+    elif tone == 'educational':
+        rate_str = '-6%'
+        pitch_str = '-1Hz'
+    elif tone == 'fast':
+        rate_str = '+20%'
+        pitch_str = '+1Hz'
+    elif tone == 'normal':
+        rate_str = '+0%'
+        pitch_str = '+0Hz'
+
+    # User speed fine-tuning override if modified
     if speed == '0.8':
-        rate_str = '-20%'
+        rate_str = '-15%'
     elif speed == '1.2':
         rate_str = '+20%'
 
     voice_name = 'ne-NP-HemkalaNeural' if voice == 'female' else 'ne-NP-SagarNeural'
 
-    # 1. Primary: Edge Neural TTS
+    # 1. Primary: Microsoft Edge Neural TTS with dedicated thread and event loop
     if voice != 'google':
         try:
+            import asyncio
+            import concurrent.futures
             import edge_tts
-            from asgiref.sync import async_to_sync
 
-            async def _run_edge():
-                communicate = edge_tts.Communicate(clean_text, voice_name, rate=rate_str)
-                out = b''
-                async for chunk in communicate.stream():
-                    if chunk['type'] == 'audio':
-                        out += chunk['data']
-                return out
+            def _run_isolated_edge():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    comm = edge_tts.Communicate(clean_text, voice_name, rate=rate_str, pitch=pitch_str)
+                    out_chunks = []
 
-            audio_data = async_to_sync(_run_edge)()
-            if audio_data and len(audio_data) > 100:
-                return audio_data
-        except Exception:
-            pass
+                    async def _stream():
+                        async for chunk in comm.stream():
+                            if chunk['type'] == 'audio':
+                                out_chunks.append(chunk['data'])
+
+                    loop.run_until_complete(_stream())
+                    return b''.join(out_chunks)
+                finally:
+                    try:
+                        loop.run_until_complete(loop.shutdown_asyncgens())
+                    except Exception:
+                        pass
+                    loop.close()
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                audio_data = pool.submit(_run_isolated_edge).result(timeout=45)
+
+            if audio_data and len(audio_data) > 200:
+                return audio_data, 'edge_neural'
+        except Exception as e:
+            logger.warning("Edge Neural TTS failed: %s, falling back to Google TTS", e)
 
     # 2. Fallback: Google Translate TTS audio chunking
     try:
@@ -2576,9 +2656,12 @@ def _generate_nepali_tts_bytes(text, voice='female', speed='1.0'):
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
             with urllib.request.urlopen(req, timeout=12) as resp:
                 out += resp.read()
-        return out
-    except Exception:
-        return b''
+        if out and len(out) > 100:
+            return out, 'google_fallback'
+        return b'', 'failed'
+    except Exception as e:
+        logger.error("Google TTS fallback also failed: %s", e)
+        return b'', 'failed'
 
 
 @staff_member_required
@@ -2586,7 +2669,7 @@ def dashboard_tts(request):
     """
     Nepali Text-to-Speech Studio in /rishav/:
     Allows pasting text, choosing natural voices (Hemkala / Sagar / Google),
-    converting to speech, listening live, and downloading as MP3.
+    tones, converting to speech, listening live, and downloading as MP3.
     """
     from blog.models import BlogPost
     from notes.models import Note
@@ -2626,6 +2709,7 @@ def tts_generate_audio(request):
     raw_text = str(data.get('text', '')).strip()
     clean_text = strip_tags(raw_text).strip()
     voice = str(data.get('voice', 'female')).strip().lower()
+    tone = str(data.get('tone', 'broadcast')).strip().lower()
     speed = str(data.get('speed', '1.0')).strip()
     download_direct = request.GET.get('download') == '1' or data.get('download') == '1'
 
@@ -2635,7 +2719,7 @@ def tts_generate_audio(request):
     # Max length: 15,000 characters for smooth performance
     clean_text = clean_text[:15000]
 
-    audio_bytes = _generate_nepali_tts_bytes(clean_text, voice=voice, speed=speed)
+    audio_bytes, engine_used = _generate_nepali_tts_bytes(clean_text, voice=voice, tone=tone, speed=speed)
 
     if not audio_bytes:
         return JsonResponse({'status': 'error', 'message': 'आवाज रूपान्तरण गर्न सकिएन, कृपया पुन: प्रयास गर्नुहोस्। (Could not generate audio, please try again)'}, status=500)
@@ -2650,13 +2734,21 @@ def tts_generate_audio(request):
         return response
 
     audio_base64 = "data:audio/mpeg;base64," + base64.b64encode(audio_bytes).decode('utf-8')
-    voice_label = "हेमकला (महिला - Natural Neural)" if voice == 'female' else ("सागर (पुरुष - Natural Neural)" if voice == 'male' else "गुगल नेपाली (Google Voice)")
+
+    if engine_used == 'edge_neural':
+        voice_label = "हेमकला (महिला - Microsoft Natural Neural)" if voice == 'female' else "सागर (पुरुष - Microsoft Natural Neural)"
+        engine_warning = ""
+    else:
+        voice_label = "गुगल नेपाली (Google Voice - Backup)"
+        engine_warning = "सर्भरमा Edge Neural TTS उपलब्ध नभएकाले गुगल ब्याकअप आवाज प्रयोग भयो। १००% प्राकृतिक नेपाली आवाजको लागि cPanel Terminal मा 'pip install edge-tts' चलाउनुहोस्।"
 
     return JsonResponse({
         'status': 'ok',
         'audio_data': audio_base64,
         'filename': filename,
         'voice_label': voice_label,
+        'engine_used': engine_used,
+        'engine_warning': engine_warning,
         'char_count': len(clean_text),
         'word_count': len(clean_text.split()),
         'size_kb': round(len(audio_bytes) / 1024, 1),
