@@ -59,25 +59,23 @@
 
 
 
-    <!-- Preconnect & DNS-Prefetch for early DNS/TLS handshakes -->
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <!-- Preconnect & DNS-Prefetch for Google Fonts -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Critical CSS & Font Preload -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style">
+    <!-- Critical Core Stylesheet & Font Preloads (Zero External CDNs) -->
+    <link rel="preload" href="{% static 'css/bootstrap.min.css' %}" as="style">
     <link rel="preload" href="{% static 'css/style.min.css' %}?v=20261028-perf" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'fonts/bootstrap-icons.woff2' %}" as="font" type="font/woff2" crossorigin>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS (Preloaded with non-render-blocking swap) -->
-    <link rel="stylesheet" href="{% static 'css/style.min.css' %}?v=20261028-perf" media="print" onload="this.media='all'">
+    <!-- Core Stylesheets: Same-Origin with Gzip & HTTP/2 Multiplexing -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.min.css' %}?v=20261028-perf">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="{% static 'css/style.min.css' %}?v=20261028-perf">
+        <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
     </noscript>
 
     <!-- Critical Inline CSS: Pure CSS Sticky Footer, Google Translate reset & Zero-Reflow Dark Mode -->
@@ -97,12 +95,11 @@
             flex: 1 0 auto;
         }
 
-        /* Bootstrap Icons font-display: swap to prevent invisible text/icons on mobile */
+        /* Bootstrap Icons font-display: swap pointing to local self-hosted woff2 */
         @font-face {
             font-family: "bootstrap-icons";
             font-display: swap;
-            src: url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff2?dd67030699838ea61371b30c7da0ed95") format("woff2"),
-                 url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff?dd67030699838ea61371b30c7da0ed95") format("woff");
+            src: url("{% static 'fonts/bootstrap-icons.woff2' %}") format("woff2");
         }
 
         /* Eliminate Google Translate banners & spinners without layout shifts */
@@ -156,9 +153,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@400;500;600&family=Mukta:wght@400;600&display=swap">
     </noscript>
 
-    <!-- Bootstrap Icons (Deferred) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
+
 
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
@@ -911,7 +906,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </a>
 
     <!-- Bootstrap JS & Custom JS — deferred to unblock main thread -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}" defer></script>
     <script src="{% static 'js/main.min.js' %}" defer></script>
     <script>
         // Global SmartStore Search Shortcut '/'
