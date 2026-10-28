@@ -3,13 +3,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Google AdSense Verification Meta Tag -->
+    <!-- Google AdSense Verification Meta Tag & Script (Required for AdSense Crawler Approval) -->
     {% if site_settings.enable_adsense_meta and site_settings.adsense_meta_tag %}
     {{ site_settings.adsense_meta_tag|safe }}
     {% elif site_settings.adsense_meta_tag %}
     {{ site_settings.adsense_meta_tag|safe }}
     {% else %}
     <meta name="google-adsense-account" content="{{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}">
+    {% endif %}
+    {% if site_settings.enable_adsense_code %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}" crossorigin="anonymous"></script>
     {% endif %}
 
 
@@ -1212,12 +1215,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 gtag('config', '{{ site_settings.google_analytics_id }}');
                 {% endif %}
 
-                // 3. Google AdSense
-                var ads = document.createElement('script');
-                ads.async = true;
-                ads.crossOrigin = 'anonymous';
-                ads.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:"ca-pub-3956705237421931" }}';
-                document.head.appendChild(ads);
+                // 3. Google AdSense auto-ads already verified in <head> for AdSense crawlers
             }
 
             // Load immediately on user interaction or after 3.5s idle

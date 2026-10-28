@@ -52,10 +52,11 @@ def global_categories(request):
     if cached is not None:
         return cached
 
-    notes_categories = list(Category.objects.filter(module='notes', is_active=True))
-    downloads_categories = list(Category.objects.filter(module='downloads', is_active=True))
-    blog_categories = list(Category.objects.filter(module='blog', is_active=True))
-    quiz_categories = list(Category.objects.filter(module='quiz', is_active=True))
+    # Filter categories to only those containing published content to satisfy Google AdSense site navigation policy
+    notes_categories = list(Category.objects.filter(module='notes', is_active=True, notes__is_published=True).distinct())
+    downloads_categories = list(Category.objects.filter(module='downloads', is_active=True, downloads__is_published=True).distinct())
+    blog_categories = list(Category.objects.filter(module='blog', is_active=True, blog_posts__is_published=True).distinct())
+    quiz_categories = list(Category.objects.filter(module='quiz', is_active=True, quizzes__is_published=True).distinct())
 
     downloads_counts = {}
     downloads_sub_counts = {}
