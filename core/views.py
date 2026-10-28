@@ -84,10 +84,6 @@ def home(request):
         }
         cache.set('homepage_content_payload_v2', home_payload, 300)
 
-    site_settings = cache.get('cp_site_settings_base_v2')
-    if site_settings is None:
-        site_settings = SiteSettings.objects.first()
-        cache.set('cp_site_settings_base_v2', site_settings, 1800)
     context = {
         'featured_notes': home_payload['featured_notes'],
         'latest_notes': home_payload['latest_notes'],
@@ -96,7 +92,6 @@ def home(request):
         'recent_quizzes': home_payload['recent_quizzes'],
         'daily_questions_json': json.dumps(daily_questions_data) if daily_questions_data else '',
         'stats': home_payload['stats'],
-        'site_settings': site_settings,
         'meta_title': 'Learning Platform - Your Gateway to Knowledge',
         'meta_description': 'Access free notes, practice MCQs, download study materials, and read educational blogs. No login required for MCQ practice!',
     }
