@@ -1213,17 +1213,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 {% endif %}
 
                 // 3. Google AdSense
-                {% if site_settings.enable_adsense_code and site_settings.adsense_code_snippet %}
-                var adDiv = document.createElement('div');
-                adDiv.innerHTML = `{{ site_settings.adsense_code_snippet|safe }}`;
-                document.body.appendChild(adDiv);
-                {% else %}
                 var ads = document.createElement('script');
                 ads.async = true;
                 ads.crossOrigin = 'anonymous';
                 ads.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:"ca-pub-3956705237421931" }}';
-                document.body.appendChild(ads);
-                {% endif %}
+                document.head.appendChild(ads);
             }
 
             // Load immediately on user interaction or after 3.5s idle
