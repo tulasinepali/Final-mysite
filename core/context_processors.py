@@ -1,46 +1,61 @@
 import json
 from django.apps import apps
+from django.core.cache import cache
 from .models import SiteSettings, Category, AdPlacement, VisitorCount, Subscriber
 
 
 def site_settings(request):
-    """Make site settings available in all templates."""
-    settings, _ = SiteSettings.objects.get_or_create(pk=1)
+    """Make site settings available in all templates (Cached for 10 minutes)."""
+    cached_base = cache.get('cp_site_settings_base_v2')
+    if cached_base is None:
+        settings, _ = SiteSettings.objects.get_or_create(pk=1)
+        total_videos_count = 0
+        try:
+            YouTubeVideo = apps.get_model('core', 'YouTubeVideo', require_ready=False)
+            if YouTubeVideo:
+                promoted_videos = list(YouTubeVideo.objects.filter(is_active=True).values(
+                    'id', 'video_id', 'title', 'category', 'channel_name', 'channel_url', 'custom_thumbnail'
+                ))
+                total_videos_count = YouTubeVideo.objects.count()
+            else:
+                promoted_videos = []
+        except Exception:
+            promoted_videos = []
+
+        cached_base = {
+            'site_settings': settings,
+            'promoted_youtube_videos': promoted_videos,
+            'promoted_youtube_videos_json': json.dumps(promoted_videos),
+            'total_youtube_videos_count': total_videos_count,
+        }
+        cache.set('cp_site_settings_base_v2', cached_base, 600)
+
     sub_count = 0
-    if request.user.is_authenticated and request.user.is_staff:
+    if hasattr(request, 'user') and request.user.is_authenticated and request.user.is_staff:
         try:
             sub_count = Subscriber.objects.filter(is_active=True).count()
         except Exception:
             sub_count = 0
 
-    total_videos_count = 0
-    try:
-        YouTubeVideo = apps.get_model('core', 'YouTubeVideo', require_ready=False)
-        if YouTubeVideo:
-            promoted_videos = list(YouTubeVideo.objects.filter(is_active=True).values(
-                'id', 'video_id', 'title', 'category', 'channel_name', 'channel_url', 'custom_thumbnail'
-            ))
-            total_videos_count = YouTubeVideo.objects.count()
-        else:
-            promoted_videos = []
-    except Exception:
-        promoted_videos = []
-
     return {
-        'site_settings': settings,
+        'site_settings': cached_base['site_settings'],
         'total_subscribers': sub_count,
-        'promoted_youtube_videos': promoted_videos,
-        'promoted_youtube_videos_json': json.dumps(promoted_videos),
-        'total_youtube_videos_count': total_videos_count,
+        'promoted_youtube_videos': cached_base['promoted_youtube_videos'],
+        'promoted_youtube_videos_json': cached_base['promoted_youtube_videos_json'],
+        'total_youtube_videos_count': cached_base['total_youtube_videos_count'],
     }
 
 
 def global_categories(request):
-    """Make categorized navigation and downloads counts available in all templates."""
-    notes_categories = Category.objects.filter(module='notes', is_active=True)
-    downloads_categories = Category.objects.filter(module='downloads', is_active=True)
-    blog_categories = Category.objects.filter(module='blog', is_active=True)
-    quiz_categories = Category.objects.filter(module='quiz', is_active=True)
+    """Make categorized navigation and downloads counts available in all templates (Cached for 10 minutes)."""
+    cached = cache.get('cp_global_categories_v2')
+    if cached is not None:
+        return cached
+
+    notes_categories = list(Category.objects.filter(module='notes', is_active=True))
+    downloads_categories = list(Category.objects.filter(module='downloads', is_active=True))
+    blog_categories = list(Category.objects.filter(module='blog', is_active=True))
+    quiz_categories = list(Category.objects.filter(module='quiz', is_active=True))
 
     downloads_counts = {}
     downloads_sub_counts = {}
@@ -48,7 +63,7 @@ def global_categories(request):
         Download = apps.get_model('downloads', 'Download', require_ready=False)
         if Download:
             from django.db.models import Count
-            qs = Download.objects.filter(is_published=True).values('resource_type').annotate(c=Count('id'))
+            qs = list(Download.objects.filter(is_published=True).values('resource_type').annotate(c=Count('id')))
             for row in qs:
                 downloads_counts[row['resource_type']] = row['c']
             downloads_counts['questions'] = (
@@ -58,7 +73,7 @@ def global_categories(request):
             downloads_counts['total'] = sum(row['c'] for row in qs)
 
             # Sub-counts grouped by resource_type and target_sector
-            qs_sub = Download.objects.filter(is_published=True).values('resource_type', 'target_sector').annotate(c=Count('id'))
+            qs_sub = list(Download.objects.filter(is_published=True).values('resource_type', 'target_sector').annotate(c=Count('id')))
             for row in qs_sub:
                 key = f"{row['resource_type']}_{row['target_sector']}"
                 downloads_sub_counts[key] = row['c']
@@ -66,7 +81,7 @@ def global_categories(request):
         downloads_counts = {}
         downloads_sub_counts = {}
 
-    return {
+    res = {
         'notes_categories': notes_categories,
         'downloads_categories': downloads_categories,
         'blog_categories': blog_categories,
@@ -74,10 +89,16 @@ def global_categories(request):
         'downloads_counts': downloads_counts,
         'downloads_sub_counts': downloads_sub_counts,
     }
+    cache.set('cp_global_categories_v2', res, 600)
+    return res
 
 
 def ad_placements(request):
-    """Make ad placements available in all templates."""
+    """Make ad placements available in all templates (Cached for 5 minutes)."""
+    cached = cache.get('cp_ad_placements_v2')
+    if cached is not None:
+        return cached
+
     ads = {}
     popup_ad = None
     for ad in AdPlacement.objects.filter(is_active=True):
@@ -86,7 +107,9 @@ def ad_placements(request):
         else:
             ads[ad.placement] = ad.ad_code
     visitor_count = VisitorCount.get_count()
-    return {'ads': ads, 'popup_ad': popup_ad, 'visitor_count': visitor_count}
+    res = {'ads': ads, 'popup_ad': popup_ad, 'visitor_count': visitor_count}
+    cache.set('cp_ad_placements_v2', res, 300)
+    return res
 
 
 def dashboard_signals(request):
@@ -181,4 +204,3 @@ def dashboard_signals(request):
         }
     except Exception:
         return {}
-

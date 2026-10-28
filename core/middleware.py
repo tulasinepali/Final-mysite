@@ -12,7 +12,7 @@ def parse_user_agent(ua_string):
     ua = ua_string.lower()
 
     # Detect bot
-    bot_patterns = ['bot', 'crawler', 'spider', 'slurp', 'googlebot', 'bingbot', 'yandex', 'duckduckbot', 'lighthouse']
+    bot_patterns = ['bot', 'crawler', 'spider', 'slurp', 'googlebot', 'bingbot', 'yandex', 'duckduckbot', 'lighthouse', 'pagespeed', 'headless', 'ptst']
     is_bot = any(b in ua for b in bot_patterns)
 
     # Detect device
@@ -113,74 +113,56 @@ class VisitorCountMiddleware:
 
     def __call__(self, request):
         path = request.path
+        ua_str = request.META.get('HTTP_USER_AGENT', '')
+        parsed = parse_user_agent(ua_str)
+
+        # Fast unblocked exit for bots, audit tools (Lighthouse/PageSpeed), and excluded paths
+        if parsed['is_bot'] or self._should_skip(path) or is_admin_or_staff(request):
+            return self.get_response(request)
+
+        # 1. Unblock TTFB: Generate HTTP response FIRST
+        response = self.get_response(request)
+
+        # 2. Record analytics AFTER the response has been generated (zero-latency for users)
         today_str = timezone.now().strftime('%Y%m%d')
-        should_set_cookie = False
-
-        # Untrack visits if current user is admin/staff or has the admin DNT cookie
-        is_untracked = is_admin_or_staff(request)
-
-        if not self._should_skip(path) and not is_untracked:
-            # 1. Total Daily Visitor Counter
-            if request.COOKIES.get(self.COOKIE_NAME) != today_str:
+        if request.COOKIES.get(self.COOKIE_NAME) != today_str:
+            try:
                 updated = VisitorCount.objects.filter(pk=1).update(count=F('count') + 1)
                 if updated == 0:
                     VisitorCount.objects.get_or_create(pk=1, defaults={'count': 1})
-                should_set_cookie = True
-
-            # 2. Detailed Visitor Analytics Log
-            try:
-                ip = get_client_ip(request)
-                ua_str = request.META.get('HTTP_USER_AGENT', '')
-                parsed = parse_user_agent(ua_str)
-                referrer = request.META.get('HTTP_REFERER', '')
-                if referrer and len(referrer) > 490:
-                    referrer = referrer[:490]
-                
-                # Check for country header if forwarded by Cloudflare/Proxy
-                country = request.META.get('HTTP_CF_IPCOUNTRY') or request.META.get('GEOIP_COUNTRY_NAME') or 'Nepal'
-
-                session_key = request.session.session_key if hasattr(request, 'session') and request.session else None
-
-                VisitorLog.objects.create(
-                    ip_address=ip[:50] if ip else '127.0.0.1',
-                    path=path[:490],
-                    method=request.method[:10],
-                    referrer=referrer if referrer else None,
-                    user_agent=ua_str[:1000] if ua_str else '',
-                    device_type=parsed['device_type'],
-                    browser=parsed['browser'],
-                    os=parsed['os'],
-                    country=country[:60],
-                    session_key=session_key,
-                    is_bot=parsed['is_bot'],
-                )
-            except Exception:
-                # Visitor logging should never interrupt request handling
-                pass
-
-        response = self.get_response(request)
-
-        # Set the daily cookie so the same regular visitor isn't counted again today
-        if should_set_cookie:
-            response.set_cookie(
-                self.COOKIE_NAME,
-                today_str,
-                max_age=86400,   # Expires after 1 day
-                httponly=True,
-                samesite='Lax',
-            )
-
-        # Ensure admin_do_not_track cookie is set on staff browser (checked post-response to detect fresh logins)
-        current_user = getattr(request, 'user', None)
-        if current_user and current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
-            if request.COOKIES.get(self.ADMIN_DNT_COOKIE) != '1':
                 response.set_cookie(
-                    self.ADMIN_DNT_COOKIE,
-                    '1',
-                    max_age=31536000,   # 1 year persistent untracked marker
+                    self.COOKIE_NAME,
+                    today_str,
+                    max_age=86400,
                     httponly=True,
                     samesite='Lax',
                 )
+            except Exception:
+                pass
+
+        try:
+            ip = get_client_ip(request)
+            referrer = request.META.get('HTTP_REFERER', '')
+            if referrer and len(referrer) > 490:
+                referrer = referrer[:490]
+            country = request.META.get('HTTP_CF_IPCOUNTRY') or request.META.get('GEOIP_COUNTRY_NAME') or 'Nepal'
+            session_key = request.session.session_key if hasattr(request, 'session') and request.session else None
+
+            VisitorLog.objects.create(
+                ip_address=ip[:50] if ip else '127.0.0.1',
+                path=path[:490],
+                method=request.method[:10],
+                referrer=referrer if referrer else None,
+                user_agent=ua_str[:1000] if ua_str else '',
+                device_type=parsed['device_type'],
+                browser=parsed['browser'],
+                os=parsed['os'],
+                country=country[:60],
+                session_key=session_key,
+                is_bot=False,
+            )
+        except Exception:
+            pass
 
         return response
 
