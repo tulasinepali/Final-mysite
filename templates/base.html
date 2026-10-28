@@ -11,13 +11,7 @@
     {% else %}
     <meta name="google-adsense-account" content="{{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}">
     {% endif %}
-    <!-- Google Tag Manager — async, does not block render -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KCFVW48R');</script>
-    <!-- End Google Tag Manager -->
+
 
 
     <meta charset="UTF-8">
@@ -63,16 +57,7 @@
     <meta name="twitter:image" content="{% static 'images/og-default.png' %}">
     {% endblock %}
 
-    <!-- Google Analytics -->
-    {% if site_settings.google_analytics_id %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ site_settings.google_analytics_id }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '{{ site_settings.google_analytics_id }}');
-    </script>
-    {% endif %}
+
 
     <!-- Preconnect to CDNs for early DNS/TLS handshakes -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -152,10 +137,10 @@
     </style>
 
     <!-- Google Fonts (Non-render-blocking with display=swap) -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@400;500;600&family=Mukta:wght@400;600&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@400;500;600&family=Mukta:wght@400;600&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@400;500;600&family=Mukta:wght@400;600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@400;500;600&family=Mukta:wght@400;600&display=swap" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@400;500;600&family=Mukta:wght@400;600&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@400;500;600&family=Mukta:wght@400;600&display=swap">
     </noscript>
 
     <!-- Bootstrap Icons (Deferred) -->
@@ -1195,14 +1180,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }
     </script>
 
-    <!-- Google AdSense (Deferred to end of body to prevent render-blocking) -->
-    {% if site_settings.enable_adsense_code and site_settings.adsense_code_snippet %}
-    {{ site_settings.adsense_code_snippet|safe }}
-    {% elif site_settings.adsense_code_snippet %}
-    {{ site_settings.adsense_code_snippet|safe }}
-    {% else %}
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}" crossorigin="anonymous"></script>
-    {% endif %}
+    <!-- High-Performance Lazy-Loaded Analytics & AdSense (Unblocks Mobile FCP/LCP/TBT) -->
+    <script>
+        (function() {
+            var thirdPartyLoaded = false;
+            function initThirdParty() {
+                if (thirdPartyLoaded) return;
+                thirdPartyLoaded = true;
+                ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'].forEach(function(ev) {
+                    window.removeEventListener(ev, initThirdParty, { passive: true });
+                });
+
+                // 1. Google Tag Manager
+                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                })(window,document,'script','dataLayer','GTM-KCFVW48R');
+
+                // 2. Google Analytics 4
+                {% if site_settings.google_analytics_id %}
+                var ga = document.createElement('script');
+                ga.async = true;
+                ga.src = 'https://www.googletagmanager.com/gtag/js?id={{ site_settings.google_analytics_id }}';
+                document.body.appendChild(ga);
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '{{ site_settings.google_analytics_id }}');
+                {% endif %}
+
+                // 3. Google AdSense
+                {% if site_settings.enable_adsense_code and site_settings.adsense_code_snippet %}
+                var adDiv = document.createElement('div');
+                adDiv.innerHTML = `{{ site_settings.adsense_code_snippet|safe }}`;
+                document.body.appendChild(adDiv);
+                {% else %}
+                var ads = document.createElement('script');
+                ads.async = true;
+                ads.crossOrigin = 'anonymous';
+                ads.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:"ca-pub-3956705237421931" }}';
+                document.body.appendChild(ads);
+                {% endif %}
+            }
+
+            // Load immediately on user interaction or after 3.5s idle
+            ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'].forEach(function(ev) {
+                window.addEventListener(ev, initThirdParty, { once: true, passive: true });
+            });
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(function() { setTimeout(initThirdParty, 3500); });
+            } else {
+                setTimeout(initThirdParty, 4000);
+            }
+        })();
+    </script>
 
     <!-- PWA Service Worker Registration -->
     <script>
