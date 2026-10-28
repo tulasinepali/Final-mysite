@@ -16,8 +16,17 @@ from django.contrib.auth.models import User
 
 def home(request):
     from django.core.cache import cache
+    from django.http import HttpResponse
     import json
     import random
+
+    # 0. High-Performance Anonymous Fast-Path: Sub-50ms TTFB for visitors & PageSpeed bots
+    if not request.user.is_authenticated:
+        cached_html = cache.get('home_rendered_html_anon_v3')
+        if cached_html is not None:
+            res = HttpResponse(cached_html, content_type='text/html; charset=utf-8')
+            res['X-Cache-Status'] = 'HIT'
+            return res
 
     # 1. Question of the Day: Use python memory sampling & cache for 30 minutes instead of heavy database ORDER BY RAND()
     daily_questions_data = cache.get('daily_questions_pool_v2')
@@ -75,7 +84,10 @@ def home(request):
         }
         cache.set('homepage_content_payload_v2', home_payload, 300)
 
-    site_settings = SiteSettings.objects.first()
+    site_settings = cache.get('cp_site_settings_base_v2')
+    if site_settings is None:
+        site_settings = SiteSettings.objects.first()
+        cache.set('cp_site_settings_base_v2', site_settings, 1800)
     context = {
         'featured_notes': home_payload['featured_notes'],
         'latest_notes': home_payload['latest_notes'],
@@ -88,7 +100,10 @@ def home(request):
         'meta_title': 'Learning Platform - Your Gateway to Knowledge',
         'meta_description': 'Access free notes, practice MCQs, download study materials, and read educational blogs. No login required for MCQ practice!',
     }
-    return render(request, 'core/home.html', context)
+    response = render(request, 'core/home.html', context)
+    if not request.user.is_authenticated and response.status_code == 200:
+        cache.set('home_rendered_html_anon_v3', response.content, 600)
+    return response
 
 def about(request):
     site_settings = SiteSettings.objects.first()
