@@ -1024,28 +1024,28 @@ body.dark-mode .student-avatar,
             <div class="col-6 col-md-3">
                 <div class="p-3 bg-white rounded-4 border shadow-sm">
                     <i class="bi bi-journal-text fs-2 text-primary mb-2 d-block"></i>
-                    <div class="stat-number fs-2 fw-bold text-dark mb-0" data-count="{{ stats.total_notes|default:'0' }}">0</div>
+                    <div class="stat-number fs-2 fw-bold text-dark mb-0">{{ stats.total_notes|default:'0' }}</div>
                     <div class="text-muted small fw-semibold">Study Notes</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="p-3 bg-white rounded-4 border shadow-sm">
                     <i class="bi bi-patch-question fs-2 text-success mb-2 d-block"></i>
-                    <div class="stat-number fs-2 fw-bold text-dark mb-0" data-count="{{ stats.total_mcqs|default:'0' }}">0</div>
+                    <div class="stat-number fs-2 fw-bold text-dark mb-0">{{ stats.total_mcqs|default:'0' }}</div>
                     <div class="text-muted small fw-semibold">MCQ Questions</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="p-3 bg-white rounded-4 border shadow-sm">
                     <i class="bi bi-download fs-2 text-warning mb-2 d-block"></i>
-                    <div class="stat-number fs-2 fw-bold text-dark mb-0" data-count="{{ stats.total_downloads|default:'0' }}">0</div>
+                    <div class="stat-number fs-2 fw-bold text-dark mb-0">{{ stats.total_downloads|default:'0' }}</div>
                     <div class="text-muted small fw-semibold">PDF Downloads</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="p-3 bg-white rounded-4 border shadow-sm">
                     <i class="bi bi-people fs-2 text-info mb-2 d-block"></i>
-                    <div class="stat-number fs-2 fw-bold text-dark mb-0" data-count="{{ visitor_count|default:"0" }}">0</div>
+                    <div class="stat-number fs-2 fw-bold text-dark mb-0">{{ visitor_count|default:"0" }}</div>
                     <div class="text-muted small fw-semibold">Active Visitors</div>
                 </div>
             </div>
