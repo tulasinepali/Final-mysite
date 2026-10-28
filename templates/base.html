@@ -59,7 +59,10 @@
 
 
 
-    <!-- Preconnect to CDNs for early DNS/TLS handshakes -->
+    <!-- Preconnect & DNS-Prefetch for early DNS/TLS handshakes -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -133,6 +136,12 @@
         body.dark-mode [style*="color:#000"],
         body.dark-mode [style*="color: black"] {
             color: #f3f4f6 !important;
+        }
+
+        /* Modern Web Performance: Skip offscreen layout work on initial paint */
+        .stats-section, footer#footer {
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 400px;
         }
     </style>
 
