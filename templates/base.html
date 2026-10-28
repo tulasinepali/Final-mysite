@@ -76,27 +76,38 @@
     </script>
     {% endif %}
 
-    <!-- Google AdSense Code Snippet -->
-    {% if site_settings.enable_adsense_code and site_settings.adsense_code_snippet %}
-    {{ site_settings.adsense_code_snippet|safe }}
-    {% elif site_settings.adsense_code_snippet %}
-    {{ site_settings.adsense_code_snippet|safe }}
-    {% else %}
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}" crossorigin="anonymous"></script>
-    {% endif %}
-
-    <!-- Preconnect to CDNs for faster connections -->
+    <!-- Preconnect to CDNs for early DNS/TLS handshakes -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Bootstrap 5 CSS — critical, load normally -->
+    <!-- Critical CSS Preload -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style">
+    <link rel="preload" href="{% static 'css/style.css' %}?v=20261019-dark-dropdown" as="style">
+
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS — critical, load normally -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261019-dark-dropdown">
+
+    <!-- Critical Inline CSS: Pure CSS Sticky Footer, Google Translate reset & Zero-Reflow Dark Mode -->
     <style>
-        /* Immediately eliminate all Google Translate injected banners, tooltips & 96px bottom spinner */
+        /* Modern Pure CSS Sticky Footer (Zero JS layout calculations) */
+        html, body {
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            top: 0px !important;
+            position: static !important;
+        }
+        #main-content {
+            flex: 1 0 auto;
+        }
+
+        /* Eliminate Google Translate banners & spinners without layout shifts */
         .goog-te-banner-frame,
         iframe.goog-te-banner-frame,
         .goog-te-banner-frame.skiptranslate,
@@ -106,23 +117,40 @@
             display: none !important;
             visibility: hidden !important;
         }
-        body {
-            top: 0px !important;
-            position: static !important;
+
+        /* Pure CSS Dark Mode Overrides (Eliminates document.querySelectorAll('*') forced reflows) */
+        [data-bs-theme="dark"] [style*="background: #ffffff"],
+        [data-bs-theme="dark"] [style*="background:#ffffff"],
+        [data-bs-theme="dark"] [style*="background-color: #ffffff"],
+        [data-bs-theme="dark"] [style*="background-color:#ffffff"],
+        [data-bs-theme="dark"] [style*="background: #edf2f8"],
+        [data-bs-theme="dark"] [style*="background-color: #edf2f8"],
+        body.dark-mode [style*="background: #ffffff"],
+        body.dark-mode [style*="background:#ffffff"],
+        body.dark-mode [style*="background-color: #ffffff"],
+        body.dark-mode [style*="background-color:#ffffff"],
+        body.dark-mode [style*="background: #edf2f8"],
+        body.dark-mode [style*="background-color: #edf2f8"] {
+            background: #111827 !important;
+            background-color: #111827 !important;
+        }
+
+        [data-bs-theme="dark"] [style*="color: #000"],
+        [data-bs-theme="dark"] [style*="color:#000"],
+        [data-bs-theme="dark"] [style*="color: black"],
+        body.dark-mode [style*="color: #000"],
+        body.dark-mode [style*="color:#000"],
+        body.dark-mode [style*="color: black"] {
+            color: #f3f4f6 !important;
         }
     </style>
 
-    <!-- Google Fonts — deferred (non-render-blocking) -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    <!-- Google Fonts with native font-display: swap (Optimized weight subsetting) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap Icons — deferred (non-critical icons) -->
+    <!-- Bootstrap Icons (Deferred) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
-
-    <!-- Font Awesome — deferred (non-critical) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
 
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
@@ -874,10 +902,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <i class="bi bi-arrow-up-short fs-4"></i>
     </a>
 
-    <!-- Bootstrap JS — load normally (deferring increases TBT) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS — load normally -->
-    <script src="{% static 'js/main.js' %}"></script>
+    <!-- Bootstrap JS & Custom JS — deferred to unblock main thread -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{% static 'js/main.js' %}" defer></script>
     <script>
         // Global SmartStore Search Shortcut '/'
         document.addEventListener('keydown', function(e) {
@@ -907,24 +934,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             });
         }
 
-        // Dynamic Footer Flush Alignment: Ensures main-content fills viewport remainder on short pages
-        function ensureFooterBottom() {
-            var header = document.getElementById('header');
-            var footer = document.getElementById('footer');
-            var main = document.getElementById('main-content');
-            if (header && footer && main) {
-                var hH = header.offsetHeight || 0;
-                var fH = footer.offsetHeight || 0;
-                var rem = window.innerHeight - hH - fH;
-                if (rem > 0) {
-                    main.style.minHeight = rem + 'px';
-                }
-            }
-        }
-        window.addEventListener('resize', ensureFooterBottom);
-        window.addEventListener('orientationchange', ensureFooterBottom);
-        document.addEventListener('DOMContentLoaded', ensureFooterBottom);
-        ensureFooterBottom();
+        // Sticky footer is handled via CSS flexbox (Zero JS forced reflows)
 
     </script>
     {% block extra_js %}{% endblock %}
@@ -985,42 +995,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </script>
     {% endif %}
 
-    <!-- Dark Mode Controller -->
+    <!-- Dark Mode Controller (Zero Forced Reflows) -->
     <script>
-        function enforceDarkBackgrounds() {
-            var allElements = document.querySelectorAll('*');
-            for (var i = 0; i < allElements.length; i++) {
-                var el = allElements[i];
-                var bg = el.style.backgroundColor || el.style.background || '';
-                if (bg && (bg.includes('255, 255, 255') || bg.includes('255,255,255') || bg.includes('#ffffff') || bg.includes('#fff') || bg.includes('edf2f8') || bg.includes('237, 242, 248'))) {
-                    if (!el.getAttribute('data-orig-bg')) {
-                        el.setAttribute('data-orig-bg', bg);
-                    }
-                    el.style.setProperty('background', '#111827', 'important');
-                    el.style.setProperty('background-color', '#111827', 'important');
-                }
-                var col = el.style.color || '';
-                if (col && (col.includes('0, 0, 0') || col.includes('rgb(0,0,0)') || col.includes('#000') || col.includes('black'))) {
-                    if (!el.getAttribute('data-orig-col')) {
-                        el.setAttribute('data-orig-col', col);
-                    }
-                    el.style.setProperty('color', '#ffffff', 'important');
-                }
-            }
-        }
-
-        function restoreLightBackgrounds() {
-            document.querySelectorAll('[data-orig-bg]').forEach(function(el) {
-                el.style.background = el.getAttribute('data-orig-bg');
-                el.style.backgroundColor = el.getAttribute('data-orig-bg');
-                el.removeAttribute('data-orig-bg');
-            });
-            document.querySelectorAll('[data-orig-col]').forEach(function(el) {
-                el.style.color = el.getAttribute('data-orig-col');
-                el.removeAttribute('data-orig-col');
-            });
-        }
-
         function setDarkMode(isDark) {
             var theme = isDark ? 'dark' : 'light';
             document.documentElement.setAttribute('data-bs-theme', theme);
@@ -1032,11 +1008,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             var icon = document.getElementById('darkModeIcon');
             if (icon) {
                 icon.className = isDark ? 'bi bi-sun fs-5 text-warning' : 'bi bi-moon-stars fs-5';
-            }
-            if (isDark) {
-                enforceDarkBackgrounds();
-            } else {
-                restoreLightBackgrounds();
             }
         }
 
@@ -1051,11 +1022,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     setDarkMode(cur !== 'dark');
                 });
             }
-            document.addEventListener('DOMContentLoaded', function() {
-                if (localStorage.getItem('theme') === 'dark') {
-                    enforceDarkBackgrounds();
-                }
-            });
         })();
     </script>
 
@@ -1192,7 +1158,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }, true);
         })();
     </script>
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- Google Translate Script (Lazy-loaded on interaction or when Nepali active) -->
+    <script>
+        var gtLoaded = false;
+        function loadGoogleTranslate() {
+            if (gtLoaded) return;
+            gtLoaded = true;
+            var script = document.createElement('script');
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            script.async = true;
+            document.body.appendChild(script);
+        }
+
+        var activeLang = localStorage.getItem('site_lang') || 'en';
+        if (activeLang === 'ne' || (window.location.hash && window.location.hash.indexOf('googtrans') !== -1)) {
+            loadGoogleTranslate();
+        } else {
+            // Lazy load when user hovers or taps the language switcher
+            var langBtn = document.getElementById('languageDropdown') || document.querySelector('.language-switcher');
+            if (langBtn) {
+                langBtn.addEventListener('mouseenter', loadGoogleTranslate, { once: true });
+                langBtn.addEventListener('click', loadGoogleTranslate, { once: true });
+                langBtn.addEventListener('touchstart', loadGoogleTranslate, { once: true, passive: true });
+            }
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(function() {
+                    setTimeout(loadGoogleTranslate, 3500);
+                });
+            } else {
+                setTimeout(loadGoogleTranslate, 4000);
+            }
+        }
+    </script>
+
+    <!-- Google AdSense (Deferred to end of body to prevent render-blocking) -->
+    {% if site_settings.enable_adsense_code and site_settings.adsense_code_snippet %}
+    {{ site_settings.adsense_code_snippet|safe }}
+    {% elif site_settings.adsense_code_snippet %}
+    {{ site_settings.adsense_code_snippet|safe }}
+    {% else %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site_settings.adsense_client_id|default:'ca-pub-3956705237421931' }}" crossorigin="anonymous"></script>
+    {% endif %}
 
     <!-- PWA Service Worker Registration -->
     <script>
