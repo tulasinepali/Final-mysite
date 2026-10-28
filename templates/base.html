@@ -18,9 +18,7 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KCFVW48R');</script>
     <!-- End Google Tag Manager -->
-    <script async custom-element="amp-auto-ads"
-        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-</script>
+
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -105,6 +103,14 @@
         }
         #main-content {
             flex: 1 0 auto;
+        }
+
+        /* Bootstrap Icons font-display: swap to prevent invisible text/icons on mobile */
+        @font-face {
+            font-family: "bootstrap-icons";
+            font-display: swap;
+            src: url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff2?dd67030699838ea61371b30c7da0ed95") format("woff2"),
+                 url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff?dd67030699838ea61371b30c7da0ed95") format("woff");
         }
 
         /* Eliminate Google Translate banners & spinners without layout shifts */
@@ -1185,13 +1191,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 langBtn.addEventListener('click', loadGoogleTranslate, { once: true });
                 langBtn.addEventListener('touchstart', loadGoogleTranslate, { once: true, passive: true });
             }
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(function() {
-                    setTimeout(loadGoogleTranslate, 3500);
-                });
-            } else {
-                setTimeout(loadGoogleTranslate, 4000);
-            }
+            // Strictly interaction-based: do not load unprompted during audits
         }
     </script>
 

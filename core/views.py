@@ -15,51 +15,75 @@ from django.contrib.auth.models import User
 
 
 def home(request):
-    featured_notes = Note.objects.filter(is_published=True, is_featured=True)[:4]
-    latest_notes = Note.objects.filter(is_published=True).order_by('-created_at')[:6]
-    trending_blogs = BlogPost.objects.filter(is_published=True).order_by('-views')[:6]
-    popular_downloads = Download.objects.filter(is_published=True).order_by('-download_count')[:6]
-    recent_quizzes = Quiz.objects.filter(is_published=True).order_by('-created_at')[:4]
-    total_notes = Note.objects.filter(is_published=True).count()
-    total_blogs = BlogPost.objects.filter(is_published=True).count()
-    total_downloads = Download.objects.filter(is_published=True).count()
-    total_mcqs = Quiz.objects.filter(is_published=True).aggregate(total=Count('questions'))['total'] or 0
-    total_users = User.objects.count()
-    site_settings = SiteSettings.objects.first()
-
-    # Question of the Day: Fetch up to 10 published questions with related quiz/category
-    from quiz.models import Question
+    from django.core.cache import cache
     import json
-    daily_questions_qs = Question.objects.filter(
-        quiz__is_published=True
-    ).select_related('quiz', 'quiz__category').order_by('?')[:8]
+    import random
 
-    daily_questions_data = []
-    choice_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
-    for q in daily_questions_qs:
-        daily_questions_data.append({
-            'category': q.quiz.category.name if q.quiz.category else 'General Knowledge',
-            'categoryIcon': 'bi-laptop' if 'computer' in (q.quiz.category.name.lower() if q.quiz.category else '') else 'bi-question-circle',
-            'level': q.quiz.title,
-            'question': q.question_text,
-            'options': [q.option_a, q.option_b, q.option_c, q.option_d],
-            'correctIndex': choice_map.get(q.correct_answer.upper().strip(), 0),
-            'explanation': q.explanation or f"Option {q.correct_answer.upper()} is the correct answer.",
-            'quizUrl': q.quiz.get_absolute_url() if hasattr(q.quiz, 'get_absolute_url') else '/quizzes/'
-        })
+    # 1. Question of the Day: Use python memory sampling & cache for 30 minutes instead of heavy database ORDER BY RAND()
+    daily_questions_data = cache.get('daily_questions_pool_v2')
+    if daily_questions_data is None:
+        from quiz.models import Question
+        # Fetch published questions without heavy ORDER BY RAND()
+        daily_questions_qs = list(Question.objects.filter(
+            quiz__is_published=True
+        ).select_related('quiz', 'quiz__category')[:30])
+        
+        sampled_qs = random.sample(daily_questions_qs, min(len(daily_questions_qs), 8)) if daily_questions_qs else []
+        daily_questions_data = []
+        choice_map = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+        for q in sampled_qs:
+            daily_questions_data.append({
+                'category': q.quiz.category.name if q.quiz.category else 'General Knowledge',
+                'categoryIcon': 'bi-laptop' if 'computer' in (q.quiz.category.name.lower() if q.quiz.category else '') else 'bi-question-circle',
+                'level': q.quiz.title,
+                'question': q.question_text,
+                'options': [q.option_a, q.option_b, q.option_c, q.option_d],
+                'correctIndex': choice_map.get(q.correct_answer.upper().strip(), 0),
+                'explanation': q.explanation or f"Option {q.correct_answer.upper()} is the correct answer.",
+                'quizUrl': q.quiz.get_absolute_url() if hasattr(q.quiz, 'get_absolute_url') else '/quizzes/'
+            })
+        cache.set('daily_questions_pool_v2', daily_questions_data, 1800)
 
+    # 2. Homepage Content & Stats Cache (5 minutes)
+    home_payload = cache.get('homepage_content_payload_v2')
+    if home_payload is None:
+        featured_notes = list(Note.objects.filter(is_published=True, is_featured=True).select_related('category')[:4])
+        latest_notes = list(Note.objects.filter(is_published=True).select_related('category').order_by('-created_at')[:6])
+        trending_blogs = list(BlogPost.objects.filter(is_published=True).select_related('category').order_by('-views')[:6])
+        popular_downloads = list(Download.objects.filter(is_published=True).order_by('-download_count')[:6])
+        recent_quizzes = list(Quiz.objects.filter(is_published=True).select_related('category').order_by('-created_at')[:4])
+        
+        total_notes = Note.objects.filter(is_published=True).count()
+        total_blogs = BlogPost.objects.filter(is_published=True).count()
+        total_downloads = Download.objects.filter(is_published=True).count()
+        total_mcqs = Quiz.objects.filter(is_published=True).aggregate(total=Count('questions'))['total'] or 0
+        total_users = User.objects.count()
+
+        home_payload = {
+            'featured_notes': featured_notes,
+            'latest_notes': latest_notes,
+            'trending_blogs': trending_blogs,
+            'popular_downloads': popular_downloads,
+            'recent_quizzes': recent_quizzes,
+            'stats': {
+                'total_notes': total_notes,
+                'total_blogs': total_blogs,
+                'total_downloads': total_downloads,
+                'total_mcqs': total_mcqs,
+                'total_users': total_users,
+            }
+        }
+        cache.set('homepage_content_payload_v2', home_payload, 300)
+
+    site_settings = SiteSettings.objects.first()
     context = {
-        'featured_notes': featured_notes, 'latest_notes': latest_notes,
-        'trending_blogs': trending_blogs, 'popular_downloads': popular_downloads,
-        'recent_quizzes': recent_quizzes,
+        'featured_notes': home_payload['featured_notes'],
+        'latest_notes': home_payload['latest_notes'],
+        'trending_blogs': home_payload['trending_blogs'],
+        'popular_downloads': home_payload['popular_downloads'],
+        'recent_quizzes': home_payload['recent_quizzes'],
         'daily_questions_json': json.dumps(daily_questions_data) if daily_questions_data else '',
-        'stats': {
-            'total_notes': total_notes,
-            'total_blogs': total_blogs,
-            'total_downloads': total_downloads,
-            'total_mcqs': total_mcqs,
-            'total_users': total_users,
-        },
+        'stats': home_payload['stats'],
         'site_settings': site_settings,
         'meta_title': 'Learning Platform - Your Gateway to Knowledge',
         'meta_description': 'Access free notes, practice MCQs, download study materials, and read educational blogs. No login required for MCQ practice!',

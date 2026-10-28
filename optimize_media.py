@@ -30,6 +30,9 @@ def run_optimizer():
     count = 0
 
     for root, _, files in os.walk(media_dir):
+        is_site_dir = 'site' in root.replace('\\', '/').split('/')
+        size_threshold = 8000 if is_site_dir else 80000
+
         for f in files:
             ext = os.path.splitext(f)[1].lower()
             if ext not in ('.jpg', '.jpeg', '.png'):
@@ -37,19 +40,23 @@ def run_optimizer():
             
             p = os.path.join(root, f)
             orig_size = os.path.getsize(p)
-            if orig_size < 100000:  # Skip already small files (< 100KB)
+            if orig_size < size_threshold:
                 continue
 
             try:
                 with Image.open(p) as im:
-                    # Scale down if abnormally large
-                    max_w, max_h = (400, 400) if 'site' in root else (1000, 1000)
+                    # Maximum dimensions: 120x120 for site logos/icons, 1000x1000 for content
+                    max_w, max_h = (120, 120) if is_site_dir else (1000, 1000)
                     im.thumbnail((max_w, max_h), Image.Resampling.LANCZOS)
 
                     if ext in ('.jpg', '.jpeg'):
                         im.save(p, 'JPEG', quality=82, optimize=True)
                     elif ext == '.png':
-                        if im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info):
+                        if is_site_dir or orig_size > 50000:
+                            # Use adaptive palette to compress PNGs significantly while preserving transparency
+                            im_opt = im.convert('P', palette=Image.Palette.ADAPTIVE)
+                            im_opt.save(p, 'PNG', optimize=True)
+                        elif im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info):
                             im.save(p, 'PNG', optimize=True)
                         else:
                             im = im.convert('RGB')
